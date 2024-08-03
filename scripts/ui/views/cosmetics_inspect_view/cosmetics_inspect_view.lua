@@ -1,0 +1,1345 @@
+local CosmeticsInspectViewSettings = require("scripts/ui/views/cosmetics_inspect_view/cosmetics_inspect_view_settings")
+local Definitions = require("scripts/ui/views/cosmetics_inspect_view/cosmetics_inspect_view_definitions")
+local ItemSlotSettings = require("scripts/settings/item/item_slot_settings")
+local ItemUtils = require("scripts/utilities/items")
+local MasterItems = require("scripts/backend/master_items")
+local Personalities = require("scripts/settings/character/personalities")
+local ScriptCamera = require("scripts/foundation/utilities/script_camera")
+local ScriptWorld = require("scripts/foundation/utilities/script_world")
+local UIFonts = require("scripts/managers/ui/ui_fonts")
+local UIProfileSpawner = require("scripts/managers/ui/ui_profile_spawner")
+local UIRenderer = require("scripts/managers/ui/ui_renderer")
+local UISettings = require("scripts/settings/ui/ui_settings")
+local UISoundEvents = require("scripts/settings/ui/ui_sound_events")
+local UIWidget = require("scripts/managers/ui/ui_widget")
+local UIWidgetGrid = require("scripts/ui/widget_logic/ui_widget_grid")
+local UIWorldSpawner = require("scripts/managers/ui/ui_world_spawner")
+local ViewElementInputLegend = require("scripts/ui/view_elements/view_element_input_legend/view_element_input_legend")
+local VoiceFxPresetSettings = require("scripts/settings/dialogue/voice_fx_preset_settings")
+local CosmeticsInspectView = class("CosmeticsInspectView", "BaseView")
+
+function CosmeticsInspectView:init(settings, context)
+	self._context = context
+	self._preview_player = context.preview_player or self:_player()
+	local is_in_debug = context.debug
+	local class_name = self.__class_name
+	self._unique_id = class_name .. "_" .. string.gsub(tostring(self), "table: ", "")
+
+	if context.bundle then
+		self._bundle_data = {
+			image = context.bundle.image,
+			title = context.bundle.title,
+			description = context.bundle.description,
+			type = context.bundle.type
+		}
+	end
+
+	if not is_in_debug then
+		local item = context.preview_item
+		item = item and (item.gear and MasterItems.create_preview_item_instance(item) or table.clone_instance(item))
+		self._preview_item = item
+		local use_store_appearance = context.use_store_appearance
+
+		if use_store_appearance then
+			self:_apply_store_appearance()
+		else
+			self:_apply_default_appearance()
+		end
+
+		self._disable_zoom = true
+
+		if self._preview_item then
+			self._initial_rotation = context.initial_rotation
+			self._disable_rotation_input = context.disable_rotation_input
+			self._animation_event_name_suffix = context.animation_event_name_suffix
+			self._animation_event_variable_data = context.animation_event_variable_data
+			self._disable_zoom = context.disable_zoom
+			local player = self:_player()
+			local profile = context.profile
+			local prefered_profile = profile or player and player:profile()
+			local prefered_gender = prefered_profile and prefered_profile.gender
+			local prefered_archetype = prefered_profile and prefered_profile.archetype.name
+			self._mannequin_profile = ItemUtils.create_mannequin_profile_by_item(item, prefered_gender, prefered_archetype)
+			local mannequin_profile_loadout = table.clone(self._mannequin_profile.loadout)
+			self._mannequin_profile.loadout = mannequin_profile_loadout
+			local slots = self._preview_item and self._preview_item.slots
+			local slot_name = context.slot_name or slots and slots[1]
+			self._selected_slot = slot_name and ItemSlotSettings[slot_name]
+
+			if not self._initial_rotation and slot_name == "slot_gear_extra_cosmetic" then
+				self._initial_rotation = math.pi
+			end
+
+			local items = item.items
+
+			if items then
+				for i = 1, #items do
+					self._mannequin_profile.loadout[items[i].slots[1]] = items[i]
+				end
+			else
+				self._mannequin_profile.loadout[slot_name] = item
+			end
+
+			local preview_with_gear = context.preview_with_gear
+
+			if preview_with_gear and profile then
+				self._preview_profile = profile
+				local gear_profile = table.clone_instance(profile)
+				gear_profile.character_id = "cosmetics_view_preview_character"
+				self._gear_profile = gear_profile
+
+				if items then
+					for i = 1, #items do
+						gear_profile.loadout[items[i].slots[1]] = items[i]
+					end
+				else
+					gear_profile.loadout[slot_name] = item
+				end
+			end
+
+			self._previewed_with_gear = false
+			self._presentation_profile = self._mannequin_profile
+			self._camera_zoomed_in = true
+
+			if item and item.item_type == "SET" then
+				self._camera_focus_slot_name = "slot_gear_upperbody"
+				self._camera_zoomed_in = false
+			end
+		end
+	end
+
+	CosmeticsInspectView.super.init(self, Definitions, settings, context)
+
+	self._pass_input = false
+	self._pass_draw = false
+	self._parent = context and context.parent
+end
+
+function CosmeticsInspectView:_setup_offscreen_gui()
+	local ui_manager = Managers.ui
+	local timer_name = "ui"
+	local parent = self
+	local view_name = parent.view_name
+	local world_layer = 103
+	local world_name = self._unique_id .. "_ui_offscreen_world"
+	self._description_world = ui_manager:create_world(world_name, world_layer, timer_name, view_name)
+	local viewport_name = self._unique_id .. "_ui_offscreen_world_viewport"
+	local viewport_type = "overlay_offscreen_2"
+	local viewport_layer = 1
+	self._description_viewport = ui_manager:create_viewport(self._description_world, viewport_name, viewport_type, viewport_layer)
+	self._description_viewport_name = viewport_name
+	self._ui_offscreen_renderer = ui_manager:create_renderer(self._unique_id .. "_ui_offscreen_renderer", self._description_world)
+end
+
+function CosmeticsInspectView:_destroy_offscreen_gui()
+	if self._ui_offscreen_renderer then
+		self._ui_offscreen_renderer = nil
+
+		Managers.ui:destroy_renderer(self._unique_id .. "_ui_offscreen_renderer")
+
+		local world = self._description_world
+		local viewport_name = self._description_viewport_name
+
+		ScriptWorld.destroy_viewport(world, viewport_name)
+		Managers.ui:destroy_world(world)
+
+		self._description_viewport_name = nil
+		self._description_world = nil
+	end
+end
+
+function CosmeticsInspectView:_apply_default_appearance()
+	local scenegraph_definition = Definitions.scenegraph_definition
+	scenegraph_definition.corner_top_left = {
+		vertical_alignment = "top",
+		parent = "screen",
+		horizontal_alignment = "left",
+		size = {
+			180,
+			310
+		},
+		position = {
+			0,
+			0,
+			62
+		}
+	}
+	scenegraph_definition.corner_top_right = {
+		vertical_alignment = "top",
+		parent = "screen",
+		horizontal_alignment = "right",
+		size = {
+			180,
+			310
+		},
+		position = {
+			0,
+			0,
+			62
+		}
+	}
+	scenegraph_definition.corner_bottom_left = {
+		vertical_alignment = "bottom",
+		parent = "screen",
+		horizontal_alignment = "left",
+		size = {
+			180,
+			120
+		},
+		position = {
+			0,
+			0,
+			62
+		}
+	}
+	scenegraph_definition.corner_bottom_right = {
+		vertical_alignment = "bottom",
+		parent = "screen",
+		horizontal_alignment = "right",
+		size = {
+			180,
+			120
+		},
+		position = {
+			0,
+			0,
+			62
+		}
+	}
+	scenegraph_definition.description_scrollbar = {
+		vertical_alignment = "top",
+		parent = "description_grid",
+		horizontal_alignment = "right",
+		size = {
+			10,
+			CosmeticsInspectViewSettings.grid_height - 40
+		},
+		position = {
+			30,
+			-20,
+			2
+		}
+	}
+	local widget_definitions = Definitions.widget_definitions
+	widget_definitions.corner_top_left = UIWidget.create_definition({
+		{
+			pass_type = "texture",
+			value = "content/ui/materials/frames/screen/metal_01_upper"
+		}
+	}, "corner_top_left")
+	widget_definitions.corner_top_right = UIWidget.create_definition({
+		{
+			value = "content/ui/materials/frames/screen/metal_01_upper",
+			pass_type = "texture_uv",
+			style = {
+				uvs = {
+					{
+						1,
+						0
+					},
+					{
+						0,
+						1
+					}
+				}
+			}
+		}
+	}, "corner_top_right")
+	widget_definitions.corner_bottom_left = UIWidget.create_definition({
+		{
+			pass_type = "texture",
+			value = "content/ui/materials/frames/screen/metal_01_lower"
+		}
+	}, "corner_bottom_left")
+	widget_definitions.corner_bottom_right = UIWidget.create_definition({
+		{
+			value = "content/ui/materials/frames/screen/metal_01_lower",
+			pass_type = "texture_uv",
+			style = {
+				uvs = {
+					{
+						1,
+						0
+					},
+					{
+						0,
+						1
+					}
+				}
+			}
+		}
+	}, "corner_bottom_right")
+	widget_definitions.description_background = UIWidget.create_definition({
+		{
+			value = "content/ui/materials/backgrounds/terminal_basic",
+			pass_type = "texture",
+			style = {
+				vertical_alignment = "center",
+				scale_to_material = true,
+				horizontal_alignment = "center",
+				color = Color.terminal_frame(255, true),
+				size_addition = {
+					20,
+					30
+				},
+				offset = {
+					0,
+					0,
+					0
+				}
+			}
+		},
+		{
+			value = "content/ui/materials/dividers/horizontal_frame_big_upper",
+			pass_type = "texture",
+			style = {
+				vertical_alignment = "top",
+				horizontal_alignment = "center",
+				offset = {
+					0,
+					-18,
+					3
+				},
+				size = {
+					nil,
+					36
+				}
+			}
+		},
+		{
+			value = "content/ui/materials/dividers/horizontal_frame_big_lower",
+			pass_type = "texture",
+			style = {
+				vertical_alignment = "bottom",
+				horizontal_alignment = "center",
+				offset = {
+					0,
+					18,
+					3
+				},
+				size = {
+					nil,
+					36
+				}
+			}
+		}
+	}, "left_side", {
+		visible = false
+	})
+end
+
+function CosmeticsInspectView:_apply_store_appearance()
+	local scenegraph_definition = Definitions.scenegraph_definition
+	scenegraph_definition.corner_top_left = {
+		vertical_alignment = "top",
+		parent = "screen",
+		horizontal_alignment = "left",
+		size = {
+			84,
+			224
+		},
+		position = {
+			0,
+			0,
+			62
+		}
+	}
+	scenegraph_definition.corner_top_right = {
+		vertical_alignment = "top",
+		parent = "screen",
+		horizontal_alignment = "right",
+		size = {
+			84,
+			224
+		},
+		position = {
+			0,
+			0,
+			62
+		}
+	}
+	scenegraph_definition.corner_bottom_left = {
+		vertical_alignment = "bottom",
+		parent = "screen",
+		horizontal_alignment = "left",
+		size = {
+			84,
+			224
+		},
+		position = {
+			0,
+			0,
+			62
+		}
+	}
+	scenegraph_definition.corner_bottom_right = {
+		vertical_alignment = "bottom",
+		parent = "screen",
+		horizontal_alignment = "right",
+		size = {
+			84,
+			224
+		},
+		position = {
+			0,
+			0,
+			62
+		}
+	}
+	scenegraph_definition.description_scrollbar = {
+		vertical_alignment = "top",
+		parent = "description_grid",
+		horizontal_alignment = "right",
+		size = {
+			10,
+			CosmeticsInspectViewSettings.grid_height - 80
+		},
+		position = {
+			30,
+			-20,
+			2
+		}
+	}
+	local widget_definitions = Definitions.widget_definitions
+	widget_definitions.corner_top_left = UIWidget.create_definition({
+		{
+			pass_type = "texture",
+			value = "content/ui/materials/frames/screen/premium_upper_left"
+		}
+	}, "corner_top_left")
+	widget_definitions.corner_top_right = UIWidget.create_definition({
+		{
+			value = "content/ui/materials/frames/screen/premium_upper_left",
+			pass_type = "texture_uv",
+			style = {
+				uvs = {
+					{
+						1,
+						0
+					},
+					{
+						0,
+						1
+					}
+				}
+			}
+		}
+	}, "corner_top_right")
+	widget_definitions.corner_bottom_left = UIWidget.create_definition({
+		{
+			pass_type = "texture",
+			value = "content/ui/materials/frames/screen/premium_lower_left"
+		}
+	}, "corner_bottom_left")
+	widget_definitions.corner_bottom_right = UIWidget.create_definition({
+		{
+			pass_type = "texture",
+			value = "content/ui/materials/frames/screen/premium_lower_right"
+		}
+	}, "corner_bottom_right")
+	widget_definitions.description_background = UIWidget.create_definition({
+		{
+			value = "content/ui/materials/backgrounds/terminal_basic",
+			pass_type = "texture",
+			style = {
+				vertical_alignment = "center",
+				scale_to_material = true,
+				horizontal_alignment = "center",
+				color = Color.terminal_frame(255, true),
+				size_addition = {
+					20,
+					30
+				},
+				offset = {
+					0,
+					0,
+					0
+				}
+			}
+		},
+		{
+			value = "content/ui/materials/frames/premium_store/details_upper",
+			pass_type = "texture",
+			style = {
+				vertical_alignment = "top",
+				horizontal_alignment = "center",
+				size_addition = {
+					52,
+					0
+				},
+				offset = {
+					0,
+					-60,
+					3
+				},
+				size = {
+					nil,
+					80
+				}
+			}
+		},
+		{
+			value = "content/ui/materials/frames/premium_store/details_lower_basic",
+			pass_type = "texture",
+			style = {
+				vertical_alignment = "bottom",
+				horizontal_alignment = "center",
+				size_addition = {
+					52,
+					0
+				},
+				offset = {
+					0,
+					34,
+					3
+				},
+				size = {
+					nil,
+					108
+				}
+			}
+		}
+	}, "left_side", {
+		visible = false
+	})
+end
+
+function CosmeticsInspectView:on_enter()
+	CosmeticsInspectView.super.on_enter(self)
+	self:_stop_previewing()
+	self:_setup_input_legend()
+	self:_setup_offscreen_gui()
+	self:_setup_background_world()
+	self:_start_preview_item()
+
+	local context = self._context
+	self._spawn_player = self._preview_item and context and not context.debug
+end
+
+function CosmeticsInspectView:_setup_input_legend()
+	local context = self._context
+	local use_store_appearance = context.use_store_appearance
+	self._input_legend_element = self:_add_element(ViewElementInputLegend, "input_legend", 50)
+	local legend_inputs = self._definitions.legend_inputs
+
+	for i = 1, #legend_inputs do
+		local legend_input = legend_inputs[i]
+		local valid = true
+
+		if legend_input.store_appearance_option and not use_store_appearance then
+			valid = false
+		end
+
+		if valid then
+			local on_pressed_callback = legend_input.on_pressed_callback and callback(self, legend_input.on_pressed_callback)
+
+			self._input_legend_element:add_entry(legend_input.display_name, legend_input.input_action, legend_input.visibility_function, on_pressed_callback, legend_input.alignment)
+		end
+	end
+end
+
+function CosmeticsInspectView:_can_preview()
+	local context = self._context
+
+	return context and context.preview_with_gear
+end
+
+function CosmeticsInspectView:_set_preview_widgets_visibility(visible)
+	local widgets_by_name = self._widgets_by_name
+end
+
+function CosmeticsInspectView:_stop_previewing()
+	if self._weapon_preview then
+		self._weapon_preview:stop_presenting()
+	end
+
+	if self._weapon_stats then
+		self._weapon_stats:stop_presenting()
+	end
+
+	local visible = false
+
+	self:_set_preview_widgets_visibility(visible)
+
+	if self._context.prop_item then
+		local item_slot = self._context.prop_item.slots[1]
+		local presentation_profile = self._presentation_profile
+		local presentation_loadout = presentation_profile.loadout
+		presentation_loadout[item_slot] = nil
+	end
+end
+
+function CosmeticsInspectView:_spawn_profile(profile, initial_rotation, disable_rotation_input)
+	if self._profile_spawner then
+		self._profile_spawner:destroy()
+
+		self._profile_spawner = nil
+	end
+
+	local world = self._world_spawner:world()
+	local camera = self._world_spawner:camera()
+	local unit_spawner = self._world_spawner:unit_spawner()
+	self._profile_spawner = UIProfileSpawner:new("CosmeticsInspectView", world, camera, unit_spawner)
+
+	if disable_rotation_input then
+		self._profile_spawner:disable_rotation_input()
+	end
+
+	local camera_position = ScriptCamera.position(camera)
+	local spawn_position = Unit.world_position(self._spawn_point_unit, 1)
+	local spawn_rotation = Unit.world_rotation(self._spawn_point_unit, 1)
+
+	if initial_rotation then
+		local character_initial_rotation = Quaternion.axis_angle(Vector3(0, 0, 1), initial_rotation)
+		spawn_rotation = Quaternion.multiply(character_initial_rotation, spawn_rotation)
+	end
+
+	camera_position.z = 0
+
+	self._profile_spawner:spawn_profile(profile, spawn_position, spawn_rotation)
+
+	local selected_archetype = profile.archetype
+	local archetype_name = selected_archetype.name
+	local animation_duration = 0.01
+	local world_spawner = self._world_spawner
+
+	if archetype_name == "ogryn" then
+		world_spawner:set_camera_position_axis_offset("x", -0.5, animation_duration, math.easeOutCubic)
+		world_spawner:set_camera_position_axis_offset("y", -1.5, animation_duration, math.easeOutCubic)
+		world_spawner:set_camera_position_axis_offset("z", 0.5, animation_duration, math.easeOutCubic)
+	else
+		world_spawner:set_camera_position_axis_offset("x", 0, animation_duration, math.easeOutCubic)
+		world_spawner:set_camera_position_axis_offset("y", 0, animation_duration, math.easeOutCubic)
+		world_spawner:set_camera_position_axis_offset("z", 0, animation_duration, math.easeOutCubic)
+	end
+
+	self._spawned_profile = profile
+end
+
+local ANIMATION_SLOTS_MAP = {
+	slot_animation_emote_3 = true,
+	slot_animation_end_of_round = true,
+	slot_animation_emote_4 = true,
+	slot_animation_emote_5 = true,
+	slot_animation_emote_1 = true,
+	slot_animation_emote_2 = true
+}
+
+function CosmeticsInspectView:_setup_item_description(description_text, restriction_text, property_text)
+	local widgets_by_name = self._widgets_by_name
+	local description_background = widgets_by_name.description_background
+	description_background.content.visible = false
+
+	self:_destroy_description_grid()
+
+	local any_text = description_text or restriction_text or property_text
+
+	if not any_text then
+		return
+	end
+
+	local widgets = {}
+	local alignment_widgets = {}
+	local scenegraph_id = "description_content_pivot"
+	local max_width = self._ui_scenegraph.description_grid.size[1]
+
+	local function _add_text_widget(pass_template, text)
+		local widget_definition = UIWidget.create_definition(pass_template, scenegraph_id, nil, {
+			max_width,
+			0
+		})
+		local widget = self:_create_widget(string.format("description_grid_widget_%d", #widgets), widget_definition)
+		widget.content.text = text
+		local widget_text_style = widget.style.text
+		local text_options = UIFonts.get_font_options_by_style(widget.style.text)
+		local _, text_height = self:_text_size(text, widget_text_style.font_type, widget_text_style.font_size, {
+			max_width,
+			math.huge
+		}, text_options)
+		widget.content.size[2] = text_height
+		widgets[#widgets + 1] = widget
+		alignment_widgets[#alignment_widgets + 1] = widget
+	end
+
+	local function _add_spacing(height)
+		widgets[#widgets + 1] = nil
+		alignment_widgets[#alignment_widgets + 1] = {
+			size = {
+				max_width,
+				height
+			}
+		}
+	end
+
+	local desired_spacing = 50
+
+	if description_text then
+		if #widgets > 0 then
+			_add_spacing(desired_spacing)
+		end
+
+		_add_text_widget(Definitions.text_description_pass_template, description_text)
+
+		desired_spacing = 80
+	end
+
+	if property_text then
+		if #widgets > 0 then
+			_add_spacing(desired_spacing)
+		end
+
+		_add_text_widget(Definitions.item_sub_title_pass, Utf8.upper(Localize("loc_item_property_header")))
+		_add_spacing(10)
+		_add_text_widget(Definitions.item_text_pass, property_text)
+
+		desired_spacing = 50
+	end
+
+	if restriction_text then
+		if #widgets > 0 then
+			_add_spacing(desired_spacing)
+		end
+
+		_add_text_widget(Definitions.item_sub_title_pass, Utf8.upper(Localize("loc_item_equippable_on_header")))
+		_add_spacing(10)
+		_add_text_widget(Definitions.item_text_pass, restriction_text)
+
+		desired_spacing = 50
+	end
+
+	self._description_grid_widgets = widgets
+	self._description_grid_alignment_widgets = alignment_widgets
+	local grid_scenegraph_id = "description_grid"
+	local grid_pivot_scenegraph_id = "description_content_pivot"
+	local grid_spacing = {
+		0,
+		0
+	}
+	local grid_direction = "down"
+	local use_is_focused_for_navigation = true
+	local grid = UIWidgetGrid:new(self._description_grid_widgets, self._description_grid_alignment_widgets, self._ui_scenegraph, grid_scenegraph_id, grid_direction, grid_spacing, nil, use_is_focused_for_navigation)
+	self._description_grid = grid
+	local scrollbar_widget = widgets_by_name.description_scrollbar
+
+	grid:assign_scrollbar(scrollbar_widget, grid_pivot_scenegraph_id, grid_scenegraph_id)
+	grid:set_scrollbar_progress(0)
+	grid:set_scroll_step_length(100)
+
+	description_background.content.visible = true
+end
+
+function CosmeticsInspectView:_destroy_description_grid()
+	if self._description_grid then
+		for i = 1, #self._description_grid_widgets do
+			local widget = self._description_grid_widgets[i]
+
+			self:_unregister_widget_name(widget.name)
+		end
+
+		self._description_grid = nil
+		self._description_grid_widgets = nil
+		self._description_grid_alignment_widgets = nil
+	end
+end
+
+function CosmeticsInspectView:_start_preview_item()
+	local item = self._preview_item
+
+	self:_stop_previewing()
+
+	if item then
+		local item_display_name = item.display_name
+
+		if string.match(item_display_name, "unarmed") then
+			return
+		end
+
+		local item_name = item.name
+		local selected_slot = self._selected_slot
+		local selected_slot_name = selected_slot and selected_slot.name
+		local presentation_profile = self._presentation_profile
+		local presentation_loadout = presentation_profile.loadout
+
+		if selected_slot_name then
+			presentation_loadout[selected_slot_name] = item
+		end
+
+		local animation_slot = ANIMATION_SLOTS_MAP[selected_slot_name]
+
+		if animation_slot then
+			local context = self._context
+			local state_machine = item.state_machine
+			local item_animation_event = item.animation_event
+			local item_face_animation_event = item.face_animation_event
+			local animation_event_name_suffix = self._animation_event_name_suffix
+			self._disable_zoom = context.disable_zoom or true
+			context.state_machine = context.state_machine or item.state_machine
+			context.animation_event = context.animation_event or item_animation_event
+			context.face_animation_event = self._previewed_with_gear and (context.face_animation_event or item_face_animation_event) or nil
+			local animation_event = item_animation_event
+
+			if animation_event_name_suffix then
+				animation_event = animation_event .. animation_event_name_suffix
+			end
+
+			if self._profile_spawner then
+				self._profile_spawner:assign_state_machine(context.state_machine, context.item_animation_event, context.item_face_animation_event)
+			end
+
+			local animation_event_variable_data = self._animation_event_variable_data
+
+			if animation_event_variable_data and self._profile_spawner then
+				local index = animation_event_variable_data.index
+				local value = animation_event_variable_data.value
+
+				if self._profile_spawner then
+					self._profile_spawner:assign_animation_variable(index, value)
+				end
+			end
+
+			local prop_item_key = item.prop_item
+			local prop_item = prop_item_key and prop_item_key ~= "" and MasterItems.get_item(prop_item_key)
+			context.prop_item = context.prop_item or prop_item
+
+			if context.prop_item then
+				local prop_item_slot = context.prop_item.slots[1]
+				presentation_loadout[prop_item_slot] = context.prop_item
+
+				if self._profile_spawner then
+					self._profile_spawner:wield_slot(prop_item_slot)
+				end
+			end
+		end
+
+		self:_set_preview_widgets_visibility(true)
+
+		local property_text = ItemUtils.item_property_text(item, true)
+		local restriction_text, present_restriction_text = ItemUtils.restriction_text(item)
+
+		if not present_restriction_text then
+			restriction_text = nil
+		end
+
+		local description = item.description and Localize(item.description)
+
+		self:_setup_item_description(description, restriction_text, property_text)
+		self:_setup_title(item)
+	elseif self._bundle_data then
+		local description = self._bundle_data.description or ""
+
+		self:_setup_item_description(description)
+
+		local texture_data = self._bundle_data.image
+
+		if texture_data then
+			local url = texture_data.url
+			self._image_url = url
+
+			Managers.url_loader:load_texture(url)
+
+			self._widgets_by_name.bundle_background.style.bundle.material_values.texture_map = texture_data.texture
+		end
+
+		local title_item_data = {
+			item_type = Localize(UISettings.item_type_localization_lookup[Utf8.upper(self._bundle_data.type)]),
+			display_name = self._bundle_data.title
+		}
+
+		self:_setup_title(title_item_data, true)
+		self:_set_preview_widgets_visibility(true)
+	end
+end
+
+function CosmeticsInspectView:_setup_title(item, ignore_localization)
+	self._widgets_by_name.title.content.text = ignore_localization and item.display_name or Localize(item.display_name) or ""
+	local item_type = ignore_localization and item.item_type or ItemUtils.type_display_name(item)
+	local sub_text = item_type
+
+	if item.rarity then
+		local rarity_color, rarity_color_dark = ItemUtils.rarity_color(item)
+		local rarity_display_name = ItemUtils.rarity_display_name(item)
+		sub_text = string.format("{#color(%d, %d, %d)}%s{#reset()} • %s", rarity_color[2], rarity_color[3], rarity_color[4], rarity_display_name, item_type)
+	end
+
+	self._widgets_by_name.title.content.sub_text = sub_text
+	local title_style = self._widgets_by_name.title.style.text
+	local sub_title_style = self._widgets_by_name.title.style.sub_text
+	local title_options = UIFonts.get_font_options_by_style(title_style)
+	local sub_title_options = UIFonts.get_font_options_by_style(sub_title_style)
+	local max_width = self._ui_scenegraph.title.size[1]
+
+	if self._context.use_store_appearance then
+		title_style.material = "content/ui/materials/font_gradients/slug_font_gradient_gold"
+	else
+		title_style.material = "content/ui/materials/font_gradients/slug_font_gradient_header"
+	end
+
+	local title_width, title_height = self:_text_size(self._widgets_by_name.title.content.text, title_style.font_type, title_style.font_size, {
+		max_width,
+		math.huge
+	}, title_options)
+	local sub_title_width, sub_title_height = self:_text_size(self._widgets_by_name.title.content.sub_text, sub_title_style.font_type, sub_title_style.font_size, {
+		max_width,
+		math.huge
+	}, sub_title_options)
+	local sub_title_margin = 10
+	sub_title_style.offset[2] = sub_title_margin + title_height
+	local title_total_size = sub_title_style.offset[2] + sub_title_height + self._widgets_by_name.title.style.divider.size[2] + sub_title_margin
+	local title_scenegraph_position = self._ui_scenegraph.title.position
+	local margin = 15
+	local max_height = self._ui_scenegraph.left_side.size[2] - 40
+	local grid_height = max_height - (title_scenegraph_position[2] + title_total_size + margin)
+
+	self:_set_scenegraph_size("title", nil, title_total_size)
+
+	grid_height = grid_height - margin
+	local mask_oversize = 10
+	local start_description_position = title_scenegraph_position[2] + title_total_size + margin
+
+	self:_set_scenegraph_position("description_grid", nil, start_description_position)
+	self:_set_scenegraph_size("description_grid", nil, grid_height)
+	self:_set_scenegraph_size("description_mask", nil, grid_height + mask_oversize)
+	self:_set_scenegraph_size("description_scrollbar", nil, grid_height)
+end
+
+function CosmeticsInspectView:_generate_mannequin_loadout(profile, item)
+	local presentation_profile = profile
+	local loadout = profile.loadout
+	local gender_name = presentation_profile.gender
+	local archetype = presentation_profile.archetype
+	local breed_name = archetype.breed
+	local new_loadout = {}
+	local slots = item and item.slots
+	local first_slot_name = slots and slots[1]
+
+	for i = 1, #slots do
+		local required_item_slot_name = slots[i]
+		loadout[required_item_slot_name] = item
+	end
+
+	local required_breed_item_names_per_slot = UISettings.item_preview_required_slot_items_per_slot_by_breed_and_gender[breed_name]
+	local required_gender_item_names_per_slot = required_breed_item_names_per_slot and required_breed_item_names_per_slot[gender_name]
+
+	if required_gender_item_names_per_slot then
+		local required_items = required_gender_item_names_per_slot[first_slot_name]
+
+		if required_items then
+			for required_item_slot_name, slot_item_name in pairs(required_items) do
+				local item_definition = MasterItems.get_item(slot_item_name)
+
+				if item_definition then
+					local slot_item = table.clone(item_definition)
+					self._mannequin_loadout[required_item_slot_name] = slot_item
+				end
+			end
+		end
+	end
+
+	return new_loadout
+end
+
+function CosmeticsInspectView:cb_on_weapon_swap_pressed()
+	local wield_slot = self._wielded_slot
+	wield_slot = wield_slot == "slot_primary" and "slot_secondary" or "slot_primary"
+
+	self:_play_sound(UISoundEvents.weapons_swap)
+
+	self._wielded_slot = wield_slot
+
+	self:_update_presentation_wield_item()
+end
+
+function CosmeticsInspectView:_has_wielded_slot()
+	return self._wielded_slot ~= nil
+end
+
+function CosmeticsInspectView:_can_swap_weapon()
+	return false
+end
+
+function CosmeticsInspectView:_update_presentation_wield_item()
+	if not self._profile_spawner then
+		return
+	end
+
+	local wield_slot = self._wielded_slot
+	local presentation_profile = self._presentation_profile
+	local loadout = presentation_profile.loadout
+	local slot_item = loadout[wield_slot]
+
+	self._profile_spawner:wield_slot(wield_slot)
+
+	local item_inventory_animation_event = slot_item and slot_item.inventory_animation_event or "inventory_idle_default"
+
+	if item_inventory_animation_event then
+		self._profile_spawner:assign_animation_event(item_inventory_animation_event)
+	end
+end
+
+function CosmeticsInspectView:cb_on_preview_with_gear_toggled(id, input_pressed, instant)
+	self._previewed_with_gear = not self._previewed_with_gear
+	self._presentation_profile = self._previewed_with_gear and self._gear_profile or self._mannequin_profile
+	self._spawn_player = true
+
+	self:_play_sound(UISoundEvents.cosmetics_vendor_show_with_gear)
+end
+
+function CosmeticsInspectView:cb_on_camera_zoom_toggled(id, input_pressed, instant)
+	self._camera_zoomed_in = not self._camera_zoomed_in
+
+	if self._camera_zoomed_in then
+		self:_play_sound(UISoundEvents.apparel_zoom_in)
+	else
+		self:_play_sound(UISoundEvents.apparel_zoom_out)
+	end
+
+	self:_trigger_zoom_logic(instant, self._camera_focus_slot_name)
+end
+
+function CosmeticsInspectView:_stop_current_voice()
+	local ui_world = Managers.ui:world()
+	local wwise_world = Managers.world:wwise_world(ui_world)
+
+	if not wwise_world then
+		return
+	end
+
+	local current_event = self._sound_event_id
+
+	if not current_event then
+		return
+	end
+
+	if not WwiseWorld.is_playing(wwise_world, current_event) then
+		return
+	end
+
+	WwiseWorld.stop_event(wwise_world, current_event)
+
+	self._sound_event_id = nil
+end
+
+function CosmeticsInspectView:cb_preview_voice()
+	local voice_fx_preset_key = table.nested_get(self, "_preview_item", "voice_fx_preset")
+	local voice_fx_preset_rtcp = VoiceFxPresetSettings[voice_fx_preset_key]
+
+	if not voice_fx_preset_key then
+		return
+	end
+
+	local personality_key = table.nested_get(self, "_preview_profile", "lore", "backstory", "personality")
+	local personality_settings = Personalities[personality_key]
+	local sound_event = personality_settings and personality_settings.preview_sound_event
+
+	if not sound_event then
+		return
+	end
+
+	local ui_world = Managers.ui:world()
+	local wwise_world = Managers.world:wwise_world(ui_world)
+
+	if not wwise_world then
+		return
+	end
+
+	self:_stop_current_voice()
+
+	local source = WwiseWorld.make_auto_source(wwise_world, Vector3.zero())
+
+	WwiseWorld.set_source_parameter(wwise_world, source, "voice_fx_preset", voice_fx_preset_rtcp)
+
+	self._sound_event_id = WwiseWorld.trigger_resource_event(wwise_world, sound_event, source)
+end
+
+function CosmeticsInspectView:_can_preview_voice()
+	local has_profile = self._preview_profile and self._previewed_with_gear
+	local has_voice_fx = self._preview_item and self._preview_item.voice_fx_preset ~= nil
+
+	return has_profile and has_voice_fx
+end
+
+function CosmeticsInspectView:_can_zoom()
+	return not self._disable_zoom
+end
+
+function CosmeticsInspectView:_trigger_zoom_logic(instant, optional_slot_name)
+	local selected_slot = self._selected_slot
+	local selected_slot_name = optional_slot_name or selected_slot and selected_slot.name
+	local func_ptr = math.easeCubic
+	local world_spawner = self._world_spawner
+	local duration = instant and 0 or 1
+
+	if self._camera_zoomed_in then
+		self:_set_camera_item_slot_focus(selected_slot_name, duration, func_ptr)
+	else
+		world_spawner:set_camera_position_axis_offset("x", 0, duration, func_ptr)
+		world_spawner:set_camera_position_axis_offset("y", 0, duration, func_ptr)
+		world_spawner:set_camera_position_axis_offset("z", 0, duration, func_ptr)
+		world_spawner:set_camera_rotation_axis_offset("x", 0, duration, func_ptr)
+		world_spawner:set_camera_rotation_axis_offset("y", 0, duration, func_ptr)
+		world_spawner:set_camera_rotation_axis_offset("z", 0, duration, func_ptr)
+	end
+end
+
+function CosmeticsInspectView:on_exit()
+	self:_stop_current_voice()
+
+	if self._world_spawner then
+		self._world_spawner:set_camera_blur(0, 0)
+	end
+
+	if self._profile_spawner then
+		self._profile_spawner:destroy()
+
+		self._profile_spawner = nil
+	end
+
+	if self._world_spawner then
+		self._world_spawner:destroy()
+
+		self._world_spawner = nil
+	end
+
+	self:_destroy_offscreen_gui()
+
+	local image_url = self._image_url
+
+	if image_url then
+		Managers.url_loader:unload_texture(image_url)
+	end
+
+	CosmeticsInspectView.super.on_exit(self)
+end
+
+function CosmeticsInspectView:_handle_back_pressed()
+	local view_name = "cosmetics_inspect_view"
+
+	Managers.ui:close_view(view_name)
+end
+
+function CosmeticsInspectView:cb_on_close_pressed()
+	self:_handle_back_pressed()
+end
+
+function CosmeticsInspectView:update(dt, t, input_service)
+	if self._spawn_player and self._spawn_point_unit and self._default_camera_unit then
+		local context = self._context
+		local profile = self._presentation_profile
+		local initial_rotation = self._initial_rotation
+		local disable_rotation_input = self._disable_rotation_input
+
+		self:_spawn_profile(profile, initial_rotation, disable_rotation_input)
+
+		self._spawn_player = false
+		local selected_slot = self._selected_slot
+		local selected_slot_name = selected_slot and selected_slot.name
+
+		self:_trigger_zoom_logic(true, self._camera_focus_slot_name or selected_slot_name)
+
+		local wield_slot = context.prop_item and context.prop_item.slots and context.prop_item.slots[1] or context.wield_slot
+
+		if wield_slot then
+			self._wielded_slot = wield_slot
+
+			if context.prop_item then
+				profile.loadout[wield_slot] = context.prop_item
+			end
+
+			self._profile_spawner:wield_slot(wield_slot)
+		end
+
+		local state_machine = context.state_machine
+
+		if state_machine then
+			local animation_event = context.animation_event
+			local face_animation_event = context.face_animation_event
+
+			self._profile_spawner:assign_state_machine(state_machine, animation_event, face_animation_event)
+		end
+
+		local animation_event_variable_data = self._animation_event_variable_data
+
+		if animation_event_variable_data and self._profile_spawner then
+			local index = animation_event_variable_data.index
+			local value = animation_event_variable_data.value
+
+			self._profile_spawner:assign_animation_variable(index, value)
+		end
+	end
+
+	local profile_spawner = self._profile_spawner
+
+	if profile_spawner then
+		profile_spawner:update(dt, t, input_service)
+	end
+
+	local world_spawner = self._world_spawner
+
+	if world_spawner then
+		world_spawner:update(dt, t)
+	end
+
+	return CosmeticsInspectView.super.update(self, dt, t, input_service)
+end
+
+function CosmeticsInspectView:_draw_description_grid(dt, t, input_service)
+	local description_grid = self._description_grid
+
+	if not description_grid then
+		return
+	end
+
+	local widgets = self._description_grid_widgets
+	local render_settings = self._render_settings
+	local ui_renderer = self._ui_offscreen_renderer
+	local ui_scenegraph = self._ui_scenegraph
+
+	self._description_grid:update(dt, t, input_service)
+	UIRenderer.begin_pass(ui_renderer, ui_scenegraph, input_service, dt, render_settings)
+
+	for i = 1, #widgets do
+		local widget = widgets[i]
+
+		if description_grid:is_widget_visible(widget) then
+			UIWidget.draw(widget, ui_renderer)
+		end
+	end
+
+	UIRenderer.end_pass(ui_renderer)
+end
+
+function CosmeticsInspectView:draw(dt, t, input_service, layer)
+	self:_draw_description_grid(dt, t, input_service)
+	CosmeticsInspectView.super.draw(self, dt, t, input_service, layer)
+end
+
+function CosmeticsInspectView:_get_weapon_spawn_position_normalized()
+	self:_force_update_scenegraph()
+
+	local scale = nil
+	local pivot_world_position = self:_scenegraph_world_position("weapon_pivot", scale)
+	local parent_world_position = self:_scenegraph_world_position("weapon_viewport", scale)
+	local viewport_width, viewport_height = self:_scenegraph_size("weapon_viewport", scale)
+	local scale_x = (pivot_world_position[1] - parent_world_position[1]) / viewport_width
+	local scale_y = 1 - (pivot_world_position[2] - parent_world_position[2]) / viewport_height
+
+	return scale_x, scale_y
+end
+
+function CosmeticsInspectView:on_resolution_modified(scale)
+	CosmeticsInspectView.super.on_resolution_modified(self, scale)
+end
+
+function CosmeticsInspectView:_setup_background_world()
+	local profile = self._preview_profile or self._mannequin_profile
+	local archetype = profile and profile.archetype
+	local breed_name = profile and archetype.breed or "human"
+	local default_camera_event_id = "event_register_cosmetics_preview_default_camera_" .. breed_name
+
+	self[default_camera_event_id] = function (instance, camera_unit)
+		if instance._context then
+			instance._context.camera_unit = camera_unit
+		end
+
+		instance._default_camera_unit = camera_unit
+		local viewport_name = CosmeticsInspectViewSettings.viewport_name
+		local viewport_type = CosmeticsInspectViewSettings.viewport_type
+		local viewport_layer = CosmeticsInspectViewSettings.viewport_layer
+		local shading_environment = CosmeticsInspectViewSettings.shading_environment
+
+		instance._world_spawner:create_viewport(camera_unit, viewport_name, viewport_type, viewport_layer, shading_environment)
+		instance:_unregister_event(default_camera_event_id)
+	end
+
+	self:_register_event(default_camera_event_id)
+
+	self._item_camera_by_slot_id = {}
+
+	for slot_name, slot in pairs(ItemSlotSettings) do
+		if slot.slot_type == "gear" then
+			local item_camera_event_id = "event_register_cosmetics_preview_item_camera_" .. breed_name .. "_" .. slot_name
+
+			self[item_camera_event_id] = function (instance, camera_unit)
+				instance._item_camera_by_slot_id[slot_name] = camera_unit
+
+				instance:_unregister_event(item_camera_event_id)
+			end
+
+			self:_register_event(item_camera_event_id)
+		end
+	end
+
+	self:_register_event("event_register_cosmetics_preview_character_spawn_point")
+
+	local world_name = CosmeticsInspectViewSettings.world_name
+	local world_layer = CosmeticsInspectViewSettings.world_layer
+	local world_timer_name = CosmeticsInspectViewSettings.timer_name
+	self._world_spawner = UIWorldSpawner:new(world_name, world_layer, world_timer_name, self.view_name)
+	local level_name = CosmeticsInspectViewSettings.level_name
+
+	self._world_spawner:spawn_level(level_name)
+end
+
+function CosmeticsInspectView:world_spawner()
+	return self._world_spawner
+end
+
+function CosmeticsInspectView:spawn_point_unit()
+	return self._spawn_point_unit
+end
+
+function CosmeticsInspectView:event_register_cosmetics_preview_character_spawn_point(spawn_point_unit)
+	self:_unregister_event("event_register_cosmetics_preview_character_spawn_point")
+
+	self._spawn_point_unit = spawn_point_unit
+
+	if self._context then
+		self._context.spawn_point_unit = spawn_point_unit
+	end
+end
+
+function CosmeticsInspectView:_set_camera_item_slot_focus(slot_name, time, func_ptr)
+	local world_spawner = self._world_spawner
+	local slot_camera = self._item_camera_by_slot_id[slot_name] or self._default_camera_unit
+	local camera_world_position = Unit.world_position(slot_camera, 1)
+	local camera_world_rotation = Unit.world_rotation(slot_camera, 1)
+	local boxed_camera_start_position = world_spawner:boxed_camera_start_position()
+	local default_camera_world_position = Vector3.from_array(boxed_camera_start_position)
+
+	world_spawner:set_camera_position_axis_offset("x", camera_world_position.x - default_camera_world_position.x, time, func_ptr)
+	world_spawner:set_camera_position_axis_offset("y", camera_world_position.y - default_camera_world_position.y, time, func_ptr)
+	world_spawner:set_camera_position_axis_offset("z", camera_world_position.z - default_camera_world_position.z, time, func_ptr)
+
+	local boxed_camera_start_rotation = world_spawner:boxed_camera_start_rotation()
+	local default_camera_world_rotation = boxed_camera_start_rotation:unbox()
+	local default_camera_world_rotation_x, default_camera_world_rotation_y, default_camera_world_rotation_z = Quaternion.to_euler_angles_xyz(default_camera_world_rotation)
+	local camera_world_rotation_x, camera_world_rotation_y, camera_world_rotation_z = Quaternion.to_euler_angles_xyz(camera_world_rotation)
+
+	world_spawner:set_camera_rotation_axis_offset("x", camera_world_rotation_x - default_camera_world_rotation_x, time, func_ptr)
+	world_spawner:set_camera_rotation_axis_offset("y", camera_world_rotation_y - default_camera_world_rotation_y, time, func_ptr)
+	world_spawner:set_camera_rotation_axis_offset("z", camera_world_rotation_z - default_camera_world_rotation_z, time, func_ptr)
+end
+
+function CosmeticsInspectView:_set_camera_node_focus(node_name, time, func_ptr)
+	if node_name then
+		local profile_spawner = self._profile_spawner
+		local world_spawner = self._world_spawner
+		local base_world_position = profile_spawner:node_world_position(1)
+		local node_world_position = profile_spawner:node_world_position(node_name)
+		local target_position = node_world_position - base_world_position
+
+		world_spawner:set_camera_position_axis_offset("x", target_position.x, time, func_ptr)
+		world_spawner:set_camera_position_axis_offset("y", target_position.y, time, func_ptr)
+		world_spawner:set_camera_position_axis_offset("z", target_position.z, time, func_ptr)
+	end
+end
+
+function CosmeticsInspectView:_set_camera_position_axis_offset(axis, value, animation_time, func_ptr)
+	self._world_spawner:set_camera_position_axis_offset(axis, value, animation_time, func_ptr)
+end
+
+function CosmeticsInspectView:_set_camera_rotation_axis_offset(axis, value, animation_time, func_ptr)
+	self._world_spawner:set_camera_rotation_axis_offset(axis, value, animation_time, func_ptr)
+end
+
+return CosmeticsInspectView

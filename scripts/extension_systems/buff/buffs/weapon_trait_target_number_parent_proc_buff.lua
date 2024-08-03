@@ -1,0 +1,83 @@
+require("scripts/extension_systems/buff/buffs/proc_buff")
+
+local WeaponTraitTargetNumberParentProcBuff = class("WeaponTraitTargetNumberParentProcBuff", "WeaponTraitParentProcBuff")
+
+function WeaponTraitTargetNumberParentProcBuff:init(context, template, start_time, instance_id, ...)
+	WeaponTraitTargetNumberParentProcBuff.super.init(self, context, template, start_time, instance_id, ...)
+
+	self._active = false
+	self._last_proc_time = 0
+end
+
+function WeaponTraitTargetNumberParentProcBuff:update(dt, t, ...)
+	WeaponTraitTargetNumberParentProcBuff.super.super.update(self, dt, t, ...)
+
+	local template = self._template
+
+	if self._is_server then
+		self:update_number_of_children(t)
+
+		local template_override_data = self._template_override_data
+		local duration = template_override_data and template_override_data.child_duration or template.child_duration
+		local num_child_stacks = self._num_child_stacks
+		local start_t = self._template_data.last_hit_time
+
+		if num_child_stacks > 1 and duration and start_t ~= 0 then
+			local remove_t = start_t + duration
+
+			if t > remove_t then
+				local template_data = self._template_data
+				template_data.attacked_unit = nil
+				template_data.number_of_hits = 0
+				template_data.target_number_of_stacks = 0
+				local num_stacks_to_remove = num_child_stacks - 1
+
+				self:_remove_child_buff_stack(t, num_stacks_to_remove)
+
+				self._duration_progress = 0
+			else
+				local time_until_remove = remove_t - t
+				local remove_progress = time_until_remove / duration
+				self._duration_progress = 1 - remove_progress
+			end
+		end
+	end
+end
+
+function WeaponTraitTargetNumberParentProcBuff:update_proc_events(t, proc_events, num_proc_events, portable_random, local_portable_random)
+	local activated_proc, procced_proc_events = WeaponTraitTargetNumberParentProcBuff.super.super.update_proc_events(self, t, proc_events, num_proc_events, portable_random, local_portable_random)
+
+	self:update_number_of_children(t)
+
+	return activated_proc, procced_proc_events
+end
+
+function WeaponTraitTargetNumberParentProcBuff:update_number_of_children(t)
+	local target_number_of_child_buffs = 1 + (self._template_data.target_number_of_stacks or 0)
+	local current_num_child_stacks = self._num_child_stacks
+
+	if current_num_child_stacks < target_number_of_child_buffs then
+		local num_stacks_to_add = target_number_of_child_buffs - current_num_child_stacks
+
+		self:_add_child_buff_stack(t, num_stacks_to_add)
+
+		self._duration_progress = 0
+		self._last_proc_time = self._template_data.last_hit_time or 0
+	elseif target_number_of_child_buffs < current_num_child_stacks then
+		local num_stacks_to_remove = current_num_child_stacks - target_number_of_child_buffs
+
+		self:_remove_child_buff_stack(t, num_stacks_to_remove)
+
+		self._duration_progress = 0
+	elseif self._last_proc_time then
+		local last_proc_time = self._template_data.last_hit_time or 0
+
+		if self._last_proc_time < last_proc_time then
+			self._last_proc_time = last_proc_time
+
+			self:set_start_time(last_proc_time)
+		end
+	end
+end
+
+return WeaponTraitTargetNumberParentProcBuff
