@@ -37,7 +37,11 @@ local action_data = {
 		disappear_timings = {
 			foff = 0.9333333333333333
 		},
-		explosion_template = ExplosionTemplates.twin_disappear_explosion
+		explosion_template = ExplosionTemplates.twin_disappear_explosion,
+		vo_event = {
+			trigger_id = "cult_retreat_a",
+			voice_profile = "captain_twin_female_a"
+		}
 	},
 	disappear_instant = {
 		explode_position_node = "j_spine",
@@ -543,6 +547,7 @@ local action_data = {
 		dash_speed = 25,
 		push_minions_radius = 3,
 		power_level = 150,
+		vo_event = "cult_switch_focus_a",
 		push_minions_power_level = 150,
 		considerations = UtilityConsiderations.twin_captain_dash,
 		dash_anim_events = {
@@ -576,6 +581,7 @@ local action_data = {
 		dash_speed = 25,
 		push_minions_radius = 3,
 		power_level = 150,
+		vo_event = "cult_switch_focus_a",
 		push_minions_power_level = 150,
 		considerations = UtilityConsiderations.twin_captain_dash,
 		dash_anim_events = {

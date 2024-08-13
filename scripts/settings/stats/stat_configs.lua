@@ -23,6 +23,9 @@ local StatConfigs = {
 		},
 		is_hub = {
 			default = false
+		},
+		live_event = {
+			default = "none"
 		}
 	},
 	user = {

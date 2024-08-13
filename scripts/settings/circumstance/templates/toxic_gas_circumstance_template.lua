@@ -1,62 +1,4 @@
-local mission_overrides = {
-	pickup_settings = {
-		rubberband_pool = {
-			wounds = {
-				syringe_corruption_pocketable = {
-					10,
-					10,
-					10,
-					10,
-					10
-				}
-			}
-		},
-		mid_event = {
-			wounds = {
-				syringe_corruption_pocketable = {
-					1,
-					1,
-					1,
-					1,
-					1
-				}
-			}
-		},
-		end_event = {
-			wounds = {
-				syringe_corruption_pocketable = {
-					1,
-					1,
-					1,
-					1,
-					1
-				}
-			}
-		},
-		primary = {
-			wounds = {
-				syringe_corruption_pocketable = {
-					10,
-					10,
-					10,
-					10,
-					10
-				}
-			}
-		},
-		secondary = {
-			wounds = {
-				syringe_corruption_pocketable = {
-					10,
-					10,
-					10,
-					10,
-					10
-				}
-			}
-		}
-	}
-}
+local MissionOverrides = require("scripts/settings/circumstance/mission_overrides")
 local circumstance_templates = {
 	toxic_gas_01 = {
 		dialogue_id = "circumstance_vo_toxic_gas",
@@ -71,7 +13,7 @@ local circumstance_templates = {
 			display_name = "loc_circumstance_toxic_gas_title",
 			happening_display_name = "loc_happening_ventilation_purge"
 		},
-		mission_overrides = mission_overrides
+		mission_overrides = MissionOverrides.more_corruption_syringes
 	},
 	toxic_gas_less_resistance_01 = {
 		dialogue_id = "circumstance_vo_toxic_gas",
@@ -87,7 +29,7 @@ local circumstance_templates = {
 			display_name = "loc_circumstance_toxic_gas_less_resistance_title",
 			happening_display_name = "loc_happening_ventilation_purge"
 		},
-		mission_overrides = mission_overrides
+		mission_overrides = MissionOverrides.more_corruption_syringes
 	},
 	toxic_gas_more_resistance_01 = {
 		dialogue_id = "circumstance_vo_toxic_gas",
@@ -103,7 +45,7 @@ local circumstance_templates = {
 			display_name = "loc_circumstance_toxic_gas_more_resistance_title",
 			happening_display_name = "loc_happening_ventilation_purge"
 		},
-		mission_overrides = mission_overrides
+		mission_overrides = MissionOverrides.more_corruption_syringes
 	},
 	toxic_gas_twins_01 = {
 		dialogue_id = "circumstance_vo_toxic_gas",

@@ -681,6 +681,13 @@ local dialogue_speaker_voice_settings = {
 		subtitles_enabled = true,
 		icon = "content/ui/textures/icons/npc_portraits/mission_givers/swagger_a",
 		player_voice = false
+	},
+	dreg_lector_a = {
+		full_name = "loc_npc_full_name_dreg_lector_a",
+		short_name = "loc_npc_short_name_dreg_lector_a",
+		subtitles_enabled = true,
+		icon = "content/ui/textures/icons/npc_portraits/mission_givers/default",
+		player_voice = false
 	}
 }
 

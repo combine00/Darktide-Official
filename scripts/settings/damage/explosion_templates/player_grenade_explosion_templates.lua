@@ -126,6 +126,7 @@ local explosion_templates = {
 		scalable_radius = true,
 		close_radius = 2,
 		collision_filter = "filter_player_character_explosion",
+		override_friendly_fire = false,
 		static_power_level = 100,
 		min_close_radius = 2,
 		close_damage_profile = DamageProfileTemplates.smoke_grenade,

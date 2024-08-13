@@ -4190,7 +4190,7 @@ return function ()
 				"query_context",
 				"trigger_id",
 				OP.EQ,
-				"taunt"
+				"taunt_disabled"
 			},
 			{
 				"query_context",

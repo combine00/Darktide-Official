@@ -205,6 +205,7 @@ local DialogueSettings = {
 	enemies_close_distance = 10,
 	enemies_distant_distance = 40,
 	dialogue_level_start_delay = 120,
+	story_tickers_intensity_cooldown = 6,
 	story_ticker_enabled = true,
 	story_start_delay = 173,
 	story_tick_time = 5.1,

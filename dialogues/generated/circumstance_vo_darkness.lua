@@ -385,6 +385,628 @@ return function ()
 		}
 	})
 	define_rule({
+		name = "cult_downed_player_a",
+		wwise_route = 51,
+		response = "cult_downed_player_a",
+		database = "circumstance_vo_darkness",
+		category = "enemy_story_vo",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"generic_enemy_vo_event"
+			},
+			{
+				"query_context",
+				"trigger_id",
+				OP.EQ,
+				"killed_player"
+			},
+			{
+				"query_context",
+				"enemy_tag",
+				OP.SET_INCLUDES,
+				args = {
+					"renegade_twin_captain_two"
+				}
+			},
+			{
+				"global_context",
+				"current_mission",
+				OP.NEQ,
+				"km_enforcer_twins"
+			},
+			{
+				"user_memory",
+				"cult_downed_player_a",
+				OP.TIMEDIFF,
+				OP.GT,
+				10
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"cult_downed_player_a",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 1
+			}
+		}
+	})
+	define_rule({
+		name = "cult_gas_cloud_a",
+		category = "enemy_vo_prio_0",
+		wwise_route = 51,
+		response = "cult_gas_cloud_a",
+		database = "circumstance_vo_darkness",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"generic_enemy_vo_event"
+			},
+			{
+				"query_context",
+				"trigger_id",
+				OP.EQ,
+				"cult_gas_cloud_a"
+			},
+			{
+				"query_context",
+				"enemy_tag",
+				OP.SET_INCLUDES,
+				args = {
+					"renegade_twin_captain_two"
+				}
+			},
+			{
+				"global_context",
+				"current_mission",
+				OP.NEQ,
+				"km_enforcer_twins"
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "players"
+		}
+	})
+	define_rule({
+		name = "cult_horde_announcement_a",
+		category = "enemy_vo_prio_0",
+		wwise_route = 1,
+		response = "cult_horde_announcement_a",
+		database = "circumstance_vo_darkness",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"generic_enemy_vo_event"
+			},
+			{
+				"query_context",
+				"trigger_id",
+				OP.EQ,
+				"cult_horde_announcement_a"
+			},
+			{
+				"query_context",
+				"enemy_tag",
+				OP.SET_INCLUDES,
+				args = {
+					"renegade_twin_captain_two"
+				}
+			},
+			{
+				"global_context",
+				"current_mission",
+				OP.NEQ,
+				"km_enforcer_twins"
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "players"
+		}
+	})
+	define_rule({
+		name = "cult_hurt_player_a",
+		wwise_route = 51,
+		response = "cult_hurt_player_a",
+		database = "circumstance_vo_darkness",
+		category = "enemy_story_vo",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"generic_enemy_vo_event"
+			},
+			{
+				"query_context",
+				"trigger_id",
+				OP.EQ,
+				"downed_player"
+			},
+			{
+				"query_context",
+				"enemy_tag",
+				OP.SET_INCLUDES,
+				args = {
+					"renegade_twin_captain_two"
+				}
+			},
+			{
+				"global_context",
+				"current_mission",
+				OP.NEQ,
+				"km_enforcer_twins"
+			},
+			{
+				"user_memory",
+				"cult_hurt_player_a",
+				OP.TIMEDIFF,
+				OP.GT,
+				10
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"cult_hurt_player_a",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 1
+			}
+		}
+	})
+	define_rule({
+		name = "cult_monster_announcement_a",
+		category = "enemy_vo_prio_0",
+		wwise_route = 1,
+		response = "cult_monster_announcement_a",
+		database = "circumstance_vo_darkness",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"generic_enemy_vo_event"
+			},
+			{
+				"query_context",
+				"trigger_id",
+				OP.EQ,
+				"cult_monster_announcement_a"
+			},
+			{
+				"query_context",
+				"enemy_tag",
+				OP.SET_INCLUDES,
+				args = {
+					"renegade_twin_captain_two"
+				}
+			},
+			{
+				"global_context",
+				"current_mission",
+				OP.NEQ,
+				"km_enforcer_twins"
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "players"
+		}
+	})
+	define_rule({
+		name = "cult_pre_ambush_a",
+		category = "enemy_story_vo",
+		wwise_route = 1,
+		response = "cult_pre_ambush_a",
+		database = "circumstance_vo_darkness",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"generic_enemy_vo_event"
+			},
+			{
+				"query_context",
+				"trigger_id",
+				OP.EQ,
+				"cult_pre_ambush_a"
+			},
+			{
+				"query_context",
+				"enemy_tag",
+				OP.SET_INCLUDES,
+				args = {
+					"renegade_twin_captain_two"
+				}
+			},
+			{
+				"global_context",
+				"current_mission",
+				OP.EQ,
+				"km_enforcer_twins"
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "players"
+		}
+	})
+	define_rule({
+		name = "cult_retreat_a",
+		wwise_route = 1,
+		response = "cult_retreat_a",
+		database = "circumstance_vo_darkness",
+		category = "enemy_story_vo",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"generic_enemy_vo_event"
+			},
+			{
+				"query_context",
+				"trigger_id",
+				OP.EQ,
+				"cult_retreat_a"
+			},
+			{
+				"query_context",
+				"enemy_tag",
+				OP.SET_INCLUDES,
+				args = {
+					"renegade_twin_captain_two"
+				}
+			},
+			{
+				"global_context",
+				"current_mission",
+				OP.NEQ,
+				"km_enforcer_twins"
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "mission_givers"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 5
+			}
+		}
+	})
+	define_rule({
+		name = "cult_switch_focus_a",
+		wwise_route = 51,
+		response = "cult_switch_focus_a",
+		database = "circumstance_vo_darkness",
+		category = "enemy_story_vo",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"generic_enemy_vo_event"
+			},
+			{
+				"query_context",
+				"trigger_id",
+				OP.EQ,
+				"cult_switch_focus_a"
+			},
+			{
+				"query_context",
+				"enemy_tag",
+				OP.SET_INCLUDES,
+				args = {
+					"renegade_twin_captain_two"
+				}
+			},
+			{
+				"global_context",
+				"current_mission",
+				OP.EQ,
+				"km_enforcer_twins"
+			},
+			{
+				"user_memory",
+				"cult_switch_focus_a",
+				OP.TIMEDIFF,
+				OP.GT,
+				7
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"cult_switch_focus_a",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.5
+			}
+		}
+	})
+	define_rule({
+		name = "cult_taunt_twin_a",
+		wwise_route = 51,
+		response = "cult_taunt_twin_a",
+		database = "circumstance_vo_darkness",
+		category = "enemy_story_vo",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"generic_enemy_vo_event"
+			},
+			{
+				"query_context",
+				"trigger_id",
+				OP.EQ,
+				"cult_taunt_twin_a"
+			},
+			{
+				"query_context",
+				"enemy_tag",
+				OP.SET_INCLUDES,
+				args = {
+					"renegade_twin_captain_two"
+				}
+			},
+			{
+				"global_context",
+				"current_mission",
+				OP.EQ,
+				"km_enforcer_twins"
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "mission_givers"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 1.7
+			}
+		}
+	})
+	define_rule({
+		post_wwise_event = "play_radio_static_end",
+		concurrent_wwise_event = "play_vox_static_loop",
+		pre_wwise_event = "play_radio_static_start",
+		name = "kalyx_darkness_circumstance_invader_defeated_a",
+		response = "kalyx_darkness_circumstance_invader_defeated_a",
+		database = "circumstance_vo_darkness",
+		wwise_route = 1,
+		category = "vox_prio_0",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"cult_retreat_a"
+				}
+			},
+			{
+				"user_context",
+				"class_name",
+				OP.SET_INCLUDES,
+				args = {
+					"explicator"
+				}
+			},
+			{
+				"faction_memory",
+				"kalyx_darkness_circumstance_invader_defeated_a",
+				OP.EQ,
+				"0"
+			}
+		},
+		on_done = {
+			{
+				"faction_memory",
+				"kalyx_darkness_circumstance_invader_defeated_a",
+				OP.ADD,
+				1
+			}
+		},
+		heard_speak_routing = {
+			target = "disabled"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.5
+			},
+			random_ignore_vo = {
+				chance = 0.4,
+				max_failed_tries = 0,
+				hold_for = 0
+			}
+		}
+	})
+	define_rule({
+		post_wwise_event = "play_radio_static_end",
+		concurrent_wwise_event = "play_vox_static_loop",
+		pre_wwise_event = "play_radio_static_start",
+		name = "kalyx_darkness_circumstance_invader_sighted_a",
+		response = "kalyx_darkness_circumstance_invader_sighted_a",
+		database = "circumstance_vo_darkness",
+		wwise_route = 1,
+		category = "vox_prio_0",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"cult_taunt_twin_a"
+				}
+			},
+			{
+				"user_context",
+				"class_name",
+				OP.SET_INCLUDES,
+				args = {
+					"explicator"
+				}
+			},
+			{
+				"faction_memory",
+				"kalyx_darkness_circumstance_invader_sighted_a",
+				OP.EQ,
+				"0"
+			}
+		},
+		on_done = {
+			{
+				"faction_memory",
+				"kalyx_darkness_circumstance_invader_sighted_a",
+				OP.ADD,
+				1
+			}
+		},
+		heard_speak_routing = {
+			target = "disabled"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			},
+			random_ignore_vo = {
+				chance = 0.4,
+				max_failed_tries = 0,
+				hold_for = 0
+			}
+		}
+	})
+	define_rule({
+		pre_wwise_event = "play_radio_static_start",
+		concurrent_wwise_event = "play_vox_static_loop",
+		name = "kalyx_darkness_circumstance_start_a",
+		wwise_route = 1,
+		response = "kalyx_darkness_circumstance_start_a",
+		database = "circumstance_vo_darkness",
+		category = "vox_prio_0",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"global_context",
+				"circumstance_vo_id",
+				OP.EQ,
+				"circumstance_vo_darkness_twin"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"power_circumstance_start_b"
+				}
+			},
+			{
+				"user_context",
+				"class_name",
+				OP.SET_INCLUDES,
+				args = {
+					"dreg_lector"
+				}
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "self"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		post_wwise_event = "play_radio_static_end",
+		concurrent_wwise_event = "play_vox_static_loop",
+		name = "kalyx_darkness_circumstance_start_b",
+		wwise_route = 1,
+		response = "kalyx_darkness_circumstance_start_b",
+		database = "circumstance_vo_darkness",
+		category = "vox_prio_0",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"kalyx_darkness_circumstance_start_a"
+				}
+			},
+			{
+				"user_context",
+				"class_name",
+				OP.SET_INCLUDES,
+				args = {
+					"dreg_lector"
+				}
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "disabled"
+		}
+	})
+	define_rule({
 		post_wwise_event = "play_radio_static_end",
 		concurrent_wwise_event = "play_vox_static_loop",
 		pre_wwise_event = "play_radio_static_start",
@@ -403,8 +1025,11 @@ return function ()
 			{
 				"global_context",
 				"circumstance_vo_id",
-				OP.EQ,
-				"circumstance_vo_darkness"
+				OP.SET_INCLUDES,
+				args = {
+					"circumstance_vo_darkness",
+					"circumstance_vo_darkness_twin"
+				}
 			},
 			{
 				"query_context",
@@ -420,7 +1045,7 @@ return function ()
 					"mission_propaganda_short_elevator_conversation_one_b",
 					"mission_propaganda_short_elevator_conversation_two_b",
 					"mission_propaganda_short_elevator_conversation_three_b",
-					"level_hab_block_first_objective_response",
+					"mission_habs_redux_start_zone_response",
 					"mission_archives_start_banter_c",
 					"mission_complex_start_banter_c",
 					"mission_enforcer_start_banter_c",
@@ -429,7 +1054,9 @@ return function ()
 					"mission_stockpile_start_banter_c",
 					"mission_strain_start_banter_c",
 					"mission_armoury_rooftops_c",
-					"mission_raid_safe_zone_e"
+					"mission_raid_safe_zone_e",
+					"mission_rise_first_objective_response",
+					"mission_core_safe_zone_e"
 				}
 			},
 			{
@@ -478,7 +1105,7 @@ return function ()
 		},
 		on_done = {},
 		heard_speak_routing = {
-			target = "disabled"
+			target = "mission_givers"
 		},
 		on_pre_rule_execution = {
 			delay_vo = {

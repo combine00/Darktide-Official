@@ -1,3 +1,4 @@
+local MissionOverrides = require("scripts/settings/circumstance/mission_overrides")
 local circumstance_templates = {
 	snipers_01 = {
 		wwise_state = "hunting_grounds_01",
@@ -28,13 +29,7 @@ local circumstance_templates = {
 			display_name = "loc_circumstance_hunting_grounds_title",
 			happening_display_name = "loc_happening_hunting_grounds"
 		},
-		mission_overrides = {
-			hazard_prop_settings = {
-				explosion = 1,
-				fire = 1,
-				none = 0
-			}
-		}
+		mission_overrides = MissionOverrides.no_empty_hazards
 	},
 	mutants_01 = {
 		wwise_state = "hunting_grounds_01",

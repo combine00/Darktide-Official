@@ -954,15 +954,15 @@ weapon_template.actions = {
 	},
 	action_melee_start_right_2 = {
 		kind = "windup",
-		chain_anim_event = "heavy_charge_left_diagonal_pose",
+		chain_anim_event = "heavy_charge_down_left_pose",
 		proc_time_interval = 0.2,
 		weapon_handling_template = "time_scale_1",
 		first_person_hit_anim = "hit_left_shake",
 		anim_end_event = "attack_finished",
 		first_person_hit_stop_anim = "hit_left_shake",
-		chain_anim_event_3p = "attack_swing_charge_down_left",
-		anim_event_3p = "attack_swing_charge_down_left",
-		anim_event = "heavy_charge_left_diagonal",
+		chain_anim_event_3p = "attack_swing_charge_down",
+		anim_event_3p = "attack_swing_charge_down",
+		anim_event = "heavy_charge_down",
 		hit_stop_anim = "attack_hit_shield",
 		stop_input = "attack_cancel",
 		total_time = 3,
@@ -1726,7 +1726,7 @@ weapon_template.base_stats = {
 				damage_trait_templates.powermaul_cleave_damage_stat
 			},
 			action_light_4 = {
-				damage_trait_templates.ogryn_combatblade_p1_m1_cleave_stat
+				damage_trait_templates.powermaul_cleave_damage_stat
 			},
 			action_pushfollow = {
 				damage_trait_templates.powermaul_cleave_damage_stat

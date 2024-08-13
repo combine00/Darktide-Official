@@ -59,22 +59,6 @@ function DestructibleSystem:hot_join_sync(sender, channel)
 	end
 end
 
-function DestructibleSystem:update_level_props_broadphase()
-	local unit_to_extension_map = self._unit_to_extension_map
-
-	for unit, extension in pairs(unit_to_extension_map) do
-		local broadphase_radius = extension:broadphase_radius()
-		local units_nearby = LevelPropsBroadphase.check_units_nearby(POSITION_LOOKUP[unit], broadphase_radius)
-		local in_update_list = self:has_update_function("DestructibleExtension", "update", unit)
-
-		if units_nearby and not in_update_list then
-			self:enable_update_function("DestructibleExtension", "update", unit, extension)
-		elseif not units_nearby and in_update_list then
-			self:disable_update_function("DestructibleExtension", "update", unit, extension)
-		end
-	end
-end
-
 function DestructibleSystem:rpc_destructible_damage_taken(channel_id, unit_id, is_level_unit)
 	if unit_id ~= NetworkConstants.invalid_level_unit_id then
 		local unit = Managers.state.unit_spawner:unit(unit_id, is_level_unit)

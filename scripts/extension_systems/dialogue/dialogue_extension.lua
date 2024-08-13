@@ -296,7 +296,10 @@ function DialogueExtension:extensions_ready(world, unit)
 end
 
 function DialogueExtension:physics_async_update(context, dt, t)
-	self:_update_random_talk_lines(t)
+	if self._is_server then
+		self:_update_random_talk_lines(t)
+	end
+
 	self:_update_vo_event_cool_down_times(t)
 end
 
@@ -305,7 +308,7 @@ function DialogueExtension:_update_random_talk_lines(t)
 		return
 	end
 
-	if self._is_server and self._mission_update_enabled == true then
+	if self._mission_update_enabled == true then
 		self:_update_mission_update_vo()
 	end
 

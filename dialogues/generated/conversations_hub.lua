@@ -12459,6 +12459,92 @@ return function ()
 		on_done = {}
 	})
 	define_rule({
+		post_wwise_event = "play_radio_static_end",
+		name = "hub_seasonal_kalyx_mid_a",
+		pre_wwise_event = "play_radio_static_start",
+		response = "hub_seasonal_kalyx_mid_a",
+		database = "conversations_hub",
+		wwise_route = 40,
+		category = "npc_prio_0",
+		speaker_routing = {
+			target = "dialogist"
+		},
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"npc_interacting_vo"
+			},
+			{
+				"query_context",
+				"vo_event",
+				OP.EQ,
+				"hub_seasonal_kalyx_mid_a"
+			},
+			{
+				"query_context",
+				"interactor_voice_profile",
+				OP.SET_INCLUDES,
+				args = {
+					""
+				}
+			},
+			{
+				"user_context",
+				"class_name",
+				OP.SET_INCLUDES,
+				args = {
+					""
+				}
+			}
+		},
+		on_done = {}
+	})
+	define_rule({
+		post_wwise_event = "play_radio_static_end",
+		name = "hub_seasonal_kalyx_start_a",
+		pre_wwise_event = "play_radio_static_start",
+		response = "hub_seasonal_kalyx_start_a",
+		database = "conversations_hub",
+		wwise_route = 40,
+		category = "npc_prio_0",
+		speaker_routing = {
+			target = "dialogist"
+		},
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"npc_interacting_vo"
+			},
+			{
+				"query_context",
+				"vo_event",
+				OP.EQ,
+				"hub_seasonal_kalyx_start_a"
+			},
+			{
+				"query_context",
+				"interactor_voice_profile",
+				OP.SET_INCLUDES,
+				args = {
+					""
+				}
+			},
+			{
+				"user_context",
+				"class_name",
+				OP.SET_INCLUDES,
+				args = {
+					""
+				}
+			}
+		},
+		on_done = {}
+	})
+	define_rule({
 		pre_wwise_event = "play_hub_pa_notification",
 		wwise_route = 22,
 		name = "hub_status_announcement",
