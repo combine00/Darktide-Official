@@ -43,6 +43,13 @@ function ViewElementNewsSlide:destroy()
 	ViewElementNewsSlide.super.destroy(self)
 end
 
+local function _compare_slides(a, b)
+	local a_index = a.sort_index or 0
+	local b_index = b.sort_index or 0
+
+	return a_index > b_index
+end
+
 function ViewElementNewsSlide:_initialize_slides(backend_data)
 	if #backend_data == 0 then
 		return
@@ -80,14 +87,18 @@ function ViewElementNewsSlide:_initialize_slides(backend_data)
 
 		if title and image_url then
 			slides[#slides + 1] = {
+				id = raw_data.id,
 				title = title or "",
 				body_text = body_text or "",
 				body_number = body_number or "",
 				image_url = image_url,
-				backend_index = i
+				backend_index = i,
+				sort_index = raw_data.displayPriority and tonumber(raw_data.displayPriority) or 0
 			}
 		end
 	end
+
+	table.sort(slides, _compare_slides)
 
 	for url, _ in pairs(self._textures) do
 		Managers.url_loader:load_texture(url):next(function (data)
@@ -242,19 +253,41 @@ function ViewElementNewsSlide:_change_slide(target, optional_start_time)
 	news_button.content.title = slide_data.title
 	news_button.content.body_text = slide_data.body_text
 	news_button.content.body_number = slide_data.body_number
+
+	Managers.telemetry_events:update_news_widget(target, slide_data.id)
+
 	news_button.style.online_image.material_values.texture = nil
 
 	self:_update_slide_image()
 end
 
+local function _top_center_aspect_uvs(target_x, target_y, real_x, real_y)
+	local x_ratio = target_x / real_x
+	local y_ratio = target_y / real_y
+	local ratio = math.max(x_ratio, y_ratio)
+	y_ratio = y_ratio / ratio
+	x_ratio = x_ratio / ratio
+	local x_diff = (1 - x_ratio) / 2
+
+	return x_diff, 0, 1 - x_diff, y_ratio
+end
+
 function ViewElementNewsSlide:_update_slide_image()
-	local material_values = self._widgets_by_name.news_button.style.online_image.material_values
+	local style = self._widgets_by_name.news_button.style.online_image
+	local material_values = style.material_values
 	local current_slide_data = self._slide_data[self._current_index]
 	local url = current_slide_data and current_slide_data.image_url
 	local texture_data = self._textures[url]
 
 	if not material_values.texture and texture_data then
-		material_values.texture = texture_data.texture
+		local texture = texture_data.texture
+		material_values.texture = texture
+
+		if texture then
+			local uvs = style.uvs
+			local target_size = Settings.image_size
+			uvs[1][1], uvs[1][2], uvs[2][1], uvs[2][2] = _top_center_aspect_uvs(target_size[1], target_size[2], texture_data.width, texture_data.height)
+		end
 	end
 end
 
@@ -339,6 +372,7 @@ function ViewElementNewsSlide:view_requested()
 	if backend_data then
 		Managers.ui:open_view("news_view", nil, nil, nil, nil, {
 			should_save = false,
+			telemetry_id = slide_data.id,
 			slide_data = {
 				starting_slide_index = 1,
 				slides = {

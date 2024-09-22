@@ -243,7 +243,7 @@ function BaseView:on_enter()
 		end
 	end
 
-	Managers.telemetry_events:open_view(self.view_name, self._hub_interaction)
+	Managers.telemetry_events:open_view(self.view_name, self._hub_interaction, self._telemetry_id)
 end
 
 function BaseView:character_level()

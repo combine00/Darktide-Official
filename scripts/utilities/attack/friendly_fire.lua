@@ -4,12 +4,6 @@ local attack_types = AttackSettings.attack_types
 local FriendlyFire = {}
 
 function FriendlyFire.is_enabled(attacking_unit, target_unit, attack_type)
-	local mutator_manager = Managers.state.mutator
-
-	if attack_type == attack_types.explosion and mutator_manager and mutator_manager:mutator("mutator_explosive_friendly_fire") then
-		return true
-	end
-
 	local target_unit_data_extension = ScriptUnit.has_extension(target_unit, "unit_data_system")
 	local target_breed_or_nil = target_unit_data_extension and target_unit_data_extension:breed()
 	local target_is_player = Breed.is_player(target_breed_or_nil)

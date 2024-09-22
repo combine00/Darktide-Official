@@ -36,6 +36,8 @@ function NewsView:init(settings, context)
 
 	self._allow_close_hotkey = false
 	self._pass_draw = false
+	self._telemetry_view_name = string.format("news_view_%s", self._view_triggered_by_user and "widget" or "startup")
+	self._telemetry_id = context.telemetry_id
 end
 
 local function to_news_view(news_item)
@@ -132,6 +134,7 @@ function NewsView:on_enter()
 	widgets_by_name.next_button.content.visible = false
 
 	self:_setup_grid()
+	Managers.telemetry_events:open_view(self._telemetry_view_name, false, self._telemetry_id)
 	Promise.until_value_is_true(function ()
 		return self._initialized
 	end):next(function ()
@@ -155,6 +158,7 @@ end
 
 function NewsView:on_exit()
 	NewsView.super.on_exit(self)
+	Managers.telemetry_events:close_view(self._telemetry_view_name)
 	self:_unload_url_textures()
 end
 

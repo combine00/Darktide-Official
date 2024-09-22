@@ -586,9 +586,6 @@ local mutator_templates = {
 	},
 	mutator_single_twin = {
 		class = "scripts/managers/mutator/mutators/mutator_base"
-	},
-	mutator_explosive_friendly_fire = {
-		class = "scripts/managers/mutator/mutators/mutator_base"
 	}
 }
 
