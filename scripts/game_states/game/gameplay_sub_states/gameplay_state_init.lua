@@ -21,15 +21,23 @@ function GameplayStateInit:on_enter(parent, params)
 end
 
 function GameplayStateInit:on_exit(on_shutdown)
+	local initialized_steps = self._shared_state.initialized_steps
+
+	if not initialized_steps.GameplayInitStepStateLast then
+		Log.exception("MissionCleanupUtilies", "Exit in the middle of initialization.")
+		table.dump(initialized_steps)
+	end
+
 	local shared_state = self._shared_state
 	local world = shared_state.world
 	local is_server = shared_state.is_server
 
 	if on_shutdown then
-		MissionCleanupUtilies.cleanup(shared_state, self._gameplay_state)
+		MissionCleanupUtilies.cleanup(shared_state, self._gameplay_state, initialized_steps)
 	end
 
 	self:_setup_scene_update_callback(world, is_server)
+	self._state_machine:delete()
 end
 
 function GameplayStateInit:update(main_dt, main_t)

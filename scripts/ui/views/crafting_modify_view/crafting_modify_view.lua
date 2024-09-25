@@ -360,6 +360,12 @@ function CraftingModifyView:_preview_item(item)
 		self._crafting_recipe:set_selected_item(item)
 	end
 
+	self._parent:stop_presenting_current_item()
+
+	if item then
+		self._parent:start_present_item(item)
+	end
+
 	local weapon_stats = self:_element("weapon_stats")
 	local grid_height = weapon_stats:grid_height()
 

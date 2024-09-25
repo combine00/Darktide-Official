@@ -1,6 +1,7 @@
 local Action = require("scripts/utilities/weapon/action")
 local Component = require("scripts/utilities/component")
 local ReloadStates = require("scripts/extension_systems/weapon/utilities/reload_states")
+local WieldableSlotScriptInterface = require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/wieldable_slot_script_interface")
 local _components = nil
 local RevolverSpeedloader = class("RevolverSpeedloader")
 
@@ -170,5 +171,7 @@ function _components(destination, destination_lookup, attachments, attachments_n
 		end
 	end
 end
+
+implements(RevolverSpeedloader, WieldableSlotScriptInterface)
 
 return RevolverSpeedloader

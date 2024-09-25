@@ -92,7 +92,7 @@ function CraftingView:on_enter()
 		self._world_spawner:set_listener(viewport_name)
 	end
 
-	self:show_wallets(true)
+	self:show_wallets(false)
 
 	local narrative_manager = Managers.narrative
 	local narrative_event_name = "level_unlock_crafting_station_visited"
@@ -113,6 +113,67 @@ function CraftingView:on_enter()
 	self._next_tab_index = nil
 end
 
+function CraftingView:start_present_item(item)
+	if self._ui_weapon_spawner then
+		self._ui_weapon_spawner:destroy()
+
+		self._ui_weapon_spawner = nil
+	end
+
+	local world_spawner = self._world_spawner
+	local world = world_spawner:world()
+	local camera = world_spawner:camera()
+	local unit_spawner = world_spawner:unit_spawner()
+	local ui_weapon_spawner = UIWeaponSpawner:new("CraftingView", world, camera, unit_spawner)
+	local render_context = nil
+	local alignment_key = "weapon_alignment_tag"
+
+	if render_context and render_context.alignment_key then
+		alignment_key = render_context.alignment_key
+	end
+
+	local item_base_unit_name = item.base_unit
+	local item_level_link_unit = self:_get_unit_by_value_key(alignment_key, item_base_unit_name)
+	local default_level_link_unit = self:_get_unit_by_value_key(alignment_key, "content/weapons/player/melee/combat_knife/wpn_combat_knife_chained_rig")
+	local spawn_point_unit = item_level_link_unit or default_level_link_unit
+	local spawn_position = Unit.world_position(spawn_point_unit, 1)
+	local spawn_rotation = Unit.world_rotation(spawn_point_unit, 1)
+	local spawn_scale = Unit.world_scale(spawn_point_unit, 1)
+	local force_highest_mip = true
+
+	ui_weapon_spawner:start_presentation(item, spawn_position, spawn_rotation, spawn_scale, nil, force_highest_mip)
+
+	self._ui_weapon_spawner = ui_weapon_spawner
+end
+
+function CraftingView:_get_unit_by_value_key(key, value)
+	local world_spawner = self._world_spawner
+	local level = world_spawner:level()
+	local level_units = Level.units(level)
+
+	for i = 1, #level_units do
+		local unit = level_units[i]
+
+		if Unit.get_data(unit, key) == value then
+			return unit
+		end
+	end
+end
+
+function CraftingView:stop_presenting_current_item()
+	if self._ui_weapon_spawner then
+		self._ui_weapon_spawner:destroy()
+
+		self._ui_weapon_spawner = nil
+	end
+end
+
+function CraftingView:set_item_position(position)
+	if self._ui_weapon_spawner then
+		self._ui_weapon_spawner:set_position(position)
+	end
+end
+
 function CraftingView:_setup_tab_bar(tab_bar_params, additional_context)
 	CraftingView.super._setup_tab_bar(self, tab_bar_params, additional_context)
 end
@@ -121,12 +182,16 @@ function CraftingView:update(dt, t, input_service)
 	local overlay_style_color = self._widgets_by_name.overlay.style.overlay.color
 	overlay_style_color[1] = math.lerp(self._wanted_overlay_alpha or 0, overlay_style_color[1], 1e-05^dt)
 
+	if self._ui_weapon_spawner then
+		self._ui_weapon_spawner:update(dt, t, input_service)
+	end
+
 	return CraftingView.super.update(self, dt, t, input_service)
 end
 
 function CraftingView:_change_view_callback(tab_params)
 	if not tab_params then
-		-- Nothing
+		self:show_wallets(false)
 	elseif tab_params.on_active_callback then
 		tab_params.on_active_callback(self)
 	end
@@ -158,6 +223,10 @@ function CraftingView:_close_active_view(is_handling_new_view)
 
 	self._wanted_overlay_alpha = 0
 	self._previously_active_view_name = self._active_view
+
+	if not is_handling_new_view then
+		self:stop_presenting_current_item()
+	end
 
 	if not is_handling_new_view then
 		self:_change_view_callback()

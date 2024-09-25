@@ -1,10 +1,9 @@
-local StateGameScore = class("StateGameScore")
 local EndViewSettings = require("scripts/ui/views/end_view/end_view_settings")
-local EndPartyViewSettings = require("scripts/ui/views/end_party_view/end_party_view_settings")
 local MAX_EOR_DURATION = EndViewSettings.max_duration
 local events = {
 	event_state_game_score_continue = "_continue"
 }
+local StateGameScore = class("StateGameScore")
 
 function StateGameScore:on_enter(parent, params, creation_context)
 	self._creation_context = creation_context
@@ -59,8 +58,7 @@ function StateGameScore:_present_end_of_round_view()
 end
 
 function StateGameScore:_get_total_presentation_time()
-	local duration = 0
-	duration = MAX_EOR_DURATION
+	local duration = MAX_EOR_DURATION
 
 	return duration
 end

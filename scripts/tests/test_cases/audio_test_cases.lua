@@ -1,5 +1,5 @@
 local TestifySnippets = require("scripts/tests/testify_snippets")
-local VOQueryConstants = require("scripts/settings/dialogue/vo_query_constants")
+local VoQueryConstants = require("scripts/settings/dialogue/vo_query_constants")
 AudioTestCases = {
 	play_all_vo_lines = function ()
 		Testify:run_case(function (dt, t)
@@ -491,9 +491,9 @@ function AudioTestCases.vo_rules_smart_tag_com_wheel()
 
 		Testify:make_request("wait_for_state_gameplay_reached")
 
-		local concept_com_wheel = VOQueryConstants.concepts.on_demand_com_wheel
-		local concept_item_tag = VOQueryConstants.concepts.on_demand_vo_tag_item
-		local concept_enemy_tag = VOQueryConstants.concepts.on_demand_vo_tag_enemy
+		local concept_com_wheel = VoQueryConstants.concepts.on_demand_com_wheel
+		local concept_item_tag = VoQueryConstants.concepts.on_demand_vo_tag_item
+		local concept_enemy_tag = VoQueryConstants.concepts.on_demand_vo_tag_enemy
 		local result = {
 			TestifySnippets.trigger_vo_on_demand(concept_com_wheel, "com_need_ammo", 1),
 			TestifySnippets.trigger_vo_on_demand(concept_com_wheel, "com_need_health", 1),

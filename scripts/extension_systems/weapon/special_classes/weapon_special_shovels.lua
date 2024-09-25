@@ -1,12 +1,10 @@
 local AttackSettings = require("scripts/settings/damage/attack_settings")
-local BuffSettings = require("scripts/settings/buff/buff_settings")
 local Push = require("scripts/extension_systems/character_state_machine/character_states/utilities/push")
 local WeaponSpecialInterface = require("scripts/extension_systems/weapon/special_classes/weapon_special_interface")
 local attack_types = AttackSettings.attack_types
-local stat_buff_types = BuffSettings.stat_buffs
-local WeaponSpeciaShovels = class("WeaponSpeciaShovels")
+local WeaponSpecialShovels = class("WeaponSpecialShovels")
 
-function WeaponSpeciaShovels:init(context, init_data)
+function WeaponSpecialShovels:init(context, init_data)
 	self._input_extension = context.input_extension
 	self._weapon_extension = context.weapon_extension
 	self._animation_extension = context.animation_extension
@@ -20,7 +18,7 @@ function WeaponSpeciaShovels:init(context, init_data)
 	self._locomotion_push_component = unit_data_extension:write_component("locomotion_push")
 end
 
-function WeaponSpeciaShovels:update(dt, t)
+function WeaponSpecialShovels:fixed_update(dt, t)
 	local time_to_play_deactivation_animation = self._time_to_play_deactivation_animation
 	local special_active = self._inventory_slot_component.special_active
 
@@ -31,7 +29,7 @@ function WeaponSpeciaShovels:update(dt, t)
 			local tweak_data = self._tweak_data
 			local deactivation_animation = tweak_data.deactivation_animation
 
-			self:trigger_anim_event(deactivation_animation, deactivation_animation)
+			self:_trigger_anim_event(deactivation_animation, deactivation_animation)
 
 			self._time_to_play_deactivation_animation = nil
 		else
@@ -42,19 +40,23 @@ function WeaponSpeciaShovels:update(dt, t)
 	end
 end
 
-function WeaponSpeciaShovels:on_special_activation(t)
+function WeaponSpecialShovels:on_special_activation(t)
 	return
 end
 
-function WeaponSpeciaShovels:on_sweep_action_start(t)
+function WeaponSpecialShovels:on_special_deactivation(t)
 	return
 end
 
-function WeaponSpeciaShovels:on_sweep_action_finish(t, num_hit_enemies)
+function WeaponSpecialShovels:on_sweep_action_start(t)
 	return
 end
 
-function WeaponSpeciaShovels:process_hit(t, weapon, action_settings, num_hit_enemies, target_is_alive, target_unit, hit_position, attack_direction, abort_attack, optional_origin_slot)
+function WeaponSpecialShovels:on_sweep_action_finish(t, num_hit_enemies)
+	return
+end
+
+function WeaponSpecialShovels:process_hit(t, weapon, action_settings, num_hit_enemies, target_is_alive, target_unit, damage, result, damage_efficiency, stagger_result, hit_position, attack_direction, abort_attack, optional_origin_slot)
 	local special_active = self._inventory_slot_component.special_active
 	local player_unit = self._player_unit
 	local tweak_data = self._tweak_data
@@ -77,20 +79,21 @@ function WeaponSpeciaShovels:process_hit(t, weapon, action_settings, num_hit_ene
 	end
 end
 
-function WeaponSpeciaShovels:on_exit_damage_window(t, num_hit_enemies, aborted)
+function WeaponSpecialShovels:on_exit_damage_window(t, num_hit_enemies, aborted)
 	local inventory_slot_component = self._inventory_slot_component
 	local tweak_data = self._tweak_data
 	local is_sticky = self._action_sweep_component.is_sticky
 
 	if inventory_slot_component.special_active and num_hit_enemies > 0 then
-		inventory_slot_component.special_active = false
+		self._weapon_extension:set_wielded_weapon_weapon_special_active(t, false, "max_activations")
+
 		local delay = tweak_data.deactivation_animation_delay or 0
 		local deactivation_animation_on_abort = tweak_data.deactivation_animation_on_abort
 		self._time_to_play_deactivation_animation = (not aborted or deactivation_animation_on_abort) and not is_sticky and delay or nil
 	end
 end
 
-function WeaponSpeciaShovels:trigger_anim_event(anim_event, anim_event_3p, action_time_offset, ...)
+function WeaponSpecialShovels:_trigger_anim_event(anim_event, anim_event_3p, action_time_offset, ...)
 	local anim_ext = self._animation_extension
 	local time_scale = 1
 	action_time_offset = action_time_offset or 0
@@ -102,6 +105,6 @@ function WeaponSpeciaShovels:trigger_anim_event(anim_event, anim_event_3p, actio
 	end
 end
 
-implements(WeaponSpeciaShovels, WeaponSpecialInterface)
+implements(WeaponSpecialShovels, WeaponSpecialInterface)
 
-return WeaponSpeciaShovels
+return WeaponSpecialShovels

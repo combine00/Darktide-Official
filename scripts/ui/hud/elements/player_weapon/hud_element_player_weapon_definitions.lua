@@ -1,11 +1,12 @@
 local HudElementPlayerWeaponHandlerSettings = require("scripts/ui/hud/elements/player_weapon_handler/hud_element_player_weapon_handler_settings")
 local HudElementPlayerWeaponSettings = require("scripts/ui/hud/elements/player_weapon/hud_element_player_weapon_settings")
-local UIWorkspaceSettings = require("scripts/settings/ui/ui_workspace_settings")
-local UIHudSettings = require("scripts/settings/ui/ui_hud_settings")
 local UIFontSettings = require("scripts/managers/ui/ui_font_settings")
+local UIHudSettings = require("scripts/settings/ui/ui_hud_settings")
 local UIWidget = require("scripts/managers/ui/ui_widget")
+local UIWorkspaceSettings = require("scripts/settings/ui/ui_workspace_settings")
 local size = HudElementPlayerWeaponHandlerSettings.size
 local icon_size = HudElementPlayerWeaponHandlerSettings.icon_size
+local max_ammo_digits = HudElementPlayerWeaponSettings.max_ammo_digits
 local scenegraph_definition = {
 	screen = UIWorkspaceSettings.screen,
 	weapon = {
@@ -78,13 +79,32 @@ input_text_style.offset = {
 input_text_style.drop_shadow = false
 input_text_style.text_color = UIHudSettings.color_tint_main_1
 
-local function color_copy(target, source, alpha)
-	target[1] = alpha or source[1]
-	target[2] = source[2]
-	target[3] = source[3]
-	target[4] = source[4]
+local function _create_ammo_counter_pass_definitions()
+	local pass_definitions = {}
 
-	return target
+	for ii = 1, max_ammo_digits do
+		pass_definitions[#pass_definitions + 1] = {
+			pass_type = "text",
+			value_id = string.format("ammo_amount_%d", ii),
+			style_id = string.format("ammo_amount_%d", ii),
+			value = string.format("<ammo_amount_%d>", ii),
+			style = table.merge({
+				primary_counter = true,
+				index = ii
+			}, ammo_text_style)
+		}
+		pass_definitions[#pass_definitions + 1] = {
+			pass_type = "text",
+			value = "",
+			value_id = string.format("ammo_spare_%d", ii),
+			style_id = string.format("ammo_spare_%d", ii),
+			style = table.merge({
+				index = ii
+			}, ammo_spare_text_style)
+		}
+	end
+
+	return pass_definitions
 end
 
 local widget_definitions = {
@@ -111,84 +131,7 @@ local widget_definitions = {
 			}
 		}
 	}, "background"),
-	ammo_text = UIWidget.create_definition({
-		{
-			value_id = "ammo_amount_1",
-			style_id = "ammo_amount_1",
-			pass_type = "text",
-			value = "<ammo_amount_1>",
-			style = table.merge({
-				index = 1,
-				primary_counter = true
-			}, ammo_text_style)
-		},
-		{
-			value_id = "ammo_amount_2",
-			style_id = "ammo_amount_2",
-			pass_type = "text",
-			value = "<ammo_amount_2>",
-			style = table.merge({
-				index = 2,
-				primary_counter = true
-			}, ammo_text_style)
-		},
-		{
-			value_id = "ammo_amount_3",
-			style_id = "ammo_amount_3",
-			pass_type = "text",
-			value = "<ammo_amount_3>",
-			style = table.merge({
-				index = 3,
-				primary_counter = true
-			}, ammo_text_style)
-		},
-		{
-			value_id = "ammo_amount_4",
-			style_id = "ammo_amount_4",
-			pass_type = "text",
-			value = "<ammo_amount_4>",
-			style = table.merge({
-				index = 4,
-				primary_counter = true
-			}, ammo_text_style)
-		},
-		{
-			value_id = "ammo_spare_1",
-			style_id = "ammo_spare_1",
-			pass_type = "text",
-			value = "",
-			style = table.merge({
-				index = 1
-			}, ammo_spare_text_style)
-		},
-		{
-			value_id = "ammo_spare_2",
-			style_id = "ammo_spare_2",
-			pass_type = "text",
-			value = "",
-			style = table.merge({
-				index = 2
-			}, ammo_spare_text_style)
-		},
-		{
-			value_id = "ammo_spare_3",
-			style_id = "ammo_spare_3",
-			pass_type = "text",
-			value = "",
-			style = table.merge({
-				index = 3
-			}, ammo_spare_text_style)
-		},
-		{
-			value_id = "ammo_spare_4",
-			style_id = "ammo_spare_4",
-			pass_type = "text",
-			value = "",
-			style = table.merge({
-				index = 4
-			}, ammo_spare_text_style)
-		}
-	}, "background"),
+	ammo_text = UIWidget.create_definition(_create_ammo_counter_pass_definitions(), "background"),
 	input_text = UIWidget.create_definition({
 		{
 			value_id = "text",
@@ -203,7 +146,7 @@ local widget_definitions = {
 			end
 		}
 	}, "background"),
-	overheat_infinite_symbol = UIWidget.create_definition({
+	infinite_symbol = UIWidget.create_definition({
 		{
 			value = "content/ui/materials/symbols/infinite",
 			style_id = "texture",

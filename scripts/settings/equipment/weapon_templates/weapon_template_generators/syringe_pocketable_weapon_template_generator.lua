@@ -5,7 +5,7 @@ local PocketableUtils = require("scripts/settings/equipment/weapon_templates/poc
 local SmartTargetingTemplates = require("scripts/settings/equipment/smart_targeting_templates")
 local wield_inputs = PlayerCharacterConstants.wield_inputs
 
-local function generate_base_template(buff_name, validate_target_func, hud_icon, hud_icon_small, pickup_name, assist_notification_type, vo_event)
+local function generate_base_template(buff_name, validate_target_func, hud_icon, hud_icon_small, pickup_name, assist_notification_type)
 	local base_template = {
 		action_inputs = {
 			use_self = {
@@ -308,8 +308,7 @@ local function generate_base_template(buff_name, validate_target_func, hud_icon,
 			},
 			buff_name = buff_name,
 			validate_target_func = validate_target_func,
-			assist_notification_type = assist_notification_type,
-			vo_event = vo_event
+			assist_notification_type = assist_notification_type
 		},
 		action_aim_give = {
 			aim_ready_up_time = 0,
@@ -359,7 +358,11 @@ local function generate_base_template(buff_name, validate_target_func, hud_icon,
 			anim_event = "share_ally",
 			total_time = 0.7,
 			smart_targeting_template = SmartTargetingTemplates.target_ally_close,
-			validate_target_func = PocketableUtils.validate_give_pocketable_small_target_func
+			validate_target_func = PocketableUtils.validate_give_pocketable_small_target_func,
+			voice_event_data = {
+				voice_tag_concept = "on_demand_com_wheel",
+				voice_tag_id = "com_take_this"
+			}
 		},
 		action_inspect = {
 			anim_event = "inspect_start",
@@ -382,6 +385,10 @@ local function generate_base_template(buff_name, validate_target_func, hud_icon,
 		"syringe"
 	}
 	base_template.ammo_template = "no_ammo"
+	base_template.hud_configuration = {
+		uses_overheat = false,
+		uses_ammunition = false
+	}
 	base_template.breed_anim_state_machine_3p = {
 		human = "content/characters/player/human/third_person/animations/pocketables",
 		ogryn = "content/characters/player/ogryn/third_person/animations/pocketables"

@@ -88,6 +88,10 @@ function AccountManagerBase:fetch_crossplay_restrictions()
 	return
 end
 
+function AccountManagerBase:set_crossplay_restriction()
+	return
+end
+
 function AccountManagerBase:has_crossplay_restriction()
 	return false
 end

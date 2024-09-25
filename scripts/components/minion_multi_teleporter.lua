@@ -3,8 +3,6 @@ local SharedNav = require("scripts/components/utilities/shared_nav")
 local MinionMultiTeleporter = component("MinionMultiTeleporter")
 
 function MinionMultiTeleporter:init(unit, is_server, nav_world)
-	self._is_server = is_server
-
 	if not is_server then
 		return false
 	end
@@ -19,15 +17,14 @@ function MinionMultiTeleporter:init(unit, is_server, nav_world)
 	teleporter_units[unit] = self
 	local unit_id = Unit.id_string(unit)
 	local smart_object_id_lookup = {}
-	self._unit = unit
 	self._unit_id = unit_id
 	self._nav_world = nav_world
 	self._smart_object_id_lookup = smart_object_id_lookup
 	local nav_graph_extension = ScriptUnit.fetch_component_extension(unit, "nav_graph_system")
-	self._nav_graph_extension = nav_graph_extension
 
 	if nav_graph_extension then
 		self.is_valid = self:_setup_smart_objects(unit, unit_id, nav_world, nav_graph_extension, smart_object_id_lookup, teleporter_units)
+		self._nav_graph_extension = nav_graph_extension
 	else
 		self.is_valid = false
 	end
@@ -58,7 +55,7 @@ function MinionMultiTeleporter:_setup_smart_objects(unit, unit_id, nav_world, na
 end
 
 function MinionMultiTeleporter:destroy(unit)
-	if not self._is_server then
+	if not self.is_server then
 		return
 	end
 
@@ -91,7 +88,7 @@ function MinionMultiTeleporter:add_smart_object(destination_unit, destination_un
 	local unit_id = self._unit_id
 	local smart_object_id_lookup = self._smart_object_id_lookup
 	local existing_smart_object_id = smart_object_id_lookup[destination_unit]
-	local smart_object, smart_object_id = MinionMultiTeleporterQueries.generate_smart_object(self._unit, self._nav_world, destination_unit)
+	local smart_object, smart_object_id = MinionMultiTeleporterQueries.generate_smart_object(self.unit, self._nav_world, destination_unit)
 
 	self._nav_graph_extension:add_smart_object(smart_object, smart_object_id)
 
@@ -144,8 +141,7 @@ function MinionMultiTeleporter:editor_init(unit)
 
 	self._my_nav_gen_guid = nil
 	self._is_selected = false
-	self._should_debug_draw = false
-	self._unit = unit
+	self._debug_draw_enabled = false
 	local update_enabled = true
 
 	return update_enabled
@@ -198,9 +194,10 @@ function MinionMultiTeleporter:_editor_debug_draw(unit)
 
 	drawer:reset()
 
-	local nav_world = MinionMultiTeleporter._nav_info.nav_world
+	local active_mission_level_id = LevelEditor:get_active_mission_level()
+	local nav_world = MinionMultiTeleporter._nav_info.nav_world_from_level_id[active_mission_level_id]
 
-	if nav_world and self._should_debug_draw then
+	if nav_world and self._debug_draw_enabled then
 		table.clear(AVAILABLE_DESTINATION_TELEPORTERS)
 
 		local teleporter_units = MinionMultiTeleporter._teleporter_units
@@ -244,6 +241,16 @@ function MinionMultiTeleporter:_editor_debug_draw(unit)
 	drawer:update(self._world)
 end
 
+function MinionMultiTeleporter:editor_on_mission_changed(unit)
+	if not rawget(_G, "LevelEditor") then
+		return
+	end
+
+	if self._is_selected then
+		self:_editor_debug_draw(unit)
+	end
+end
+
 function MinionMultiTeleporter:editor_selection_changed(unit, selected)
 	if not rawget(_G, "LevelEditor") then
 		return
@@ -276,17 +283,19 @@ function MinionMultiTeleporter:editor_toggle_debug_draw(enable)
 		return
 	end
 
-	self._should_debug_draw = enable
+	self._debug_draw_enabled = enable
 
-	self:_editor_debug_draw(self._unit)
+	if self._is_selected then
+		self:_editor_debug_draw(self.unit)
+	end
 end
 
 function MinionMultiTeleporter:flow_enable()
-	if not self._is_server then
+	if not self.is_server then
 		return
 	end
 
-	local unit = self._unit
+	local unit = self.unit
 	local toggleable = self:get_data(unit, "toggleable")
 
 	self._nav_graph_extension:add_nav_graphs_to_database()
@@ -301,11 +310,11 @@ function MinionMultiTeleporter:flow_enable()
 end
 
 function MinionMultiTeleporter:flow_disable()
-	if not self._is_server then
+	if not self.is_server then
 		return
 	end
 
-	local unit = self._unit
+	local unit = self.unit
 	local toggleable = self:get_data(unit, "toggleable")
 
 	self._nav_graph_extension:remove_nav_graphs_from_database()

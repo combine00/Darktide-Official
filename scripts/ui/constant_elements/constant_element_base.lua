@@ -103,6 +103,10 @@ function ConstantElementBase:should_draw()
 	return self._is_visible
 end
 
+function ConstantElementBase:set_render_scale(render_scale)
+	self._render_scale = render_scale
+end
+
 function ConstantElementBase:on_resolution_modified()
 	self._update_scenegraph = true
 end
@@ -124,6 +128,10 @@ function ConstantElementBase:scenegraph_world_position(id, scale)
 	local ui_scenegraph = self._ui_scenegraph
 
 	return UIScenegraph.world_position(ui_scenegraph, id, scale)
+end
+
+function ConstantElementBase:_force_update_scenegraph()
+	UIScenegraph.update_scenegraph(self._ui_scenegraph, self._render_scale)
 end
 
 function ConstantElementBase:set_scenegraph_position(id, x, y, z, horizontal_alignment, vertical_alignment)

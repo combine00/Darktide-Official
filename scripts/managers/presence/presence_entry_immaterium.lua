@@ -217,6 +217,12 @@ function PresenceEntryImmaterium:is_cross_playing()
 	return self:_key_value_string("is_cross_playing") == "true"
 end
 
+function PresenceEntryImmaterium:psn_session_id()
+	local session_id = self:_key_value_string("psn_session_id")
+
+	return session_id ~= "none" and session_id or nil
+end
+
 function PresenceEntryImmaterium:is_alive()
 	if self._alive then
 		self._alive_queried = true

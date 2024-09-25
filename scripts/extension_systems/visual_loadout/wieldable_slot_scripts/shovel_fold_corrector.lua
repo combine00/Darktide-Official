@@ -1,3 +1,4 @@
+local WieldableSlotScriptInterface = require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/wieldable_slot_script_interface")
 local ShovelFoldCorrector = class("ShovelFoldCorrector")
 
 function ShovelFoldCorrector:init(context, slot, weapon_template, fx_sources)
@@ -49,5 +50,7 @@ end
 function ShovelFoldCorrector:destroy()
 	return
 end
+
+implements(ShovelFoldCorrector, WieldableSlotScriptInterface)
 
 return ShovelFoldCorrector

@@ -126,11 +126,15 @@ function LoadingHost:update(dt)
 end
 
 function LoadingHost:add(client_channel_id)
+	Profiler.send_message(string.format("[LoadingHost][add] client_channel_id: %s", tostring(client_channel_id)))
+
 	local client = LoadingRemoteStateMachine:new(self._network_delegate, client_channel_id, self._spawn_queue, self._done_loading_level_func)
 	self._clients[client_channel_id] = client
 end
 
 function LoadingHost:remove(client_channel_id)
+	Profiler.send_message(string.format("[LoadingHost][remove] client_channel_id: %s", tostring(client_channel_id)))
+
 	local client = self._clients[client_channel_id]
 	local client_peer_id = client:peer_id()
 

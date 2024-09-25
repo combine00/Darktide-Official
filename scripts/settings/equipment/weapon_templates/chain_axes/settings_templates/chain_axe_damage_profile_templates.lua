@@ -1432,6 +1432,10 @@ overrides.chainaxe_light_stab = {
 	parent_template_name = "default_light_chainaxe",
 	overrides = {
 		{
+			"ignore_stagger_reduction",
+			true
+		},
+		{
 			"targets",
 			1,
 			"power_distribution",

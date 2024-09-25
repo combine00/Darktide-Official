@@ -1,4 +1,5 @@
 local Component = require("scripts/utilities/component")
+local WieldableSlotScriptInterface = require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/wieldable_slot_script_interface")
 local RandomizedFriendRockUnit = class("RandomizedFriendRockUnit")
 
 function RandomizedFriendRockUnit:init(context, slot, weapon_template, fx_sources)
@@ -80,5 +81,7 @@ function RandomizedFriendRockUnit:_update_next_visibility_group_index()
 		self._next_visibility_group_index = next_visibility_group_index
 	end
 end
+
+implements(RandomizedFriendRockUnit, WieldableSlotScriptInterface)
 
 return RandomizedFriendRockUnit

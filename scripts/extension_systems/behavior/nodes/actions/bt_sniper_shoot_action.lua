@@ -393,6 +393,8 @@ function BtSniperShootAction:_ray_cast(scratchpad, from, to, distance)
 
 	if not hit_position then
 		hit_position = from + direction * distance
+		local out_of_bounds_manager = Managers.state.out_of_bounds
+		hit_position = out_of_bounds_manager:limit_line_end_position_to_soft_cap_extents(from, hit_position)
 	elseif hit_actor then
 		local hit_target = Actor.unit(hit_actor)
 

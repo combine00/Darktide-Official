@@ -575,6 +575,10 @@ local gibbing_template = {
 				left_arm
 			}
 		},
+		implosion = {
+			upper_left_arm_remove,
+			left_arm
+		},
 		plasma = {
 			conditional = {
 				upper_left_arm_remove,
@@ -602,6 +606,10 @@ local gibbing_template = {
 				upper_right_arm_remove,
 				right_arm
 			}
+		},
+		implosion = {
+			upper_right_arm_remove,
+			right_arm
 		},
 		plasma = {
 			conditional = {
@@ -631,6 +639,10 @@ local gibbing_template = {
 				left_leg
 			}
 		},
+		implosion = {
+			upper_left_leg_remove,
+			left_leg
+		},
 		plasma = {
 			conditional = {
 				upper_left_leg_remove,
@@ -659,6 +671,10 @@ local gibbing_template = {
 				right_leg
 			}
 		},
+		implosion = {
+			upper_right_leg_remove,
+			right_leg
+		},
 		plasma = {
 			conditional = {
 				upper_right_leg_remove,
@@ -678,6 +694,10 @@ local gibbing_template = {
 			lower_left_arm,
 			lower_left_arm_remove
 		},
+		implosion = {
+			lower_left_arm,
+			lower_left_arm_remove
+		},
 		plasma = lower_left_arm_remove,
 		warp = lower_left_arm_warp,
 		warp_shard = lower_left_arm_warp_shard
@@ -689,6 +709,10 @@ local gibbing_template = {
 			lower_right_arm_remove
 		},
 		boltshell = {
+			lower_right_arm,
+			lower_right_arm_remove
+		},
+		implosion = {
 			lower_right_arm,
 			lower_right_arm_remove
 		},
@@ -706,6 +730,10 @@ local gibbing_template = {
 			lower_left_leg,
 			lower_left_leg_remove
 		},
+		implosion = {
+			lower_left_leg,
+			lower_left_leg_remove
+		},
 		plasma = lower_left_leg_remove,
 		warp = lower_left_leg_warp,
 		warp_shard = lower_left_leg_warp_shard
@@ -717,6 +745,10 @@ local gibbing_template = {
 			lower_right_leg_remove
 		},
 		boltshell = {
+			lower_right_leg,
+			lower_right_leg_remove
+		},
+		implosion = {
 			lower_right_leg,
 			lower_right_leg_remove
 		},
@@ -733,6 +765,9 @@ local gibbing_template = {
 			torso_sever,
 			torso_remove,
 			torso_full
+		},
+		implosion = {
+			torso_remove
 		},
 		boltshell = torso_remove,
 		plasma = torso_remove,
@@ -752,11 +787,10 @@ local gibbing_template = {
 			torso_sever
 		},
 		explosion = {
-			center_mass_full,
-			center_mass_upper,
-			center_mass_lower,
-			center_mass_left,
-			center_mass_right
+			torso_remove
+		},
+		implosion = {
+			torso_remove
 		},
 		boltshell = {
 			center_mass_full,

@@ -195,18 +195,6 @@ function PlayerSuppressionExtension:max_suppression()
 	return self._max_suppression
 end
 
-function PlayerSuppressionExtension:wwise_suppression_state()
-	local num_suppression_hits = self._num_suppression_hits
-
-	if NUM_HITS_FOR_HIGH_SUPPRESSION <= num_suppression_hits then
-		return "high"
-	elseif NUM_HITS_FOR_LOW_SUPPRESSION <= num_suppression_hits then
-		return "low"
-	else
-		return "none"
-	end
-end
-
 function PlayerSuppressionExtension:clear_suppression()
 	if self._is_server or self._is_local_unit then
 		local suppression_component = self._suppression_component

@@ -17,12 +17,12 @@ end
 
 function CreditsVendorView:on_enter()
 	CreditsVendorView.super.on_enter(self)
-	self._item_grid:update_dividers("content/ui/materials/frames/details_upper_armoury", {
-		656,
-		76
+	self._item_grid:update_dividers("content/ui/materials/frames/item_list_top_hollow", {
+		652,
+		118
 	}, {
 		0,
-		-45,
+		-18,
 		20
 	}, "content/ui/materials/frames/details_lower_armoury", {
 		674,
@@ -276,6 +276,17 @@ function CreditsVendorView:_setup_sort_options()
 	local sort_callback = callback(self, "cb_on_sort_button_pressed")
 
 	self._item_grid:setup_sort_button(self._sort_options, sort_callback)
+end
+
+function CreditsVendorView:cb_switch_tab(index)
+	self._next_tab_index = index
+	self._next_tab_index_ignore_item_selection = true
+end
+
+function CreditsVendorView:_generate_menu_tabs(layout, offers)
+	local definitions = self._definitions
+
+	return definitions.item_category_tabs_content
 end
 
 return CreditsVendorView

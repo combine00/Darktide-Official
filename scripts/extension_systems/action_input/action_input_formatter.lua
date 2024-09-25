@@ -23,8 +23,13 @@ function ActionInputFormatter.format(action_input_type, templates, raw_inputs)
 	local action_inputs_hierarchy = {}
 	local action_inputs_configs = {}
 	local action_inputs_network_lookups = {}
+	local template_keys = table.keys(templates)
 
-	for name, template in pairs(templates) do
+	table.sort(template_keys)
+
+	for key_index = 1, #template_keys do
+		local name = template_keys[key_index]
+		local template = templates[name]
 		local action_inputs = template.action_inputs
 
 		if action_inputs then
@@ -56,7 +61,12 @@ function ActionInputFormatter.format(action_input_type, templates, raw_inputs)
 end
 
 function _read_action_inputs(name, action_inputs, sequences, network_lookup, total_num_action_inputs)
-	for action_input, data in pairs(action_inputs) do
+	local keys = table.keys(action_inputs)
+
+	table.sort(keys)
+
+	for _, action_input in ipairs(keys) do
+		local data = action_inputs[action_input]
 		local network_lookup_i = #network_lookup + 1
 		network_lookup[network_lookup_i] = action_input
 		network_lookup[action_input] = network_lookup_i
@@ -96,8 +106,13 @@ end
 function _read_hierarchy(hierarchy_data, sequences, hierarchy_depth)
 	hierarchy_depth = hierarchy_depth and hierarchy_depth + 1 or 1
 	local best_children_hierarchy_depth = nil
+	local keys = table.keys(hierarchy_data)
 
-	for action_input, children in pairs(hierarchy_data) do
+	table.sort(keys)
+
+	for _, action_input in ipairs(keys) do
+		local children = hierarchy_data[action_input]
+
 		if type(children) == "table" then
 			local child_hierarchy_depth = _read_hierarchy(children, sequences, hierarchy_depth)
 
@@ -107,7 +122,7 @@ function _read_hierarchy(hierarchy_data, sequences, hierarchy_depth)
 		else
 			local stay = children == "stay"
 			local base = children == "base"
-			slot11 = children == "previous"
+			slot13 = children == "previous"
 		end
 	end
 

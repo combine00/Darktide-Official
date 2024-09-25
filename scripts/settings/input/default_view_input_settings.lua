@@ -61,8 +61,8 @@ local default_view_input_settings = {
 		},
 		hotkey_item_discard = {
 			"keyboard_x",
-			"xbox_controller_y",
-			"ps4_controller_triangle",
+			"xbox_controller_right_thumb",
+			"ps4_controller_r3",
 			description = "loc_alias_view_hotkey_item_discard",
 			bindable = false
 		},
@@ -82,8 +82,8 @@ local default_view_input_settings = {
 		},
 		hotkey_item_compare = {
 			"keyboard_g",
-			"xbox_controller_d_right",
-			"ps4_controller_d_right",
+			"xbox_controller_x",
+			"ps4_controller_square",
 			description = "",
 			bindable = false
 		},
@@ -92,6 +92,13 @@ local default_view_input_settings = {
 			"xbox_controller_x",
 			"ps4_controller_square",
 			description = "loc_mission_board_toggle_solo_play",
+			bindable = false
+		},
+		hotkey_item_favorite = {
+			"keyboard_f",
+			"xbox_controller_y",
+			"ps4_controller_triangle",
+			description = "loc_alias_view_hotkey_item_favorite",
 			bindable = false
 		},
 		next_hint = {
@@ -458,6 +465,34 @@ local default_view_input_settings = {
 			"ps4_controller_touch",
 			description = "",
 			bindable = false
+		},
+		hotkey_help = {
+			"keyboard_h",
+			"xbox_controller_y",
+			"ps4_controller_triangle",
+			description = "",
+			bindable = false
+		},
+		group_finder_group_inspect = {
+			"keyboard_left shift",
+			"xbox_controller_left_shoulder",
+			"ps4_controller_l1",
+			description = "",
+			bindable = false
+		},
+		group_finder_group_clear_tags = {
+			"keyboard_e",
+			"xbox_controller_x",
+			"ps4_controller_square",
+			description = "",
+			bindable = false
+		},
+		group_finder_refresh_groups = {
+			"keyboard_r",
+			"xbox_controller_right_thumb",
+			"ps4_controller_r3",
+			description = "",
+			bindable = false
 		}
 	},
 	settings = {
@@ -555,6 +590,10 @@ local default_view_input_settings = {
 		},
 		hotkey_start_game = {
 			key_alias = "hotkey_start_game",
+			type = "pressed"
+		},
+		hotkey_item_favorite = {
+			key_alias = "hotkey_item_favorite",
 			type = "pressed"
 		},
 		hotkey_item_profile_preset_input_1 = {
@@ -704,6 +743,14 @@ local default_view_input_settings = {
 		navigate_primary_right_pressed = {
 			key_alias = "navigate_primary_right",
 			type = "pressed"
+		},
+		navigate_primary_left_held = {
+			key_alias = "navigate_primary_left",
+			type = "held"
+		},
+		navigate_primary_right_held = {
+			key_alias = "navigate_primary_right",
+			type = "held"
 		},
 		navigate_secondary_up_pressed = {
 			key_alias = "navigate_secondary_up",
@@ -931,6 +978,22 @@ local default_view_input_settings = {
 		},
 		lobby_open_inventory = {
 			key_alias = "lobby_open_inventory",
+			type = "pressed"
+		},
+		hotkey_help = {
+			key_alias = "hotkey_help",
+			type = "pressed"
+		},
+		group_finder_group_inspect = {
+			key_alias = "group_finder_group_inspect",
+			type = "held"
+		},
+		group_finder_group_clear_tags = {
+			key_alias = "group_finder_group_clear_tags",
+			type = "pressed"
+		},
+		group_finder_refresh_groups = {
+			key_alias = "group_finder_refresh_groups",
 			type = "pressed"
 		}
 	}

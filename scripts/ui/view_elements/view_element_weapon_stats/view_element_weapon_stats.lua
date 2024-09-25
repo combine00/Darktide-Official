@@ -1,6 +1,6 @@
 require("scripts/ui/view_elements/view_element_grid/view_element_grid")
 
-local ItemUtils = require("scripts/utilities/items")
+local Items = require("scripts/utilities/items")
 local MasterItems = require("scripts/backend/master_items")
 local WeaponTemplate = require("scripts/utilities/weapon/weapon_template")
 local _create_definitions_function = require("scripts/ui/view_elements/view_element_weapon_stats/view_element_weapon_stats_definitions")
@@ -24,24 +24,16 @@ function ViewElementWeaponStats:destroy(ui_renderer)
 	ViewElementWeaponStats.super.destroy(self, ui_renderer)
 end
 
-local function _add_base_rating(item, layout, grid_size)
-	local base_stats_rating = ItemUtils.calculate_stats_rating(item)
-	layout[#layout + 1] = {
-		widget_type = "rating_info",
-		rating = base_stats_rating,
-		header = Localize("loc_item_information_stats_title_modifiers")
-	}
-end
-
 local function _add_presentation_perks(item, layout, grid_size)
 	local item_type = item.item_type
 	local perks = item.perks
 	local num_perks = perks and #perks or 0
 	local add_end_margin = false
-	local num_modifications, max_modifications = ItemUtils.modifications_by_rarity(item)
-	local item_locked = num_modifications == max_modifications
 
 	if num_perks > 0 then
+		layout[#layout + 1] = {
+			widget_type = "divider_line"
+		}
 		layout[#layout + 1] = {
 			widget_type = "dynamic_spacing",
 			size = {
@@ -50,7 +42,7 @@ local function _add_presentation_perks(item, layout, grid_size)
 			}
 		}
 		add_end_margin = true
-		local rating = item.override_perk_rating_string or ItemUtils.item_perk_rating(item)
+		local rating = item.override_perk_rating_string or Items.item_perk_rating(item)
 		layout[#layout + 1] = {
 			widget_type = "rating_info",
 			rating = rating,
@@ -73,8 +65,8 @@ local function _add_presentation_perks(item, layout, grid_size)
 		local perk_item = MasterItems.get_item(perk_id)
 
 		if perk_item then
-			local is_locked = item_locked and not perk.modified
-			local is_modified = perk.modified
+			local is_locked = false
+			local is_modified = false
 			local show_glow = perk.is_fake
 			local is_gadget = item_type == "GADGET"
 			layout[#layout + 1] = {
@@ -110,11 +102,12 @@ local function _add_presentation_traits(item, layout, grid_size)
 	local add_end_margin = false
 	local traits = item.traits
 	local num_traits = traits and #traits or 0
-	local num_modifications, max_modifications = ItemUtils.modifications_by_rarity(item)
-	local item_locked = num_modifications == max_modifications
 
 	if num_traits > 0 then
-		local rating = item.override_trait_rating_string or ItemUtils.item_trait_rating(item)
+		layout[#layout + 1] = {
+			widget_type = "divider_line"
+		}
+		local rating = item.override_trait_rating_string or Items.item_trait_rating(item)
 		layout[#layout + 1] = {
 			widget_type = "rating_info",
 			rating = rating,
@@ -144,13 +137,13 @@ local function _add_presentation_traits(item, layout, grid_size)
 		local trait_id = trait.id
 		local trait_value = trait.value
 		local trait_rarity = trait.rarity
-		local trait_category = (item_type == "WEAPON_MELEE" or item_type == "WEAPON_RANGED") and ItemUtils.trait_category(item)
+		local trait_category = (item_type == "WEAPON_MELEE" or item_type == "WEAPON_RANGED") and Items.trait_category(item)
 		local trait_item = MasterItems.get_item(trait_id)
 
 		if trait_item then
 			local widget_type = is_gadget and "gadget_trait" or "weapon_trait"
-			local is_locked = item_locked and not trait.modified
-			local is_modified = trait.modified
+			local is_locked = false
+			local is_modified = false
 			local show_glow = trait.is_fake
 			layout[#layout + 1] = {
 				add_background = true,
@@ -223,7 +216,7 @@ function ViewElementWeaponStats:present_item(item, context, on_present_callback)
 	local grid_size = menu_settings.grid_size
 	local item_name = item.name
 	local item_type = item.item_type
-	local is_weapon = item_type == "WEAPON_MELEE" or item_type == "WEAPON_RANGED"
+	local is_weapon = Items.is_weapon(item_type)
 
 	if is_weapon and not self:_verify_weapon(item) then
 		return
@@ -249,7 +242,7 @@ function ViewElementWeaponStats:present_item(item, context, on_present_callback)
 			return
 		end
 
-		local obtained_display_name = ItemUtils.obtained_display_name(item)
+		local obtained_display_name = Items.obtained_display_name(item)
 
 		if obtained_display_name then
 			local unlocked = is_inventory_item()
@@ -278,24 +271,25 @@ function ViewElementWeaponStats:present_item(item, context, on_present_callback)
 		end
 	end
 
-	layout[#layout + 1] = {
-		widget_type = "dynamic_spacing",
-		size = {
-			grid_size[1],
-			10
-		}
-	}
-
 	if is_weapon then
 		layout[#layout + 1] = {
 			widget_type = "weapon_header",
 			item = item
 		}
 		layout[#layout + 1] = {
+			widget_type = "weapon_attack_data",
+			item = item,
+			size = {
+				grid_size[1],
+				75
+			}
+		}
+		layout[#layout + 1] = {
 			widget_type = "weapon_keywords",
 			item = item
 		}
 		layout[#layout + 1] = {
+			add_background = true,
 			widget_type = "dynamic_spacing",
 			size = {
 				grid_size[1],
@@ -303,32 +297,29 @@ function ViewElementWeaponStats:present_item(item, context, on_present_callback)
 			}
 		}
 		layout[#layout + 1] = {
-			widget_type = "weapon_attack_data",
-			item = item,
-			size = {
-				grid_size[1],
-				60
-			}
+			add_background = true,
+			widget_type = "weapon_stats",
+			item = item
 		}
-
-		_add_base_rating(item, layout, grid_size)
-
 		layout[#layout + 1] = {
 			add_background = true,
 			widget_type = "dynamic_spacing",
 			size = {
 				grid_size[1],
-				30
+				10
 			}
 		}
-		layout[#layout + 1] = {
-			add_background = true,
-			widget_type = "weapon_stats",
-			item = item
-		}
+		add_end_margin = false
 
 		if _add_presentation_perks(item, layout, grid_size) then
-			add_end_margin = true
+			layout[#layout + 1] = {
+				widget_type = "dynamic_spacing",
+				size = {
+					grid_size[1],
+					10
+				}
+			}
+			add_end_margin = false
 		end
 
 		if _add_presentation_traits(item, layout, grid_size) then
@@ -337,7 +328,7 @@ function ViewElementWeaponStats:present_item(item, context, on_present_callback)
 				widget_type = "dynamic_spacing",
 				size = {
 					grid_size[1],
-					20
+					30
 				}
 			}
 			add_end_margin = false
@@ -346,9 +337,6 @@ function ViewElementWeaponStats:present_item(item, context, on_present_callback)
 		layout[#layout + 1] = {
 			widget_type = "gadget_header",
 			item = item
-		}
-		layout[#layout + 1] = {
-			widget_type = "divider_line"
 		}
 
 		if _add_presentation_traits(item, layout, grid_size) then
@@ -359,7 +347,7 @@ function ViewElementWeaponStats:present_item(item, context, on_present_callback)
 			add_end_margin = true
 		end
 	elseif item_type == "WEAPON_SKIN" then
-		local visual_item = ItemUtils.weapon_skin_preview_item(item)
+		local visual_item = Items.weapon_skin_preview_item(item)
 
 		if visual_item then
 			layout[#layout + 1] = {
@@ -379,7 +367,7 @@ function ViewElementWeaponStats:present_item(item, context, on_present_callback)
 				widget_type = "divider_line"
 			}
 
-			if show_requirement and ItemUtils.weapon_skin_requirement_text(item) ~= "" then
+			if show_requirement and Items.weapon_skin_requirement_text(item) ~= "" then
 				layout[#layout + 1] = {
 					widget_type = "dynamic_spacing",
 					size = {
@@ -429,7 +417,7 @@ function ViewElementWeaponStats:present_item(item, context, on_present_callback)
 			add_end_margin = false
 		end
 	elseif item_type == "WEAPON_TRINKET" then
-		local visual_item = ItemUtils.weapon_trinket_preview_item(item)
+		local visual_item = Items.weapon_trinket_preview_item(item)
 
 		if visual_item then
 			layout[#layout + 1] = {
@@ -486,7 +474,7 @@ function ViewElementWeaponStats:present_item(item, context, on_present_callback)
 			widget_type = "divider_line"
 		}
 
-		if show_requirement and ItemUtils.class_requirement_text(item) ~= "" then
+		if show_requirement and Items.class_requirement_text(item) ~= "" then
 			layout[#layout + 1] = {
 				widget_type = "dynamic_spacing",
 				size = {
@@ -671,12 +659,37 @@ function ViewElementWeaponStats:present_item(item, context, on_present_callback)
 		}
 	end
 
+	local widgets_by_name = self._widgets_by_name
+	local grid_divider_top = widgets_by_name.grid_divider_top
+	local grid_divider_bottom = widgets_by_name.grid_divider_bottom
+	grid_divider_top.visible = not is_weapon
+	grid_divider_bottom.visible = not is_weapon
+	local grid_divider_top_weapon = widgets_by_name.grid_divider_top_weapon
+	local grid_divider_bottom_weapon = widgets_by_name.grid_divider_bottom_weapon
+	grid_divider_top_weapon.visible = is_weapon
+	grid_divider_bottom_weapon.visible = is_weapon
+
+	if is_weapon then
+		local rating_value, has_rating = Items.expertise_level(item)
+		grid_divider_top_weapon.content.rating_value = has_rating and rating_value or ""
+		local display_name = Items.weapon_card_display_name(item)
+		grid_divider_top_weapon.content.weapon_display_name = display_name
+	end
+
+	self._item = item
+
 	self:present_grid_layout(layout, on_present_callback, item)
 end
 
 function ViewElementWeaponStats:stop_presenting()
 	self:_destroy_grid_widgets()
 	self:_destroy_grid()
+
+	self._item = nil
+end
+
+function ViewElementWeaponStats:is_presenting()
+	return not not self._item
 end
 
 function ViewElementWeaponStats:present_grid_layout(layout, on_present_callback, item)
@@ -699,6 +712,10 @@ function ViewElementWeaponStats:present_grid_layout(layout, on_present_callback,
 	ViewElementWeaponStats.super.present_grid_layout(self, layout, ContentBlueprints, left_click_callback, right_click_callback, grid_display_name, grow_direction, on_present_callback)
 end
 
+function ViewElementWeaponStats:play_expertise_upgrade_animation(callback)
+	return self:_start_animation("on_expertise_upgrade", self._widgets_by_name, nil, callback)
+end
+
 function ViewElementWeaponStats:_on_present_grid_layout_changed(layout, content_blueprints, left_click_callback, right_click_callback, display_name, optional_grow_direction)
 	ViewElementWeaponStats.super._on_present_grid_layout_changed(self, layout, content_blueprints, left_click_callback, right_click_callback, display_name, optional_grow_direction)
 
@@ -709,6 +726,8 @@ function ViewElementWeaponStats:_on_present_grid_layout_changed(layout, content_
 	local new_grid_height = math.clamp(grid_length, 0, self._default_grid_size[2])
 	grid_size[2] = new_grid_height
 	mask_size[2] = new_grid_height
+	local shine_overlay_widget = self._widgets_by_name.shine_overlay
+	shine_overlay_widget.style.texture.size[2] = new_grid_height - 25
 
 	self:force_update_list_size()
 end
@@ -743,18 +762,76 @@ function ViewElementWeaponStats:select_trait(index)
 	end
 end
 
-function ViewElementWeaponStats:update_modification_cap(override_value)
+function ViewElementWeaponStats:preview_perk(index, new_perk)
+	local widgets = self:widgets()
+
+	for i = 1, #widgets do
+		local widget = widgets[i]
+
+		if widget.type == "weapon_perk" and widget.content.entry.perk_index == index then
+			local perk_id = new_perk and new_perk.id
+			local perk_value = new_perk and new_perk.value
+			local perk_rarity = new_perk and new_perk.rarity
+			local perk_item = perk_id and MasterItems.get_item(perk_id)
+			local preview_perk = {
+				preview_perk_item = perk_item and perk_item,
+				preview_perk_value = perk_item and perk_value,
+				preview_perk_rarity = perk_item and perk_rarity
+			}
+
+			if widget.update_item then
+				widget:update_item(preview_perk)
+			end
+
+			break
+		end
+	end
+end
+
+function ViewElementWeaponStats:preview_trait(index, new_trait)
+	local widgets = self:widgets()
+
+	for i = 1, #widgets do
+		local widget = widgets[i]
+
+		if widget.type == "weapon_trait" and widget.content.entry.trait_index == index then
+			local trait_id = new_trait and new_trait.id
+			local trait_value = new_trait and new_trait.value
+			local trait_rarity = new_trait and new_trait.rarity
+			local trait_item = trait_id and MasterItems.get_item(trait_id)
+			local preview_trait = {
+				preview_trait_item = trait_item and trait_item,
+				preview_trait_value = trait_item and trait_value,
+				preview_trait_rarity = trait_item and trait_rarity
+			}
+
+			if widget.update_item then
+				widget:update_item(preview_trait)
+			end
+
+			break
+		end
+	end
+end
+
+function ViewElementWeaponStats:update_expertise_value(start_value, override_value)
 	local item = self._item
-	local grid_divider_bottom_weapon = self._widgets_by_name.grid_divider_bottom_weapon
+	local grid_divider_bottom_weapon = self._widgets_by_name.grid_divider_top_weapon
 
 	if item and (item.item_type == "WEAPON_MELEE" or item.item_type == "WEAPON_RANGED") then
-		ItemUtils.modifications_by_item(item):next(function (values)
-			grid_divider_bottom_weapon.content.modified_text = string.format(" %i/%i", values.modifications, override_value or values.max_modifications)
-		end):catch(function (values)
-			grid_divider_bottom_weapon.style.modified_frame.visible = false
-			grid_divider_bottom_weapon.style.modified_text.visible = false
-			grid_divider_bottom_weapon.content.modified_text = ""
-		end)
+		grid_divider_bottom_weapon.content.rating_value = string.format(" %i", override_value or start_value)
+		grid_divider_bottom_weapon.content.show_glow = override_value and override_value ~= start_value
+		local max_expertise_level = Items.max_expertise_level()
+		local widgets = self:widgets()
+
+		for i = 1, #widgets do
+			local widget = widgets[i]
+
+			if widget.type == "weapon_stats" then
+				widget.content.start_expertise_value = start_value
+				widget.content.preview_expertise_value = override_value and math.min(max_expertise_level, override_value) or nil
+			end
+		end
 	end
 end
 

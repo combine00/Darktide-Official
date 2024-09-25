@@ -60,6 +60,7 @@ function GameStateMachine:_log_state_change(current_state, next_state)
 	end
 
 	_debug_print("[%s] Changing state '%s' -> '%s'", self._name, current_state_name, next_state_name)
+	Profiler.send_message(string.format("[%s] Changing state '%s' -> '%s'", self._name, current_state_name, next_state_name))
 end
 
 function GameStateMachine:_change_state()

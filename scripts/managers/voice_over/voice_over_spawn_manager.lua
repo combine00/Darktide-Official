@@ -23,7 +23,11 @@ function VoiceOverSpawnManager:on_gameplay_post_init(level)
 
 		if mission_giver_packs then
 			local mission_giver = self:current_voice_profile()
-			vo_classes_2d = mission_giver_packs[mission_giver]
+			local pack = mission_giver_packs[mission_giver]
+
+			if pack then
+				vo_classes_2d = pack
+			end
 		end
 	end
 

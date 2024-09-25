@@ -65,6 +65,8 @@ function SpawnQueue:trigger_group(group_id)
 		peers[#peers + 1] = peer
 	end
 
+	table.sort(peers)
+
 	for _, peer in ipairs(self._spawned) do
 		peers[#peers + 1] = peer
 	end
@@ -92,7 +94,12 @@ function SpawnQueue:all_levels_loaded(group_id)
 end
 
 function SpawnQueue:retire_group(group_id)
-	for peer, _ in pairs(self._spawning.peers) do
+	local peers = table.keys(self._spawning.peers)
+
+	table.sort(peers)
+
+	for peer_index = 1, #peers do
+		local peer = peers[peer_index]
 		self._spawned[#self._spawned + 1] = peer
 	end
 

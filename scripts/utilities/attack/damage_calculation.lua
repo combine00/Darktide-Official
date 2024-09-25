@@ -70,7 +70,8 @@ function DamageCalculation.calculate(damage_profile, damage_type, target_setting
 	local backstab_damage = _backstab_damage(damage, attack_type, attacker_stat_buffs, is_backstab, damage_profile)
 	local flanking_damage = _flanking_damage(damage, attacker_stat_buffs, is_flanking)
 	damage = damage + backstab_damage + flanking_damage
-	local hit_zone_damage_multiplier = _hit_zone_damage_multiplier(breed_or_nil, hit_zone_name, attack_type, damage_profile.ignore_hitzone_multiplier, damage_profile.ignore_roamer_hitzone_multipliers)
+	local ignore_hitzone_multipliers_breed_tags = damage_profile.ignore_roamer_hitzone_multipliers
+	local hit_zone_damage_multiplier = _hit_zone_damage_multiplier(breed_or_nil, hit_zone_name, attack_type, damage_profile.ignore_hitzone_multiplier, ignore_hitzone_multipliers_breed_tags)
 	damage = damage * hit_zone_damage_multiplier
 	damage = _apply_armor_type_buffs_to_damage(damage, armor_type, attacker_stat_buffs, target_toughness_extension)
 	damage = _apply_armor_type_buffs_to_damage(damage, armor_type, target_stat_buffs, target_toughness_extension)
@@ -195,6 +196,9 @@ function _calculate_damage_buff(damage_profile, damage_type, target_settings, po
 	local damage_stat_buffs = 1
 	local damage_stat_buff = (attacker_stat_buffs.damage or 1) - 1
 	damage_stat_buffs = damage_stat_buffs + damage_stat_buff
+	local breed_name_or_nil = attacked_breed_or_nil and attacked_breed_or_nil.name
+	local breed_stat_buff = (breed_name_or_nil and attacker_stat_buffs["damage_vs_" .. breed_name_or_nil] or 1) - 1
+	damage_stat_buffs = damage_stat_buffs + breed_stat_buff
 	local close_damage_buff = attacker_stat_buffs.damage_near or 1
 	local far_damage_buff = attacker_stat_buffs.damage_far or 1
 	distance = distance or 0
@@ -459,14 +463,14 @@ function _apply_diminishing_returns_to_damage(damage, target_health_extension, b
 	return math.lerp(0, damage, math.easeInCubic(current_health_percent))
 end
 
-function _hit_zone_damage_multiplier(breed_or_nil, hit_zone_name, attack_type, ignore_hitzone_multiplier, ignore_roamer_hitzone_multipliers)
+function _hit_zone_damage_multiplier(breed_or_nil, hit_zone_name, attack_type, ignore_hitzone_multiplier, ignore_hitzone_multipliers_breed_tags_or_nil)
 	if ignore_hitzone_multiplier or not breed_or_nil then
 		return 1
 	end
 
 	local breed_tags = breed_or_nil.tags
 
-	if breed_tags and ignore_roamer_hitzone_multipliers and not breed_tags.monster then
+	if breed_tags and ignore_hitzone_multipliers_breed_tags_or_nil and not breed_tags.monster then
 		return 1
 	end
 

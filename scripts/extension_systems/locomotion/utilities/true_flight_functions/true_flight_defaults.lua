@@ -2,7 +2,7 @@ local MinionState = require("scripts/utilities/minion_state")
 local ProjectileLocomotion = require("scripts/extension_systems/locomotion/utilities/projectile_locomotion")
 local ProjectileLocomotionSettings = require("scripts/settings/projectile_locomotion/projectile_locomotion_settings")
 local projectile_impact_results = ProjectileLocomotionSettings.impact_results
-local true_flight_defaults = {}
+local TrueFlightDefaults = {}
 
 local function _center_of_all_actors(target_unit)
 	local Unit_get_node_actors = Unit.get_node_actors
@@ -69,7 +69,7 @@ local function _center_of_hit_zone(target_unit, target_hit_zone)
 	return nil
 end
 
-function true_flight_defaults.get_unit_position(target_unit, target_hit_zone)
+function TrueFlightDefaults.get_unit_position(target_unit, target_hit_zone)
 	local center_of_hit_zone = _center_of_hit_zone(target_unit, target_hit_zone)
 
 	if center_of_hit_zone then
@@ -97,7 +97,7 @@ local function _lerp_modifier_func(true_flight_template)
 	return template_func or _lerp_modifier_func_default
 end
 
-function true_flight_defaults.default_update_towards_position(target_position, physics_world, integration_data, dt, t, optional_validate_impact_func, optional_on_impact_func)
+function TrueFlightDefaults.default_update_towards_position(target_position, physics_world, integration_data, dt, t, optional_validate_impact_func, optional_on_impact_func)
 	local position = integration_data.position
 	local velocity = integration_data.velocity
 	local current_direction = Vector3.normalize(velocity)
@@ -124,37 +124,37 @@ function true_flight_defaults.default_update_towards_position(target_position, p
 	local new_velocity = new_direction * new_speed
 	integration_data.velocity = new_velocity
 	local new_rotation = Quaternion.look(velocity)
-	new_position = true_flight_defaults.default_check_collisions(physics_world, integration_data, position, new_position, dt, t, optional_validate_impact_func, optional_on_impact_func)
+	new_position = TrueFlightDefaults.default_check_collisions(physics_world, integration_data, position, new_position, dt, t, optional_validate_impact_func, optional_on_impact_func)
 
 	return new_position, new_rotation
 end
 
-function true_flight_defaults.default_update_position_velocity(physics_world, integration_data, dt, t, optional_validate_impact_func, optional_on_impact_func)
+function TrueFlightDefaults.default_update_position_velocity(physics_world, integration_data, dt, t, optional_validate_impact_func, optional_on_impact_func)
 	local velocity = integration_data.velocity
 	local position = integration_data.position
 	local new_position = position + velocity * dt
 	local new_rotation = Quaternion.look(velocity)
-	new_position = true_flight_defaults.default_check_collisions(physics_world, integration_data, position, new_position, dt, t, optional_validate_impact_func, optional_on_impact_func)
+	new_position = TrueFlightDefaults.default_check_collisions(physics_world, integration_data, position, new_position, dt, t, optional_validate_impact_func, optional_on_impact_func)
 
 	return new_position, new_rotation
 end
 
 local broadphase_results = {}
 
-function true_flight_defaults.broadphase_query(owner_unit, position, radius)
+function TrueFlightDefaults.broadphase_query(projectile_unit, position, radius)
 	table.clear(broadphase_results)
 
 	local extension_manager = Managers.state.extension
 	local broadphase_system = extension_manager:system("broadphase_system")
 	local broadphase = broadphase_system.broadphase
-	local side = ScriptUnit.extension(owner_unit, "side_system").side
+	local side = ScriptUnit.extension(projectile_unit, "side_system").side
 	local relation_side_names = side:relation_side_names("enemy")
 	local num_hits = Broadphase.query(broadphase, position, radius, broadphase_results, relation_side_names)
 
 	return num_hits, broadphase_results
 end
 
-function true_flight_defaults.get_closest_highest_value_target(integration_data, number_of_results, results, position, is_valid_and_legitimate_target_func, default_hit_zone)
+function TrueFlightDefaults.get_closest_highest_value_target(integration_data, number_of_results, results, position, is_valid_and_legitimate_target_func, default_hit_zone)
 	local closest_unit = nil
 	local closest_distance = math.huge
 
@@ -179,8 +179,8 @@ function true_flight_defaults.get_closest_highest_value_target(integration_data,
 	return nil, nil
 end
 
-function true_flight_defaults.find_closest_highest_value_target(integration_data, position, is_valid_and_legitimate_targe_func)
-	local owner_unit = integration_data.owner_unit
+function TrueFlightDefaults.find_closest_highest_value_target(integration_data, position, is_valid_and_legitimate_targe_func)
+	local projectile_unit = integration_data.projectile_unit
 	local true_flight_template = integration_data.true_flight_template
 	local broadphase_radius = true_flight_template.broadphase_radius
 	local forward_search_distance_to_find_target = true_flight_template.forward_search_distance_to_find_target
@@ -188,37 +188,37 @@ function true_flight_defaults.find_closest_highest_value_target(integration_data
 
 	if integration_data.target_position then
 		local target_position = integration_data.target_position
-		number_of_results, results = true_flight_defaults.broadphase_query(owner_unit, target_position, broadphase_radius)
+		number_of_results, results = TrueFlightDefaults.broadphase_query(projectile_unit, target_position, broadphase_radius)
 	else
 		local veclocity = integration_data.velocity
 		local current_direction = Vector3.normalize(veclocity)
 		local first_search_pos = position + current_direction * forward_search_distance_to_find_target
-		number_of_results, results = true_flight_defaults.broadphase_query(owner_unit, first_search_pos, broadphase_radius)
+		number_of_results, results = TrueFlightDefaults.broadphase_query(projectile_unit, first_search_pos, broadphase_radius)
 
 		if number_of_results <= 0 then
 			local second_search_pos = position + current_direction * forward_search_distance_to_find_target * 2
-			number_of_results, results = true_flight_defaults.broadphase_query(owner_unit, second_search_pos, broadphase_radius * 2)
+			number_of_results, results = TrueFlightDefaults.broadphase_query(projectile_unit, second_search_pos, broadphase_radius * 2)
 		end
 	end
 
-	local closest_unit, hit_zone = true_flight_defaults.get_closest_highest_value_target(integration_data, number_of_results, results, position, is_valid_and_legitimate_targe_func, true_flight_template.target_hit_zone)
+	local closest_unit, hit_zone = TrueFlightDefaults.get_closest_highest_value_target(integration_data, number_of_results, results, position, is_valid_and_legitimate_targe_func, true_flight_template.target_hit_zone)
 
 	return closest_unit, hit_zone
 end
 
-function true_flight_defaults.default_no_new_target(integration_data, position, is_valid_and_legitimate_targe_func)
+function TrueFlightDefaults.default_no_new_target(integration_data, position, is_valid_and_legitimate_targe_func)
 	return nil, nil
 end
 
-function true_flight_defaults.legitimate_always(integration_data, target_unit, target_position, position)
+function TrueFlightDefaults.legitimate_always(integration_data, target_unit, target_position, position)
 	return true
 end
 
-function true_flight_defaults.legitimate_never(integration_data, target_unit, target_position, position)
+function TrueFlightDefaults.legitimate_never(integration_data, target_unit, target_position, position)
 	return false
 end
 
-function true_flight_defaults.legitimate_line_of_sight_from_player(integration_data, target_unit, target_position, position)
+function TrueFlightDefaults.legitimate_line_of_sight_from_player(integration_data, target_unit, target_position, position)
 	local player_unit = integration_data.owner_unit
 
 	if not HEALTH_ALIVE[player_unit] then
@@ -247,7 +247,7 @@ function true_flight_defaults.legitimate_line_of_sight_from_player(integration_d
 	return not hit_something
 end
 
-function true_flight_defaults.legitimate_dot_check(integration_data, target_unit, target_position, position)
+function TrueFlightDefaults.legitimate_dot_check(integration_data, target_unit, target_position, position)
 	local velocity = integration_data.velocity
 	local current_direction = Vector3.normalize(velocity)
 	local direction_to_target = target_position - position
@@ -261,7 +261,7 @@ function true_flight_defaults.legitimate_dot_check(integration_data, target_unit
 	return false
 end
 
-function true_flight_defaults.legitimate_angle_check(integration_data, target_unit, target_position, position)
+function TrueFlightDefaults.legitimate_angle_check(integration_data, target_unit, target_position, position)
 	local true_flight_template = integration_data.true_flight_template
 	local velocity = integration_data.velocity
 	local current_direction = Vector3.normalize(velocity)
@@ -277,43 +277,43 @@ function true_flight_defaults.legitimate_angle_check(integration_data, target_un
 	return false
 end
 
-function true_flight_defaults.is_not_sleeping_demon_host(integration_data, target_unit, target_position, position)
+function TrueFlightDefaults.is_not_sleeping_demon_host(integration_data, target_unit, target_position, position)
 	local is_not_sleeping_deamonhost = not MinionState.is_sleeping_deamonhost(target_unit)
-	local is_angle_ok = true_flight_defaults.legitimate_angle_check(integration_data, target_unit, target_position, position)
+	local is_angle_ok = TrueFlightDefaults.legitimate_angle_check(integration_data, target_unit, target_position, position)
 
 	return is_not_sleeping_deamonhost and is_angle_ok
 end
 
-function true_flight_defaults.impact_is_always_valid(hit_unit, integration_data)
+function TrueFlightDefaults.impact_is_always_valid(hit_unit, integration_data)
 	return true
 end
 
-function true_flight_defaults.on_impact_do_nothing(hit_unit, hit, integration_data, new_position, is_server, dt, t)
+function TrueFlightDefaults.on_impact_do_nothing(hit_unit, hit, integration_data, new_position, is_server, dt, t)
 	return new_position
 end
 
-function true_flight_defaults.retry_if_no_target(integration_data)
+function TrueFlightDefaults.retry_if_no_target(integration_data)
 	local target_unit = integration_data.target_unit
 	local target_pos = integration_data.target_position
 
 	return not target_unit and not target_pos
 end
 
-function true_flight_defaults.dont_retry_target(integration_data)
+function TrueFlightDefaults.dont_retry_target(integration_data)
 	return false
 end
 
-function true_flight_defaults.always_retry_target(integration_data)
+function TrueFlightDefaults.always_retry_target(integration_data)
 	return true
 end
 
-function true_flight_defaults.retry_if_target_position(integration_data)
+function TrueFlightDefaults.retry_if_target_position(integration_data)
 	local target_unit = integration_data.target_unit
 
 	return not target_unit
 end
 
-function true_flight_defaults.default_check_collisions(physics_world, integration_data, previus_position, new_position, dt, t, optional_validate_impact_func, optional_on_impact_func)
+function TrueFlightDefaults.default_check_collisions(physics_world, integration_data, previus_position, new_position, dt, t, optional_validate_impact_func, optional_on_impact_func)
 	local true_flight_template = integration_data.true_flight_template
 	local radius = integration_data.radius
 	local collision_filter = integration_data.collision_filter
@@ -390,4 +390,4 @@ function true_flight_defaults.default_check_collisions(physics_world, integratio
 	return new_position
 end
 
-return true_flight_defaults
+return TrueFlightDefaults

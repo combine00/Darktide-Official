@@ -3,14 +3,13 @@ local SharedNav = require("scripts/components/utilities/shared_nav")
 local BotJumpAssist = component("BotJumpAssist")
 
 function BotJumpAssist:init(unit, is_server)
-	self._is_server = is_server
 	local run_update = false
 
 	return run_update
 end
 
 function BotJumpAssist:on_gameplay_post_init(unit, level)
-	if self._is_server then
+	if self.is_server then
 		local wanted_from = Unit.world_position(unit, 1)
 		local via = Unit.world_position(unit, Unit.node(unit, "waypoint"))
 		local wanted_to = Unit.world_position(unit, Unit.node(unit, "destination"))
@@ -27,7 +26,7 @@ function BotJumpAssist:on_gameplay_post_init(unit, level)
 end
 
 function BotJumpAssist:destroy(unit)
-	if self._is_server and self._transition_index then
+	if self.is_server and self._transition_index then
 		Managers.state.bot_nav_transition:unregister_transition(self._transition_index)
 	end
 end
@@ -58,8 +57,10 @@ function BotJumpAssist:editor_init(unit)
 	end
 
 	self._my_nav_gen_guid = nil
-	self._unit = unit
-	self._should_debug_draw = false
+	self._debug_draw_enabled = false
+	local object_id = Unit.get_data(unit, "LevelEditor", "object_id")
+	self._object_id = object_id
+	self._in_active_mission_table = LevelEditor:is_level_object_in_active_mission_table(object_id)
 
 	return true
 end
@@ -86,15 +87,12 @@ function BotJumpAssist:editor_destroy(unit)
 		return
 	end
 
-	local line_object = self._line_object
 	local world = self._world
+	local line_object = self._line_object
 
 	LineObject.reset(line_object)
 	LineObject.dispatch(world, line_object)
 	World.destroy_line_object(world, line_object)
-
-	self._line_object = nil
-	self._world = nil
 end
 
 function BotJumpAssist:editor_update(unit)
@@ -119,14 +117,18 @@ function BotJumpAssist:_editor_debug_draw(unit)
 
 	drawer:reset()
 
-	local should_debug_draw = self._should_debug_draw
-	local nav_world = BotJumpAssist._nav_info.nav_world
+	local nav_world, active_mission_level_id = nil
 
-	if nav_world and should_debug_draw then
+	if self._in_active_mission_table and self._debug_draw_enabled then
+		active_mission_level_id = LevelEditor:get_active_mission_level()
+		nav_world = BotJumpAssist._nav_info.nav_world_from_level_id[active_mission_level_id]
+	end
+
+	if nav_world then
 		local wanted_from = Unit.world_position(unit, 1)
 		local via = Unit.world_position(unit, Unit.node(unit, "waypoint"))
 		local wanted_to = Unit.world_position(unit, Unit.node(unit, "destination"))
-		local traverse_logic = BotJumpAssist._nav_info.traverse_logic
+		local traverse_logic = BotJumpAssist._nav_info.traverse_logic_from_level_id[active_mission_level_id]
 		local success, from, to = BotNavTransition.check_nav_mesh(wanted_from, wanted_to, nav_world, traverse_logic, drawer)
 		local any_error = from == nil
 
@@ -167,9 +169,17 @@ function BotJumpAssist:_editor_debug_draw(unit)
 		end
 	end
 
-	local world = self._world
+	drawer:update(self._world)
+end
 
-	drawer:update(world)
+function BotJumpAssist:editor_on_mission_changed(unit)
+	if not rawget(_G, "LevelEditor") then
+		return
+	end
+
+	self._in_active_mission_table = LevelEditor:is_level_object_in_active_mission_table(self._object_id)
+
+	self:_editor_debug_draw(unit)
 end
 
 function BotJumpAssist:editor_world_transform_modified(unit)
@@ -185,9 +195,9 @@ function BotJumpAssist:editor_toggle_debug_draw(enable)
 		return
 	end
 
-	self._should_debug_draw = enable
+	self._debug_draw_enabled = enable
 
-	self:_editor_debug_draw(self._unit)
+	self:_editor_debug_draw(self.unit)
 end
 
 BotJumpAssist.component_data = {

@@ -1648,10 +1648,10 @@ weapon_template.actions = {
 		}
 	},
 	action_right_light_pushfollow = {
+		allowed_during_sprint = true,
 		kind = "sweep",
 		max_num_saved_entries = 20,
 		first_person_hit_anim = "hit_left_shake",
-		sprint_requires_press_to_interrupt = "true",
 		num_frames_before_process = 0,
 		hit_armor_anim = "attack_hit_shield",
 		damage_window_start = 0.27,
@@ -1903,24 +1903,26 @@ weapon_template.anim_state_machine_3p = "content/characters/player/human/third_p
 weapon_template.anim_state_machine_1p = "content/characters/player/human/first_person/animations/chain_sword"
 weapon_template.weapon_box = chain_sword_sweep_box
 weapon_template.chain_speed_template = ChainSpeedTemplates.chainsword
-weapon_template.uses_ammunition = false
-weapon_template.uses_overheat = false
+weapon_template.hud_configuration = {
+	uses_overheat = false,
+	uses_ammunition = false
+}
 weapon_template.sprint_ready_up_time = 0.1
 weapon_template.max_first_person_anim_movement_speed = 5.8
 weapon_template.smart_targeting_template = SmartTargetingTemplates.default_melee
 weapon_template.damage_window_start_sweep_trail_offset = -0.05
 weapon_template.damage_window_end_sweep_trail_offset = 0.05
 weapon_template.ammo_template = "no_ammo"
-weapon_template.allow_sprinting_with_special = true
 weapon_template.weapon_special_class = "WeaponSpecialDeactivateAfterNumActivations"
 weapon_template.weapon_special_tweak_data = {
-	active_duration = 4,
-	num_activations = 1
+	keep_active_on_sprint = true,
+	num_activations = 1,
+	active_duration = 4
 }
 weapon_template.fx_sources = {
 	_sticky = "fx_sawing",
 	_special_active = "fx_weapon_special",
-	_engine = "fx_engine",
+	_melee_idling = "fx_engine",
 	_block = "fx_block",
 	_sweep = "fx_sweep"
 }
@@ -2537,6 +2539,24 @@ weapon_template.displayed_attacks = {
 		desc = "loc_stats_special_action_powerup_desc",
 		display_name = "loc_weapon_special_activate",
 		type = "activate"
+	}
+}
+weapon_template.weapon_card_data = {
+	main = {
+		{
+			icon = "smiter",
+			value_func = "primary_attack",
+			header = "light"
+		},
+		{
+			icon = "linesman",
+			value_func = "secondary_attack",
+			header = "heavy"
+		}
+	},
+	weapon_special = {
+		icon = "activate",
+		header = "activate"
 	}
 }
 

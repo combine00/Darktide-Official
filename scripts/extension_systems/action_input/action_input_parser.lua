@@ -181,7 +181,7 @@ function ActionInputParser:consume_next_input(t)
 			local sequences = self._sequences[ring_buffer_index]
 			local second_entry_hierarchy_position = second_entry[HIERARCHY_POSITION]
 
-			self:_jump_hierarchy(hierarchy_position, second_entry_hierarchy_position, base_hierarchy, sequences, t, network_lookup)
+			self:_jump_hierarchy(t, hierarchy_position, second_entry_hierarchy_position, base_hierarchy, sequences, t, network_lookup)
 			self:_clear_action_input_queue(input_queue)
 		else
 			for i = 1, MAX_ACTION_INPUT_QUEUE do
@@ -259,7 +259,7 @@ function ActionInputParser:action_transitioned_with_automatic_input(action_input
 	if has_first_entry then
 		local wanted_hierarchy_position = first_entry[HIERARCHY_POSITION]
 
-		self:_jump_hierarchy(hierarchy_position, wanted_hierarchy_position, base_hierarchy, sequences, t, network_lookup)
+		self:_jump_hierarchy(t, hierarchy_position, wanted_hierarchy_position, base_hierarchy, sequences, t, network_lookup)
 		self:_clear_action_input_queue(input_queue)
 	end
 
@@ -575,7 +575,7 @@ function ActionInputParser:_update_buffering(old_input_queue, new_input_queue, t
 		local buffer_time = action_input_config.buffer_time
 		local prepare_child_t = t - buffer_time
 
-		self:_jump_hierarchy(hierarchy_position, first_entry_hierarchy_position, base_hierarchy, sequences, prepare_child_t, network_lookup)
+		self:_jump_hierarchy(t, hierarchy_position, first_entry_hierarchy_position, base_hierarchy, sequences, prepare_child_t, network_lookup)
 		self:_clear_action_input_queue(new_input_queue)
 	else
 		for i = 1, self._MAX_ACTION_INPUT_QUEUE do
@@ -633,8 +633,11 @@ function ActionInputParser:_update_sequences(dt, t, template_name, hierarchy_pos
 	local base_hierarchy = self._ACTION_INPUT_HIERARCHY[template_name]
 	local hierarchy = _get_current_hierarchy(hierarchy_position, base_hierarchy, MAX_HIERARCHY_DEPTH, NO_ACTION_INPUT)
 	local action_input_sequence_completed, action_input_sequence_config, action_input_raw_input = nil
+	local sorted_action_inputs = table.keys(hierarchy)
 
-	for action_input, children in pairs(hierarchy) do
+	table.sort(sorted_action_inputs)
+
+	for _, action_input in ipairs(sorted_action_inputs) do
 		local sequence_config = sequence_configs[action_input]
 		local sequence_i = network_lookup[action_input]
 		local sequence = sequences[sequence_i]
@@ -671,7 +674,7 @@ function ActionInputParser:_update_sequences(dt, t, template_name, hierarchy_pos
 				local wanted_hierarchy = first_entry[HIERARCHY_POSITION]
 
 				self:_clear_action_input_queue(input_queue, 2)
-				self:_jump_hierarchy(hierarchy_position, wanted_hierarchy, base_hierarchy, sequences, t, network_lookup)
+				self:_jump_hierarchy(t, hierarchy_position, wanted_hierarchy, base_hierarchy, sequences, t, network_lookup)
 
 				return
 			end
@@ -748,7 +751,7 @@ function ActionInputParser:_regress_hierarchy_position(hierarchy_position)
 	ferror("Tried regress empty hierarchy_position.")
 end
 
-function ActionInputParser:_jump_hierarchy(hierarchy_position, wanted_hierarchy_position, base_hierarchy, sequences, prepare_child_t, network_lookup)
+function ActionInputParser:_jump_hierarchy(t, hierarchy_position, wanted_hierarchy_position, base_hierarchy, sequences, prepare_child_t, network_lookup)
 	local MAX_HIERARCHY_DEPTH = self._MAX_HIERARCHY_DEPTH
 	local NO_ACTION_INPUT = self._NO_ACTION_INPUT
 	local current_hierarchy = _get_current_hierarchy(hierarchy_position, base_hierarchy, MAX_HIERARCHY_DEPTH, NO_ACTION_INPUT)
@@ -765,7 +768,11 @@ function ActionInputParser:_jump_hierarchy(hierarchy_position, wanted_hierarchy_
 end
 
 function ActionInputParser:_prepare_child_sequences(children, sequences, t, network_lookup)
-	for action_input, _ in pairs(children) do
+	local sorted_action_inputs = table.keys(children)
+
+	table.sort(sorted_action_inputs)
+
+	for _, action_input in ipairs(sorted_action_inputs) do
 		local sequence_i = network_lookup[action_input]
 		local sequence = sequences[sequence_i]
 

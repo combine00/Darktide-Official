@@ -15,13 +15,14 @@ local TextUtils = require("scripts/utilities/ui/text")
 local InputUtils = require("scripts/managers/input/input_utils")
 local ViewElementWintrack = class("ViewElementWintrack", "ViewElementBase")
 
-function ViewElementWintrack:init(parent, draw_layer, start_scale, optional_menu_settings)
+function ViewElementWintrack:init(parent, draw_layer, start_scale, optional_menu_settings, optional_definitions)
 	self._pivot_offset = {
 		0,
 		0
 	}
+	local view_definitions = optional_definitions or Definitions
 
-	ViewElementWintrack.super.init(self, parent, draw_layer, start_scale, Definitions)
+	ViewElementWintrack.super.init(self, parent, draw_layer, start_scale, view_definitions)
 
 	local class_name = self.__class_name
 	self._unique_id = class_name .. "_" .. string.gsub(tostring(self), "table: ", "")
@@ -34,6 +35,7 @@ function ViewElementWintrack:init(parent, draw_layer, start_scale, optional_menu
 
 	self._ui_animations = {}
 	self._points = 0
+	self._max_points = 0
 	self._visual_points = 0
 	self._loaded_icon_id_cache = {}
 	self._reward_offset_x = 0
@@ -70,14 +72,23 @@ function ViewElementWintrack:init(parent, draw_layer, start_scale, optional_menu
 	self._widgets_by_name.navigation_arrow_right.content.hotspot.on_hover_sound = UISoundEvents.penance_menu_wintrack_page_button_hovered
 	local front_widgets = {}
 
-	for name, definition in pairs(Definitions.front_widget_definitions) do
+	for name, definition in pairs(self._definitions.front_widget_definitions) do
 		local widget = self:_create_widget(name, definition)
 		front_widgets[#front_widgets + 1] = widget
 	end
 
 	self._front_widgets = front_widgets
+	self._read_only = optional_menu_settings.read_only or false
 
 	self:_update_claim_button_state()
+end
+
+function ViewElementWintrack:ui_resource_renderer()
+	return self._ui_resource_renderer
+end
+
+function ViewElementWintrack:ui_reward_renderer()
+	return self._ui_reward_renderer
 end
 
 function ViewElementWintrack:_setup_grid_gui(optional_world)
@@ -243,7 +254,7 @@ function ViewElementWintrack:_is_reward_widget_visible(widget, extra_margin)
 	local draw_end_length = draw_length
 	local scenegraph_id = "reward"
 	local reward_width, reward_height = self:_scenegraph_size(scenegraph_id)
-	local start_position_start = (widget.offset[1] + 70) * scale
+	local start_position_start = widget.offset[1] * scale
 	local start_position_end = start_position_start + reward_width
 
 	if draw_end_length < start_position_start then
@@ -311,6 +322,8 @@ function ViewElementWintrack:draw(dt, t, ui_renderer, render_settings, input_ser
 
 	local ui_resource_renderer = self._ui_resource_renderer
 	local ui_reward_renderer = self._ui_reward_renderer
+	ui_resource_renderer.color_intensity_multiplier = ui_renderer.color_intensity_multiplier or 1
+	ui_reward_renderer.color_intensity_multiplier = ui_renderer.color_intensity_multiplier or 1
 
 	if not self._initialize and self._rewards then
 		self._initialize = true
@@ -360,15 +373,35 @@ function ViewElementWintrack:on_reward_claimed(index)
 	local reward_widgets = self._reward_widgets
 	local reward_item_widgets = self._reward_item_widgets
 	local widget = reward_widgets[index]
-	widget.content.claimed = true
 
-	self:_play_sound(UISoundEvents.penance_menu_wintrack_reward_claimed)
+	if widget then
+		widget.content.claimed = true
+
+		self:_play_sound(UISoundEvents.penance_menu_wintrack_reward_claimed)
+	end
+
+	local reward_item_widgets = self._reward_item_widgets
+	local reward_widget = reward_item_widgets[index]
+
+	if reward_widget then
+		reward_widget.content.claimed = true
+	end
 end
 
 function ViewElementWintrack:set_index_claimed(index)
 	local reward_widgets = self._reward_widgets
 	local widget = reward_widgets[index]
-	widget.content.claimed = true
+
+	if widget then
+		widget.content.claimed = true
+	end
+
+	local reward_item_widgets = self._reward_item_widgets
+	local reward_widget = reward_item_widgets[index]
+
+	if reward_widget then
+		reward_widget.content.claimed = true
+	end
 end
 
 function ViewElementWintrack:ready_to_claim_reward_by_index()
@@ -376,6 +409,10 @@ function ViewElementWintrack:ready_to_claim_reward_by_index()
 end
 
 function ViewElementWintrack:_update_reward_claim_status(dt, t, input_service)
+	if self._read_only then
+		return
+	end
+
 	local reward_widgets = self._reward_widgets
 	local reward_item_widgets = self._reward_item_widgets
 	self._reward_index_to_claim = nil
@@ -660,6 +697,13 @@ function ViewElementWintrack:_update_claim_button_state(force_effect)
 	local widgets_by_name = self._widgets_by_name
 	local widget = widgets_by_name.claim_button
 	local widget_content = widget.content
+	widget_content.visible = not self._read_only
+	self._widgets_by_name.reward_field_2.content.read_only = self._read_only
+
+	if widget_content.visible == false then
+		return
+	end
+
 	local widget_hotspot = widget_content.hotspot
 	local disabled = not self._can_claim_rewards
 
@@ -917,7 +961,7 @@ function ViewElementWintrack:_create_reward_widgets(rewards, ui_renderer)
 	local amount = #rewards
 	local bar_width = self:_get_progress_bars_width()
 	local distance_between_reward = bar_width / self._num_rewards_per_bar
-	local pass_template = Definitions.reward_base_pass_template
+	local pass_template = self._definitions.reward_base_pass_template
 	local scenegraph_id = "reward"
 	local reward_width, reward_height = self:_scenegraph_size(scenegraph_id)
 	local widget_definition = UIWidget.create_definition(pass_template, scenegraph_id)
@@ -998,16 +1042,18 @@ function ViewElementWintrack:_get_progress_required_to_page(index)
 end
 
 function ViewElementWintrack:_set_reward_page(index, animate)
-	if index ~= self._current_reward_page_index and animate then
+	local clamped_index = math.clamp(index, 1, self._num_reward_pages)
+
+	if clamped_index ~= self._current_reward_page_index and animate then
 		self:_play_sound(UISoundEvents.penance_menu_wintrack_move_page)
 	end
 
 	local previous_index = self._current_reward_page_index
-	self._current_reward_page_index = index
+	self._current_reward_page_index = clamped_index
 
-	self:_set_page_indicator_focus(index)
+	self:_set_page_indicator_focus(clamped_index)
 
-	local progress_required_to_page = self:_get_progress_required_to_page(index)
+	local progress_required_to_page = self:_get_progress_required_to_page(clamped_index)
 	local anim_progress = self._anim_progress or 0
 	local current_diff = progress_required_to_page - anim_progress
 	self._scroll_add = nil
@@ -1197,7 +1243,7 @@ function ViewElementWintrack:_animate_progress_bars(dt, t)
 	local current_diff = math.abs(progress_required_to_page - (anim_progress - page_progress))
 	local experience_bar_extra_width_next_page = 0
 	local reward_bar_extra_width_next_page = 0
-	local extra_width = 85
+	local extra_width = 0
 
 	if overflow_experience_bar or not overflow_experience_bar and previous_page_overflow_experience_bar and current_diff > 0.1 then
 		experience_bar_extra_width_next_page = extra_width
@@ -1237,7 +1283,7 @@ function ViewElementWintrack:_animate_progress_bars(dt, t)
 end
 
 function ViewElementWintrack:_create_page_indicators()
-	local widget_definition = Definitions.page_thumb_widget_definition
+	local widget_definition = self._definitions.page_thumb_widget_definition
 	local widgets = {}
 	local page_thumb_size_width = ViewElementWintrackSettings.page_thumb_size[1]
 	local thumb_offset = 10
@@ -1313,7 +1359,7 @@ function ViewElementWintrack:_update_item_stats_position(scenegraph_id, item_sta
 	local render_scale = item_stats:render_scale() or 1
 	local scale_difference = math.round_with_precision(render_scale - scale, 3)
 	local position = self:scenegraph_world_position(scenegraph_id)
-	local length = item_stats:grid_area_length() or 0
+	local length = item_stats:grid_length() or 0
 	local menu_settings = item_stats:menu_settings()
 	local grid_size = menu_settings.grid_size
 	local edge_padding = menu_settings.edge_padding
@@ -1415,6 +1461,10 @@ function ViewElementWintrack:apply_focus_on_reward()
 	local index = self._currently_selected_index or self._next_reward_to_claim or 1
 
 	self:focus_on_reward(index)
+end
+
+function ViewElementWintrack:tooltip_visible()
+	return self._item_stats and self._item_stats:is_presenting()
 end
 
 return ViewElementWintrack

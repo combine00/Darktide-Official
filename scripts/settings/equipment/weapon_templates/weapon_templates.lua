@@ -122,8 +122,7 @@ local template_groups = {
 	{
 		"power_mauls",
 		"powermaul_p1_m1",
-		"powermaul_p1_m2",
-		"powermaul_p1_m3"
+		"powermaul_p1_m2"
 	},
 	{
 		"power_mauls_2h",
@@ -236,10 +235,11 @@ local template_groups = {
 	},
 	{
 		"devices",
-		"breach_charge",
 		"auspex_scanner",
-		"skull_decoder",
+		"breach_charge",
+		"scanner_equip",
 		"servo_skull",
+		"skull_decoder",
 		"skull_decoder_02"
 	},
 	{
@@ -274,10 +274,6 @@ local template_groups = {
 		"grimoire_pocketable",
 		"medical_crate_pocketable",
 		"tome_pocketable"
-	},
-	{
-		"scanner",
-		"scanner_equip"
 	}
 }
 local template_names = {

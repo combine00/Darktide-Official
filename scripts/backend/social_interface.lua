@@ -6,7 +6,8 @@ local Interface = {
 	"fetch_blocked_accounts",
 	"add_blocked_account",
 	"remove_blocked_account",
-	"suggested_names_by_archetype"
+	"suggested_names_by_archetype",
+	"fetch_group_finder_tags"
 }
 
 return Interface

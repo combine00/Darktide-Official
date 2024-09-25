@@ -21,14 +21,6 @@ function HealthStation:init(unit, is_server)
 	end
 end
 
-function HealthStation:editor_init(unit)
-	return
-end
-
-function HealthStation:editor_validate(unit)
-	return true, ""
-end
-
 function HealthStation:enable(unit)
 	return
 end

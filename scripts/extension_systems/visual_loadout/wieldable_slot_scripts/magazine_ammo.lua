@@ -1,6 +1,7 @@
 local Action = require("scripts/utilities/weapon/action")
 local Component = require("scripts/utilities/component")
 local ReloadStates = require("scripts/extension_systems/weapon/utilities/reload_states")
+local WieldableSlotScriptInterface = require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/wieldable_slot_script_interface")
 local MagazineAmmo = class("MagazineAmmo")
 
 function MagazineAmmo:init(context, slot, weapon_template, fx_sources)
@@ -115,5 +116,7 @@ end
 function MagazineAmmo:destroy()
 	return
 end
+
+implements(MagazineAmmo, WieldableSlotScriptInterface)
 
 return MagazineAmmo

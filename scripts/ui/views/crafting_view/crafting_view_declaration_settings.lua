@@ -13,7 +13,7 @@ local view_settings = {
 	class = "CraftingView",
 	disable_game_world = true,
 	levels = {
-		"content/levels/ui/crafting_view/crafting_view"
+		"content/levels/ui/crafting_view_itemization/crafting_view_itemization"
 	},
 	enter_sound_events = {
 		UISoundEvents.crafting_view_on_enter

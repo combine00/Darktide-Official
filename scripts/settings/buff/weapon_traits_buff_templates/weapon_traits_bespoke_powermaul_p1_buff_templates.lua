@@ -28,7 +28,7 @@ templates.weapon_trait_bespoke_powermaul_p1_block_has_chance_to_stun = {
 	child_buff_template = "block_has_chance_to_stun_child",
 	child_duration = 3,
 	predicted = false,
-	allow_proc_while_active = true,
+	allow_proc_while_active = false,
 	class_name = "weapon_trait_parent_proc_buff",
 	proc_events = {
 		[proc_events.on_perfect_block] = 1
@@ -36,7 +36,15 @@ templates.weapon_trait_bespoke_powermaul_p1_block_has_chance_to_stun = {
 	add_child_proc_events = {
 		[proc_events.on_perfect_block] = 1
 	},
-	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
+	conditional_proc_func = function (template_data, template_context, t)
+		local stacks = template_context.buff_extension:current_stacks("block_has_chance_to_stun_child")
+
+		if stacks > 1 then
+			return false
+		end
+
+		return ConditionalFunctions.is_item_slot_wielded(template_data, template_context, t)
+	end,
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	proc_func = function (params, template_data, template_context, t)
 		local attacking_unit = params.attacking_unit

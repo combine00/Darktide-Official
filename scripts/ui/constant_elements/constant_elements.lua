@@ -1,6 +1,16 @@
 local ChatElementSettings = require("scripts/ui/constant_elements/elements/chat/constant_element_chat_settings")
 local elements = {
 	{
+		package = "packages/ui/constant_elements/group_finder_status/group_finder_status",
+		class_name = "ConstantGroupFinderStatus",
+		filename = "scripts/ui/constant_elements/elements/group_finder_status/constant_element_group_finder_status",
+		visibility_groups = {
+			"in_hub_view",
+			"in_hub",
+			"default"
+		}
+	},
+	{
 		class_name = "ConstantElementTeamProfileLoader",
 		filename = "scripts/ui/constant_elements/elements/team_profile_loader/constant_element_team_profile_loader",
 		visibility_groups = {
@@ -9,6 +19,8 @@ local elements = {
 			"mission_lobby",
 			"end_of_round",
 			"in_view",
+			"in_hub_view",
+			"in_hub",
 			"in_loading",
 			"skippable_cinematic",
 			"default"
@@ -23,6 +35,8 @@ local elements = {
 			"mission_lobby",
 			"end_of_round",
 			"in_view",
+			"in_hub_view",
+			"in_hub",
 			"in_loading",
 			"skippable_cinematic",
 			"default"
@@ -37,6 +51,8 @@ local elements = {
 			"mission_lobby",
 			"end_of_round",
 			"in_view",
+			"in_hub_view",
+			"in_hub",
 			"in_loading",
 			"skippable_cinematic",
 			"default",
@@ -53,6 +69,8 @@ local elements = {
 			"mission_lobby",
 			"end_of_round",
 			"in_view",
+			"in_hub_view",
+			"in_hub",
 			"default"
 		}
 	},
@@ -65,6 +83,8 @@ local elements = {
 			"mission_lobby",
 			"end_of_round",
 			"in_view",
+			"in_hub_view",
+			"in_hub",
 			"default"
 		}
 	},
@@ -77,6 +97,8 @@ local elements = {
 			"mission_lobby",
 			"end_of_round",
 			"in_view",
+			"in_hub_view",
+			"in_hub",
 			"default"
 		}
 	},
@@ -98,6 +120,8 @@ local elements = {
 			"mission_lobby",
 			"end_of_round",
 			"in_view",
+			"in_hub_view",
+			"in_hub",
 			"default"
 		}
 	},
@@ -111,6 +135,8 @@ local elements = {
 			"end_of_round",
 			"in_loading",
 			"cutscene",
+			"in_hub_view",
+			"in_hub",
 			"default"
 		},
 		visibility_group_parameters = {
@@ -142,6 +168,8 @@ local elements = {
 			"mission_lobby",
 			"end_of_round",
 			"in_view",
+			"in_hub_view",
+			"in_hub",
 			"default"
 		}
 	},
@@ -153,6 +181,8 @@ local elements = {
 			"mission_lobby",
 			"end_of_round",
 			"in_view",
+			"in_hub_view",
+			"in_hub",
 			"default"
 		}
 	}

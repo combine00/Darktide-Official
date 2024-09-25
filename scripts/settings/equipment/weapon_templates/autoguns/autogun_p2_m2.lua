@@ -632,8 +632,10 @@ weapon_template.conditional_state_to_action_input = {
 	}
 }
 weapon_template.no_ammo_delay = 0.15
-weapon_template.uses_ammunition = true
-weapon_template.uses_overheat = false
+weapon_template.hud_configuration = {
+	uses_overheat = false,
+	uses_ammunition = true
+}
 weapon_template.sprint_ready_up_time = 0.1
 weapon_template.max_first_person_anim_movement_speed = 5.8
 weapon_template.ammo_template = "autogun_p2_m2"
@@ -885,7 +887,31 @@ weapon_template.displayed_attacks = {
 	special = {
 		desc = "loc_stats_special_action_melee_weapon_bash_desc",
 		display_name = "loc_weapon_special_weapon_bash",
-		type = "melee"
+		type = "melee_hand"
+	}
+}
+weapon_template.weapon_card_data = {
+	main = {
+		{
+			value_func = "primary_attack",
+			icon = "hipfire",
+			sub_icon = "full_auto",
+			header = "hipfire"
+		},
+		{
+			value_func = "secondary_attack",
+			icon = "brace",
+			sub_icon = "full_auto",
+			header = "brace"
+		},
+		{
+			value_func = "ammo",
+			header = "ammo"
+		}
+	},
+	weapon_special = {
+		icon = "melee_hand",
+		header = "weapon_bash"
 	}
 }
 weapon_template.explicit_combo = {

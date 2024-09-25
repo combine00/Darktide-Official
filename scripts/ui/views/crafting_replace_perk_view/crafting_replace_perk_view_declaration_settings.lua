@@ -7,7 +7,7 @@ local CraftingReplacePerkViewDeclarationSettings = {
 	class = "CraftingReplacePerkView",
 	disable_game_world = true,
 	levels = {
-		"content/levels/ui/crafting_view/crafting_view"
+		"content/levels/ui/crafting_view_itemization/crafting_view_itemization"
 	},
 	enter_sound_events = {},
 	exit_sound_events = {},

@@ -1315,11 +1315,11 @@ end
 function FlowCallbacks.complete_game_mode(params)
 	local triggered_from_flow = true
 
-	Managers.state.game_mode:complete_game_mode(triggered_from_flow)
+	Managers.state.game_mode:complete_game_mode(params.reason, triggered_from_flow)
 end
 
 function FlowCallbacks.fail_game_mode(params)
-	Managers.state.game_mode:fail_game_mode()
+	Managers.state.game_mode:fail_game_mode(params.reason)
 end
 
 function FlowCallbacks.set_difficulty(params)
@@ -1891,6 +1891,22 @@ function FlowCallbacks.register_objective_unit(params)
 	end
 end
 
+function FlowCallbacks.teleport_payload(params)
+	local is_server = Managers.state.game_session:is_server()
+
+	if not is_server then
+		return
+	end
+
+	local unit = params.payload
+
+	if ScriptUnit.has_extension(unit, "payload_system") then
+		local payload_extension = ScriptUnit.extension(unit, "payload_system")
+
+		payload_extension:teleport_to_node(params.path, params.node)
+	end
+end
+
 function FlowCallbacks.start_mission_objective(params)
 	local is_server = Managers.state.game_session:is_server()
 
@@ -1974,6 +1990,18 @@ function FlowCallbacks.mission_objective_show_ui(params)
 	end
 end
 
+function FlowCallbacks.mission_objective_set_ui_state(params)
+	local is_server = Managers.state.game_session:is_server()
+
+	if is_server then
+		local objective_name = params.mission_objective_name
+		local state = params.state
+		local mission_objective_system = Managers.state.extension:system("mission_objective_system")
+
+		mission_objective_system:flow_callback_set_objective_ui_state(objective_name, state)
+	end
+end
+
 function FlowCallbacks.mission_objective_increment(params)
 	local is_server = Managers.state.game_session:is_server()
 
@@ -1995,6 +2023,30 @@ function FlowCallbacks.mission_objective_show_counter(params)
 		local mission_objective_system = Managers.state.extension:system("mission_objective_system")
 
 		mission_objective_system:flow_callback_set_objective_show_counter(objective_name, show)
+	end
+end
+
+function FlowCallbacks.mission_objective_show_bar(params)
+	local is_server = Managers.state.game_session:is_server()
+
+	if is_server then
+		local objective_name = params.mission_objective_name
+		local show = params.show_bar
+		local mission_objective_system = Managers.state.extension:system("mission_objective_system")
+
+		mission_objective_system:flow_callback_set_objective_show_bar(objective_name, show)
+	end
+end
+
+function FlowCallbacks.mission_objective_show_timer(params)
+	local is_server = Managers.state.game_session:is_server()
+
+	if is_server then
+		local objective_name = params.mission_objective_name
+		local show = params.show_timer
+		local mission_objective_system = Managers.state.extension:system("mission_objective_system")
+
+		mission_objective_system:flow_callback_set_objective_show_timer(objective_name, show)
 	end
 end
 
@@ -2590,6 +2642,20 @@ function FlowCallbacks.set_actor_scene_query_enabled(params)
 	local enabled = params.enabled
 
 	Actor.set_scene_query_enabled(actor, enabled)
+end
+
+function FlowCallbacks.aggro_all_within_radius(params)
+	local is_server = Managers.state.game_session:is_server()
+
+	if not is_server then
+		return
+	end
+
+	local pacing_manager = Managers.state.pacing
+	local position = params.worldposition
+	local radius = params.radius
+
+	pacing_manager:aggro_all_within_radius(position, radius)
 end
 
 return FlowCallbacks

@@ -24,7 +24,7 @@ templates.weapon_trait_bespoke_combataxe_p1_windup_increases_power_child = table
 templates.weapon_trait_bespoke_combataxe_p1_targets_receive_rending_debuff = table.clone(BaseWeaponTraitBuffTemplates.targets_receive_rending_debuff)
 templates.weapon_trait_bespoke_combataxe_p1_stacking_rending_on_one_hit_kill_parent = {
 	class_name = "weapon_trait_parent_proc_buff",
-	child_buff_template = "weapon_trait_bespoke_combataxe_p1_rending_on_one_hit_kill_child",
+	child_buff_template = "weapon_trait_bespoke_combataxe_p1_stacking_rending_on_one_hit_kill_child",
 	child_duration = 8,
 	predicted = false,
 	stacks_to_remove = 5,
@@ -37,7 +37,7 @@ templates.weapon_trait_bespoke_combataxe_p1_stacking_rending_on_one_hit_kill_par
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
 	check_proc_func = CheckProcFunctions.all(CheckProcFunctions.on_item_match, CheckProcFunctions.on_one_hit_kill)
 }
-templates.weapon_trait_bespoke_combataxe_p1_rending_on_one_hit_kill_child = {
+templates.weapon_trait_bespoke_combataxe_p1_stacking_rending_on_one_hit_kill_child = {
 	hide_icon_in_hud = true,
 	stack_offset = -1,
 	max_stacks = 5,

@@ -5,6 +5,9 @@ local ScrollbarPassTemplates = require("scripts/ui/pass_templates/scrollbar_pass
 local grid_size = SystemViewSettings.grid_size
 local grid_width = grid_size[1]
 local grid_height = grid_size[2]
+local grid_x_offset = 100
+local background_icon_size = 1250
+local legend_height = 50
 local scenegraph_definition = {
 	screen = {
 		scale = "fit",
@@ -18,17 +21,17 @@ local scenegraph_definition = {
 			0
 		}
 	},
-	background = {
-		vertical_alignment = "top",
+	grid = {
+		vertical_alignment = "center",
 		parent = "screen",
-		horizontal_alignment = "left",
+		horizontal_alignment = "center",
 		size = {
 			grid_width,
 			grid_height
 		},
 		position = {
-			180,
-			240,
+			grid_x_offset - background_icon_size / 2,
+			-legend_height / 2,
 			1
 		}
 	},
@@ -37,8 +40,8 @@ local scenegraph_definition = {
 		parent = "screen",
 		horizontal_alignment = "center",
 		size = {
-			1250,
-			1250
+			background_icon_size,
+			background_icon_size
 		},
 		position = {
 			0,
@@ -48,7 +51,7 @@ local scenegraph_definition = {
 	},
 	grid_start = {
 		vertical_alignment = "top",
-		parent = "background",
+		parent = "grid",
 		horizontal_alignment = "left",
 		size = {
 			0,
@@ -74,59 +77,17 @@ local scenegraph_definition = {
 			10
 		}
 	},
-	button = {
-		vertical_alignment = "left",
-		parent = "grid_content_pivot",
-		horizontal_alignment = "top",
-		size = {
-			400,
-			50
-		},
-		position = {
-			0,
-			0,
-			0
-		}
-	},
 	scrollbar = {
 		vertical_alignment = "center",
-		parent = "background",
+		parent = "grid",
 		horizontal_alignment = "right",
 		size = {
 			10,
 			grid_height
 		},
 		position = {
-			50,
+			25,
 			0,
-			1
-		}
-	},
-	title_divider = {
-		vertical_alignment = "top",
-		parent = "screen",
-		horizontal_alignment = "left",
-		size = {
-			335,
-			18
-		},
-		position = {
-			180,
-			145,
-			1
-		}
-	},
-	title_text = {
-		vertical_alignment = "bottom",
-		parent = "title_divider",
-		horizontal_alignment = "left",
-		size = {
-			1000,
-			50
-		},
-		position = {
-			0,
-			-35,
 			1
 		}
 	}

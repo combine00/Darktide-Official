@@ -904,8 +904,10 @@ weapon_template.conditional_state_to_action_input = {
 	}
 }
 weapon_template.no_ammo_delay = 0.45
-weapon_template.uses_ammunition = true
-weapon_template.uses_overheat = true
+weapon_template.hud_configuration = {
+	uses_overheat = true,
+	uses_ammunition = true
+}
 weapon_template.sprint_ready_up_time = 0.1
 weapon_template.max_first_person_anim_movement_speed = 5.8
 weapon_template.fx_sources = {
@@ -920,6 +922,7 @@ weapon_template.crosshair = {
 weapon_template.hit_marker_type = "center"
 weapon_template.overheat_configuration = {
 	auto_vent_delay = 1,
+	overheat_icon_text = "",
 	vent_duration = 3,
 	explode_action = "action_overheat_explode",
 	high_threshold_decay_rate_modifier = 0.5,
@@ -988,6 +991,30 @@ weapon_template.displayed_attacks = {
 		desc = "loc_stats_special_action_venting_desc",
 		display_name = "loc_weapon_special_weapon_vent",
 		type = "vent"
+	}
+}
+weapon_template.weapon_card_data = {
+	main = {
+		{
+			value_func = "primary_attack",
+			icon = "charge",
+			sub_icon = "semi_auto",
+			header = "hipfire"
+		},
+		{
+			value_func = "secondary_attack",
+			icon = "charge",
+			sub_icon = "semi_auto",
+			header = "brace"
+		},
+		{
+			value_func = "ammo",
+			header = "ammo"
+		}
+	},
+	weapon_special = {
+		icon = "vent",
+		header = "vent"
 	}
 }
 weapon_template.displayed_attack_ranges = {

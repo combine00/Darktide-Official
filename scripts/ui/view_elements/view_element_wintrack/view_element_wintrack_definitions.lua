@@ -45,11 +45,13 @@ basic_text_style.offset = {
 	300
 }
 local bar_size = {
-	1150,
+	1300,
 	17
 }
-local reward_field_width = bar_size[1] + 480
-local reward_field_height = 198
+local reward_field_size = {
+	bar_size[1] + 300,
+	198
+}
 local item_size = ViewElementWintrackSettings.item_size
 local reward_size = {
 	164,
@@ -75,10 +77,7 @@ local scenegraph_definition = {
 		vertical_alignment = "bottom",
 		parent = "pivot",
 		horizontal_alignment = "center",
-		size = {
-			reward_field_width,
-			reward_field_height
-		},
+		size = reward_field_size,
 		position = {
 			0,
 			-95,
@@ -126,7 +125,7 @@ local scenegraph_definition = {
 		parent = "reward_progress_bar",
 		horizontal_alignment = "center",
 		size = {
-			bar_size[1] + 130,
+			bar_size[1] + 50,
 			reward_size[2] + 150
 		},
 		position = {
@@ -371,7 +370,7 @@ local widget_definitions = {
 				vertical_alignment = "bottom",
 				horizontal_alignment = "center",
 				size = {
-					bar_size[1] + 180,
+					bar_size[1] + 100,
 					16
 				},
 				offset = {
@@ -406,7 +405,7 @@ local widget_definitions = {
 				vertical_alignment = "bottom",
 				horizontal_alignment = "center",
 				size = {
-					bar_size[1] + 180,
+					bar_size[1] + 100,
 					16
 				},
 				offset = {
@@ -920,9 +919,9 @@ claim_button_pass_template[#claim_button_pass_template + 1] = {
 local front_widget_definitions = {
 	reward_field_2 = UIWidget.create_definition({
 		{
-			value = "content/ui/materials/frames/achievements/wintrack_frame_corner_left",
 			style_id = "corner_left",
 			pass_type = "texture",
+			value = "content/ui/materials/frames/achievements/wintrack_frame_corner_left",
 			style = {
 				vertical_alignment = "center",
 				horizontal_alignment = "left",
@@ -935,12 +934,15 @@ local front_widget_definitions = {
 					9,
 					30
 				}
-			}
+			},
+			visibility_function = function (content, style)
+				return not content.read_only
+			end
 		},
 		{
-			value = "content/ui/materials/effects/achievements/wintrack_frame_corner_left_candles",
 			style_id = "corner_left",
 			pass_type = "texture",
+			value = "content/ui/materials/effects/achievements/wintrack_frame_corner_left_candles",
 			style = {
 				vertical_alignment = "center",
 				horizontal_alignment = "left",
@@ -953,7 +955,10 @@ local front_widget_definitions = {
 					9,
 					30
 				}
-			}
+			},
+			visibility_function = function (content, style)
+				return not content.read_only
+			end
 		},
 		{
 			value = "content/ui/materials/frames/achievements/wintrack_frame_corner_right",
@@ -972,6 +977,27 @@ local front_widget_definitions = {
 					30
 				}
 			}
+		},
+		{
+			style_id = "corner_left_read_only",
+			pass_type = "texture",
+			value = "content/ui/materials/frames/achievements/wintrack_frame_corner_right",
+			style = {
+				vertical_alignment = "center",
+				horizontal_alignment = "left",
+				size = {
+					192,
+					224
+				},
+				offset = {
+					0,
+					17,
+					30
+				}
+			},
+			visibility_function = function (content, style)
+				return content.read_only
+			end
 		}
 	}, "reward_field"),
 	claim_button = UIWidget.create_definition(claim_button_pass_template, "claim_button", {

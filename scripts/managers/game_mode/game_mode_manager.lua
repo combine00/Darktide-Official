@@ -396,15 +396,15 @@ function GameModeManager:rpc_game_mode_end_conditions_met(channel_id, outcome_id
 	self:_set_end_conditions_met(outcome)
 end
 
-function GameModeManager:complete_game_mode(triggered_from_flow)
+function GameModeManager:complete_game_mode(reason, triggered_from_flow)
 	if self._is_server then
-		self._game_mode:complete(triggered_from_flow)
+		self._game_mode:complete(reason, triggered_from_flow)
 	end
 end
 
-function GameModeManager:fail_game_mode()
+function GameModeManager:fail_game_mode(reason)
 	if self._is_server then
-		self._game_mode:fail()
+		self._game_mode:fail(reason)
 	end
 end
 

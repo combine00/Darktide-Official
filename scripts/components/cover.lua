@@ -15,6 +15,10 @@ function Cover:init(unit)
 	end
 end
 
+function Cover:destroy(unit)
+	return
+end
+
 function Cover:enable(unit)
 	return
 end
@@ -23,16 +27,11 @@ function Cover:disable(unit)
 	return
 end
 
-function Cover:destroy(unit)
-	return
-end
-
 function Cover:editor_init(unit)
 	if not rawget(_G, "LevelEditor") then
 		return
 	end
 
-	self._unit = unit
 	local world = Application.main_world()
 	self._world = world
 	self._physics_world = World.physics_world(world)
@@ -45,6 +44,9 @@ function Cover:editor_init(unit)
 	end
 
 	self._my_nav_gen_guid = nil
+	local object_id = Unit.get_data(unit, "LevelEditor", "object_id")
+	self._object_id = object_id
+	self._in_active_mission_table = LevelEditor:is_level_object_in_active_mission_table(object_id)
 
 	self:_reset_data()
 
@@ -56,15 +58,12 @@ function Cover:editor_destroy(unit)
 		return
 	end
 
-	local line_object = self._line_object
 	local world = self._world
+	local line_object = self._line_object
 
 	LineObject.reset(line_object)
 	LineObject.dispatch(world, line_object)
 	World.destroy_line_object(world, line_object)
-
-	self._line_object = nil
-	self._world = nil
 end
 
 function Cover:editor_validate(unit)
@@ -82,10 +81,20 @@ function Cover:editor_update(unit)
 	if nav_gen_guid then
 		self._my_nav_gen_guid = nav_gen_guid
 
-		self:_generate_cover_slots()
+		self:_generate_cover_slots(unit)
 	end
 
 	return true
+end
+
+function Cover:editor_on_mission_changed(unit)
+	if not rawget(_G, "LevelEditor") then
+		return
+	end
+
+	self._in_active_mission_table = LevelEditor:is_level_object_in_active_mission_table(self._object_id)
+
+	self:_generate_cover_slots(unit)
 end
 
 function Cover:editor_world_transform_modified(unit)
@@ -93,7 +102,7 @@ function Cover:editor_world_transform_modified(unit)
 		return
 	end
 
-	self:_generate_cover_slots()
+	self:_generate_cover_slots(unit)
 end
 
 function Cover:editor_toggle_debug_draw(enable)
@@ -104,18 +113,21 @@ function Cover:editor_toggle_debug_draw(enable)
 	self._should_debug_draw = enable
 end
 
-function Cover:_generate_cover_slots()
+function Cover:_generate_cover_slots(unit)
 	self:_reset_data()
 
-	local nav_world = Cover._nav_info.nav_world
+	if not self._in_active_mission_table then
+		return
+	end
+
+	local active_mission_level_id = LevelEditor:get_active_mission_level()
+	local nav_world = Cover._nav_info.nav_world_from_level_id[active_mission_level_id]
 
 	if nav_world then
-		local physics_world = self._physics_world
-		local unit = self._unit
 		local enabled = self:get_data(unit, "enabled")
 		local cover_type = self:get_data(unit, "cover_type")
 		local node_positions = CoverSlots.fetch_node_positions(unit)
-		local cover_slots = CoverSlots.create(physics_world, nav_world, unit, cover_type, node_positions)
+		local cover_slots = CoverSlots.create(self._physics_world, nav_world, unit, cover_type, node_positions)
 		self._cover_type = cover_type
 		self._enabled = enabled
 		self._node_positions = node_positions

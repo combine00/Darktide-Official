@@ -1,4 +1,5 @@
 local Action = require("scripts/utilities/weapon/action")
+local WieldableSlotScriptInterface = require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/wieldable_slot_script_interface")
 local TargetUnits = class("TargetUnits")
 local OUTLINE_NAME_VALID = "buff"
 local OUTLINE_NAMES_INVALID = "knocked_down"
@@ -126,5 +127,7 @@ function TargetUnits:_set_outline(unit, enabled, outline_name)
 		self._outline_system:remove_outline(unit, outline_name)
 	end
 end
+
+implements(TargetUnits, WieldableSlotScriptInterface)
 
 return TargetUnits

@@ -3,6 +3,7 @@ local ImpactFxResourceDependencies = require("scripts/settings/damage/impact_fx_
 local MasterItems = require("scripts/backend/master_items")
 local NetworkLookup = require("scripts/network_lookup/network_lookup")
 local PlayerCharacterConstants = require("scripts/settings/player_character/player_character_constants")
+local PlayerCharacterLoopingSoundAliases = require("scripts/settings/sound/player_character_looping_sound_aliases")
 local PlayerCharacterParticles = require("scripts/settings/particles/player_character_particles")
 local PlayerCharacterSounds = require("scripts/settings/sound/player_character_sounds")
 local WeaponTemplate = require("scripts/utilities/weapon/weapon_template")
@@ -254,13 +255,7 @@ function PlayerHuskVisualLoadoutExtension:_update_item_visibility(is_in_first_pe
 	local slot_scripts = self._wieldable_slot_scripts[self._wielded_slot]
 
 	if slot_scripts then
-		local num_scripts = #slot_scripts
-
-		for i = 1, num_scripts do
-			local wieldable_slot_script = slot_scripts[i]
-
-			wieldable_slot_script:update_first_person_mode(is_in_first_person_mode)
-		end
+		WieldableSlotScripts.update_first_person_mode(slot_scripts, is_in_first_person_mode)
 	end
 end
 
@@ -453,6 +448,35 @@ function PlayerHuskVisualLoadoutExtension:resolve_gear_sound(sound_alias, option
 	local properties = self._profile_properties
 
 	return PlayerCharacterSounds.resolve_sound(sound_alias, properties, optional_external_properties)
+end
+
+function PlayerHuskVisualLoadoutExtension:resolve_looping_gear_sound(looping_sound_alias, use_husk_event, optional_external_properties)
+	local LOOPING_SFX_CONFIG = PlayerCharacterLoopingSoundAliases[looping_sound_alias]
+	local start_config = LOOPING_SFX_CONFIG.start
+	local stop_config = LOOPING_SFX_CONFIG.stop
+	local start_event_alias = start_config.event_alias
+	local stop_event_alias = stop_config.event_alias
+	local resolved, event_name, has_husk_events = self:resolve_gear_sound(start_event_alias, optional_external_properties)
+
+	if resolved then
+		if use_husk_event and has_husk_events then
+			event_name = event_name .. "_husk" or event_name
+		end
+
+		local stop_resolved, stop_event_name, stop_has_husk_events = self:resolve_gear_sound(stop_event_alias, optional_external_properties)
+
+		if stop_resolved then
+			if use_husk_event and stop_has_husk_events then
+				stop_event_name = stop_event_name .. "_husk" or stop_event_name
+			end
+
+			return true, event_name, true, stop_event_name
+		else
+			return true, event_name, false, nil
+		end
+	end
+
+	return false, nil, false, nil
 end
 
 function PlayerHuskVisualLoadoutExtension:resolve_gear_particle(particle_alias, optional_external_properties)

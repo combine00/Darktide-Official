@@ -3,9 +3,6 @@ local SharedNav = require("scripts/components/utilities/shared_nav")
 local NavGraph = component("NavGraph")
 
 function NavGraph:init(unit, is_server)
-	self._unit = unit
-	self._is_server = is_server
-
 	if not is_server then
 		return false
 	end
@@ -117,7 +114,9 @@ function NavGraph:editor_init(unit)
 	end
 
 	self._my_nav_gen_guid = nil
-	self._unit = unit
+	local object_id = Unit.get_data(unit, "LevelEditor", "object_id")
+	self._object_id = object_id
+	self._in_active_mission_table = LevelEditor:is_level_object_in_active_mission_table(object_id)
 
 	return true
 end
@@ -146,30 +145,45 @@ function NavGraph:editor_update(unit)
 		return
 	end
 
-	local with_traverse_logic = false
-	local nav_gen_guid = SharedNav.check_new_navmesh_generated(NavGraph._nav_info, self._my_nav_gen_guid, with_traverse_logic)
-
-	if nav_gen_guid then
-		self._my_nav_gen_guid = nav_gen_guid
-
-		self:_generate_positions(unit)
-	end
-
 	local should_debug_draw = self._debug_draw_enabled
+	local refresh_needed = false
 
-	if should_debug_draw then
-		local camera_position = LevelEditor:get_camera_location()
-		local unit_position = Unit.local_position(unit, 1)
-		should_debug_draw = Vector3.distance_squared(camera_position, unit_position) < MAX_DEBUG_DRAW_CAMERA_DISTANCE_SQ
+	if self._in_active_mission_table then
+		local with_traverse_logic = false
+		local nav_gen_guid = SharedNav.check_new_navmesh_generated(NavGraph._nav_info, self._my_nav_gen_guid, with_traverse_logic)
+
+		if nav_gen_guid then
+			self._my_nav_gen_guid = nav_gen_guid
+
+			self:_generate_positions(unit)
+
+			refresh_needed = self._active_debug_draw
+		end
+
+		if should_debug_draw then
+			local camera_position = LevelEditor:get_camera_location()
+			local unit_position = Unit.local_position(unit, 1)
+			should_debug_draw = Vector3.distance_squared(camera_position, unit_position) < MAX_DEBUG_DRAW_CAMERA_DISTANCE_SQ
+		end
+	else
+		should_debug_draw = false
 	end
 
-	if should_debug_draw ~= self._active_debug_draw then
+	if should_debug_draw ~= self._active_debug_draw or refresh_needed then
 		self._active_debug_draw = should_debug_draw
 
 		self:_editor_debug_draw(unit)
 	end
 
 	return true
+end
+
+function NavGraph:editor_on_mission_changed(unit)
+	if not rawget(_G, "LevelEditor") then
+		return
+	end
+
+	self._in_active_mission_table = LevelEditor:is_level_object_in_active_mission_table(self._object_id)
 end
 
 function NavGraph:editor_world_transform_modified(unit)
@@ -221,7 +235,16 @@ function NavGraph:_generate_positions(unit)
 	table.clear_array(debug_data_smart_objects, #debug_data_smart_objects)
 	table.clear_array(calculation_items, #calculation_items)
 
-	local nav_world = NavGraph._nav_info.nav_world
+	local nav_world = nil
+	local pregenerate_smart_objects = self:get_data(unit, "pregenerate_smart_objects")
+
+	if pregenerate_smart_objects then
+		local _, level_id = LevelEditor:find_level_object(self._object_id)
+		nav_world = NavGraph._nav_info.nav_world_from_level_id[level_id]
+	else
+		local active_mission_level_id = LevelEditor:get_active_mission_level()
+		nav_world = NavGraph._nav_info.nav_world_from_level_id[active_mission_level_id]
+	end
 
 	if nav_world then
 		local smart_objects, debug_draw_list = NavGraphQueries.generate_smart_objects(unit, nav_world, self._physics_world, self)
@@ -244,7 +267,7 @@ function NavGraph:_generate_positions(unit)
 end
 
 function NavGraph:flow_nav_enable()
-	if not self._is_server or not self._nav_graph_extension then
+	if not self.is_server or not self._nav_graph_extension then
 		return
 	end
 
@@ -252,7 +275,7 @@ function NavGraph:flow_nav_enable()
 end
 
 function NavGraph:flow_nav_disable()
-	if not self._is_server or not self._nav_graph_extension then
+	if not self.is_server or not self._nav_graph_extension then
 		return
 	end
 

@@ -259,8 +259,8 @@ weapon_template.actions = {
 		kind = "sweep",
 		allowed_during_sprint = true,
 		damage_window_end = 0.3333333333333333,
-		attack_direction_override = "down",
 		anim_end_event = "attack_finished",
+		attack_direction_override = "down",
 		uninterruptible = true,
 		anim_event = "attack_swing_heavy_down",
 		total_time = 1.72,
@@ -332,7 +332,11 @@ weapon_template.actions = {
 		damage_profile = DamageProfileTemplates.ogryn_shovel_heavy_smiter,
 		damage_type = damage_types.shovel_heavy,
 		herding_template = HerdingTemplates.smiter_down,
-		wounds_shape = wounds_shapes.vertical_slash_coarse
+		wounds_shape = wounds_shapes.vertical_slash_coarse,
+		time_scale_stat_buffs = {
+			buff_stat_buffs.attack_speed,
+			buff_stat_buffs.melee_attack_speed
+		}
 	},
 	action_melee_start_right = {
 		allowed_during_sprint = true,
@@ -907,12 +911,12 @@ weapon_template.actions = {
 	action_right_light_pushfollow = {
 		damage_window_start = 0.36666666666666664,
 		hit_armor_anim = "attack_hit_shield",
-		weapon_handling_template = "time_scale_1",
-		first_person_hit_anim = "hit_right_shake",
-		first_person_hit_stop_anim = "attack_hit",
-		sprint_requires_press_to_interrupt = "true",
-		range_mod = 1.25,
 		kind = "sweep",
+		first_person_hit_anim = "hit_right_shake",
+		range_mod = 1.25,
+		first_person_hit_stop_anim = "attack_hit",
+		allowed_during_sprint = true,
+		weapon_handling_template = "time_scale_1",
 		damage_window_end = 0.4666666666666667,
 		anim_end_event = "attack_finished",
 		attack_direction_override = "left",
@@ -1079,8 +1083,10 @@ weapon_template.weapon_box = {
 	0.7,
 	0.02
 }
-weapon_template.uses_ammunition = false
-weapon_template.uses_overheat = false
+weapon_template.hud_configuration = {
+	uses_overheat = false,
+	uses_ammunition = false
+}
 weapon_template.sprint_ready_up_time = 0.2
 weapon_template.max_first_person_anim_movement_speed = 4.8
 weapon_template.has_first_person_dodge_events = true
@@ -1382,6 +1388,24 @@ weapon_template.displayed_attacks = {
 		desc = "loc_stats_special_action_special_attack_ogryn_club_p1m1_desc",
 		display_name = "loc_weapon_special_fist_attack",
 		type = "melee_hand"
+	}
+}
+weapon_template.weapon_card_data = {
+	main = {
+		{
+			icon = "tank",
+			value_func = "primary_attack",
+			header = "light"
+		},
+		{
+			icon = "smiter",
+			value_func = "secondary_attack",
+			header = "heavy"
+		}
+	},
+	weapon_special = {
+		icon = "melee_hand",
+		header = "weapon_bash"
 	}
 }
 weapon_template.special_action_name = "action_special_uppercut"

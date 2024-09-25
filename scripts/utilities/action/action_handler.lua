@@ -801,9 +801,9 @@ function ActionHandler:_validate_chain_action(chain_action, t, current_action_t,
 end
 
 function ActionHandler:_validate_single_chain_action(chain_action, t, current_action_t, time_scale, actions, condition_func_params, used_input, running_action_state)
-	local chain_time = chain_action.chain_time and chain_action.chain_time / time_scale
-	local chain_until = chain_action.chain_until and chain_action.chain_until / time_scale
-	local chain_validated = nil
+	local chain_time, chain_until, chain_validated = nil
+	chain_time = chain_action.chain_time and chain_action.chain_time / time_scale
+	chain_until = chain_action.chain_until and chain_action.chain_until / time_scale
 	chain_validated = not chain_time or (chain_time and chain_time <= current_action_t or chain_until and current_action_t <= chain_until) and true
 	local running_action_state_requirement = chain_action.running_action_state_requirement
 

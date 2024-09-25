@@ -102,6 +102,10 @@ function MinigameBase:should_exit()
 	return self:is_completed()
 end
 
+function MinigameBase:uses_action()
+	return true
+end
+
 function MinigameBase:uses_joystick()
 	return false
 end
@@ -136,7 +140,7 @@ function MinigameBase:play_sound(alias, sync_with_clients, include_client)
 	sync_with_clients = sync_with_clients == nil and true
 	include_client = include_client == nil and true
 
-	self._fx_extension:trigger_gear_wwise_event_with_source(alias, nil, self._fx_source_name, sync_with_clients, include_client)
+	return self._fx_extension:trigger_gear_wwise_event_with_source(alias, nil, self._fx_source_name, sync_with_clients, include_client)
 end
 
 function MinigameBase:current_stage()
@@ -157,6 +161,10 @@ function MinigameBase:set_current_stage(stage)
 	end
 
 	self._current_stage = stage
+end
+
+function MinigameBase:progressing()
+	return false
 end
 
 return MinigameBase

@@ -118,6 +118,7 @@ local base_template_settings = {
 			allowed_during_sprint = true,
 			ability_type = "grenade_ability",
 			anim_time_scale = 1.25,
+			time_scale_stat_buffs = false,
 			fire_time = 0.25,
 			override_origin_slot = "slot_grenade_ability",
 			anim_event = "ability_knife_throw",

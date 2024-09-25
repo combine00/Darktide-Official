@@ -1,8 +1,8 @@
 local ArmorSettings = require("scripts/settings/damage/armor_settings")
 local BuffSettings = require("scripts/settings/buff/buff_settings")
-local buff_keywords = BuffSettings.keywords
 local Armor = {}
 local armor_types = ArmorSettings.types
+local buff_keywords = BuffSettings.keywords
 local default_armor = armor_types.unarmored
 local _check_toughness, _character_armor_type = nil
 

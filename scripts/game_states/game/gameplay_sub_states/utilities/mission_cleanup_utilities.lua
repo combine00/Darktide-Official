@@ -8,7 +8,7 @@ end
 
 local MissionCleanupUtilies = {}
 
-function MissionCleanupUtilies.cleanup(shared_state, gameplay_state)
+function MissionCleanupUtilies.cleanup(shared_state, gameplay_state, initialized_steps)
 	if Managers.account:leaving_game() then
 		local ui_manager = Managers.ui
 		local active_views = ui_manager:active_views()

@@ -56,6 +56,10 @@ local weapon_template = {
 	toughness_template = "default",
 	hud_icon = "content/ui/materials/icons/pickups/default",
 	hide_slot = true,
+	hud_configuration = {
+		uses_overheat = false,
+		uses_ammunition = false
+	},
 	not_player_wieldable = true
 }
 

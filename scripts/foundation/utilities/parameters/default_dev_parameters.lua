@@ -109,6 +109,7 @@ local categories = {
 	"Terror Event",
 	"Testify",
 	"Time Scaling",
+	"Training Grounds",
 	"UI",
 	"Version Info",
 	"Volume",
@@ -1839,6 +1840,10 @@ params.debug_change_time_scale = {
 	value = true,
 	category = "Time Scaling"
 }
+params.disable_training_grounds_minion_respawning = {
+	value = false,
+	category = "Training Grounds"
+}
 params.debug_sweep_show_disregarded_actors = {
 	value = false,
 	category = "Action"
@@ -1954,6 +1959,13 @@ params.renegade_captain_attack_selection_template_override = {
 		return _attack_selection_template_override_options("renegade_captain")
 	end
 }
+params.cultist_captain_attack_selection_template_override = {
+	value = false,
+	category = "Minion Attack Selection",
+	options_function = function ()
+		return _attack_selection_template_override_options("cultist_captain")
+	end
+}
 params.debug_taunting = {
 	value = false,
 	category = "Minion Attack Selection"
@@ -2027,6 +2039,78 @@ params.renegade_captain_custom_attack_selection_shotgun_strafe_shoot = {
 	category = "Minion Renegade Captain Custom Attack Selection"
 }
 params.renegade_captain_custom_attack_selection_void_shield_explosion = {
+	value = false,
+	category = "Minion Renegade Captain Custom Attack Selection"
+}
+params.cultist_captain_custom_attack_selection_bolt_pistol_shoot = {
+	value = false,
+	category = "Minion Renegade Captain Custom Attack Selection"
+}
+params.cultist_captain_custom_attack_selection_bolt_pistol_strafe_shoot = {
+	value = false,
+	category = "Minion Renegade Captain Custom Attack Selection"
+}
+params.cultist_captain_custom_attack_selection_charge = {
+	value = false,
+	category = "Minion Renegade Captain Custom Attack Selection"
+}
+params.cultist_captain_custom_attack_selection_fire_grenade = {
+	value = false,
+	category = "Minion Renegade Captain Custom Attack Selection"
+}
+params.cultist_captain_custom_attack_selection_frag_grenade = {
+	value = false,
+	category = "Minion Renegade Captain Custom Attack Selection"
+}
+params.cultist_captain_custom_attack_selection_hellgun_shoot = {
+	value = false,
+	category = "Minion Renegade Captain Custom Attack Selection"
+}
+params.cultist_captain_custom_attack_selection_hellgun_spray_and_pray = {
+	value = false,
+	category = "Minion Renegade Captain Custom Attack Selection"
+}
+params.cultist_captain_custom_attack_selection_hellgun_strafe_shoot = {
+	value = false,
+	category = "Minion Renegade Captain Custom Attack Selection"
+}
+params.cultist_captain_custom_attack_selection_hellgun_sweep_shoot = {
+	value = false,
+	category = "Minion Renegade Captain Custom Attack Selection"
+}
+params.cultist_captain_custom_attack_selection_kick = {
+	value = false,
+	category = "Minion Renegade Captain Custom Attack Selection"
+}
+params.cultist_captain_custom_attack_selection_power_sword_melee_combo_attack = {
+	value = false,
+	category = "Minion Renegade Captain Custom Attack Selection"
+}
+params.cultist_captain_custom_attack_selection_power_sword_moving_melee_attack = {
+	value = false,
+	category = "Minion Renegade Captain Custom Attack Selection"
+}
+params.cultist_captain_custom_attack_selection_powermaul_ground_slam_attack = {
+	value = false,
+	category = "Minion Renegade Captain Custom Attack Selection"
+}
+params.cultist_captain_custom_attack_selection_punch = {
+	value = false,
+	category = "Minion Renegade Captain Custom Attack Selection"
+}
+params.cultist_captain_custom_attack_selection_shoot_net = {
+	value = false,
+	category = "Minion Renegade Captain Custom Attack Selection"
+}
+params.cultist_captain_custom_attack_selection_shotgun_shoot = {
+	value = false,
+	category = "Minion Renegade Captain Custom Attack Selection"
+}
+params.cultist_captain_custom_attack_selection_shotgun_strafe_shoot = {
+	value = false,
+	category = "Minion Renegade Captain Custom Attack Selection"
+}
+params.cultist_captain_custom_attack_selection_void_shield_explosion = {
 	value = false,
 	category = "Minion Renegade Captain Custom Attack Selection"
 }
@@ -2703,6 +2787,10 @@ params.show_debug_overheat_hud = {
 	category = "Hud"
 }
 params.show_debug_warp_charge_hud = {
+	value = false,
+	category = "Hud"
+}
+params.show_debug_force_sword_2h_hud = {
 	value = false,
 	category = "Hud"
 }
@@ -3563,6 +3651,84 @@ params.debug_item_alias_fake_loading = {
 	value = false,
 	category = "Equipment"
 }
+params.character_profile_selector_slot_primary_override = {
+	value = false,
+	category = "Equipment",
+	options_function = function ()
+		local MasterItems = require("scripts/backend/master_items")
+		local options = {}
+
+		for item_name, item_data in pairs(MasterItems.get_cached()) do
+			local slots = item_data.slots
+			local valid_slot = slots ~= nil
+
+			if slots then
+				for ii = 1, #slots do
+					local slot_name = slots[ii]
+					valid_slot = slot_name == "slot_primary"
+
+					if not valid_slot then
+						valid_slot = false
+
+						break
+					end
+				end
+			end
+
+			local archetypes = item_data.archetypes
+			local valid_archetype = not archetypes or archetypes and not table.contains(archetypes, "npc")
+			local valid_type = item_data.item_type == "WEAPON_MELEE"
+
+			if valid_slot and valid_archetype and valid_type then
+				options[#options + 1] = item_name
+			end
+		end
+
+		table.sort(options)
+		table.insert(options, 1, false)
+
+		return options
+	end
+}
+params.character_profile_selector_slot_secondary_override = {
+	value = false,
+	category = "Equipment",
+	options_function = function ()
+		local MasterItems = require("scripts/backend/master_items")
+		local options = {}
+
+		for item_name, item_data in pairs(MasterItems.get_cached()) do
+			local slots = item_data.slots
+			local valid_slot = slots ~= nil
+
+			if slots then
+				for ii = 1, #slots do
+					local slot_name = slots[ii]
+					valid_slot = slot_name == "slot_secondary"
+
+					if not valid_slot then
+						valid_slot = false
+
+						break
+					end
+				end
+			end
+
+			local archetypes = item_data.archetypes
+			local valid_archetype = not archetypes or archetypes and not table.contains(archetypes, "npc")
+			local valid_type = item_data.item_type == "WEAPON_RANGED"
+
+			if valid_slot and valid_archetype and valid_type then
+				options[#options + 1] = item_name
+			end
+		end
+
+		table.sort(options)
+		table.insert(options, 1, false)
+
+		return options
+	end
+}
 params.always_trigger_stagger = {
 	value = false,
 	category = "Stagger"
@@ -3920,7 +4086,7 @@ end
 
 function enable_rpc_logging()
 	if not DevParameters.debug_rpc_logging then
-		Network.log("silent")
+		Network.log("warnings")
 
 		return
 	end
@@ -4306,6 +4472,14 @@ params.debug_force_weapon_effects = {
 	value = false,
 	category = "Weapon Effects"
 }
+params.debug_force_weapon_block_effects = {
+	value = false,
+	category = "Weapon Effects"
+}
+params.debug_force_weapon_wind_slash_stage_effects = {
+	value = false,
+	category = "Weapon Effects"
+}
 params.debug_grimoire_effects = {
 	value = false,
 	category = "Weapon Effects"
@@ -4399,6 +4573,10 @@ params.use_localized_weapon_trait_names_in_debug_menu = {
 }
 params.weapon_mastery_use_override_xp = {
 	value = false,
+	category = "Weapon Mastery"
+}
+params.enable_mastery_debug_options = {
+	value = true,
 	category = "Weapon Mastery"
 }
 params.debug_aim_weapon_offset = {
@@ -4558,6 +4736,10 @@ params.debug_draw_impact_vfx_rotation = {
 	value = false,
 	category = "Damage Interface"
 }
+params.debug_draw_shield_impact_fx_offset = {
+	value = false,
+	category = "Damage Interface"
+}
 params.print_missing_impact_fx_definitions = {
 	value = false,
 	category = "Damage Interface"
@@ -4657,6 +4839,10 @@ params.override_proximity_fx = {
 	}
 }
 params.debug_fov = {
+	value = false,
+	category = "Camera"
+}
+params.camera_manager_debug = {
 	value = false,
 	category = "Camera"
 }
@@ -4787,6 +4973,10 @@ params.debug_visualize_ledge_finder_ledges = {
 	value = false,
 	category = "Ledge Finder"
 }
+params.debug_draw_ledge_finder_oobb_sweep = {
+	value = false,
+	category = "Ledge Finder"
+}
 params.debug_use_local_mission_board = {
 	value = false,
 	category = "Level & Mission"
@@ -4865,7 +5055,7 @@ params.unlock_all_shooting_range_enemies = {
 	category = "Shooting Range"
 }
 params.trace_rumble_activation_events = {
-	value = true,
+	value = false,
 	category = "Rumble"
 }
 params.category_log_levels = {

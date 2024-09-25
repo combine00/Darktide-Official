@@ -112,6 +112,10 @@ function PresenceManager:reset()
 	end
 
 	self._myself:reset()
+
+	if IS_PLAYSTATION then
+		Managers.account:leave_psn_session()
+	end
 end
 
 function PresenceManager:presence()
@@ -123,6 +127,8 @@ function PresenceManager:presence_entry_myself()
 end
 
 function PresenceManager:set_party(party_id, num_party_members)
+	local joined_new_party = party_id ~= self._myself:party_id()
+
 	self._myself:set_party_id(party_id)
 	self._myself:set_num_party_members(num_party_members)
 	self:_update_my_presence({
@@ -132,6 +138,20 @@ function PresenceManager:set_party(party_id, num_party_members)
 
 	if self._advertise_playing then
 		self:_update_platform_presence()
+	end
+
+	if IS_PLAYSTATION then
+		if joined_new_party then
+			self:_create_or_join_psn_session()
+		else
+			Managers.account:is_psn_session_leader():next(function (is_leader)
+				if is_leader then
+					self:_max_psn_session_players():next(function (max_players)
+						Managers.account:update_psn_session_max_players(max_players)
+					end)
+				end
+			end)
+		end
 	end
 end
 
@@ -163,6 +183,13 @@ function PresenceManager:_set_is_cross_playing(value)
 	})
 end
 
+function PresenceManager:set_psn_session_id(session_id)
+	self._myself:set_psn_session_id(session_id)
+	self:_update_my_presence({
+		psn_session_id = true
+	})
+end
+
 function PresenceManager:get_presence(account_id)
 	if account_id == gRPC.get_account_id() then
 		local myself = self:presence_entry_myself()
@@ -180,6 +207,18 @@ function PresenceManager:get_presence(account_id)
 	end
 
 	return presence_entry, presence_entry:first_update_promise()
+end
+
+function PresenceManager:get_presences(account_ids)
+	local promises = {}
+
+	for i = 1, #account_ids do
+		local account_id = account_ids[i]
+		local _, promise = self:get_presence(account_id)
+		promises[i] = promise
+	end
+
+	return Promise.all(unpack(promises))
 end
 
 function PresenceManager:get_presence_by_platform(platform, platform_user_id)
@@ -549,6 +588,37 @@ function PresenceManager:_check_activity()
 
 			self._advertise_playing = advertise_playing
 		end
+
+		if IS_PLAYSTATION then
+			Managers.account:is_psn_session_leader():next(function (is_leader)
+				if not is_leader then
+					return
+				end
+
+				if activity_id == "mission" then
+					self:_max_psn_session_players():next(function (max_players)
+						Managers.account:update_psn_session_max_players(max_players)
+					end)
+
+					local is_private = Managers.party_immaterium:is_in_private_session()
+
+					Managers.account:update_psn_session_privacy(is_private)
+				elseif old_activity_id == "mission" then
+					self:_max_psn_session_players():next(function (max_players)
+						Managers.account:update_psn_session_max_players(max_players)
+					end)
+					Managers.account:update_psn_session_privacy(false)
+				end
+
+				if activity_id == "onboarding" then
+					Managers.account:update_psn_session_join_disabled(true)
+					Managers.account:update_psn_session_max_players(1)
+				elseif old_activity_id == "onboarding" then
+					Managers.account:update_psn_session_join_disabled(false)
+					Managers.account:update_psn_session_max_players(4)
+				end
+			end)
+		end
 	elseif activity_id == "mission" then
 		local num_mission_members = Managers.connection:num_members()
 
@@ -559,6 +629,16 @@ function PresenceManager:_check_activity()
 
 			if self._advertise_playing and (IS_XBS or IS_GDK) then
 				self:_update_platform_presence()
+			end
+
+			if IS_PLAYSTATION then
+				Managers.account:is_psn_session_leader():next(function (is_leader)
+					if is_leader then
+						self:_max_psn_session_players():next(function (max_players)
+							Managers.account:update_psn_session_max_players(max_players)
+						end)
+					end
+				end)
 			end
 		end
 	end
@@ -593,6 +673,48 @@ function PresenceManager:_delete_platform_presence()
 		Presence.stop_advertise_playing()
 	elseif IS_XBS or IS_GDK then
 		XboxLiveUtils.delete_activity()
+	end
+end
+
+function PresenceManager:_create_or_join_psn_session()
+	local psn_party_members = Managers.party_immaterium:other_members_by_platform("psn")
+
+	if #psn_party_members == 0 then
+		local activity_id = self._myself:activity_id()
+		local join_disabled = activity_id == "onboarding"
+		local is_private = activity_id == "mission" and Managers.party_immaterium:is_in_private_session() or false
+
+		self:_max_psn_session_players():next(function (max_members)
+			Managers.account:create_psn_session(max_members, join_disabled, is_private)
+		end)
+
+		return
+	end
+
+	local session_id = psn_party_members[1]:psn_session_id()
+
+	Managers.account:join_psn_session(session_id)
+end
+
+function PresenceManager:_max_psn_session_players()
+	local activity_id = self._myself:activity_id()
+	local account_ids = activity_id == "mission" and Managers.connection:member_peers() or Managers.party_immaterium:other_members_account_ids()
+	local max_players = 4
+
+	if #account_ids == 0 then
+		return Promise.resolved(max_players)
+	else
+		return self:get_presences(account_ids):next(function (presences)
+			for i = 1, #presences do
+				local presence = presences[i]
+
+				if presence:platform() ~= "psn" then
+					max_players = max_players - 1
+				end
+			end
+
+			return max_players
+		end)
 	end
 end
 

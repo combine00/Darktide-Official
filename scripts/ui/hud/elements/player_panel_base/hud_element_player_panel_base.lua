@@ -882,7 +882,8 @@ function HudElementPlayerPanelBase:_get_weapon_ammo_status(player, dead, unit_da
 		local slot_id = weapon_slots[i]
 		local inventory_component = unit_data_extension:read_component(slot_id)
 		local weapon_template = visual_loadout_extension:weapon_template_from_slot(slot_id)
-		local uses_ammunition = weapon_template and weapon_template.uses_ammunition
+		local hud_configuration = weapon_template and weapon_template.hud_configuration
+		local uses_ammunition = hud_configuration and hud_configuration.uses_ammunition
 
 		if inventory_component and uses_ammunition then
 			has_ammo = true

@@ -501,9 +501,9 @@ damage_templates.ogryn_charge_impact = {
 	}
 }
 damage_templates.ogryn_charge_finish = {
+	stagger_category = "explosion",
 	ragdoll_push_force = 500,
 	ignore_stagger_reduction = true,
-	stagger_category = "explosion",
 	cleave_distribution = {
 		attack = 0.1,
 		impact = 0.1
@@ -556,28 +556,6 @@ damage_templates.ogryn_charge_finish = {
 				[armor_types.disgustingly_resilient] = 5,
 				[armor_types.void_shield] = 5
 			}
-		}
-	},
-	crit_mods = {
-		attack = {
-			[armor_types.unarmored] = 0,
-			[armor_types.armored] = 0,
-			[armor_types.resistant] = 0,
-			[armor_types.player] = 0,
-			[armor_types.berserker] = 0,
-			[armor_types.super_armor] = 0,
-			[armor_types.disgustingly_resilient] = 0,
-			[armor_types.void_shield] = 0
-		},
-		impact = {
-			[armor_types.unarmored] = 5,
-			[armor_types.armored] = 5,
-			[armor_types.resistant] = 5,
-			[armor_types.player] = 5,
-			[armor_types.berserker] = 5,
-			[armor_types.super_armor] = 5,
-			[armor_types.disgustingly_resilient] = 5,
-			[armor_types.void_shield] = 5
 		}
 	},
 	power_distribution = {
@@ -637,8 +615,8 @@ damage_templates.ogryn_charge_impact_damage = {
 	}
 }
 damage_templates.ogryn_charge_finish_damage = {
-	ragdoll_push_force = 500,
 	stagger_duration_modifier = 1.5,
+	ragdoll_push_force = 500,
 	ignore_stagger_reduction = true,
 	stagger_category = "explosion",
 	power_distribution = {
@@ -697,28 +675,6 @@ damage_templates.ogryn_charge_finish_damage = {
 				[armor_types.disgustingly_resilient] = 5,
 				[armor_types.void_shield] = 5
 			}
-		}
-	},
-	crit_mods = {
-		attack = {
-			[armor_types.unarmored] = 0,
-			[armor_types.armored] = 0,
-			[armor_types.resistant] = 0,
-			[armor_types.player] = 0,
-			[armor_types.berserker] = 0,
-			[armor_types.super_armor] = 0,
-			[armor_types.disgustingly_resilient] = 0,
-			[armor_types.void_shield] = 0
-		},
-		impact = {
-			[armor_types.unarmored] = 5,
-			[armor_types.armored] = 5,
-			[armor_types.resistant] = 5,
-			[armor_types.player] = 5,
-			[armor_types.berserker] = 5,
-			[armor_types.super_armor] = 5,
-			[armor_types.disgustingly_resilient] = 5,
-			[armor_types.void_shield] = 5
 		}
 	},
 	targets = {

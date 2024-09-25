@@ -32,6 +32,55 @@ function PackageManager:_new_load_call_item(package_name, reference_name, callba
 	return load_call_item
 end
 
+function PackageManager:_prioritize_package(package_name, use_resident_loading)
+	local index = nil
+
+	for i = 1, #self._queue_order do
+		local package_data = self._queue_order[i]
+
+		if package_data.package_name == package_name then
+			index = i
+
+			break
+		end
+	end
+
+	table.remove(self._queue_order, index)
+
+	local package_data = {
+		package_name = package_name,
+		use_resident_loading = use_resident_loading
+	}
+
+	table.insert(self._queue_order, 1, package_data)
+end
+
+function PackageManager:_queue_package(package_name, prioritize, use_resident_loading)
+	self._queued_async_packages[package_name] = true
+	local package_data = {
+		package_name = package_name,
+		use_resident_loading = use_resident_loading
+	}
+
+	if prioritize then
+		table.insert(self._queue_order, 1, package_data)
+	else
+		self._queue_order[#self._queue_order + 1] = package_data
+	end
+end
+
+function PackageManager:_start_loading_package(package_name, use_resident_loading)
+	local resource_handle = Application.resource_package(package_name)
+
+	if use_resident_loading then
+		ResourcePackage.load_resident(resource_handle)
+	else
+		ResourcePackage.load(resource_handle)
+	end
+
+	self._asynch_packages[package_name] = resource_handle
+end
+
 function PackageManager:load(package_name, reference_name, callback, prioritize, use_resident_loading)
 	local load_call_item = self:_new_load_call_item(package_name, reference_name, callback)
 	self._packages_to_unload[package_name] = nil
@@ -46,26 +95,7 @@ function PackageManager:load(package_name, reference_name, callback, prioritize,
 		end
 
 		if self._queued_async_packages[package_name] and prioritize then
-			local index = nil
-
-			for i = 1, #self._queue_order do
-				local package_data = self._queue_order[i]
-
-				if package_data.package_name == package_name then
-					index = i
-
-					break
-				end
-			end
-
-			table.remove(self._queue_order, index)
-
-			local package_data = {
-				package_name = package_name,
-				use_resident_loading = use_resident_loading
-			}
-
-			table.insert(self._queue_order, 1, package_data)
+			self:_prioritize_package(package_name, use_resident_loading)
 		end
 
 		return load_call_item.id
@@ -76,27 +106,9 @@ function PackageManager:load(package_name, reference_name, callback, prioritize,
 	}
 
 	if PackageManager.MAX_CONCURRENT_ASYNC_PACKAGES <= table.size(self._asynch_packages) then
-		self._queued_async_packages[package_name] = true
-		local package_data = {
-			package_name = package_name,
-			use_resident_loading = use_resident_loading
-		}
-
-		if prioritize then
-			table.insert(self._queue_order, 1, package_data)
-		else
-			self._queue_order[#self._queue_order + 1] = package_data
-		end
+		self:_queue_package(package_name, prioritize, use_resident_loading)
 	else
-		local resource_handle = Application.resource_package(package_name)
-
-		if use_resident_loading then
-			ResourcePackage.load_resident(resource_handle)
-		else
-			ResourcePackage.load(resource_handle)
-		end
-
-		self._asynch_packages[package_name] = resource_handle
+		self:_start_loading_package(package_name, use_resident_loading)
 	end
 
 	return load_call_item.id
@@ -144,15 +156,8 @@ function PackageManager:_pop_queue()
 	end
 
 	if queued_package_name then
-		local resource_handle = Application.resource_package(queued_package_name)
+		self:_start_loading_package(queued_package_name, use_resident_loading)
 
-		if use_resident_loading then
-			ResourcePackage.load_resident(resource_handle)
-		else
-			ResourcePackage.load(resource_handle)
-		end
-
-		self._asynch_packages[queued_package_name] = resource_handle
 		self._queued_async_packages[queued_package_name] = nil
 		self._queue_order = table.crop(self._queue_order, index + 1)
 	else
@@ -163,15 +168,10 @@ end
 function PackageManager:release(id)
 	local load_call_item = self._load_call_data[id]
 	local package_name = load_call_item.package_name
-	local load_call_list = self._package_to_load_call_item[package_name]
 
-	for i = #load_call_list, 1, -1 do
-		if load_call_list[i] == load_call_item then
-			table.remove(load_call_list, i)
-		end
-	end
+	self:_remove_load_call_item(package_name, load_call_item)
 
-	if table.is_empty(load_call_list) then
+	if table.is_empty(self._package_to_load_call_item[package_name]) then
 		self._packages_to_unload[package_name] = load_call_item
 
 		if not self._pause_unloading then
@@ -181,6 +181,22 @@ function PackageManager:release(id)
 		end
 	end
 
+	self:_remove_queued_callback_item(load_call_item)
+
+	self._load_call_data[id] = nil
+end
+
+function PackageManager:_remove_load_call_item(package_name, load_call_item)
+	local load_call_list = self._package_to_load_call_item[package_name]
+
+	for i = #load_call_list, 1, -1 do
+		if load_call_list[i] == load_call_item then
+			table.remove(load_call_list, i)
+		end
+	end
+end
+
+function PackageManager:_remove_queued_callback_item(load_call_item)
 	local queued_callback_items = self._queued_callback_items
 
 	for i = #queued_callback_items, 1, -1 do
@@ -188,8 +204,6 @@ function PackageManager:release(id)
 			table.remove(queued_callback_items, i)
 		end
 	end
-
-	self._load_call_data[id] = nil
 end
 
 function PackageManager:_release_internal(package_name)
@@ -273,7 +287,9 @@ function PackageManager:reference_count(package, reference_name)
 
 	if load_call_item_list then
 		for i = 1, #load_call_item_list do
-			if load_call_item_list[i].reference_name == reference_name then
+			if reference_name == nil then
+				reference_count = reference_count + 1
+			elseif load_call_item_list[i].reference_name == reference_name then
 				reference_count = reference_count + 1
 			end
 		end

@@ -7,7 +7,7 @@ local view_settings = {
 	disable_game_world = true,
 	load_in_hub = true,
 	levels = {
-		"content/levels/ui/crafting_view/crafting_view"
+		"content/levels/ui/crafting_view_itemization/crafting_view_itemization"
 	},
 	testify_flags = {
 		ui_views = false

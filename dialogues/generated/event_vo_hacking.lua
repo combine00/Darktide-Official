@@ -474,6 +474,9 @@ return function ()
 				OP.TIMESET,
 				0
 			}
+		},
+		heard_speak_routing = {
+			target = "mission_givers"
 		}
 	})
 	define_rule({

@@ -1039,6 +1039,46 @@ local damage_trait_templates = {
 				max = 0.75,
 				min = 0.25
 			}
+		},
+		{
+			"targets",
+			1,
+			"power_distribution",
+			"attack",
+			{
+				max = 0.75,
+				min = 0.25
+			}
+		},
+		{
+			"targets",
+			2,
+			"power_distribution",
+			"attack",
+			{
+				max = 0.75,
+				min = 0.25
+			}
+		},
+		{
+			"targets",
+			3,
+			"power_distribution",
+			"attack",
+			{
+				max = 0.75,
+				min = 0.25
+			}
+		},
+		{
+			"targets",
+			"default_target",
+			"power_distribution",
+			"attack",
+			{
+				max = 0.75,
+				min = 0.25
+			}
 		}
 	},
 	shotgun_control_stat = {

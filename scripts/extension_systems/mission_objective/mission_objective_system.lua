@@ -36,7 +36,10 @@ local RPCS = {
 	"rpc_add_objective_marker",
 	"rpc_remove_objective_marker",
 	"rpc_mission_objective_show_ui",
+	"rpc_mission_objective_set_ui_state",
 	"rpc_mission_objective_show_counter",
+	"rpc_mission_objective_show_bar",
+	"rpc_mission_objective_show_timer",
 	"rpc_mission_objective_override_ui_string",
 	"rpc_mission_sound_event"
 }
@@ -55,7 +58,6 @@ function MissionObjectiveSystem:init(context, system_init_data, ...)
 	self._synced_increments = {}
 	self._synced_max_increments = {}
 	self._game_session = Managers.state.game_session
-	self._progression_sync_granularity = 0.01
 	self._objective_definitions = {}
 	self._new_ui_strings = {}
 	self._objective_start_times = {}
@@ -294,10 +296,11 @@ end
 function MissionObjectiveSystem:_propagate_objective_progression(objective)
 	local objective_name = objective:name()
 	local objective_name_id = NetworkLookup.mission_objective_names[objective_name]
+	local progression_sync_granularity = objective:progression_sync_granularity()
 	local progression = objective:progression()
 	local synced_progress = self._synced_progressions[objective] or 0
 	local delta = math.abs(progression - synced_progress)
-	local should_sync_progression = not self._synced_progressions[objective] or self._progression_sync_granularity < delta
+	local should_sync_progression = not self._synced_progressions[objective] or progression_sync_granularity < delta
 
 	if should_sync_progression then
 		self._synced_progressions[objective] = progression
@@ -309,7 +312,7 @@ function MissionObjectiveSystem:_propagate_objective_progression(objective)
 	local second_progression = objective:second_progression()
 	local synced_second_progression = self._synced_second_progressions[objective] or 0
 	delta = math.abs(second_progression - synced_second_progression)
-	local should_sync_second_progression = not self._synced_second_progressions[objective] or self._progression_sync_granularity < delta
+	local should_sync_second_progression = not self._synced_second_progressions[objective] or progression_sync_granularity < delta
 
 	if should_sync_second_progression then
 		self._synced_second_progressions[objective] = second_progression
@@ -438,6 +441,21 @@ function MissionObjectiveSystem:set_objective_show_ui(objective_name, show)
 	end
 end
 
+function MissionObjectiveSystem:set_objective_ui_state(objective_name, state)
+	local active_objective = self._active_objectives[objective_name]
+
+	if active_objective then
+		active_objective:set_ui_state(state)
+	end
+
+	if self._is_server then
+		local objective_name_id = NetworkLookup.mission_objective_names[objective_name]
+		local state_id = NetworkLookup.mission_objective_ui_states[state]
+
+		self:send_rpc_to_clients("rpc_mission_objective_set_ui_state", objective_name_id, state_id)
+	end
+end
+
 function MissionObjectiveSystem:set_objective_show_counter(objective_name, show)
 	local active_objective = self._active_objectives[objective_name]
 
@@ -449,6 +467,34 @@ function MissionObjectiveSystem:set_objective_show_counter(objective_name, show)
 		local objective_name_id = NetworkLookup.mission_objective_names[objective_name]
 
 		self:send_rpc_to_clients("rpc_mission_objective_show_counter", objective_name_id, show)
+	end
+end
+
+function MissionObjectiveSystem:set_objective_show_bar(objective_name, show)
+	local active_objective = self._active_objectives[objective_name]
+
+	if active_objective then
+		active_objective:set_progress_bar(show)
+	end
+
+	if self._is_server then
+		local objective_name_id = NetworkLookup.mission_objective_names[objective_name]
+
+		self:send_rpc_to_clients("rpc_mission_objective_show_bar", objective_name_id, show)
+	end
+end
+
+function MissionObjectiveSystem:set_objective_show_timer(objective_name, show)
+	local active_objective = self._active_objectives[objective_name]
+
+	if active_objective then
+		active_objective:set_progress_timer(show)
+	end
+
+	if self._is_server then
+		local objective_name_id = NetworkLookup.mission_objective_names[objective_name]
+
+		self:send_rpc_to_clients("rpc_mission_objective_show_timer", objective_name_id, show)
 	end
 end
 
@@ -787,15 +833,15 @@ function MissionObjectiveSystem:flow_callback_update_mission_objective(objective
 end
 
 function MissionObjectiveSystem:flow_callback_end_mission_objective(objective_name)
-	local objective = self._active_objectives[objective_name]
-
-	if objective and objective:is_updated_externally() then
-		self:end_mission_objective(objective_name)
-	end
+	self:end_mission_objective(objective_name)
 end
 
 function MissionObjectiveSystem:flow_callback_set_objective_show_ui(objective_name, show)
 	self:set_objective_show_ui(objective_name, show)
+end
+
+function MissionObjectiveSystem:flow_callback_set_objective_ui_state(objective_name, state)
+	self:set_objective_ui_state(objective_name, state)
 end
 
 function MissionObjectiveSystem:flow_callback_override_ui_string(objective_name, new_ui_header, new_ui_description)
@@ -804,6 +850,14 @@ end
 
 function MissionObjectiveSystem:flow_callback_set_objective_show_counter(objective_name, show)
 	self:set_objective_show_counter(objective_name, show)
+end
+
+function MissionObjectiveSystem:flow_callback_set_objective_show_bar(objective_name, show)
+	self:set_objective_show_bar(objective_name, show)
+end
+
+function MissionObjectiveSystem:flow_callback_set_objective_show_timer(objective_name, show)
+	self:set_objective_show_timer(objective_name, show)
 end
 
 function MissionObjectiveSystem:send_rpc_to_clients(rpc_name, ...)
@@ -881,10 +935,29 @@ function MissionObjectiveSystem:rpc_mission_objective_show_ui(channel_id, object
 	self:set_objective_show_ui(objective_name, show)
 end
 
+function MissionObjectiveSystem:rpc_mission_objective_set_ui_state(channel_id, objective_name_id, state_id)
+	local objective_name = NetworkLookup.mission_objective_names[objective_name_id]
+	local state = NetworkLookup.mission_objective_ui_states[state_id]
+
+	self:set_objective_ui_state(objective_name, state)
+end
+
 function MissionObjectiveSystem:rpc_mission_objective_show_counter(channel_id, objective_name_id, show)
 	local objective_name = NetworkLookup.mission_objective_names[objective_name_id]
 
 	self:set_objective_show_counter(objective_name, show)
+end
+
+function MissionObjectiveSystem:rpc_mission_objective_show_bar(channel_id, objective_name_id, show)
+	local objective_name = NetworkLookup.mission_objective_names[objective_name_id]
+
+	self:set_objective_show_bar(objective_name, show)
+end
+
+function MissionObjectiveSystem:rpc_mission_objective_show_timer(channel_id, objective_name_id, show)
+	local objective_name = NetworkLookup.mission_objective_names[objective_name_id]
+
+	self:set_objective_show_timer(objective_name, show)
 end
 
 function MissionObjectiveSystem:rpc_mission_sound_event(channel_id, music_event_id)

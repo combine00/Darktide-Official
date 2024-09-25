@@ -342,34 +342,64 @@ local disorientation_settings = {
 				action_delay = 0.5
 			}
 		},
-		thunder_hammer = {
+		thunder_hammer_light = {
 			sound_event = "wwise/events/player/play_player_get_hit_heavy_2d",
 			movement_speed_buff = "heavy_stun_movement_slow",
 			screen_space_effect = "content/fx/particles/screenspace/screen_stunned_light",
 			hit_react_anim_1p = "shake_heavy",
 			stun = {
-				end_stun_early_time = 0.9,
+				end_stun_early_time = 0.3,
+				intoxication_level = 2,
+				stun_immunity_time_buff = "stun_immune_short",
+				stun_duration = 0.3,
+				self_stun = true,
+				interrupt_delay = false,
+				action_delay = 0.3
+			}
+		},
+		thunder_hammer_heavy = {
+			sound_event = "wwise/events/player/play_player_get_hit_heavy_2d",
+			movement_speed_buff = "heavy_stun_movement_slow",
+			screen_space_effect = "content/fx/particles/screenspace/screen_stunned_light",
+			hit_react_anim_1p = "shake_heavy",
+			stun = {
+				end_stun_early_time = 0.45,
 				intoxication_level = 4,
 				stun_immunity_time_buff = "stun_immune_short",
-				stun_duration = 1.3,
+				stun_duration = 0.5,
 				self_stun = true,
 				interrupt_delay = false,
 				action_delay = 0.5
 			}
 		},
-		thunder_hammer_m2 = {
+		thunder_hammer_m2_light = {
 			sound_event = "wwise/events/player/play_player_get_hit_heavy_2d",
 			movement_speed_buff = "heavy_stun_movement_slow",
 			screen_space_effect = "content/fx/particles/screenspace/screen_stunned_light",
 			hit_react_anim_1p = "shake_heavy",
 			stun = {
-				end_stun_early_time = 0.5,
+				end_stun_early_time = 0.25,
 				intoxication_level = 2,
 				stun_immunity_time_buff = "stun_immune_short",
-				stun_duration = 0.7,
+				stun_duration = 0.25,
 				self_stun = true,
 				interrupt_delay = false,
-				action_delay = 0.2
+				action_delay = 0.25
+			}
+		},
+		thunder_hammer_m2_heavy = {
+			sound_event = "wwise/events/player/play_player_get_hit_heavy_2d",
+			movement_speed_buff = "heavy_stun_movement_slow",
+			screen_space_effect = "content/fx/particles/screenspace/screen_stunned_light",
+			hit_react_anim_1p = "shake_heavy",
+			stun = {
+				end_stun_early_time = 0.35,
+				intoxication_level = 3,
+				stun_immunity_time_buff = "stun_immune_short",
+				stun_duration = 0.4,
+				self_stun = true,
+				interrupt_delay = false,
+				action_delay = 0.4
 			}
 		},
 		ogryn_shovel = {

@@ -440,8 +440,8 @@ function InventoryWeaponCosmeticsView:_setup_weapon_preview()
 		local reference_name = "weapon_preview"
 		local layer = 10
 		local context = {
-			ignore_blur = false,
-			draw_background = true
+			ignore_blur = true,
+			draw_background = false
 		}
 		self._weapon_preview = self:_add_element(ViewElementInventoryWeaponPreview, reference_name, layer, context)
 		local allow_rotation = true
@@ -722,7 +722,7 @@ function InventoryWeaponCosmeticsView:_preview_element(element)
 	self:_preview_item(presentation_item)
 
 	local widgets_by_name = self._widgets_by_name
-	widgets_by_name.sub_display_name.content.text = ItemUtils.display_name(self._selected_item)
+	widgets_by_name.sub_display_name.content.text = string.format("%s • %s", ItemUtils.weapon_card_display_name(self._selected_item), ItemUtils.weapon_card_sub_display_name(self._selected_item))
 	widgets_by_name.display_name.content.text = real_item and ItemUtils.display_name(real_item) or Localize("loc_weapon_cosmetic_empty")
 end
 

@@ -48,8 +48,13 @@ local package_prioritization_templates = {
 		}
 	}
 }
+local template_names = table.keys(package_prioritization_templates)
 
-for template_name, template in pairs(package_prioritization_templates) do
+table.sort(template_names)
+
+for template_name_index = 1, #template_names do
+	local template_name = template_names[template_name_index]
+	local template = package_prioritization_templates[template_name]
 	template.name = template_name
 	template.remaining_package_aliases = {}
 	local required_package_aliases = template.required_package_aliases

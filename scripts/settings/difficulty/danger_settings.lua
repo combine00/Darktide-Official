@@ -3,8 +3,9 @@ local DangerSettings = {
 	by_index = {
 		{
 			index = 1,
-			expected_resistance = 2,
+			name = "sedition",
 			display_name = "loc_mission_board_danger_lowest",
+			expected_resistance = 2,
 			color = {
 				255,
 				169,
@@ -14,8 +15,9 @@ local DangerSettings = {
 		},
 		{
 			index = 2,
-			expected_resistance = 2,
+			name = "uprising",
 			display_name = "loc_mission_board_danger_low",
+			expected_resistance = 2,
 			color = {
 				255,
 				169,
@@ -25,8 +27,9 @@ local DangerSettings = {
 		},
 		{
 			index = 3,
-			expected_resistance = 3,
+			name = "malice",
 			display_name = "loc_mission_board_danger_medium",
+			expected_resistance = 3,
 			color = {
 				255,
 				228,
@@ -36,8 +39,9 @@ local DangerSettings = {
 		},
 		{
 			index = 4,
-			expected_resistance = 3,
+			name = "heresy",
 			display_name = "loc_mission_board_danger_high",
+			expected_resistance = 3,
 			color = {
 				255,
 				228,
@@ -47,8 +51,9 @@ local DangerSettings = {
 		},
 		{
 			index = 5,
-			expected_resistance = 4,
+			name = "damnation",
 			display_name = "loc_mission_board_danger_highest",
+			expected_resistance = 4,
 			color = {
 				255,
 				233,
@@ -68,5 +73,15 @@ local DangerSettings = {
 		return PlayerProgressionUnlocks.mission_difficulty_unlocks[mission_type][index] or 1
 	end
 }
+
+function DangerSettings.danger_by_name(name)
+	for i = 1, #DangerSettings.by_index do
+		local danger = DangerSettings.by_index[i]
+
+		if danger.name == name then
+			return danger
+		end
+	end
+end
 
 return settings("DangerSettings", DangerSettings)

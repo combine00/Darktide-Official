@@ -1,11 +1,10 @@
 local WwiseRoomVolume = component("WwiseRoomVolume")
 
 function WwiseRoomVolume:init(unit)
-	self._unit = unit
 	self._wwise_world = Wwise.wwise_world(Unit.world(unit))
 	self._room_id = -1
 
-	if Unit.has_volume(unit, "room_volume") == false then
+	if not Unit.has_volume(unit, "room_volume") then
 		return false
 	end
 
@@ -20,18 +19,28 @@ function WwiseRoomVolume:init(unit)
 	return false
 end
 
+function WwiseRoomVolume:destroy(unit)
+	local rooms_and_portals_manager = Managers and Managers.state and Managers.state.rooms_and_portals
+
+	if rooms_and_portals_manager then
+		rooms_and_portals_manager:remove_room(self)
+	end
+end
+
+function WwiseRoomVolume:enable(unit)
+	return
+end
+
+function WwiseRoomVolume:disable(unit)
+	return
+end
+
 function WwiseRoomVolume:editor_init(unit)
-	self._unit = unit
-	self._wwise_world = Wwise.wwise_world(Unit.world(unit))
-	self._room_id = -1
+	return
+end
 
-	if Unit.has_volume(unit, "room_volume") == false then
-		return false
-	end
-
-	if Managers then
-		Managers.state.rooms_and_portals:register_room(self)
-	end
+function WwiseRoomVolume:editor_destroy(unit)
+	return
 end
 
 function WwiseRoomVolume:editor_validate(unit)
@@ -44,26 +53,6 @@ function WwiseRoomVolume:editor_validate(unit)
 	end
 
 	return success, error_message
-end
-
-function WwiseRoomVolume:enable(unit)
-	return
-end
-
-function WwiseRoomVolume:get_unit()
-	return self._unit
-end
-
-function WwiseRoomVolume:disable(unit)
-	return
-end
-
-function WwiseRoomVolume:destroy(unit)
-	local rooms_and_portals_manager = Managers and Managers.state and Managers.state.rooms_and_portals
-
-	if rooms_and_portals_manager then
-		rooms_and_portals_manager:remove_room(self)
-	end
 end
 
 WwiseRoomVolume.component_data = {

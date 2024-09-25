@@ -29,7 +29,7 @@ local weapon_handling_trait_templates = WeaponTraitTemplates[template_types.weap
 local weapon_template = {
 	action_inputs = {
 		shoot_pressed = {
-			buffer_time = 0.5,
+			buffer_time = 0.25,
 			input_sequence = {
 				{
 					value = true,
@@ -157,11 +157,12 @@ weapon_template.actions = {
 		allowed_chain_actions = {}
 	},
 	action_wield = {
-		wield_reload_anim_event = "equip_reload",
-		allowed_during_sprint = true,
-		wield_anim_event = "equip",
 		uninterruptible = true,
 		kind = "ranged_wield",
+		wield_anim_event = "equip",
+		wield_reload_anim_event = "equip_reload",
+		weapon_handling_template = "time_scale_1_2",
+		allowed_during_sprint = true,
 		total_time = 1.9,
 		conditional_state_to_action_input = {
 			started_reload = {
@@ -736,8 +737,10 @@ weapon_template.conditional_state_to_action_input = {
 	}
 }
 weapon_template.no_ammo_delay = 0.55
-weapon_template.uses_ammunition = true
-weapon_template.uses_overheat = false
+weapon_template.hud_configuration = {
+	uses_overheat = false,
+	uses_ammunition = true
+}
 weapon_template.sprint_ready_up_time = 0.2
 weapon_template.max_first_person_anim_movement_speed = 5.8
 weapon_template.fx_sources = {
@@ -837,7 +840,31 @@ weapon_template.displayed_attacks = {
 	special = {
 		desc = "loc_stats_special_action_melee_weapon_bash_desc",
 		display_name = "loc_weapon_special_weapon_bash",
-		type = "melee"
+		type = "melee_hand"
+	}
+}
+weapon_template.weapon_card_data = {
+	main = {
+		{
+			value_func = "primary_attack",
+			icon = "hipfire",
+			sub_icon = "burst",
+			header = "hipfire"
+		},
+		{
+			value_func = "secondary_attack",
+			icon = "ads",
+			sub_icon = "semi_auto",
+			header = "ads"
+		},
+		{
+			value_func = "ammo",
+			header = "ammo"
+		}
+	},
+	weapon_special = {
+		icon = "melee_hand",
+		header = "weapon_bash"
 	}
 }
 weapon_template.explicit_combo = {

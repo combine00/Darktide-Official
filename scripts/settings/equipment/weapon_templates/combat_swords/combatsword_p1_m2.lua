@@ -1020,10 +1020,10 @@ weapon_template.actions = {
 	action_right_light_pushfollow = {
 		damage_window_start = 0.35,
 		hit_armor_anim = "attack_hit_shield",
-		range_mod = 1.25,
 		weapon_handling_template = "time_scale_1",
 		kind = "sweep",
-		sprint_requires_press_to_interrupt = "true",
+		range_mod = 1.25,
+		allowed_during_sprint = true,
 		damage_window_end = 0.45,
 		anim_end_event = "attack_finished",
 		anim_event_3p = "attack_swing_right_diagonal",
@@ -1087,7 +1087,7 @@ weapon_template.actions = {
 	},
 	action_push = {
 		push_radius = 2.5,
-		block_duration = 0.5,
+		block_duration = 0.2,
 		kind = "push",
 		anim_event = "attack_push",
 		total_time = 1,
@@ -1214,12 +1214,13 @@ weapon_template.actions = {
 	action_attack_special = {
 		damage_window_start = 0.15,
 		hit_armor_anim = "attack_hit_shield",
-		anim_end_event = "attack_finished",
 		range_mod = 1.25,
+		block_duration = 0.5,
 		kind = "sweep",
 		attack_direction_override = "push",
 		weapon_handling_template = "time_scale_1_3",
 		damage_window_end = 0.3,
+		anim_end_event = "attack_finished",
 		anim_event = "attack_special",
 		total_time = 1,
 		action_movement_curve = {
@@ -1306,8 +1307,10 @@ weapon_template.weapon_box = {
 	0.7,
 	0.02
 }
-weapon_template.uses_ammunition = false
-weapon_template.uses_overheat = false
+weapon_template.hud_configuration = {
+	uses_overheat = false,
+	uses_ammunition = false
+}
 weapon_template.sprint_ready_up_time = 0.3
 weapon_template.max_first_person_anim_movement_speed = 5.8
 weapon_template.damage_window_start_sweep_trail_offset = -0.45
@@ -1768,6 +1771,24 @@ weapon_template.displayed_attacks = {
 		desc = "loc_weapon_special_parry_desc",
 		display_name = "loc_weapon_special_parry",
 		type = "defence"
+	}
+}
+weapon_template.weapon_card_data = {
+	main = {
+		{
+			icon = "linesman",
+			value_func = "primary_attack",
+			header = "light"
+		},
+		{
+			icon = "tank",
+			value_func = "secondary_attack",
+			header = "heavy"
+		}
+	},
+	weapon_special = {
+		icon = "defence",
+		header = "parry"
 	}
 }
 weapon_template.special_action_name = "action_attack_special"

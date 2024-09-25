@@ -99,6 +99,52 @@ local conversations_hub_mourningstar_soldier_male_e = {
 			[1.0] = 1
 		},
 		randomize_indexes = {}
+	},
+	oval_hub_soldier_exchange_01_b = {
+		randomize_indexes_n = 0,
+		sound_events_n = 1,
+		sound_events = {
+			[1.0] = "loc_mourningstar_soldier_male_e__oval_hub_soldier_exchange_01_b_01"
+		},
+		sound_events_duration = {
+			[1.0] = 2.529271
+		},
+		randomize_indexes = {}
+	},
+	oval_hub_soldier_exchange_04_b = {
+		randomize_indexes_n = 0,
+		sound_events_n = 1,
+		sound_events = {
+			[1.0] = "loc_mourningstar_soldier_male_e__oval_hub_soldier_exchange_04_b_01"
+		},
+		sound_events_duration = {
+			[1.0] = 4.037375
+		},
+		randomize_indexes = {}
+	},
+	oval_hub_soldier_exchange_05_b = {
+		randomize_indexes_n = 0,
+		sound_events_n = 1,
+		sound_events = {
+			[1.0] = "loc_mourningstar_soldier_male_e__oval_hub_soldier_exchange_05_b_01"
+		},
+		sound_events_duration = {
+			[1.0] = 3.690063
+		},
+		randomize_indexes = {}
+	},
+	oval_hub_soldier_exchange_male_e = {
+		randomize_indexes_n = 0,
+		sound_events_n = 2,
+		sound_events = {
+			[1.0] = "loc_mourningstar_soldier_male_e__oval_hub_soldier_exchange_02_a_01",
+			[2.0] = "loc_mourningstar_soldier_male_e__oval_hub_soldier_exchange_03_a_01"
+		},
+		sound_events_duration = {
+			[1.0] = 4.012042,
+			[2.0] = 2.759063
+		},
+		randomize_indexes = {}
 	}
 }
 

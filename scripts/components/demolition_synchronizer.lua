@@ -87,7 +87,7 @@ DemolitionSynchronizer.component_data = {
 	automatic_start = {
 		ui_type = "check_box",
 		value = false,
-		ui_name = "Auto Start On Mission Start"
+		ui_name = "Automatic Start On Mission Start"
 	},
 	inputs = {
 		start_demolition_event = {

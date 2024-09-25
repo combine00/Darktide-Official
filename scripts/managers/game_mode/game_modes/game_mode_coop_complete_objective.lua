@@ -71,7 +71,7 @@ function GameModeCoopCompleteObjective:evaluate_end_conditions()
 			self:_change_state(next_state)
 			_log("[evaluate_end_conditions] Failure conditions changed (dead: %s | disabled: %s), game mode will end in %.2f seconds", all_players_dead and "Y" or "N", all_players_disabled and "Y" or "N", grace_time)
 		elseif completion_conditions_met then
-			self:_gamemode_complete("won")
+			self:_gamemode_complete("won", self._end_reason)
 			self:_change_state("outro_cinematic")
 			Managers.state.minion_spawn:despawn_all_minions()
 			cinematic_scene_system:play_cutscene(CINEMATIC_NAMES.outro_win)
@@ -96,7 +96,7 @@ function GameModeCoopCompleteObjective:evaluate_end_conditions()
 		if failure_conditions_met and self._end_t < t then
 			self._failed = true
 
-			self:_gamemode_complete("lost")
+			self:_gamemode_complete("lost", self._end_reason)
 			self:_change_state("outro_cinematic")
 			Managers.state.minion_spawn:despawn_all_minions()
 			cinematic_scene_system:play_cutscene(CINEMATIC_NAMES.outro_fail)
@@ -117,16 +117,13 @@ function GameModeCoopCompleteObjective:evaluate_end_conditions()
 	return false
 end
 
-function GameModeCoopCompleteObjective:_gamemode_complete(mission_result)
-	_log("gamemode_complete, result: %s", mission_result)
-
-	self._mission_result = mission_result
-
+function GameModeCoopCompleteObjective:_gamemode_complete(result, reason)
+	_log("gamemode_complete, result: %s, reason: %s", result, reason)
 	self:_fetch_session_report()
 	Managers.state.game_session:send_rpc_clients("rpc_fetch_session_report")
 
 	if Managers.mission_server then
-		Managers.mission_server:on_gamemode_completed(mission_result)
+		Managers.mission_server:on_gamemode_completed(result, reason)
 	end
 end
 
@@ -239,12 +236,14 @@ function GameModeCoopCompleteObjective:_set_pacing(enabled)
 	Managers.state.pacing:set_enabled(self._pacing_enabled)
 end
 
-function GameModeCoopCompleteObjective:complete()
+function GameModeCoopCompleteObjective:complete(reason)
 	self._completed = true
+	self._end_reason = reason
 end
 
-function GameModeCoopCompleteObjective:fail()
+function GameModeCoopCompleteObjective:fail(reason)
 	self._failed = true
+	self._end_reason = reason
 end
 
 function GameModeCoopCompleteObjective:on_player_unit_spawn(player, unit, is_respawn)

@@ -4,10 +4,9 @@ local Hud = require("scripts/utilities/ui/hud")
 local HudElementSmartTaggingSettings = require("scripts/ui/hud/elements/smart_tagging/hud_element_smart_tagging_settings")
 local InputDevice = require("scripts/managers/input/input_device")
 local InputUtils = require("scripts/managers/input/input_utils")
-local UIResolution = require("scripts/managers/ui/ui_resolution")
 local UIWidget = require("scripts/managers/ui/ui_widget")
 local Vo = require("scripts/utilities/vo")
-local VOQueryConstants = require("scripts/settings/dialogue/vo_query_constants")
+local VoQueryConstants = require("scripts/settings/dialogue/vo_query_constants")
 local ChannelTags = ChatManagerConstants.ChannelTag
 local DOUBLE_TAP_DELAY = 0.3
 local INSTANT_WHEEL_THRESHOLD = 8
@@ -34,8 +33,8 @@ function HudElementSmartTagging:init(parent, draw_layer, start_scale)
 			icon = "content/ui/materials/hud/communication_wheel/icons/for_the_emperor",
 			display_name = "loc_communication_wheel_display_name_cheer",
 			voice_event_data = {
-				voice_tag_concept = VOQueryConstants.concepts.on_demand_com_wheel,
-				voice_tag_id = VOQueryConstants.trigger_ids.com_wheel_vo_for_the_emperor
+				voice_tag_concept = VoQueryConstants.concepts.on_demand_com_wheel,
+				voice_tag_id = VoQueryConstants.trigger_ids.com_wheel_vo_for_the_emperor
 			},
 			start_angle = -(math.pi / 8) * 3
 		},
@@ -47,8 +46,8 @@ function HudElementSmartTagging:init(parent, draw_layer, start_scale)
 				channel = ChannelTags.MISSION
 			},
 			voice_event_data = {
-				voice_tag_concept = VOQueryConstants.concepts.on_demand_com_wheel,
-				voice_tag_id = VOQueryConstants.trigger_ids.com_wheel_vo_need_health
+				voice_tag_concept = VoQueryConstants.concepts.on_demand_com_wheel,
+				voice_tag_id = VoQueryConstants.trigger_ids.com_wheel_vo_need_health
 			}
 		},
 		{
@@ -59,8 +58,8 @@ function HudElementSmartTagging:init(parent, draw_layer, start_scale)
 				channel = ChannelTags.MISSION
 			},
 			voice_event_data = {
-				voice_tag_concept = VOQueryConstants.concepts.on_demand_com_wheel,
-				voice_tag_id = VOQueryConstants.trigger_ids.com_wheel_vo_thank_you
+				voice_tag_concept = VoQueryConstants.concepts.on_demand_com_wheel,
+				voice_tag_id = VoQueryConstants.trigger_ids.com_wheel_vo_thank_you
 			}
 		},
 		{
@@ -71,8 +70,8 @@ function HudElementSmartTagging:init(parent, draw_layer, start_scale)
 				channel = ChannelTags.MISSION
 			},
 			voice_event_data = {
-				voice_tag_concept = VOQueryConstants.concepts.on_demand_com_wheel,
-				voice_tag_id = VOQueryConstants.trigger_ids.com_wheel_vo_need_ammo
+				voice_tag_concept = VoQueryConstants.concepts.on_demand_com_wheel,
+				voice_tag_id = VoQueryConstants.trigger_ids.com_wheel_vo_need_ammo
 			}
 		},
 		{
@@ -80,8 +79,8 @@ function HudElementSmartTagging:init(parent, draw_layer, start_scale)
 			icon = "content/ui/materials/hud/communication_wheel/icons/enemy",
 			tag_type = "location_threat",
 			voice_event_data = {
-				voice_tag_concept = VOQueryConstants.concepts.on_demand_com_wheel,
-				voice_tag_id = VOQueryConstants.trigger_ids.com_wheel_vo_enemy_over_here
+				voice_tag_concept = VoQueryConstants.concepts.on_demand_com_wheel,
+				voice_tag_id = VoQueryConstants.trigger_ids.com_wheel_vo_enemy_over_here
 			},
 			start_angle = -(math.pi / 8) * 2
 		},
@@ -90,8 +89,8 @@ function HudElementSmartTagging:init(parent, draw_layer, start_scale)
 			display_name = "loc_communication_wheel_display_name_location",
 			tag_type = "location_ping",
 			voice_event_data = {
-				voice_tag_concept = VOQueryConstants.concepts.on_demand_com_wheel,
-				voice_tag_id = VOQueryConstants.trigger_ids.com_wheel_vo_lets_go_this_way
+				voice_tag_concept = VoQueryConstants.concepts.on_demand_com_wheel,
+				voice_tag_id = VoQueryConstants.trigger_ids.com_wheel_vo_lets_go_this_way
 			}
 		},
 		{
@@ -99,8 +98,8 @@ function HudElementSmartTagging:init(parent, draw_layer, start_scale)
 			display_name = "loc_communication_wheel_display_name_attention",
 			tag_type = "location_attention",
 			voice_event_data = {
-				voice_tag_concept = VOQueryConstants.concepts.on_demand_com_wheel,
-				voice_tag_id = VOQueryConstants.trigger_ids.com_wheel_vo_over_here
+				voice_tag_concept = VoQueryConstants.concepts.on_demand_com_wheel,
+				voice_tag_id = VoQueryConstants.trigger_ids.com_wheel_vo_over_here
 			}
 		}
 	}

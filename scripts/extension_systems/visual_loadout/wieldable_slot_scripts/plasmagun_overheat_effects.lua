@@ -1,12 +1,11 @@
 local Component = require("scripts/utilities/component")
-local PlayerCharacterLoopingSoundAliases = require("scripts/settings/sound/player_character_looping_sound_aliases")
+local WieldableSlotScriptInterface = require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/wieldable_slot_script_interface")
 local PlasmagunOverheatEffects = class("PlasmagunOverheatEffects")
 local SFX_ALIAS = "weapon_overload"
 local LOOPING_SFX_ALIAS = "weapon_overload_loop"
 local LOOPING_VFX_ALIAS = "weapon_overload_loop"
-local LOOPING_SFX_CONFIG = PlayerCharacterLoopingSoundAliases[LOOPING_SFX_ALIAS]
 local vfx_external_properties = {}
-local sfx_external_properties = {}
+local _sfx_external_properties = {}
 local _slot_components, _is_cinematic_active = nil
 
 function PlasmagunOverheatEffects:init(context, slot, weapon_template, fx_sources)
@@ -105,24 +104,22 @@ function PlasmagunOverheatEffects:_update_vfx(overheat_configuration, overheat_p
 end
 
 function PlasmagunOverheatEffects:_update_threshold_sfx(overheat_configuration, overheat_percentage)
-	local is_husk = self._is_husk
-	local is_local_unit = self._is_local_unit
 	local wwise_world = self._wwise_world
 	local sfx_source_id = self._fx_extension:sound_source(self._overheat_sfx_source_name)
 	local threshold_stages = self._sfx_threshold_stages
 	local visual_loadout_extension = self._visual_loadout_extension
-	local use_husk_event = is_husk or not is_local_unit
+	local should_play_husk_effect = self._fx_extension:should_play_husk_effect()
 
 	for stage, threshold in pairs(overheat_configuration.thresholds) do
 		local was_above_threshold = not not threshold_stages[stage]
 		local is_above_threshold = threshold < overheat_percentage
 
 		if not was_above_threshold and is_above_threshold then
-			sfx_external_properties.stage = stage
-			local resolved, event_name, has_husk_events = visual_loadout_extension:resolve_gear_sound(SFX_ALIAS, sfx_external_properties)
+			_sfx_external_properties.stage = stage
+			local resolved, event_name, has_husk_events = visual_loadout_extension:resolve_gear_sound(SFX_ALIAS, _sfx_external_properties)
 
 			if resolved then
-				if use_husk_event and has_husk_events then
+				if should_play_husk_effect and has_husk_events then
 					event_name = event_name .. "_husk" or event_name
 				end
 
@@ -222,35 +219,19 @@ function PlasmagunOverheatEffects:destroy()
 end
 
 function PlasmagunOverheatEffects:_start_sfx_loop(stage)
-	local is_husk = self._is_husk
-	local is_local_unit = self._is_local_unit
 	local wwise_world = self._wwise_world
 	local sfx_source_id = self._fx_extension:sound_source(self._overheat_sfx_source_name)
 	local visual_loadout_extension = self._visual_loadout_extension
-	local use_husk_event = is_husk or not is_local_unit
-	local start_config = LOOPING_SFX_CONFIG.start
-	local stop_config = LOOPING_SFX_CONFIG.stop
-	local start_event_alias = start_config.event_alias
-	local stop_event_alias = stop_config.event_alias
-	local resolved, has_husk_events, event_name = nil
-	sfx_external_properties.stage = stage
-	resolved, event_name, has_husk_events = visual_loadout_extension:resolve_gear_sound(start_event_alias, sfx_external_properties)
+	local should_play_husk_effect = self._fx_extension:should_play_husk_effect()
+	_sfx_external_properties.stage = stage
+	local resolved, event_name, resolved_stop, stop_event_name = visual_loadout_extension:resolve_looping_gear_sound(LOOPING_SFX_ALIAS, should_play_husk_effect, _sfx_external_properties)
 
 	if resolved then
-		if use_husk_event and has_husk_events then
-			event_name = event_name .. "_husk" or event_name
-		end
-
 		local new_playing_id = WwiseWorld.trigger_resource_event(wwise_world, event_name, sfx_source_id)
 		self._looping_playing_ids[stage] = new_playing_id
-		resolved, event_name, has_husk_events = visual_loadout_extension:resolve_gear_sound(stop_event_alias, sfx_external_properties)
 
-		if resolved then
-			if use_husk_event and has_husk_events then
-				event_name = event_name .. "_husk" or event_name
-			end
-
-			self._looping_stop_events[stage] = event_name
+		if resolved_stop then
+			self._looping_stop_events[stage] = stop_event_name
 		end
 	end
 end
@@ -324,5 +305,7 @@ function _is_cinematic_active()
 
 	return cinematic_scene_system_active or cinematic_manager_active
 end
+
+implements(PlasmagunOverheatEffects, WieldableSlotScriptInterface)
 
 return PlasmagunOverheatEffects

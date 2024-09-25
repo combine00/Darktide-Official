@@ -53,7 +53,7 @@ function GameModePrologue:evaluate_end_conditions()
 	return false
 end
 
-function GameModePrologue:complete(triggered_from_flow)
+function GameModePrologue:complete(reason, triggered_from_flow)
 	self._completed = true
 end
 

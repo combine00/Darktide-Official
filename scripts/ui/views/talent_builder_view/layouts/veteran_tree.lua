@@ -1,7 +1,7 @@
 return {
 	name = "veteran_tree",
 	node_points = 30,
-	version = 22,
+	version = 24,
 	background_height = 2550,
 	archetype_name = "veteran",
 	talent_points = 30,
@@ -754,7 +754,7 @@ return {
 			type = "ability_modifier",
 			max_points = 1,
 			widget_name = "node_92793f3d-46d0-4a20-a4af-b5fe7ea28b22",
-			y = 1472.3451319331616,
+			y = 1472.3451602902032,
 			y_normalized = 0,
 			talent = "veteran_combat_ability_coherency_outlines",
 			icon = "content/ui/textures/icons/talents/veteran/veteran_combat_ability_coherency_outlines",
@@ -796,11 +796,11 @@ return {
 			type = "ability_modifier",
 			max_points = 1,
 			widget_name = "node_3843e597-be1c-44dc-b07f-e7b0b2f779dd",
-			y = 1536.0619593257397,
+			y = 1536.0619469026549,
 			y_normalized = 0,
 			talent = "veteran_combat_ability_ranged_roamer_outlines",
 			icon = "content/ui/textures/icons/talents/veteran/veteran_combat_ability_ranged_enemies_outlines_ranged_weakspot_damage_bonus",
-			x = 675.8849487304688,
+			x = 548.4513549804688,
 			x_normalized = 0,
 			children = {
 				"node_129ff9f1-a7ba-4556-8617-c63d53c68f7c"
@@ -880,26 +880,6 @@ return {
 				"node_a6dcece9-435c-4d88-83a6-8c58bd9240b9",
 				"node_7adfbd19-7df3-4337-875b-2a9dfa00d378",
 				"node_416f354e-b04f-4749-9b7d-b6aa72168637"
-			},
-			requirements = {
-				min_points_spent = 0,
-				children_unlock_points = 1,
-				all_parents_chosen = false
-			}
-		},
-		{
-			type = "ability_modifier",
-			max_points = 1,
-			widget_name = "node_0a5464cb-bd8e-4fbc-87b5-a005d73d809c",
-			y = 1536.0619593257397,
-			y_normalized = 0,
-			talent = "veteran_combat_ability_outlined_kills_extends_duration",
-			icon = "content/ui/textures/icons/talents/veteran/veteran_combat_ability_outlined_kills_extends_duration",
-			x = 548.4513549804688,
-			x_normalized = 0,
-			children = {},
-			parents = {
-				"node_bbd51147-0e4f-4bec-a020-b23d16efb29a"
 			},
 			requirements = {
 				min_points_spent = 0,
@@ -1341,8 +1321,8 @@ return {
 			widget_name = "node_41d2b96f-c399-47c0-88c3-9e60a07638fc",
 			y = 421.0177001953125,
 			y_normalized = 0,
-			talent = "veteran_reduce_sprinting_cost",
-			icon = "content/ui/textures/icons/talents/veteran/veteran_reduce_sprinting_cost",
+			talent = "veteran_reduce_swap_time",
+			icon = "content/ui/textures/icons/talents/veteran/veteran_default_utility_talent",
 			x = 1376.7698974609375,
 			x_normalized = 0,
 			children = {
@@ -1958,11 +1938,11 @@ return {
 			type = "ability_modifier",
 			max_points = 1,
 			widget_name = "node_c9c09c7f-211c-4cf3-8192-2d532bcaffee",
-			y = 1472.3451319331616,
+			y = 1536.0619625665445,
 			y_normalized = 0,
 			talent = "veteran_combat_ability_ogryn_outlines",
 			icon = "content/ui/textures/icons/talents/veteran/veteran_big_game_hunter",
-			x = 739.598,
+			x = 675.8849487304688,
 			x_normalized = 0,
 			children = {},
 			parents = {

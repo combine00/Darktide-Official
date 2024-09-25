@@ -824,7 +824,7 @@ weapon_template.actions = {
 		anim_end_event = "attack_finished",
 		kind = "windup",
 		anim_event_3p = "attack_swing_charge_right",
-		anim_event = "heavy_charge_right_diagonal",
+		anim_event = "heavy_charge_right",
 		hit_stop_anim = "attack_hit",
 		stop_input = "attack_cancel",
 		total_time = 3,
@@ -1303,11 +1303,11 @@ weapon_template.actions = {
 	action_right_light_pushfollow = {
 		damage_window_start = 0.3,
 		hit_armor_anim = "attack_hit_shield",
-		range_mod = 1.25,
 		weapon_handling_template = "time_scale_1",
-		attack_direction_override = "push",
-		sprint_requires_press_to_interrupt = "true",
 		kind = "sweep",
+		attack_direction_override = "push",
+		range_mod = 1.25,
+		allowed_during_sprint = true,
 		damage_window_end = 0.42,
 		anim_end_event = "attack_finished",
 		anim_event_3p = "attack_swing_down",
@@ -1469,8 +1469,10 @@ weapon_template.weapon_box = {
 	0.7,
 	0.02
 }
-weapon_template.uses_ammunition = false
-weapon_template.uses_overheat = false
+weapon_template.hud_configuration = {
+	uses_overheat = false,
+	uses_ammunition = false
+}
 weapon_template.sprint_ready_up_time = 0.3
 weapon_template.max_first_person_anim_movement_speed = 5.8
 weapon_template.damage_window_start_sweep_trail_offset = -0.45
@@ -1773,6 +1775,24 @@ weapon_template.displayed_attacks = {
 		desc = "loc_stats_special_action_special_attack_combatsword_p2m1_desc",
 		display_name = "loc_weapon_special_special_attack",
 		type = "special_attack"
+	}
+}
+weapon_template.weapon_card_data = {
+	main = {
+		{
+			icon = "linesman",
+			value_func = "primary_attack",
+			header = "light"
+		},
+		{
+			icon = "smiter",
+			value_func = "secondary_attack",
+			header = "heavy"
+		}
+	},
+	weapon_special = {
+		icon = "special_attack",
+		header = "special_attack"
 	}
 }
 weapon_template.special_action_name = "action_attack_special"

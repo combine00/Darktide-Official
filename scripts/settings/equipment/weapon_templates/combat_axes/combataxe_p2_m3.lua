@@ -423,12 +423,10 @@ weapon_template.actions = {
 		hit_armor_anim = "attack_hit_shield",
 		kind = "sweep",
 		weapon_handling_template = "time_scale_0_9_hatchet",
-		max_num_saved_entries = 20,
-		first_person_hit_stop_anim = "hit_stop",
 		range_mod = 1.35,
-		num_frames_before_process = 2,
-		allowed_during_sprint = true,
+		first_person_hit_stop_anim = "hit_stop",
 		anim_event_3p = "attack_swing_up_right_ninja",
+		allowed_during_sprint = true,
 		damage_window_end = 0.35,
 		anim_end_event = "attack_finished",
 		uninterruptible = true,
@@ -824,12 +822,12 @@ weapon_template.actions = {
 	action_right_light_pushfollow = {
 		damage_window_start = 0.3,
 		hit_armor_anim = "attack_hit_shield",
-		anim_event_3p = "attack_swing_right_diagonal",
 		kind = "sweep",
 		weapon_handling_template = "time_scale_1_hatchet",
-		sprint_requires_press_to_interrupt = "true",
-		first_person_hit_stop_anim = "hit_stop",
 		range_mod = 1.35,
+		first_person_hit_stop_anim = "hit_stop",
+		anim_event_3p = "attack_swing_right_diagonal",
+		allowed_during_sprint = true,
 		damage_window_end = 0.4,
 		anim_end_event = "attack_finished",
 		uninterruptible = true,
@@ -1164,8 +1162,10 @@ weapon_template.weapon_box = {
 	0.1,
 	0.7
 }
-weapon_template.uses_ammunition = false
-weapon_template.uses_overheat = false
+weapon_template.hud_configuration = {
+	uses_overheat = false,
+	uses_ammunition = false
+}
 weapon_template.sprint_ready_up_time = 0.1
 weapon_template.max_first_person_anim_movement_speed = 5.8
 weapon_template.damage_window_start_sweep_trail_offset = -0.45
@@ -1510,6 +1510,24 @@ weapon_template.displayed_attacks = {
 		desc = "loc_stats_special_action_special_attack_combataxe_p2m3_desc",
 		display_name = "loc_weapon_special_special_attack",
 		type = "special_attack"
+	}
+}
+weapon_template.weapon_card_data = {
+	main = {
+		{
+			icon = "ninja_fencer",
+			value_func = "primary_attack",
+			header = "light"
+		},
+		{
+			icon = "smiter",
+			value_func = "secondary_attack",
+			header = "heavy"
+		}
+	},
+	weapon_special = {
+		icon = "special_attack",
+		header = "special_attack"
 	}
 }
 weapon_template.special_action_name = "action_special_down_right"

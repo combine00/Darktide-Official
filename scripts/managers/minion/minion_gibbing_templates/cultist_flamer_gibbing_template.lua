@@ -2,15 +2,15 @@ local GibbingSettings = require("scripts/settings/gibbing/gibbing_settings")
 local GibbingThresholds = GibbingSettings.gibbing_thresholds
 local SharedGibbingTemplates = require("scripts/managers/minion/minion_gibbing_templates/shared_gibbing_templates")
 local name = "cultist_flamer_gibbing"
-local size = GibbingSettings.character_size.medium
-local gib_push_head = 20
-local gib_push_upper_arm = 50
-local gib_push_lower_arm = 50
+local size = GibbingSettings.character_size.small
+local gib_push_head = 50
+local gib_push_upper_arm = 65
+local gib_push_lower_arm = 65
 local gib_push_arm = gib_push_upper_arm + gib_push_lower_arm
-local gib_push_upper_leg = 400
-local gib_push_lower_leg = 400
+local gib_push_upper_leg = 1200
+local gib_push_lower_leg = 1200
 local gib_push_leg = gib_push_upper_leg + gib_push_lower_leg
-local gib_push_torso = 17500
+local gib_push_torso = 5000
 local head_sever = table.clone(SharedGibbingTemplates.head)
 head_sever.gib_settings.override_push_force = {
 	gib_push_head,
@@ -514,6 +514,9 @@ local gibbing_template = {
 				left_arm
 			}
 		},
+		implosion = {
+			upper_left_arm_remove
+		},
 		boltshell = {
 			conditional = {
 				upper_left_arm_remove,
@@ -541,6 +544,9 @@ local gibbing_template = {
 				upper_right_arm_remove,
 				right_arm
 			}
+		},
+		implosion = {
+			upper_right_arm_remove
 		},
 		boltshell = {
 			conditional = {
@@ -570,6 +576,9 @@ local gibbing_template = {
 				left_leg
 			}
 		},
+		implosion = {
+			upper_left_leg_remove
+		},
 		boltshell = {
 			conditional = {
 				upper_left_leg_remove,
@@ -598,6 +607,9 @@ local gibbing_template = {
 				right_leg
 			}
 		},
+		implosion = {
+			upper_right_leg_remove
+		},
 		boltshell = {
 			conditional = {
 				upper_right_leg_remove,
@@ -619,6 +631,9 @@ local gibbing_template = {
 			lower_left_arm,
 			lower_left_arm_remove
 		},
+		implosion = {
+			lower_left_arm_remove
+		},
 		boltshell = {
 			lower_left_arm,
 			lower_left_arm_remove
@@ -631,6 +646,9 @@ local gibbing_template = {
 		default = lower_right_arm,
 		ballistic = {
 			lower_right_arm,
+			lower_right_arm_remove
+		},
+		implosion = {
 			lower_right_arm_remove
 		},
 		boltshell = {
@@ -647,6 +665,9 @@ local gibbing_template = {
 			lower_left_leg,
 			lower_left_leg_remove
 		},
+		implosion = {
+			lower_left_leg_remove
+		},
 		boltshell = {
 			lower_left_leg,
 			lower_left_leg_remove
@@ -659,6 +680,9 @@ local gibbing_template = {
 		default = lower_right_leg,
 		ballistic = {
 			lower_right_leg,
+			lower_right_leg_remove
+		},
+		implosion = {
 			lower_right_leg_remove
 		},
 		boltshell = {
@@ -678,6 +702,9 @@ local gibbing_template = {
 			torso_sever,
 			torso_remove,
 			torso_full
+		},
+		implosion = {
+			torso_remove
 		},
 		boltshell = torso_remove,
 		plasma = torso_remove,
@@ -702,6 +729,9 @@ local gibbing_template = {
 			center_mass_lower,
 			center_mass_left,
 			center_mass_right
+		},
+		implosion = {
+			torso_remove
 		},
 		boltshell = {
 			center_mass_full,

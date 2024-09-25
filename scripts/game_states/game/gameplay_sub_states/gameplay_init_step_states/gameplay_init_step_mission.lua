@@ -14,6 +14,7 @@ function GameplayInitStepMission:on_enter(parent, params)
 end
 
 function GameplayInitStepMission:update(main_dt, main_t)
+	self._shared_state.initialized_steps.GameplayInitStepMission = true
 	local next_step_params = {
 		shared_state = self._shared_state
 	}

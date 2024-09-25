@@ -81,7 +81,7 @@ function GameModeTrainingGrounds:evaluate_end_conditions()
 	return false
 end
 
-function GameModeTrainingGrounds:complete(triggered_from_flow)
+function GameModeTrainingGrounds:complete(reason, triggered_from_flow)
 	self._completed = true
 end
 

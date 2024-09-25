@@ -41,14 +41,18 @@ Minigame.component_data = {
 			"None",
 			"Default",
 			"Scan",
+			"Balance",
 			"Decode Symbols",
+			"Defuse",
 			"Drill"
 		},
 		options_values = {
 			"none",
 			"default",
 			"scan",
+			"balance",
 			"decode_symbols",
+			"defuse",
 			"drill"
 		}
 	},

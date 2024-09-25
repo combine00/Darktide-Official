@@ -1,3 +1,4 @@
+local WieldableSlotScriptInterface = require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/wieldable_slot_script_interface")
 local LasgunIronSight = class("LasgunIronSight")
 local SHOW_DELAY = 0.04
 local HIDE_DELAY = 0.1
@@ -71,5 +72,7 @@ end
 function LasgunIronSight:destroy()
 	return
 end
+
+implements(LasgunIronSight, WieldableSlotScriptInterface)
 
 return LasgunIronSight

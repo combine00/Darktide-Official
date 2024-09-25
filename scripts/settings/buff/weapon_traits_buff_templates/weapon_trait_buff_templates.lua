@@ -119,25 +119,6 @@ templates.weapon_trait_melee_attack_speed_on_special_smite_kill = {
 	},
 	check_proc_func = CheckProcFunctions.on_special_smite_kill
 }
-templates.weapon_trait_melee_activate_weapon_special_on_wield = {
-	predicted = true,
-	max_stacks = 1,
-	class_name = "proc_buff",
-	proc_events = {
-		[buff_proc_events.on_wield_melee] = 1
-	},
-	proc_func = function (params, template_data, template_context)
-		local t = FixedFrame.get_latest_fixed_time()
-		local unit = template_context.unit
-		local unit_data_extension = ScriptUnit.extension(unit, "unit_data_system")
-		template_data.unit_data_extension = unit_data_extension
-		template_data.inventory_component = unit_data_extension:read_component("inventory")
-		local wielded_slot = template_data.inventory_component.wielded_slot
-		local inventory_slot_component = template_data.unit_data_extension:write_component(wielded_slot)
-		inventory_slot_component.special_active = true
-		inventory_slot_component.special_active_start_t = t
-	end
-}
 templates.weapon_trait_bash_refunds_warpcharge = {
 	predicted = true,
 	class_name = "proc_buff",
@@ -287,7 +268,7 @@ templates.weapon_trait_melee_critical_strike_chance_on_weapon_special = {
 	class_name = "proc_buff",
 	active_duration = 3,
 	proc_events = {
-		[buff_proc_events.on_weapon_special] = 1
+		[buff_proc_events.on_weapon_special_activate] = 1
 	},
 	proc_stat_buffs = {
 		[buff_stat_buffs.critical_strike_chance] = 1

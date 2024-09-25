@@ -1,6 +1,6 @@
-local VotingTemplates = require("scripts/settings/voting/voting_templates")
 local Promise = require("scripts/foundation/utilities/promise")
 local VotingManagerImmateriumPartyTestify = GameParameters.testify and require("scripts/managers/voting/voting_by_immaterium_party_impl_testify")
+local VotingTemplates = require("scripts/settings/voting/voting_templates")
 
 local function _info(...)
 	Log.info("VotingManagerImmateriumParty", ...)

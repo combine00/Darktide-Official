@@ -1,6 +1,7 @@
 local AchievementBreedGroups = require("scripts/settings/achievements/achievement_breed_groups")
 local AchievementMissionGroups = require("scripts/settings/achievements/achievement_mission_groups")
 local AchievementClassGroups = require("scripts/settings/achievements/achievement_class_groups")
+local AchievementWeaponGroups = require("scripts/settings/achievements/achievement_weapon_groups")
 local AchievementFlags = require("scripts/settings/achievements/achievement_flags")
 local AchievementTypes = require("scripts/managers/achievements/achievement_types")
 local MissionTypes = require("scripts/settings/mission/mission_types")
@@ -1980,6 +1981,141 @@ family({
 	}
 })
 
+local category_name = "mastery"
+local weapons = AchievementWeaponGroups.weapons
+
+for _, weapon in ipairs(weapons) do
+	local achievement_name = "mastery_complete_" .. weapon.pattern
+	local pattern_name_string = weapon.pattern_name_string or "loc_weapon_family_" .. weapon.pattern .. "_m1"
+	local localized_pattern_name = Localize(pattern_name_string)
+	AchievementDefinitions[achievement_name] = {
+		description = "loc_achievement_max_mastery_description",
+		title = "loc_achievement_max_mastery_name",
+		type = AchievementTypesLookup.direct_unlock,
+		stat_name = "mastery_track_reached_20_" .. weapon.pattern,
+		loc_title_variables = {
+			weapon_name = localized_pattern_name
+		},
+		loc_variables = {
+			rank = 20,
+			weapon_name = localized_pattern_name
+		},
+		icon = "content/ui/textures/icons/achievements/weapon_achievements/" .. weapon.pattern .. "_mastery",
+		category = category_name,
+		flags = {}
+	}
+end
+
+local category_name = "weapons"
+local mastery_level_tiers = {
+	40,
+	80,
+	120,
+	160,
+	200
+}
+
+for i = 1, #mastery_level_tiers do
+	local mastery_track_levels_name = "mastery_complete_total_mastery_levels_" .. i
+	AchievementDefinitions[mastery_track_levels_name] = {
+		description = "loc_achievement_total_mastery_description",
+		title = "loc_achievement_total_mastery_name",
+		stat_name = "mastery_track_levels",
+		icon = "content/ui/textures/icons/achievements/weapon_achievements/weapon_achievements_icon_0003",
+		type = AchievementTypesLookup.increasing_stat,
+		target = mastery_level_tiers[i],
+		loc_variables = {
+			level = mastery_level_tiers[i]
+		},
+		loc_title_variables = {
+			rank = i
+		},
+		category = category_name,
+		flags = {}
+	}
+end
+
+local unlock_blessings = {
+	20,
+	30,
+	40,
+	50
+}
+
+for i = 1, #unlock_blessings do
+	local mastery_track_levels_name = "blessings_unlocked_" .. i
+	AchievementDefinitions[mastery_track_levels_name] = {
+		description = "loc_achievement_total_blessings_unlocked_description",
+		title = "loc_achievement_total_blessings_unlocked_name",
+		stat_name = "crafting_unique_traits_seen",
+		icon = "content/ui/textures/icons/achievements/weapon_achievements/weapon_achievements_icon_0001",
+		type = AchievementTypesLookup.increasing_stat,
+		target = unlock_blessings[i],
+		loc_variables = {
+			amount = unlock_blessings[i]
+		},
+		loc_title_variables = {
+			rank = i
+		},
+		category = category_name,
+		flags = {}
+	}
+end
+
+local expertise_tiers_variable = {
+	300,
+	400,
+	500
+}
+local expertise_tiers = {
+	30,
+	40,
+	50
+}
+
+for i = 1, #expertise_tiers do
+	local expertise_tiers_name = "expertise_tiers_reached_" .. i
+	AchievementDefinitions[expertise_tiers_name] = {
+		description = "loc_achievement_expertise_level_description",
+		title = "loc_achievement_expertise_level_name",
+		icon = "content/ui/textures/icons/achievements/weapon_achievements/weapon_achievements_icon_0005",
+		type = AchievementTypesLookup.direct_unlock,
+		stat_name = "expertise_reached_" .. expertise_tiers[i],
+		loc_variables = {
+			level = expertise_tiers_variable[i]
+		},
+		loc_title_variables = {
+			rank = i
+		},
+		category = category_name,
+		flags = {}
+	}
+end
+
+AchievementDefinitions.primary_weapon_max_expertise = {
+	description = "loc_achievement_primary_weapon_max_expertise_description",
+	icon = "content/ui/textures/icons/achievements/weapon_achievements/weapon_achievements_icon_0004",
+	title = "loc_achievement_primary_weapon_max_expertise_name",
+	stat_name = "expertise_reached_50_primary",
+	type = AchievementTypesLookup.direct_unlock,
+	loc_variables = {
+		level = 500
+	},
+	category = category_name,
+	flags = {}
+}
+AchievementDefinitions.secondary_weapon_max_expertise = {
+	description = "loc_achievement_secondary_weapon_max_expertise_description",
+	icon = "content/ui/textures/icons/achievements/weapon_achievements/weapon_achievements_icon_0002",
+	title = "loc_achievement_secondary_weapon_max_expertise_name",
+	stat_name = "expertise_reached_50_secondary",
+	type = AchievementTypesLookup.direct_unlock,
+	loc_variables = {
+		level = 500
+	},
+	category = category_name,
+	flags = {}
+}
 local category_name = "heretics"
 local kill_all_target = 1
 local kill_all_specials_target = 10
@@ -2433,6 +2569,12 @@ AchievementDefinitions.team_chaos_beast_of_nurgle_slain_no_corruption = {
 }
 local missions = AchievementMissionGroups.missions
 local category_name = "missions_general"
+local excluded_maps = {
+	op_train = true
+}
+local excluded_zones = {
+	operations = true
+}
 
 local function _add_mission_objective_family(id, icon)
 	local pattern = "type_" .. id .. "_mission_{index:%d}"
@@ -2475,32 +2617,34 @@ local function _generate_difficulty_localization()
 end
 
 for _, mission in ipairs(missions) do
-	family({
-		description = "loc_achievement_level_mission_description",
-		title = "loc_achievement_level_mission_name",
-		target = 1,
-		type = AchievementTypesLookup.increasing_stat,
-		category = mission.category.default,
-		icon = mission.icon.mission_default,
-		flags = {},
-		loc_title_variables = {
-			mission_name = Localize(mission.local_variable)
-		},
-		loc_variables = {
-			mission_name = Localize(mission.local_variable)
-		}
-	}, {
-		id = "level_" .. mission.name .. "_mission_{index:%d}",
-		stat_name = "mission_" .. mission.name .. "_difficulty_{index:%d}",
-		loc_title_variables = _generate_tier_localization(),
-		loc_variables = _generate_difficulty_localization()
-	}, {
-		{},
-		{},
-		{},
-		{},
-		{}
-	})
+	if not excluded_maps[mission.name] then
+		family({
+			description = "loc_achievement_level_mission_description",
+			title = "loc_achievement_level_mission_name",
+			target = 1,
+			type = AchievementTypesLookup.increasing_stat,
+			category = mission.category.default,
+			icon = mission.icon.mission_default,
+			flags = {},
+			loc_title_variables = {
+				mission_name = Localize(mission.local_variable)
+			},
+			loc_variables = {
+				mission_name = Localize(mission.local_variable)
+			}
+		}, {
+			id = "level_" .. mission.name .. "_mission_{index:%d}",
+			stat_name = "mission_" .. mission.name .. "_difficulty_{index:%d}",
+			loc_title_variables = _generate_tier_localization(),
+			loc_variables = _generate_difficulty_localization()
+		}, {
+			{},
+			{},
+			{},
+			{},
+			{}
+		})
+	end
 end
 
 local function _generate_auric_difficulty_stats(name)
@@ -2527,70 +2671,74 @@ local function _generate_difficulty_auric_localization()
 end
 
 for _, mission in ipairs(missions) do
-	family({
-		description = "loc_achievement_level_mission_auric_description",
-		title = "loc_achievement_level_mission_auric_name",
-		target = 1,
-		type = AchievementTypesLookup.increasing_stat,
-		category = mission.category.default,
-		icon = mission.icon.auric,
-		flags = {},
-		loc_title_variables = {
-			mission_name = Localize(mission.local_variable)
-		},
-		loc_variables = {
-			mission_name = Localize(mission.local_variable)
-		}
-	}, {
-		id = "level_" .. mission.name .. "_mission_{index:%d}_auric",
-		stat_name = _generate_auric_difficulty_stats(mission.name),
-		loc_title_variables = _generate_tier_localization(),
-		loc_variables = _generate_difficulty_auric_localization()
-	}, {
-		{},
-		{}
-	})
+	if not excluded_maps[mission.name] then
+		family({
+			description = "loc_achievement_level_mission_auric_description",
+			title = "loc_achievement_level_mission_auric_name",
+			target = 1,
+			type = AchievementTypesLookup.increasing_stat,
+			category = mission.category.default,
+			icon = mission.icon.auric,
+			flags = {},
+			loc_title_variables = {
+				mission_name = Localize(mission.local_variable)
+			},
+			loc_variables = {
+				mission_name = Localize(mission.local_variable)
+			}
+		}, {
+			id = "level_" .. mission.name .. "_mission_{index:%d}_auric",
+			stat_name = _generate_auric_difficulty_stats(mission.name),
+			loc_title_variables = _generate_tier_localization(),
+			loc_variables = _generate_difficulty_auric_localization()
+		}, {
+			{},
+			{}
+		})
+	end
 end
 
 for _, zone in ipairs(AchievementMissionGroups.zones) do
-	target_family("mission_zone_" .. zone.name .. "_{index:%d}", {
-		description = "loc_achievement_zone_mission_x_description",
-		title = "loc_achievement_zone_mission_x_name",
-		type = AchievementTypesLookup.increasing_stat,
-		icon = zone.icon.zone_default,
-		stat_name = string.format("zone_%s_missions_completed", zone.name),
-		category = zone.category,
-		flags = {},
-		loc_variables = {
-			zone_name = Localize(zone.local_variable)
-		},
-		loc_title_variables = {
-			zone_name = Localize(zone.local_variable)
-		}
-	}, {
-		10,
-		25,
-		50
-	})
-	target_family("mission_zone_" .. zone.name .. "_destructible_{index:%d}", {
-		description = "loc_achievement_zone_mission_destructibles_description",
-		title = "loc_achievement_zone_mission_destructibles_name",
-		type = AchievementTypesLookup.increasing_stat,
-		icon = zone.icon.destructible,
-		stat_name = string.format("zone_%s_destructible", zone.name),
-		category = zone.category,
-		flags = {},
-		loc_variables = {
-			zone_name = Localize(zone.local_variable)
-		},
-		loc_title_variables = {
-			zone_name = Localize(zone.local_variable)
-		}
-	}, {
-		10,
-		25,
-		50
-	})
+	if not excluded_zones[zone.name] then
+		target_family("mission_zone_" .. zone.name .. "_{index:%d}", {
+			description = "loc_achievement_zone_mission_x_description",
+			title = "loc_achievement_zone_mission_x_name",
+			type = AchievementTypesLookup.increasing_stat,
+			icon = zone.icon.zone_default,
+			stat_name = string.format("zone_%s_missions_completed", zone.name),
+			category = zone.category,
+			flags = {},
+			loc_variables = {
+				zone_name = Localize(zone.local_variable)
+			},
+			loc_title_variables = {
+				zone_name = Localize(zone.local_variable)
+			}
+		}, {
+			10,
+			25,
+			50
+		})
+		target_family("mission_zone_" .. zone.name .. "_destructible_{index:%d}", {
+			description = "loc_achievement_zone_mission_destructibles_description",
+			title = "loc_achievement_zone_mission_destructibles_name",
+			type = AchievementTypesLookup.increasing_stat,
+			icon = zone.icon.destructible,
+			stat_name = string.format("zone_%s_destructible", zone.name),
+			category = zone.category,
+			flags = {},
+			loc_variables = {
+				zone_name = Localize(zone.local_variable)
+			},
+			loc_title_variables = {
+				zone_name = Localize(zone.local_variable)
+			}
+		}, {
+			10,
+			25,
+			50
+		})
+	end
 end
 
 old_numeric_target_family("missions_{index:%d}", {
@@ -2676,6 +2824,31 @@ old_numeric_target_family("mission_circumstace_{index:%d}", {
 	100,
 	250
 })
+old_numeric_target_family("mission_flash_{index:%d}", {
+	description = "loc_achievement_mission_flash_x_description",
+	icon = "content/ui/textures/icons/achievements/achievement_icon_0074",
+	stat_name = "mission_flash",
+	type = AchievementTypesLookup.increasing_stat,
+	category = category_name,
+	flags = {}
+}, {
+	1,
+	10,
+	50,
+	100,
+	200
+})
+
+AchievementDefinitions.difficult_flash_win = {
+	description = "loc_achievement_difficult_flash_win_description",
+	title = "loc_achievement_difficult_flash_win_name",
+	icon = "content/ui/textures/icons/achievements/achievement_icon_0075",
+	target = 5,
+	stat_name = "max_difficulty_flash",
+	type = AchievementTypesLookup.increasing_stat,
+	category = category_name,
+	flags = {}
+}
 
 local function _generate_mission_completion_per_difficulty_stats(index, config)
 	local difficulty = config.difficulty
@@ -2932,6 +3105,7 @@ tiered_target_family("scripture_recovered_{index:%d}", {
 })
 
 local excluded_maps_for_puzzles = {
+	op_train = true,
 	core_research = true
 }
 
@@ -2960,31 +3134,37 @@ for _, mission in ipairs(missions) do
 	end
 end
 
+local excluded_zones = {
+	operations = true
+}
+
 for _, zone in ipairs(AchievementMissionGroups.zone_meta) do
-	family({
-		description = "loc_achievement_zone_wide_completion_description",
-		type = AchievementTypesLookup.meta,
-		icon = zone.icon,
-		category = zone.category,
-		flags = {},
-		loc_title_variables = {
-			zone_name = Localize(zone.local_variable)
-		},
-		loc_variables = {
-			zone_name = Localize(zone.local_variable)
-		}
-	}, {
-		title = "loc_achievement_zone_wide_completion_name",
-		id = "group_mission_zone_wide_" .. zone.name .. "_completion",
-		target = function (self, config)
-			return #config
-		end,
-		achievements = function (self, config)
-			return table.set(config)
-		end
-	}, {
-		zone.achievements
-	})
+	if not excluded_zones[zone.name] then
+		family({
+			description = "loc_achievement_zone_wide_completion_description",
+			type = AchievementTypesLookup.meta,
+			icon = zone.icon,
+			category = zone.category,
+			flags = {},
+			loc_title_variables = {
+				zone_name = Localize(zone.local_variable)
+			},
+			loc_variables = {
+				zone_name = Localize(zone.local_variable)
+			}
+		}, {
+			title = "loc_achievement_zone_wide_completion_name",
+			id = "group_mission_zone_wide_" .. zone.name .. "_completion",
+			target = function (self, config)
+				return #config
+			end,
+			achievements = function (self, config)
+				return table.set(config)
+			end
+		}, {
+			zone.achievements
+		})
+	end
 end
 
 local category_name = "exploration_twins_mission"

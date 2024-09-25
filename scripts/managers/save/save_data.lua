@@ -51,10 +51,12 @@ SaveData.default_account_data = {
 		subtitle_font_size = 32,
 		crafting_pickup_notification_type = "notification",
 		penance_unlock_chat_message_type = "none",
+		crossplay_enabled = true,
 		assist_notification_type = "notification",
 		subtitle_background_opacity = 60,
 		secondary_subtitle_font_size = 24,
 		news_enabled = true,
+		telemetry_enabled = true,
 		group_buff_icon_in_categories = true,
 		portrait_rendering_enabled = true,
 		camera_movement_offset_sway_intensity = 100,
@@ -90,7 +92,9 @@ SaveData.default_character_data = {
 	view_settings = {},
 	profile_presets = {
 		profile_presets_version = 1
-	}
+	},
+	favorite_items = {},
+	group_finder_search_tags = {}
 }
 
 function SaveData:init()
@@ -123,6 +127,10 @@ function SaveData:populate(save_data)
 						for character_id, character_id_data in pairs(character_data) do
 							if not character_id_data.view_settings then
 								character_id_data.view_settings = table.clone_instance(default_character_data.view_settings)
+							end
+
+							if not character_id_data.group_finder_search_tags then
+								character_id_data.group_finder_search_tags = table.clone_instance(default_character_data.group_finder_search_tags)
 							end
 
 							local profile_presets = character_id_data.profile_presets
@@ -165,7 +173,7 @@ function SaveData:populate(save_data)
 		end
 	end
 
-	if IS_XBS then
+	if IS_XBS or IS_PLAYSTATION then
 		if self.data.user_settings then
 			UserSettings = self.data.user_settings
 		else

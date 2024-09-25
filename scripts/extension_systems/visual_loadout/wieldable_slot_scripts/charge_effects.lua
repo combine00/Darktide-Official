@@ -1,4 +1,5 @@
 local Action = require("scripts/utilities/weapon/action")
+local WieldableSlotScriptInterface = require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/wieldable_slot_script_interface")
 local ChargeEffects = class("ChargeEffects")
 
 function ChargeEffects:init(context, slot, weapon_template, fx_sources)
@@ -182,5 +183,7 @@ function ChargeEffects:_update_sfx_parameter(t)
 
 	WwiseWorld.set_source_parameter(wwise_world, source, charge_sfx_parameter, charge_level)
 end
+
+implements(ChargeEffects, WieldableSlotScriptInterface)
 
 return ChargeEffects

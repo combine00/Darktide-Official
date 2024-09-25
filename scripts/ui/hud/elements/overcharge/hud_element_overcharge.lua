@@ -4,6 +4,7 @@ local PlayerCharacterConstants = require("scripts/settings/player_character/play
 local WarpCharge = require("scripts/utilities/warp_charge")
 local UIWidget = require("scripts/managers/ui/ui_widget")
 local ColorUtilities = require("scripts/utilities/ui/colors")
+local Overheat = require("scripts/utilities/overheat")
 local HudElementOvercharge = class("HudElementOvercharge", "HudElementBase")
 local EPSILON = 0.00392156862745098
 
@@ -118,6 +119,8 @@ end
 
 function HudElementOvercharge:_update_overheat(dt)
 	local overheat_level = 0
+	local overheat_state = ""
+	local overheat_configuration = nil
 	local parent = self._parent
 	local player_extensions = parent:player_extensions()
 
@@ -139,6 +142,8 @@ function HudElementOvercharge:_update_overheat(dt)
 						local slot_component = player_unit_data:read_component(wielded_slot)
 						local overheat_current_percentage = slot_component.overheat_current_percentage
 						overheat_level = overheat_current_percentage
+						overheat_state = slot_component.overheat_state
+						overheat_configuration = weapon_template.overheat_configuration
 					end
 				end
 			else
@@ -148,7 +153,15 @@ function HudElementOvercharge:_update_overheat(dt)
 					local weapon_slot = weapon_slots[i]
 					local slot_component = player_unit_data:read_component(weapon_slot)
 					local overheat_current_percentage = slot_component.overheat_current_percentage
-					overheat_level = math.max(overheat_current_percentage, overheat_level)
+
+					if overheat_current_percentage > 0 then
+						overheat_level = overheat_current_percentage
+						overheat_state = slot_component.overheat_state
+						local visual_loadout_extension = ScriptUnit.extension(parent:player_unit(), "visual_loadout_system")
+						overheat_configuration = Overheat.configuration(visual_loadout_extension, weapon_slot)
+
+						break
+					end
 				end
 			end
 		end
@@ -173,10 +186,16 @@ function HudElementOvercharge:_update_overheat(dt)
 		widget.content.anim_progress = anim_progress
 	end
 
+	local overheat_icon_text = ""
+
+	if overheat_configuration then
+		overheat_icon_text = overheat_configuration.overheat_icon_text or ""
+	end
+
 	self:_animate_widget_warnings(widget, overheat_level, dt)
 
 	local old_warning_text = widget.content.warning_text
-	local new_warning_text = "" .. string.format("%.0f%%", overheat_level * 100)
+	local new_warning_text = overheat_icon_text .. string.format("%.0f%%", math.floor(overheat_level * 100))
 	widget.content.warning_text = new_warning_text
 
 	if old_warning_text ~= new_warning_text then

@@ -1,8 +1,8 @@
 local MinionPerception = require("scripts/utilities/minion_perception")
 local UISoundEvents = require("scripts/settings/ui/ui_sound_events")
-local VOQueryConstants = require("scripts/settings/dialogue/vo_query_constants")
-local vo_concepts = VOQueryConstants.concepts
-local vo_trigger_ids = VOQueryConstants.trigger_ids
+local VoQueryConstants = require("scripts/settings/dialogue/vo_query_constants")
+local vo_concepts = VoQueryConstants.concepts
+local vo_trigger_ids = VoQueryConstants.trigger_ids
 local groups = {
 	enemy = {
 		limit = 1
@@ -119,7 +119,7 @@ local templates = {
 			replies.dibs
 		},
 		voice_tag_concept = vo_concepts.on_demand_vo_tag_item,
-		voice_tag_id = vo_trigger_ids.smart_tag_vo_pickup_health_booster
+		voice_tag_id = vo_trigger_ids.smart_tag_vo_pickup_stimm_health
 	},
 	syringe_ability_boost_over_here = {
 		group = "object",
@@ -130,7 +130,8 @@ local templates = {
 		replies = {
 			replies.dibs
 		},
-		voice_tag_concept = vo_concepts.on_demand_vo_tag_item
+		voice_tag_concept = vo_concepts.on_demand_vo_tag_item,
+		voice_tag_id = vo_trigger_ids.smart_tag_vo_pickup_stimm_concentration
 	},
 	syringe_power_boost_over_here = {
 		group = "object",
@@ -141,7 +142,8 @@ local templates = {
 		replies = {
 			replies.dibs
 		},
-		voice_tag_concept = vo_concepts.on_demand_vo_tag_item
+		voice_tag_concept = vo_concepts.on_demand_vo_tag_item,
+		voice_tag_id = vo_trigger_ids.smart_tag_vo_pickup_stimm_power
 	},
 	syringe_speed_boost_over_here = {
 		group = "object",
@@ -152,7 +154,8 @@ local templates = {
 		replies = {
 			replies.dibs
 		},
-		voice_tag_concept = vo_concepts.on_demand_vo_tag_item
+		voice_tag_concept = vo_concepts.on_demand_vo_tag_item,
+		voice_tag_id = vo_trigger_ids.smart_tag_vo_pickup_stimm_speed
 	},
 	small_grenade_over_here = {
 		group = "object",

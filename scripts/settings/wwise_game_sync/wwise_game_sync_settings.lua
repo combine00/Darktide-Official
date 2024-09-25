@@ -1,3 +1,4 @@
+local DEFAULT_GROUP_STATE = "None"
 local wwise_game_sync_settings = {
 	music_state_reset_time = 2,
 	combat_state_horde_high_minimum_aggroed_minions = 10,
@@ -5,7 +6,7 @@ local wwise_game_sync_settings = {
 	combat_state_horde_low_minimum_aggroed_minions = 5,
 	vector_horde_trigger_distance = 80,
 	boss_trigger_distance = 80,
-	default_group_state = "None",
+	default_group_state = DEFAULT_GROUP_STATE,
 	minion_aggro_intensity_settings = {
 		num_threshold_high = 16,
 		num_threshold_medium = 8,
@@ -33,29 +34,29 @@ local wwise_game_sync_settings = {
 			mission_start = "mission_start",
 			mission_loading = "mission_loading",
 			loading = "loading",
-			none = "None",
 			cinematic = "cinematic",
 			game_start = "game_start",
-			loadout_ready = "loadout_ready"
+			loadout_ready = "loadout_ready",
+			none = DEFAULT_GROUP_STATE
 		},
 		music_zone = {
 			zone_6 = "zone_6",
 			hub = "hub",
 			zone_7 = "zone_7",
 			zone_5 = "zone_5",
-			none = "None",
 			zone_2 = "zone_2",
 			prologue = "prologue",
 			zone_1 = "zone_1",
 			zone_4 = "zone_4",
-			zone_3 = "zone_3"
+			zone_3 = "zone_3",
+			none = DEFAULT_GROUP_STATE
 		},
 		music_combat = {
 			horde_high = "horde_high",
 			normal = "normal",
 			boss = "boss",
 			horde_low = "horde_low",
-			none = "None"
+			none = DEFAULT_GROUP_STATE
 		},
 		music_objective = {
 			collect_event = "collect_event",
@@ -65,18 +66,18 @@ local wwise_game_sync_settings = {
 			hacking_event = "hacking_event",
 			kill_event = "kill_event",
 			demolition_event = "demolition_event",
-			none = "None",
 			last_man_standing = "last_man_standing",
-			escape_event = "escape_event"
+			escape_event = "escape_event",
+			none = DEFAULT_GROUP_STATE
 		},
 		music_objective_progression = {
 			two = "two",
 			one = "one",
 			three = "three",
-			none = "None"
+			none = DEFAULT_GROUP_STATE
 		},
 		music_circumstance = {
-			none = "None"
+			none = DEFAULT_GROUP_STATE
 		},
 		options = {
 			credit_store_menu = "credit_store_menu",
@@ -85,18 +86,44 @@ local wwise_game_sync_settings = {
 			vendor_menu = "vendor_menu",
 			story_mission_menu = "story_mission_menu",
 			ingame_menu = "ingame_menu",
-			none = "None"
+			none = DEFAULT_GROUP_STATE
 		},
 		minion_aggro_intensity = {
 			high = "high",
 			medium = "medium",
 			low = "low",
-			none = "None"
+			none = DEFAULT_GROUP_STATE
 		},
 		event_intensity = {
 			high = "high",
 			low = "low",
-			none = "None"
+			none = DEFAULT_GROUP_STATE
+		},
+		player_state = {
+			none = DEFAULT_GROUP_STATE,
+			character_state = {
+				consumed = "consumed",
+				warp_grabbed = "warp_grabbed",
+				knocked_down = "knocked_down",
+				ledge_hanging = "hanging",
+				catapulted = "catapulted",
+				dead = "dead",
+				netted = "netted",
+				minigame = "auspex_scanner",
+				mutant_charged = "mutant_charged",
+				pounced = "pounced"
+			},
+			character_status = {
+				last_wound = "last_wound"
+			},
+			interaction = {
+				scanning = "auspex_scanner"
+			}
+		},
+		suppression_state = {
+			high = "high",
+			low = "low",
+			none = DEFAULT_GROUP_STATE
 		}
 	}
 }

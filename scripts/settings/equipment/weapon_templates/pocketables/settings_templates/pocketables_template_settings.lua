@@ -176,7 +176,11 @@ pocketables_template_settings.actions = {
 		assist_notification_type = "gifted",
 		total_time = 0.7,
 		smart_targeting_template = SmartTargetingTemplates.target_ally_close,
-		validate_target_func = PocketableUtils.validate_give_pocketable_target_func
+		validate_target_func = PocketableUtils.validate_give_pocketable_target_func,
+		voice_event_data = {
+			voice_tag_concept = "on_demand_com_wheel",
+			voice_tag_id = "com_take_this"
+		}
 	},
 	action_inspect = {
 		skip_3p_anims = true,

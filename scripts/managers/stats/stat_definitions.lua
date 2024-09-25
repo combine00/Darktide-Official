@@ -1,3 +1,4 @@
+local AchievementWeaponGroups = require("scripts/settings/achievements/achievement_weapon_groups")
 local Archetypes = require("scripts/settings/archetype/archetypes")
 local Blackboard = require("scripts/extension_systems/blackboard/utilities/blackboard")
 local Breeds = require("scripts/settings/breed/breeds")
@@ -1456,6 +1457,34 @@ StatDefinitions.mission_circumstance = {
 		return eligible_circumstance_name
 	end
 }
+StatDefinitions.mission_flash = {
+	flags = {
+		StatFlags.backend
+	},
+	triggers = {
+		{
+			id = "mission_won",
+			trigger = StatMacros.increment
+		}
+	},
+	include_condition = function (self, config)
+		return config.is_flash_mission
+	end
+}
+StatDefinitions.max_difficulty_flash = {
+	flags = {
+		StatFlags.backend
+	},
+	triggers = {
+		{
+			id = "mission_won",
+			trigger = _max_difficulty
+		}
+	},
+	include_condition = function (self, config)
+		return config.is_flash_mission
+	end
+}
 StatDefinitions.mission_twins = {
 	flags = {
 		StatFlags.backend
@@ -2478,7 +2507,7 @@ StatDefinitions.enemies_killed_with_barrels = {
 		{
 			id = "hook_explosion",
 			trigger = function (self, stat_data, explosion_template, explosion_data)
-				if explosion_template.name == "explosive_barrel" then
+				if explosion_template.name == "explosive_barrel" or explosion_template.name == "fire_barrel" then
 					local killed_units = 0
 					local hits = explosion_data.result
 
@@ -2491,6 +2520,16 @@ StatDefinitions.enemies_killed_with_barrels = {
 					end
 
 					return increment_by(self, stat_data, killed_units)
+				end
+			end
+		},
+		{
+			id = "hook_kill",
+			trigger = function (self, stat_data, attack_data)
+				local damage_profile_name = attack_data.damage_profile_name
+
+				if damage_profile_name == "liquid_area_fire_burning_barrel" then
+					return increment(self, stat_data)
 				end
 			end
 		}
@@ -2637,6 +2676,25 @@ StatDefinitions.grimoire_carried = {
 		}
 	}
 }
+StatDefinitions.grimoire_delivered = {
+	flags = {
+		StatFlags.team,
+		StatFlags.no_sync
+	},
+	data = {},
+	triggers = {
+		{
+			id = "mission_won",
+			trigger = function (self, stat_data)
+				local grimoire_count = read_stat(StatDefinitions.grimoire_carried, stat_data)
+
+				if grimoire_count >= 1 then
+					return self.id, grimoire_count
+				end
+			end
+		}
+	}
+}
 StatDefinitions.grimoire_recovered_mission_won = {
 	flags = {
 		StatFlags.backend
@@ -2644,14 +2702,8 @@ StatDefinitions.grimoire_recovered_mission_won = {
 	data = {},
 	triggers = {
 		{
-			id = "mission_won",
-			trigger = function (self, stat_data)
-				local count_grimoire = read_stat(StatDefinitions.grimoire_carried, stat_data)
-
-				if count_grimoire >= 1 then
-					return increment_by(self, stat_data, count_grimoire)
-				end
-			end
+			id = "grimoire_delivered",
+			trigger = StatMacros.increment_by
 		}
 	}
 }
@@ -2670,6 +2722,25 @@ StatDefinitions.scriptures_carried = {
 		}
 	}
 }
+StatDefinitions.scriptures_delivered = {
+	flags = {
+		StatFlags.team,
+		StatFlags.no_sync
+	},
+	data = {},
+	triggers = {
+		{
+			id = "mission_won",
+			trigger = function (self, stat_data)
+				local scriptures_count = read_stat(StatDefinitions.scriptures_carried, stat_data)
+
+				if scriptures_count >= 1 then
+					return self.id, scriptures_count
+				end
+			end
+		}
+	}
+}
 StatDefinitions.scripture_recovered_mission_won = {
 	flags = {
 		StatFlags.backend
@@ -2677,14 +2748,8 @@ StatDefinitions.scripture_recovered_mission_won = {
 	data = {},
 	triggers = {
 		{
-			id = "mission_won",
-			trigger = function (self, stat_data)
-				local count_scripture = read_stat(StatDefinitions.scriptures_carried, stat_data)
-
-				if count_scripture >= 1 then
-					return increment_by(self, stat_data, count_scripture)
-				end
-			end
+			id = "scriptures_delivered",
+			trigger = StatMacros.increment_by
 		}
 	}
 }
@@ -4804,8 +4869,7 @@ StatDefinitions.psyker_shield_total_damage_taken = {
 }
 StatDefinitions.psyker_team_elite_aura_kills = {
 	flags = {
-		StatFlags.backend,
-		StatFlags.always_log
+		StatFlags.backend
 	},
 	data = {},
 	triggers = {
@@ -4818,14 +4882,15 @@ StatDefinitions.psyker_team_elite_aura_kills = {
 }
 StatDefinitions.psyker_team_critical_hits = {
 	flags = {
-		StatFlags.backend,
-		StatFlags.always_log
+		StatFlags.backend
 	},
 	data = {},
 	triggers = {
 		{
 			id = "hook_psyker_team_critical_hits_aura",
-			trigger = StatMacros.increment
+			trigger = function (self, stat_data, amount)
+				return increment_by(self, stat_data, amount)
+			end
 		}
 	},
 	include_condition = include_condition
@@ -5523,6 +5588,68 @@ StatDefinitions.session_new_weapon_kills = {
 		}
 	}
 }
+local weapons = AchievementWeaponGroups.weapons
+
+for _, weapon in ipairs(weapons) do
+	local stat_name = string.format("mastery_track_reached_20_%s", weapon.pattern)
+	StatDefinitions[stat_name] = {
+		flags = {
+			StatFlags.backend,
+			StatFlags.no_sync
+		},
+		data = {}
+	}
+end
+
+StatDefinitions.mastery_track_levels = {
+	flags = {
+		StatFlags.backend,
+		StatFlags.no_sync
+	},
+	data = {}
+}
+StatDefinitions.expertise_reached_50_primary = {
+	flags = {
+		StatFlags.backend,
+		StatFlags.no_sync
+	},
+	data = {}
+}
+StatDefinitions.expertise_reached_50_secondary = {
+	flags = {
+		StatFlags.backend,
+		StatFlags.no_sync
+	},
+	data = {}
+}
+StatDefinitions.expertise_reached_30 = {
+	flags = {
+		StatFlags.backend,
+		StatFlags.no_sync
+	},
+	data = {}
+}
+StatDefinitions.expertise_reached_40 = {
+	flags = {
+		StatFlags.backend,
+		StatFlags.no_sync
+	},
+	data = {}
+}
+StatDefinitions.expertise_reached_50 = {
+	flags = {
+		StatFlags.backend,
+		StatFlags.no_sync
+	},
+	data = {}
+}
+StatDefinitions.crafting_unique_traits_seen = {
+	flags = {
+		StatFlags.backend,
+		StatFlags.no_sync
+	},
+	data = {}
+}
 StatDefinitions.live_event_darkness_twins_won = {
 	flags = {
 		StatFlags.team,
@@ -5539,6 +5666,39 @@ StatDefinitions.live_event_darkness_twins_won = {
 		local circumstance_name = config.circumstance_name
 
 		return circumstance_name == "darkness_twins_solo_01"
+	end
+}
+StatDefinitions.live_event_moebian_21_deliveries = {
+	flags = {
+		StatFlags.team,
+		StatFlags.no_sync,
+		StatFlags.never_log
+	},
+	data = {
+		circumstances = {
+			moebian_21st_05 = true,
+			moebian_21st_04 = true,
+			moebian_21st_06 = true,
+			moebian_21st_03 = true,
+			moebian_21st_07 = true,
+			moebian_21st_02 = true,
+			moebian_21st_01 = true
+		}
+	},
+	triggers = {
+		{
+			id = "grimoire_delivered",
+			trigger = StatMacros.increment_by
+		},
+		{
+			id = "scriptures_delivered",
+			trigger = StatMacros.increment_by
+		}
+	},
+	include_condition = function (self, config)
+		local circumstance_name = config.circumstance_name
+
+		return self.data.circumstances[circumstance_name]
 	end
 }
 StatDefinitions = _stat_data

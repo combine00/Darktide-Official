@@ -12,6 +12,7 @@ local WeaponTraitsBespokeForcestaffP4 = require("scripts/settings/equipment/weap
 local WeaponTraitTemplates = require("scripts/settings/equipment/weapon_templates/weapon_trait_templates/weapon_trait_templates")
 local WeaponTweakTemplateSettings = require("scripts/settings/equipment/weapon_templates/weapon_tweak_template_settings")
 local buff_keywords = BuffSettings.keywords
+local buff_stat_buffs = BuffSettings.stat_buffs
 local buff_targets = WeaponTweakTemplateSettings.buff_targets
 local damage_types = DamageSettings.damage_types
 local wield_inputs = PlayerCharacterConstants.wield_inputs
@@ -281,6 +282,10 @@ weapon_template.actions = {
 		projectile_template = ProjectileTemplates.force_staff_ball,
 		buff_keywords = {
 			buff_keywords.allow_hipfire_during_sprint
+		},
+		time_scale_stat_buffs = {
+			buff_stat_buffs.attack_speed,
+			buff_stat_buffs.ranged_attack_speed
 		}
 	},
 	action_charge = {
@@ -380,6 +385,9 @@ weapon_template.actions = {
 			destroy_on_end = true,
 			charge_done_effect_alias = "ranged_charging_done",
 			charge_done_source_name = "_muzzle"
+		},
+		time_scale_stat_buffs = {
+			buff_stat_buffs.charge_up_time
 		}
 	},
 	action_shoot_charged = {
@@ -453,6 +461,10 @@ weapon_template.actions = {
 			warp_charge_percent = 0.2,
 			full_charge_warp_charge_percent = 0.05,
 			charge_on_action_start = true
+		},
+		time_scale_stat_buffs = {
+			buff_stat_buffs.attack_speed,
+			buff_stat_buffs.ranged_attack_speed
 		}
 	},
 	action_stab_start = {
@@ -668,7 +680,11 @@ weapon_template.actions = {
 			}
 		},
 		damage_type = damage_types.blunt_light,
-		damage_profile = DamageProfileTemplates.force_staff_bash
+		damage_profile = DamageProfileTemplates.force_staff_bash,
+		time_scale_stat_buffs = {
+			buff_stat_buffs.attack_speed,
+			buff_stat_buffs.melee_attack_speed
+		}
 	},
 	action_stab_heavy = {
 		damage_window_start = 0.13333333333333333,
@@ -767,7 +783,11 @@ weapon_template.actions = {
 				0
 			}
 		},
-		damage_profile = DamageProfileTemplates.force_staff_bash_stab_heavy
+		damage_profile = DamageProfileTemplates.force_staff_bash_stab_heavy,
+		time_scale_stat_buffs = {
+			buff_stat_buffs.attack_speed,
+			buff_stat_buffs.melee_attack_speed
+		}
 	},
 	action_swipe = {
 		damage_window_start = 0.6333333333333333,
@@ -867,7 +887,11 @@ weapon_template.actions = {
 				0
 			}
 		},
-		damage_profile = DamageProfileTemplates.force_staff_bash
+		damage_profile = DamageProfileTemplates.force_staff_bash,
+		time_scale_stat_buffs = {
+			buff_stat_buffs.attack_speed,
+			buff_stat_buffs.melee_attack_speed
+		}
 	},
 	action_swipe_heavy = {
 		damage_window_start = 0.31666666666666665,
@@ -966,7 +990,11 @@ weapon_template.actions = {
 			}
 		},
 		damage_type = damage_types.blunt_heavy,
-		damage_profile = DamageProfileTemplates.heavy_force_staff_bash
+		damage_profile = DamageProfileTemplates.heavy_force_staff_bash,
+		time_scale_stat_buffs = {
+			buff_stat_buffs.attack_speed,
+			buff_stat_buffs.melee_attack_speed
+		}
 	},
 	action_vent = {
 		allowed_during_sprint = true,
@@ -1029,6 +1057,9 @@ weapon_template.actions = {
 				action_name = "action_stab_start",
 				chain_time = 0.4
 			}
+		},
+		time_scale_stat_buffs = {
+			buff_stat_buffs.vent_warp_charge_multiplier
 		}
 	},
 	action_inspect = {
@@ -1051,8 +1082,10 @@ table.add_missing(weapon_template.actions, BaseTemplateSettings.actions)
 weapon_template.anim_state_machine_3p = "content/characters/player/human/third_person/animations/force_staff"
 weapon_template.anim_state_machine_1p = "content/characters/player/human/first_person/animations/force_staff"
 weapon_template.spread_template = "default_force_staff_killshot"
-weapon_template.uses_ammunition = false
-weapon_template.uses_overheat = false
+weapon_template.hud_configuration = {
+	uses_overheat = false,
+	uses_ammunition = false
+}
 weapon_template.sprint_ready_up_time = 0.1
 weapon_template.max_first_person_anim_movement_speed = 5.8
 weapon_template.ammo_template = "no_ammo"
@@ -1211,6 +1244,26 @@ weapon_template.displayed_attacks = {
 		desc = "loc_stats_special_action_melee_weapon_bash_forcestaff_desc",
 		display_name = "loc_forcestaff_p1_m1_attack_special",
 		type = "melee_hand"
+	}
+}
+weapon_template.weapon_card_data = {
+	main = {
+		{
+			value_func = "primary_attack",
+			icon = "charge",
+			sub_icon = "projectile",
+			header = "primary_attack"
+		},
+		{
+			value_func = "secondary_attack",
+			icon = "charge",
+			sub_icon = "projectile",
+			header = "secondary_attack"
+		}
+	},
+	weapon_special = {
+		icon = "melee_hand",
+		header = "weapon_bash"
 	}
 }
 weapon_template.special_action_name = "action_stab"

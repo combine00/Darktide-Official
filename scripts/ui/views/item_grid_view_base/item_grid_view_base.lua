@@ -744,6 +744,8 @@ function ItemGridViewBase:_cb_on_present()
 		self._item_grid:select_first_index()
 	end
 
+	self._item_grid:scroll_to_grid_index(new_selection_index or 1, true)
+
 	self._synced_grid_index = nil
 end
 
@@ -873,7 +875,7 @@ function ItemGridViewBase:update(dt, t, input_service)
 		self._synced_grid_index = grid_index
 	end
 
-	if not Managers.ui:using_cursor_navigation() then
+	if not Managers.ui:using_cursor_navigation() and not self._item_grid:input_disabled() then
 		local item_grid = self._item_grid
 		local selected_grid_widget = item_grid and item_grid:selected_grid_widget()
 
@@ -1046,6 +1048,16 @@ end
 
 function ItemGridViewBase:element_by_index(index)
 	return self._item_grid:element_by_index(index)
+end
+
+function ItemGridViewBase:widget_by_index(index)
+	return self._item_grid:widget_by_index(index)
+end
+
+function ItemGridViewBase:is_widget_visible(widget)
+	local widget_visual_margin = self._item_grid._widget_visual_margin
+
+	return self._item_grid._grid:is_widget_visible(widget, widget.content.extra_margin or widget_visual_margin)
 end
 
 function ItemGridViewBase:trigger_sort_index(index)

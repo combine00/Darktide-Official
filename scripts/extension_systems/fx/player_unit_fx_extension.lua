@@ -963,51 +963,6 @@ function PlayerUnitFxExtension:_unregister_sound_source(source_name)
 	end
 end
 
-local CHARACTER_STATE_TO_WWISE_STATE = {
-	consumed = "consumed",
-	warp_grabbed = "warp_grabbed",
-	knocked_down = "knocked_down",
-	ledge_hanging = "hanging",
-	catapulted = "catapulted",
-	dead = "dead",
-	netted = "netted",
-	minigame = "auspex_scanner",
-	mutant_charged = "mutant_charged",
-	pounced = "pounced"
-}
-local CHARACTER_STATUS_TO_WWISE_STATE = {
-	last_wound = "last_wound"
-}
-local DEFAULT_WWISE_PLAYER_STATE = "none"
-
-function PlayerUnitFxExtension:wwise_player_state()
-	local character_state_component = self._character_state_component
-	local character_state_name = character_state_component.state_name
-	local wwise_player_state = CHARACTER_STATE_TO_WWISE_STATE[character_state_name]
-
-	if self._is_local_unit and character_state_name == "interacting" then
-		local character_interacting_state_component = self._character_interacting_state_component
-		local interaction_template_name = character_interacting_state_component.interaction_template
-		local interaction_template = InteractionTemplates[interaction_template_name]
-		wwise_player_state = interaction_template.wwise_player_state or wwise_player_state
-	end
-
-	local scanning_component = self._scanning_component
-
-	if self._is_local_unit and scanning_component.is_active then
-		wwise_player_state = "auspex_scanner"
-	end
-
-	local num_wounds = self._health_extension:num_wounds()
-	local last_wound = num_wounds == 1
-
-	if not wwise_player_state and last_wound then
-		wwise_player_state = CHARACTER_STATUS_TO_WWISE_STATE.last_wound
-	end
-
-	return wwise_player_state or DEFAULT_WWISE_PLAYER_STATE
-end
-
 function PlayerUnitFxExtension:trigger_wwise_event(event_name, append_husk_to_event_name, ...)
 	local is_resim = self._unit_data_extension.is_resimulating
 

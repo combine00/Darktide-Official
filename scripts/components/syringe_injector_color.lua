@@ -35,8 +35,8 @@ function SyringeInjectorColor:destroy(unit)
 	return
 end
 
-function SyringeInjectorColor:set_colors(unit, glass_colour, liquid_color)
-	Unit.set_vector3_for_material(unit, self._glass_material_slot_name, self._glass_color_variable_name, glass_colour)
+function SyringeInjectorColor:set_colors(unit, glass_color, liquid_color)
+	Unit.set_vector3_for_material(unit, self._glass_material_slot_name, self._glass_color_variable_name, glass_color)
 	Unit.set_vector3_for_material(unit, self._liquid_material_slot_name, self._liquid_color_variable_name, liquid_color)
 end
 

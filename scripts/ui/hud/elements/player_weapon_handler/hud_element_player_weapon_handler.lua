@@ -1,11 +1,11 @@
-local definition_path = "scripts/ui/hud/elements/player_weapon_handler/hud_element_player_weapon_handler_definitions"
 local HudElementPlayerWeapon = require("scripts/ui/hud/elements/player_weapon/hud_element_player_weapon")
 local HudElementPlayerWeaponHandlerSettings = require("scripts/ui/hud/elements/player_weapon_handler/hud_element_player_weapon_handler_settings")
 local ItemSlotSettings = require("scripts/settings/item/item_slot_settings")
+local DEFINITION_PATH = "scripts/ui/hud/elements/player_weapon_handler/hud_element_player_weapon_handler_definitions"
 local HudElementPlayerWeaponHandler = class("HudElementPlayerWeaponHandler", "HudElementBase")
 
 function HudElementPlayerWeaponHandler:init(parent, draw_layer, start_scale)
-	local definitions = require(definition_path)
+	local definitions = require(DEFINITION_PATH)
 
 	HudElementPlayerWeaponHandler.super.init(self, parent, draw_layer, start_scale, definitions)
 
@@ -55,7 +55,6 @@ function HudElementPlayerWeaponHandler:_weapon_scan(extensions, ui_renderer)
 	local force_update_positions = false
 
 	for slot_id, settings in pairs(HudElementPlayerWeaponHandlerSettings.slots_settings) do
-		local default_icon = settings.default_icon
 		local slot_component = unit_data:read_component(slot_id)
 		local item_slot_settings = ItemSlotSettings[slot_id]
 		local weapon_name = inventory_component[slot_id]
@@ -64,7 +63,7 @@ function HudElementPlayerWeaponHandler:_weapon_scan(extensions, ui_renderer)
 		local item = weapon_name and visual_loadout_extension:item_from_slot(slot_id)
 
 		if slot_data and slot_data.weapon_name ~= weapon_name then
-			local weapon = slot_data.weapon
+			local weapon = slot_data.hud_element_player_weapon
 
 			weapon:destroy(ui_renderer)
 
@@ -101,7 +100,7 @@ function HudElementPlayerWeaponHandler:_weapon_scan(extensions, ui_renderer)
 				}
 				player_weapons[slot_id] = data
 				player_weapons_array[#player_weapons_array + 1] = data
-				data.weapon = HudElementPlayerWeapon:new(parent, draw_layer, scale, data)
+				data.hud_element_player_weapon = HudElementPlayerWeapon:new(parent, draw_layer, scale, data)
 				force_update_positions = true
 			end
 		end
@@ -142,14 +141,13 @@ function HudElementPlayerWeaponHandler:_align_weapon_scenegraphs()
 	local start_x = pivot_position[1]
 	local start_y = pivot_position[2]
 	local offset_x = 0
-	local offset_y = 0
+	local offset_y = nil
 	local weapon_spacing = HudElementPlayerWeaponHandlerSettings.weapon_spacing
 	local player_weapons_array = self._player_weapons_array
 
 	for _, data in ipairs(player_weapons_array) do
-		local index = data.index
-		local weapon = data.weapon
-		index = 1
+		local weapon = data.hud_element_player_weapon
+		local index = 1
 		offset_y = -(index - 1) * (HudElementPlayerWeaponHandlerSettings.size_small[2] + weapon_spacing[2])
 		local x = start_x + offset_x
 		local y = start_y + offset_y
@@ -162,7 +160,7 @@ function HudElementPlayerWeaponHandler:destroy(ui_renderer)
 	local player_weapons = self._player_weapons
 
 	for _, data in pairs(player_weapons) do
-		local weapon = data.weapon
+		local weapon = data.hud_element_player_weapon
 
 		weapon:destroy(ui_renderer)
 	end
@@ -177,7 +175,7 @@ function HudElementPlayerWeaponHandler:set_visible(visible, ui_renderer, use_ret
 	HudElementPlayerWeaponHandler.super.set_visible(self, visible)
 
 	for _, data in ipairs(self._player_weapons_array) do
-		local weapon = data.weapon
+		local weapon = data.hud_element_player_weapon
 
 		if weapon.set_visible then
 			weapon:set_visible(visible, ui_renderer, use_retained_mode)
@@ -189,7 +187,7 @@ function HudElementPlayerWeaponHandler:on_resolution_modified()
 	HudElementPlayerWeaponHandler.super.on_resolution_modified(self)
 
 	for _, data in ipairs(self._player_weapons_array) do
-		local weapon = data.weapon
+		local weapon = data.hud_element_player_weapon
 
 		weapon:on_resolution_modified()
 	end
@@ -201,7 +199,7 @@ function HudElementPlayerWeaponHandler:_set_wielded_slot(wielded_slot)
 	local player_weapons_array = self._player_weapons_array
 
 	for _, data in ipairs(player_weapons_array) do
-		local weapon = data.weapon
+		local weapon = data.hud_element_player_weapon
 		local slot_id = data.slot_id
 		local wielded = wielded_slot == slot_id
 
@@ -223,7 +221,7 @@ function HudElementPlayerWeaponHandler:update(dt, t, ui_renderer, render_setting
 
 		for _, data in ipairs(player_weapons_array) do
 			local slot_id = data.slot_id
-			local weapon = data.weapon
+			local weapon = data.hud_element_player_weapon
 			local wield_progress = data.wield_progress or 0
 			local wielded = wielded_slot == slot_id
 
@@ -296,7 +294,7 @@ function HudElementPlayerWeaponHandler:update(dt, t, ui_renderer, render_setting
 		local slot_id = data.slot_id
 
 		if slot_id then
-			local weapon = data.weapon
+			local weapon = data.hud_element_player_weapon
 
 			weapon:update(dt, t, ui_renderer, render_settings, input_service)
 		else
@@ -311,7 +309,7 @@ function HudElementPlayerWeaponHandler:draw(dt, t, ui_renderer, render_settings,
 	HudElementPlayerWeaponHandler.super.draw(self, dt, t, ui_renderer, render_settings, input_service)
 
 	for _, data in pairs(self._player_weapons) do
-		local weapon = data.weapon
+		local weapon = data.hud_element_player_weapon
 
 		weapon:draw(dt, t, ui_renderer, render_settings, input_service)
 	end

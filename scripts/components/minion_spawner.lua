@@ -4,8 +4,6 @@ local SharedNav = require("scripts/components/utilities/shared_nav")
 local MinionSpawner = component("MinionSpawner")
 
 function MinionSpawner:init(unit, is_server)
-	self._unit = unit
-	self._is_server = is_server
 	local spawner_extension = ScriptUnit.fetch_component_extension(unit, "minion_spawner_system")
 
 	if spawner_extension then
@@ -75,34 +73,36 @@ function MinionSpawner:disable(unit)
 end
 
 function MinionSpawner.events:minion_spawner_spawning_started()
-	if self._is_server then
+	if self.is_server then
 		Component.trigger_event_on_clients(self, "minion_spawner_spawning_started")
 	end
 
+	local unit = self.unit
 	local anim_data = self._anim_data
 
-	Unit.flow_event(self._unit, "lua_spawning_started")
+	Unit.flow_event(unit, "lua_spawning_started")
 
 	if anim_data then
 		local data = anim_data.spawning_started
 
-		Unit.play_simple_animation(self._unit, data.time_from, data.time_to, false, data.speed)
+		Unit.play_simple_animation(unit, data.time_from, data.time_to, false, data.speed)
 	end
 end
 
 function MinionSpawner.events:minion_spawner_spawning_done()
-	if self._is_server then
+	if self.is_server then
 		Component.trigger_event_on_clients(self, "minion_spawner_spawning_done")
 	end
 
+	local unit = self.unit
 	local anim_data = self._anim_data
 
-	Unit.flow_event(self._unit, "lua_spawning_done")
+	Unit.flow_event(unit, "lua_spawning_done")
 
 	if anim_data then
 		local data = anim_data.spawning_done
 
-		Unit.play_simple_animation(self._unit, data.time_from, data.time_to, false, data.speed)
+		Unit.play_simple_animation(unit, data.time_from, data.time_to, false, data.speed)
 	end
 end
 
@@ -111,7 +111,6 @@ function MinionSpawner:editor_init(unit)
 		return
 	end
 
-	self._unit = unit
 	local world = Application.main_world()
 	self._world = world
 	self._line_object = World.create_line_object(world)
@@ -126,9 +125,16 @@ function MinionSpawner:editor_init(unit)
 
 	self._my_nav_gen_guid = nil
 	self._active_debug_draw = false
-	self._should_debug_draw = false
+	self._debug_draw_enabled = false
+	local object_id = Unit.get_data(unit, "LevelEditor", "object_id")
+	self._object_id = object_id
+	self._in_active_mission_table = LevelEditor:is_level_object_in_active_mission_table(object_id)
 
 	return true
+end
+
+function MinionSpawner:editor_validate(unit)
+	return true, ""
 end
 
 function MinionSpawner:editor_destroy(unit)
@@ -136,15 +142,12 @@ function MinionSpawner:editor_destroy(unit)
 		return
 	end
 
-	local line_object = self._line_object
 	local world = self._world
+	local line_object = self._line_object
 
 	LineObject.reset(line_object)
 	LineObject.dispatch(world, line_object)
 	World.destroy_line_object(world, line_object)
-
-	self._line_object = nil
-	self._world = nil
 end
 
 function MinionSpawner:editor_update(unit)
@@ -152,16 +155,20 @@ function MinionSpawner:editor_update(unit)
 		return false
 	end
 
-	local with_traverse_logic = true
-	local nav_gen_guid = SharedNav.check_new_navmesh_generated(MinionSpawner._nav_info, self._my_nav_gen_guid, with_traverse_logic)
+	local should_debug_draw = self._debug_draw_enabled
 
-	if nav_gen_guid then
-		self._my_nav_gen_guid = nav_gen_guid
+	if self._in_active_mission_table then
+		local with_traverse_logic = true
+		local nav_gen_guid = SharedNav.check_new_navmesh_generated(MinionSpawner._nav_info, self._my_nav_gen_guid, with_traverse_logic)
 
-		self:_editor_debug_draw(unit)
+		if nav_gen_guid then
+			self._my_nav_gen_guid = nav_gen_guid
+
+			self:_editor_debug_draw(unit)
+		end
+	else
+		should_debug_draw = false
 	end
-
-	local should_debug_draw = self._should_debug_draw
 
 	if should_debug_draw ~= self._active_debug_draw and self._my_nav_gen_guid then
 		self._active_debug_draw = should_debug_draw
@@ -172,18 +179,15 @@ function MinionSpawner:editor_update(unit)
 	return true
 end
 
-function MinionSpawner:editor_validate(unit)
-	return true, ""
-end
-
 function MinionSpawner:_editor_debug_draw(unit)
 	local drawer = self._drawer
 
 	drawer:reset()
 
 	if self._active_debug_draw then
-		local nav_world = MinionSpawner._nav_info.nav_world
-		local traverse_logic = MinionSpawner._nav_info.traverse_logic
+		local active_mission_level_id = LevelEditor:get_active_mission_level()
+		local nav_world = MinionSpawner._nav_info.nav_world_from_level_id[active_mission_level_id]
+		local traverse_logic = MinionSpawner._nav_info.traverse_logic_from_level_id[active_mission_level_id]
 		local spawn_offset = self._spawn_offset:unbox()
 		local exit_offset = self._exit_offset:unbox()
 		local tm = Unit.world_pose(unit, 1)
@@ -205,6 +209,19 @@ function MinionSpawner:_editor_debug_draw(unit)
 	drawer:update(self._world)
 end
 
+function MinionSpawner:editor_on_mission_changed(unit)
+	if not rawget(_G, "LevelEditor") then
+		return
+	end
+
+	local in_active_mission_table = LevelEditor:is_level_object_in_active_mission_table(self._object_id)
+	self._in_active_mission_table = in_active_mission_table
+
+	if in_active_mission_table and self._active_debug_draw then
+		self:_editor_debug_draw(unit)
+	end
+end
+
 function MinionSpawner:editor_world_transform_modified(unit)
 	if not rawget(_G, "LevelEditor") then
 		return
@@ -218,15 +235,15 @@ function MinionSpawner:editor_toggle_debug_draw(enable)
 		return
 	end
 
-	self._should_debug_draw = enable
+	self._debug_draw_enabled = enable
 end
 
 function MinionSpawner:debug_started_animation()
-	Component.event(self._unit, "minion_spawner_spawning_started")
+	Component.event(self.unit, "minion_spawner_spawning_started")
 end
 
 function MinionSpawner:debug_done_animation()
-	Component.event(self._unit, "minion_spawner_spawning_done")
+	Component.event(self.unit, "minion_spawner_spawning_done")
 end
 
 MinionSpawner.component_data = {

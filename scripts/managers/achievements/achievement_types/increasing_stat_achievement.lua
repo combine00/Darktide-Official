@@ -10,11 +10,11 @@ local IncreasingStatAchievement = {
 		return stat_value and achievement_definition.target <= stat_value
 	end,
 	verifier = function (achievement_definition)
-		if not type(achievement_definition.stat_name) == "string" then
+		if type(achievement_definition.stat_name) ~= "string" then
 			return false, "missing stat"
 		end
 
-		if not type(achievement_definition.target) == "number" then
+		if type(achievement_definition.target) ~= "number" then
 			return false, "missing target"
 		end
 

@@ -12,7 +12,7 @@ local ViewElementGrid = class("ViewElementGrid", "ViewElementBase")
 function ViewElementGrid:init(parent, draw_layer, start_scale, optional_menu_settings, optional_definitions)
 	local class_name = self.__class_name
 	self._unique_id = class_name .. "_" .. string.gsub(tostring(self), "table: ", "")
-	local owner = parent and parent.view_name or Managers.ui:active_top_view()
+	local owner = parent and (parent.view_name or parent.__class_name) or Managers.ui:active_top_view()
 	self._element_view_id = string.format("%s_%s", owner, optional_menu_settings.reference_name or "1")
 
 	if optional_menu_settings then
@@ -526,7 +526,7 @@ function ViewElementGrid:_update_grid_widgets(dt, t, input_service)
 				local update = template and template.update
 
 				if update then
-					update(self, widget, input_service, dt, t, ui_renderer)
+					update(self, widget, input_service, dt, t, ui_renderer, template)
 				end
 			end
 		end
@@ -618,7 +618,7 @@ function ViewElementGrid:_create_entry_widget_from_config(config, suffix, callba
 		local init = template.init
 
 		if init then
-			init(self, widget, config, callback_name, secondary_callback_name, ui_renderer, double_click_callback_name)
+			init(self, widget, config, callback_name, secondary_callback_name, ui_renderer, double_click_callback_name, template)
 		end
 	end
 
@@ -653,6 +653,7 @@ function ViewElementGrid:_update_window_size()
 	local grid_height_divider_deduction = (hide_dividers or ignore_divider_height) and 0 or bottom_divider_height_offset + title_top_divider_height_offset
 	local grid_size = menu_settings.grid_size
 	local mask_size = menu_settings.mask_size
+	local edge_padding = menu_settings.edge_padding or 0
 	local title_height = menu_settings.title_height - bottom_divider_height_offset
 	local scrollbar_vertical_margin = menu_settings.scrollbar_vertical_margin or 0
 	local scrollbar_vertical_offset = menu_settings.scrollbar_vertical_offset or 0
@@ -660,7 +661,8 @@ function ViewElementGrid:_update_window_size()
 	local top_padding = menu_settings.top_padding or 0
 
 	if not using_title or not {
-		[2] = grid_size[2] - title_height - grid_height_divider_deduction
+		grid_size[1],
+		grid_size[2] - title_height - grid_height_divider_deduction
 	} then
 		local active_grid_size = {
 			grid_size[1],
@@ -669,7 +671,8 @@ function ViewElementGrid:_update_window_size()
 	end
 
 	if not using_title or not {
-		[2] = mask_size[2] - title_height - grid_height_divider_deduction
+		mask_size[1],
+		mask_size[2] - title_height - grid_height_divider_deduction
 	} then
 		local active_mask_size = {
 			mask_size[1],
@@ -677,10 +680,10 @@ function ViewElementGrid:_update_window_size()
 		}
 	end
 
-	self:_set_scenegraph_size("grid_title_background", nil, using_title and title_height or 0)
-	self:_set_scenegraph_size("grid_background", nil, active_grid_size[2])
-	self:_set_scenegraph_size("grid_mask", nil, active_mask_size[2] - top_padding)
-	self:_set_scenegraph_size("grid_interaction", nil, active_mask_size[2] - top_padding)
+	self:_set_scenegraph_size("grid_title_background", active_grid_size[1] + edge_padding, using_title and title_height or 0)
+	self:_set_scenegraph_size("grid_background", active_grid_size[1] + edge_padding, active_grid_size[2])
+	self:_set_scenegraph_size("grid_mask", active_mask_size[1], active_mask_size[2] - top_padding)
+	self:_set_scenegraph_size("grid_interaction", active_mask_size[1], active_mask_size[2] - top_padding)
 
 	if self._use_horizontal_scrollbar then
 		self:_set_scenegraph_size("grid_scrollbar", active_mask_size[1] - 20 - scrollbar_vertical_margin, nil)
@@ -795,9 +798,9 @@ function ViewElementGrid:_on_present_grid_layout_changed(layout, content_bluepri
 	local widgets_by_name = self._widgets_by_name
 	local grid_scrollbar_widget_id = "grid_scrollbar"
 	local scrollbar_widget = widgets_by_name[grid_scrollbar_widget_id]
-	scrollbar_widget.content.enable_gamepad_scrolling = menu_settings.enable_gamepad_scrolling
 
 	grid:assign_scrollbar(scrollbar_widget, grid_pivot_scenegraph_id, grid_scenegraph_id)
+	grid:set_enable_gamepad_scrolling(menu_settings.enable_gamepad_scrolling)
 	grid:set_scrollbar_progress(0)
 	grid:set_scroll_step_length(100)
 	self:_update_window_size()
@@ -806,6 +809,19 @@ function ViewElementGrid:_on_present_grid_layout_changed(layout, content_bluepri
 	if #self._grid_widgets == 0 then
 		self:_show_empty_message()
 	end
+end
+
+function ViewElementGrid:set_enable_gamepad_scrolling(enable_gamepad_scrolling)
+	local menu_settings = self._menu_settings
+	menu_settings.enable_gamepad_scrolling = enable_gamepad_scrolling
+
+	self._grid:set_enable_gamepad_scrolling(enable_gamepad_scrolling)
+end
+
+function ViewElementGrid:is_gamepad_scrolling_enabled()
+	local menu_settings = self._menu_settings
+
+	return menu_settings.enable_gamepad_scrolling
 end
 
 function ViewElementGrid:grid_scrollbar()
@@ -937,11 +953,11 @@ function ViewElementGrid:widget_index(widget)
 	end
 end
 
-function ViewElementGrid:widget_by_index(widget)
+function ViewElementGrid:widget_by_index(index)
 	local grid = self._grid
 
 	if grid then
-		return grid:widget_by_index(widget)
+		return grid:widget_by_index(index)
 	end
 end
 
@@ -1215,11 +1231,11 @@ function ViewElementGrid:index_by_element(element)
 end
 
 function ViewElementGrid:grid_length()
-	return self._grid:length()
-end
+	local grid = self._grid
 
-function ViewElementGrid:grid_area_length()
-	return self._grid:area_length()
+	if grid then
+		return grid:length()
+	end
 end
 
 function ViewElementGrid:menu_settings()

@@ -9,41 +9,59 @@ local OPEN_WALL_FILTER = "filter_platform_wall"
 
 function MoveablePlatformExtension:init(extension_init_context, unit, extension_init_data, ...)
 	self._is_server = extension_init_context.is_server
-	self._unit = unit
+	self._owner_system = extension_init_context.owner_system
 	self._network_story_manager = Managers.state.network_story
+	self._unit = unit
+	self._level = Unit.level(unit)
+	local extension_manager = Managers.state.extension
+	local broadphase_system = extension_manager:system("broadphase_system")
+	self._broadphase = broadphase_system.broadphase
+	self._side_system = extension_manager:system("side_system")
 	self._story_name = nil
 	self._story_changed = false
 	self._story_direction = MOVEABLE_PLATFORM_DIRECTION.none
+	self._story_speed_forward = 1
+	self._story_speed_backward = 1
+	self._box = nil
 	self._walls = {}
 	self._player_side = nil
+	self._require_all_players_onboard = false
 	self._all_players_inside = false
 	self._wall_collision_enabled = true
 	self._passenger_units = {}
 	self._overlap_result = {}
 	self._interactables = {}
-	self._require_all_players_onboard = false
 	self._units_locked = false
 	self._teleport_node_index = 1
+	self._teleport_nodes = {}
+	self._block_text = nil
 	local initial_position = Unit.local_position(unit, 1)
 	self._previous_update_position = Vector3Box(initial_position)
 	self._movement_this_render_frame = Vector3.zero()
 	self._movement_since_last_fixed_update = Vector3.zero()
 	self._last_fixed_frame_position = Vector3Box(Vector3.zero())
-	self._story_speed_forward = 1
-	self._story_speed_backward = 1
 	self._end_sound_time = 0
 	self._play_end_sound = false
-	self._level = Unit.level(unit)
 	self._unit_spawner = Managers.state.unit_spawner
-	local extension_manager = Managers.state.extension
-	local broadphase_system = extension_manager:system("broadphase_system")
-	self._broadphase = broadphase_system.broadphase
-	self._side_system = extension_manager:system("side_system")
 	self._chunk_lod_manager = Managers.state.chunk_lod
 	self._locked_chunk_lod = false
 
 	self:_update_broadphase()
 
+	local node_count = 0
+
+	while true do
+		local node_name = string.format("teleport_location_%02d", node_count + 1)
+
+		if Unit.has_node(unit, node_name) then
+			node_count = node_count + 1
+			self._teleport_nodes[node_count] = Unit.node(unit, node_name)
+		else
+			break
+		end
+	end
+
+	self._teleport_node_count = node_count
 	local interactable_count = 1
 	local interactable_prefix = "c_interactable_"
 	local interactable_name = interactable_prefix .. tostring(interactable_count)
@@ -85,24 +103,24 @@ function MoveablePlatformExtension:init(extension_init_context, unit, extension_
 	self:_enable_wall_collision(self._box, false)
 
 	self._overlap_result[self._box] = overlap_manager:add_listening_actor(self._box)
-	self._block_text = nil
 end
 
-function MoveablePlatformExtension:setup_from_component(story_name, player_side, wall_collision_enabled, wall_collision_filter, require_all_players_onboard, interactable_story_actions, interactable_hud_descriptions, story_speed_forward, story_speed_backward, end_sound_time, nav_handling_enabled, stop_position)
+function MoveablePlatformExtension:setup_from_component(story_name, story_loop_mode, story_start_immediately, story_speed_forward, story_speed_backward, player_side, wall_collision_enabled, wall_collision_filter, require_all_players_onboard, end_sound_time, interactable_story_actions, interactable_hud_descriptions, nav_handling_enabled, stop_position)
 	local unit = self._unit
 	local level = self._level
 	local network_story_manager = self._network_story_manager
 	self._story_name = story_name
+	self._story_loop_mode = story_loop_mode
 
 	network_story_manager:register_story(story_name, level)
-	network_story_manager:play_story(story_name, level, 0)
+	self:play_story()
 
+	self._story_speed_forward = story_speed_forward
+	self._story_speed_backward = story_speed_backward
 	self._player_side = player_side
 	self._wall_collision_enabled = wall_collision_enabled
 	self._wall_collision_filter = wall_collision_filter
 	self._require_all_players_onboard = require_all_players_onboard
-	self._story_speed_forward = story_speed_forward
-	self._story_speed_backward = story_speed_backward
 	self._end_sound_time = end_sound_time
 	self._nav_handling_enabled = nav_handling_enabled
 	self._stop_position = stop_position
@@ -111,7 +129,6 @@ function MoveablePlatformExtension:setup_from_component(story_name, player_side,
 		self:_setup_nav_gates(unit)
 	end
 
-	self._story_length = self._network_story_manager:get_story_length(story_name, self._level)
 	local interactables = self._interactables
 
 	for i = 1, #interactables do
@@ -127,6 +144,16 @@ function MoveablePlatformExtension:setup_from_component(story_name, player_side,
 			interactable.hud_description = interactable_hud_descriptions[i]
 		end
 	end
+
+	if self._is_server and story_start_immediately then
+		self:_set_direction(MOVEABLE_PLATFORM_DIRECTION.forward)
+	end
+end
+
+function MoveablePlatformExtension:play_story(speed)
+	speed = speed or 0
+
+	self._network_story_manager:play_story(self._story_name, self._level, speed, self._story_loop_mode)
 end
 
 function MoveablePlatformExtension:get_interactables()
@@ -145,7 +172,7 @@ function MoveablePlatformExtension:can_move()
 
 	local hostiles_onboard = self:_check_hostile_onboard()
 
-	if self._require_all_players_onboard and hostiles_onboard then
+	if hostiles_onboard and self._require_all_players_onboard then
 		self:_set_block_text("loc_action_interaction_inactive_platform_hostiles_onboard")
 
 		return false
@@ -183,7 +210,7 @@ function MoveablePlatformExtension:_set_direction(direction)
 
 		self._play_end_sound = true
 
-		self._network_story_manager:play_story(self._story_name, self._level, play_direction)
+		self:play_story(play_direction)
 		self:_set_nav_layer_allowed(self._layer_name_start, false)
 		self:_send_direction_to_clients()
 	elseif can_move and direction == MOVEABLE_PLATFORM_DIRECTION.backward and story_state == story_states.pause_at_end then
@@ -200,7 +227,7 @@ function MoveablePlatformExtension:_set_direction(direction)
 
 		self._play_end_sound = true
 
-		self._network_story_manager:play_story(self._story_name, self._level, play_direction)
+		self:play_story(play_direction)
 		self:_set_nav_layer_allowed(self._layer_name_stop, false)
 		self:_send_direction_to_clients()
 	elseif direction == MOVEABLE_PLATFORM_DIRECTION.none then
@@ -297,35 +324,14 @@ function MoveablePlatformExtension:_enable_wall_collision(actor, activate)
 	Actor.set_collision_filter(actor, filter)
 end
 
-local teleport_location_node_names = {
-	"bot_teleport_location_01",
-	"bot_teleport_location_02",
-	"bot_teleport_location_03"
-}
-local num_teleport_location_node_names = #teleport_location_node_names
+function MoveablePlatformExtension:_set_bot_onboard(bot_player_unit, node_index)
+	local blackboard = BLACKBOARDS[bot_player_unit]
+	local follow_component = Blackboard.write_component(blackboard, "follow")
+	follow_component.level_forced_teleport = true
+	local node = self._teleport_nodes[node_index]
+	local node_position = Unit.world_position(self._unit, node)
 
-function MoveablePlatformExtension:_force_teleport_bots(bot_player_units_to_teleport)
-	local moveable_platform_unit = self._unit
-	local index = 1
-
-	for bot_player_unit, _ in pairs(bot_player_units_to_teleport) do
-		local current_node_name = teleport_location_node_names[index]
-		local has_node = Unit.has_node(moveable_platform_unit, current_node_name)
-
-		if has_node then
-			local blackboard = BLACKBOARDS[bot_player_unit]
-			local follow_component = Blackboard.write_component(blackboard, "follow")
-			follow_component.level_forced_teleport = true
-			local node = Unit.node(moveable_platform_unit, current_node_name)
-			local node_position = Unit.world_position(moveable_platform_unit, node)
-
-			follow_component.level_forced_teleport_position:store(node_position)
-		else
-			bot_player_units_to_teleport[bot_player_unit] = nil
-		end
-
-		index = index % num_teleport_location_node_names + 1
-	end
+	follow_component.level_forced_teleport_position:store(node_position)
 end
 
 local TEMP_BOT_PLAYER_UNITS = {}
@@ -353,7 +359,6 @@ function MoveablePlatformExtension:_handle_friendly_bots_on_set_direction()
 	end
 
 	if has_valid_bots_that_should_be_passengers then
-		self:_force_teleport_bots(TEMP_BOT_PLAYER_UNITS)
 		self:_add_bots_to_passengers(TEMP_BOT_PLAYER_UNITS)
 	end
 end
@@ -364,7 +369,6 @@ function MoveablePlatformExtension:update(unit, dt, t)
 			local story_states = self._network_story_manager.NETWORK_STORY_STATES
 			local story_state = self._network_story_manager:get_story_state(self._story_name, self._level)
 
-			self:_check_passengers_outside()
 			self:_check_for_end_flow_events()
 
 			if story_state == story_states.pause_at_end then
@@ -377,7 +381,6 @@ function MoveablePlatformExtension:update(unit, dt, t)
 			local story_states = self._network_story_manager.NETWORK_STORY_STATES
 			local story_state = self._network_story_manager:get_story_state(self._story_name, self._level)
 
-			self:_check_passengers_outside()
 			self:_check_for_end_flow_events()
 
 			if story_state == story_states.pause_at_start then
@@ -439,18 +442,58 @@ end
 
 function MoveablePlatformExtension:_update_passengers()
 	if self._units_locked then
-		return
-	end
+		local overlapping_units = self._overlap_result[self._box]
 
-	table.clear(self._passenger_units)
+		if overlapping_units then
+			local passenger_units = self._passenger_units
+			local bounding_box, half_size = Unit.box(self._unit)
 
-	local overlapping_units = self._overlap_result[self._box]
+			for passenger_unit, _ in pairs(passenger_units) do
+				if ALIVE[passenger_unit] then
+					local player = Managers.state.player_unit_spawn:owner(passenger_unit)
+					local is_bot = not player:is_human_controlled()
+					local unit_position = Unit.world_position(passenger_unit, 1)
+					local is_inside = not is_bot and overlapping_units[passenger_unit] or is_bot and math.point_in_box(unit_position, bounding_box, half_size)
 
-	if overlapping_units then
-		local passenger_units = self._passenger_units
+					if not is_inside then
+						if self._wall_collision_enabled then
+							self:_teleport_player_onboard(passenger_unit)
 
-		for passenger_unit, _ in pairs(overlapping_units) do
-			passenger_units[passenger_unit] = true
+							local locomotion_extension = ScriptUnit.has_extension(passenger_unit, "locomotion_system")
+
+							if locomotion_extension and locomotion_extension:get_parent_unit() == nil then
+								locomotion_extension:set_parent_unit(self._unit)
+							end
+
+							Log.warning("MoveablePlatformExtension", "%s considered outside of platform, teleported back", is_bot and "Bot" or "Player")
+						else
+							self:_unparent_passenger(passenger_unit)
+						end
+					elseif is_bot and not self._wall_collision_enabled then
+						self:_unparent_passenger(passenger_unit)
+					end
+				else
+					self._passenger_units[passenger_unit] = nil
+				end
+			end
+
+			for overlap_unit, _ in pairs(overlapping_units) do
+				if not passenger_units[overlap_unit] then
+					self:add_passenger(overlap_unit)
+				end
+			end
+		end
+	else
+		table.clear(self._passenger_units)
+
+		local overlapping_units = self._overlap_result[self._box]
+
+		if overlapping_units then
+			local passenger_units = self._passenger_units
+
+			for passenger_unit, _ in pairs(overlapping_units) do
+				passenger_units[passenger_unit] = true
+			end
 		end
 	end
 end
@@ -486,16 +529,11 @@ end
 
 function MoveablePlatformExtension:_lock_units_on_platform()
 	self:set_wall_collision(true)
-
-	local has_passengers = self:_set_platform_as_parent_for_all_passengers()
-
-	if has_passengers then
-		self._units_locked = true
-	end
+	self:_set_platform_as_parent_for_all_passengers()
 end
 
-function MoveablePlatformExtension:units_locked()
-	return self._units_locked
+function MoveablePlatformExtension:block_bot_movement()
+	return self._units_locked and self._all_players_inside
 end
 
 function MoveablePlatformExtension:_passengers_inside_walls()
@@ -546,35 +584,19 @@ end
 function MoveablePlatformExtension:_teleport_player_onboard(unit)
 	local moveable_platform_unit = self._unit
 	local node_index = self._teleport_node_index
-	local node_name = teleport_location_node_names[node_index]
-	local node = Unit.node(moveable_platform_unit, node_name)
+	local node = self._teleport_nodes[node_index]
 	local node_position = Unit.world_position(moveable_platform_unit, node)
 	local player = Managers.player:player_by_unit(unit)
 
 	if player then
-		PlayerMovement.teleport(player, node_position)
-	end
-
-	self._teleport_node_index = node_index % num_teleport_location_node_names + 1
-end
-
-function MoveablePlatformExtension:_check_passengers_outside()
-	local bounding_box, half_size = Unit.box(self._unit)
-
-	for passenger_unit, _ in pairs(self._passenger_units) do
-		if ALIVE[passenger_unit] then
-			local unit_position = Unit.world_position(passenger_unit, 1)
-
-			if not math.point_in_box(unit_position, bounding_box, half_size * 1.1) then
-				if self._wall_collision_enabled then
-					self:_teleport_player_onboard(passenger_unit)
-					Log.warning("MoveablePlatformExtension", "Player considered outside of elevator, teleported back")
-				else
-					self:_unparent_passenger(passenger_unit)
-				end
-			end
+		if Managers.state.extension:is_in_fixed_update() then
+			PlayerMovement.teleport_fixed_update(unit, node_position)
+		else
+			PlayerMovement.teleport(player, node_position)
 		end
 	end
+
+	self._teleport_node_index = node_index % self._teleport_node_count + 1
 end
 
 function MoveablePlatformExtension:_unlock_units_on_platform()
@@ -589,6 +611,12 @@ function MoveablePlatformExtension:add_passenger(unit, place_on_platform)
 	self._passenger_units[unit] = true
 
 	if self._units_locked then
+		local player = Managers.state.player_unit_spawn:owner(unit)
+
+		if not player:is_human_controlled() then
+			self:_set_bot_onboard(unit, self._teleport_node_index)
+		end
+
 		self:_set_platform_as_parent(unit)
 
 		if place_on_platform then
@@ -614,15 +642,11 @@ function MoveablePlatformExtension:_set_platform_as_parent(passenger_unit)
 end
 
 function MoveablePlatformExtension:_set_platform_as_parent_for_all_passengers()
-	local has_passengers = false
-
 	for passenger_unit, _ in pairs(self._passenger_units) do
 		self:_set_platform_as_parent(passenger_unit)
-
-		has_passengers = true
 	end
 
-	return has_passengers
+	self._units_locked = true
 end
 
 function MoveablePlatformExtension:_unparent_all_passengers()
@@ -674,6 +698,10 @@ function MoveablePlatformExtension:_unparent_passenger(passenger_unit)
 end
 
 function MoveablePlatformExtension:set_story(story_name)
+	if story_name == self._story_name then
+		return
+	end
+
 	self._network_story_manager:unregister_story(self._story_name, self._level)
 
 	self._story_name = story_name
@@ -688,10 +716,9 @@ function MoveablePlatformExtension:set_story(story_name)
 		game_session_manager:send_rpc_clients("rpc_moveable_platform_set_story", unit_level_index, story_name)
 	end
 
-	self._network_story_manager:play_story(story_name, self._level, 0)
+	self:play_story()
 
 	self._story_changed = true
-	self._story_length = self._network_story_manager:get_story_length(story_name, self._level)
 end
 
 function MoveablePlatformExtension:get_story()
@@ -710,12 +737,28 @@ function MoveablePlatformExtension:move_backward()
 	self:_set_direction(MOVEABLE_PLATFORM_DIRECTION.backward)
 end
 
+function MoveablePlatformExtension:platform_toggle_loop()
+	if not self._is_server then
+		return
+	end
+
+	if self._story_loop_mode ~= Storyteller.LOOP then
+		self._story_loop_mode = Storyteller.LOOP
+	else
+		self._story_loop_mode = Storyteller.NONE
+	end
+
+	self._network_story_manager:set_story_loop_mode(self._story_name, self._level, self._story_loop_mode)
+end
+
 function MoveablePlatformExtension:toggle_require_all_players_onboard()
 	self._require_all_players_onboard = not self._require_all_players_onboard
 end
 
 function MoveablePlatformExtension:_set_flow_all_players_onboard(val)
-	Unit.set_flow_variable(self._unit, "lua_all_players_onboard", val)
+	if ALIVE[self._unit] then
+		Unit.set_flow_variable(self._unit, "lua_all_players_onboard", val)
+	end
 end
 
 function MoveablePlatformExtension:destroy()
@@ -723,11 +766,13 @@ function MoveablePlatformExtension:destroy()
 
 	local overlap_manager = Managers.state.player_overlap_manager
 
-	for _, wall in pairs(self._walls) do
-		self._overlap_result[wall] = overlap_manager:remove_listening_actor(wall)
+	for actor, _ in pairs(self._overlap_result) do
+		self._overlap_result[actor] = overlap_manager:remove_listening_actor(actor)
 	end
 
-	self._overlap_result[self._box] = overlap_manager:remove_listening_actor(self._box)
+	self._walls = nil
+	self._box = nil
+	self._overlap_result = nil
 
 	if self._locked_chunk_lod then
 		self._chunk_lod_manager:clear_level_unit(self._unit)
@@ -735,10 +780,7 @@ function MoveablePlatformExtension:destroy()
 
 	self._unit = nil
 	self._story_name = nil
-	self._walls = nil
-	self._box = nil
 	self._passenger_units = nil
-	self._overlap_result = nil
 
 	if self._is_server and self._nav_handling_enabled then
 		local nav_mesh_manager = Managers.state.nav_mesh

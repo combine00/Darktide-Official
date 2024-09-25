@@ -47,7 +47,7 @@ local breed_data = {
 	player_locomotion_constrain_radius = 0.4,
 	stagger_reduction_ranged = 5,
 	smart_tag_target_type = "breed",
-	base_unit = "content/characters/enemy/chaos_traitor_guard/third_person/base",
+	base_unit = "content/characters/enemy/chaos_traitor_guard/third_person/flamer_base",
 	has_direct_ragdoll_flow_event = true,
 	name = breed_name,
 	breed_type = breed_types.minion,
@@ -95,7 +95,8 @@ local breed_data = {
 	vfx = require("scripts/settings/breed/breeds/cultist/cultist_common_vfx"),
 	behavior_tree_name = breed_name,
 	spawn_buffs = {
-		"cultist_flamer_liquid_immunity"
+		"cultist_flamer_liquid_immunity",
+		"flamer_backpack_counter"
 	},
 	animation_variables = {
 		"lean"
@@ -171,6 +172,12 @@ local breed_data = {
 			actors = {
 				"c_head",
 				"c_neck"
+			}
+		},
+		{
+			name = hit_zone_names.backpack,
+			actors = {
+				"c_renegadeflamethrowertanks"
 			}
 		},
 		{
@@ -254,6 +261,9 @@ local breed_data = {
 			"j_head",
 			"j_neck"
 		},
+		[hit_zone_names.backpack] = {
+			"c_renegadeflamethrowertanks"
+		},
 		[hit_zone_names.torso] = {
 			"j_head",
 			"j_spine",
@@ -309,6 +319,14 @@ local breed_data = {
 	},
 	hit_zone_ragdoll_pushes = {
 		[hit_zone_names.head] = {
+			j_rightshoulder = 0.05,
+			j_leftshoulder = 0.05,
+			j_spine = 0.2,
+			j_spine1 = 0.1,
+			j_head = 0.3,
+			j_neck = 0.3
+		},
+		[hit_zone_names.backpack] = {
 			j_rightshoulder = 0.05,
 			j_leftshoulder = 0.05,
 			j_spine = 0.2,
@@ -394,12 +412,14 @@ local breed_data = {
 		}
 	},
 	hit_zone_weakspot_types = {
-		[hit_zone_names.head] = weakspot_types.headshot
+		[hit_zone_names.head] = weakspot_types.headshot,
+		[hit_zone_names.backpack] = weakspot_types.explosive_backpack
 	},
 	hitzone_damage_multiplier = {
 		ranged = {
 			[hit_zone_names.lower_left_arm] = 0.5,
 			[hit_zone_names.lower_right_arm] = 0.5,
+			[hit_zone_names.backpack] = 0.2,
 			[hit_zone_names.lower_left_leg] = 0.5,
 			[hit_zone_names.lower_right_leg] = 0.5
 		},

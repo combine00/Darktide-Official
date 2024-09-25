@@ -1,7 +1,7 @@
 local BackendError = require("scripts/managers/error/errors/backend_error")
+local BanError = require("scripts/managers/error/errors/ban_error")
 local ErrorCodes = require("scripts/managers/error/error_codes")
 local GameVersionError = require("scripts/managers/error/errors/game_version_error")
-local BanError = require("scripts/managers/error/errors/ban_error")
 local InitializeWanError = require("scripts/managers/error/errors/initialize_wan_error")
 local MasterItems = require("scripts/backend/master_items")
 local PlayerManager = require("scripts/foundation/managers/player/player_manager")
@@ -71,7 +71,7 @@ function AccountService:signin()
 		local items_promise = MasterItems.refresh()
 		local auth_data_promise = Promise.resolved(auth_data)
 		local immaterium_connection_info = Managers.backend.interfaces.immaterium:fetch_connection_info()
-		local crafting_costs_promise = Managers.backend.interfaces.crafting:refresh_crafting_costs()
+		local crafting_costs_promise = Managers.backend.interfaces.crafting:refresh_all_costs()
 
 		return migrations_promise:next(function (data)
 			local migration_data_promise = Promise.resolved(data)
@@ -88,6 +88,8 @@ function AccountService:signin()
 			local auth_data_promise = Promise.resolved(auth_data)
 			local migration_data_promise = Promise.resolved(migration_data)
 			local immaterium_connect_promise = Managers.grpc:connect_to_immaterium(immaterium_connection_info)
+
+			Managers.data_service.crafting:warm_trait_sticker_book_cache()
 
 			return Promise.all(profiles_promise, has_created_first_character_promise, has_completed_onboarding_promise, auth_data_promise, immaterium_connect_promise, migration_data_promise)
 		else
@@ -121,7 +123,7 @@ function AccountService:signin()
 		elseif error_data.description == "INITIALIZE_WAN_ERROR" then
 			Managers.error:report_error(InitializeWanError:new(error_data))
 		else
-			local is_valid_json = string.find(error_data.description, "\":\"") ~= nil
+			local is_valid_json = error_data.description and string.find(error_data.description, "\":\"") ~= nil
 			local decoded_json_data = is_valid_json and cjson.decode(error_data.description)
 
 			if error_data.code == 503 then

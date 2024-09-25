@@ -395,7 +395,8 @@ function WeaponStats:calculate_stats(weapon_template, weapon_tweak_templates, da
 	local num_triggered_staggers = 0
 	local is_attacked_unit_suppressed = false
 	local uses_overheat = weapon_template.uses_overheat
-	local uses_ammunition = weapon_template.uses_ammunition
+	local hud_configuration = weapon_template.hud_configuration
+	local uses_ammunition = hud_configuration and hud_configuration.uses_ammunition
 	local actions = weapon_template.actions
 	local rate_of_fire = nil
 	local ammo_templates = weapon_tweak_templates[template_types.ammo]
@@ -807,7 +808,8 @@ function WeaponStats:get_comparing_stats()
 					display_name = display_name,
 					description = description,
 					fraction = stat_value,
-					current = stat_value
+					current = stat_value,
+					name = stat_name
 				}
 			end
 		end

@@ -1,6 +1,7 @@
 local HordePacing = require("scripts/managers/pacing/horde_pacing/horde_pacing")
 local MinionDifficultySettings = require("scripts/settings/difficulty/minion_difficulty_settings")
 local MonsterPacing = require("scripts/managers/pacing/monster_pacing/monster_pacing")
+local MinionPerception = require("scripts/utilities/minion_perception")
 local PacingTemplates = require("scripts/managers/pacing/pacing_templates")
 local PlayerUnitStatus = require("scripts/utilities/attack/player_unit_status")
 local RoamerPacing = require("scripts/managers/pacing/roamer_pacing/roamer_pacing")
@@ -971,6 +972,27 @@ end
 
 function PacingManager:aggro_roamer_zone_range(target_unit, range)
 	self._roamer_pacing:aggro_zone_range(target_unit, range)
+end
+
+local RADIUS_RESULT = {}
+
+function PacingManager:aggro_all_within_radius(position, radius)
+	local side_system = Managers.state.extension:system("side_system")
+	local side = side_system:get_side_from_name("villains")
+	local target_side_names = side:relation_side_names("allied")
+
+	table.clear(RADIUS_RESULT)
+
+	local broadphase_system = Managers.state.extension:system("broadphase_system")
+	local broadphase = broadphase_system.broadphase
+	local num_results = broadphase:query(position, radius, RADIUS_RESULT, target_side_names)
+
+	for i = 1, num_results do
+		local enemy = RADIUS_RESULT[i]
+		local perception_extension = ScriptUnit.extension(enemy, "perception_system")
+
+		MinionPerception.attempt_aggro(perception_extension)
+	end
 end
 
 function PacingManager:allow_nav_tag_layer(layer_name, layer_allowed)

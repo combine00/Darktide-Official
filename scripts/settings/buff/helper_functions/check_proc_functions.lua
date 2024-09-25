@@ -9,139 +9,164 @@ local damage_types = DamageSettings.damage_types
 local CLOSE_RANGE_RANGED = DamageSettings.ranged_close
 local CLOSE_RANGE_RANGED_SQUARED = CLOSE_RANGE_RANGED * CLOSE_RANGE_RANGED
 local ON_SHOOT_HIT_MULTIPLE_THRESHOLD = 2
-local CheckProcFunctions = {
-	all = function (...)
-		local conditions = {
-			...
-		}
+local CheckProcFunctions = {}
+local _is_within_close_distance = nil
 
-		return function (...)
-			for i = 1, #conditions do
-				if not conditions[i](...) then
-					return false
-				end
+function CheckProcFunctions.all(...)
+	local conditions = {
+		...
+	}
+
+	return function (...)
+		for i = 1, #conditions do
+			if not conditions[i](...) then
+				return false
 			end
-
-			return true
-		end
-	end,
-	any = function (...)
-		local conditions = {
-			...
-		}
-
-		return function (...)
-			for i = 1, #conditions do
-				if conditions[i](...) then
-					return true
-				end
-			end
-
-			return false
-		end
-	end,
-	always = function (params, template_data, template_context, t)
-		return true
-	end,
-	never = function (params, template_data, template_context, t)
-		return false
-	end,
-	on_kill = function (params, template_data, template_context, t)
-		if params.attack_result ~= attack_results.died then
-			return false
-		end
-
-		return true
-	end,
-	on_one_hit_kill = function (params, template_data, template_context, t)
-		if params.attack_result ~= attack_results.died then
-			return false
-		end
-
-		return params.one_hit_kill
-	end,
-	on_non_kill = function (params, template_data, template_context, t)
-		if params.attack_result == attack_results.died then
-			return false
-		end
-
-		return true
-	end,
-	on_weakspot_kill = function (params, template_data, template_context, t)
-		if params.attack_result ~= attack_results.died then
-			return false
-		end
-
-		if not params.hit_weakspot then
-			return false
-		end
-
-		return true
-	end,
-	on_elite_kill = function (params, template_data, template_context, t)
-		if params.attack_result ~= attack_results.died then
-			return false
-		end
-
-		if not params.tags or not params.tags.elite then
-			return false
-		end
-
-		return true
-	end,
-	on_special_kill = function (params, template_data, template_context, t)
-		if params.attack_result ~= attack_results.died then
-			return false
-		end
-
-		if not params.tags or not params.tags.special then
-			return false
-		end
-
-		return true
-	end,
-	on_elite_or_special_kill = function (params, template_data, template_context, t)
-		if params.attack_result ~= attack_results.died then
-			return false
-		end
-
-		if not params.tags then
-			return false
-		end
-
-		if not params.tags.elite and not params.tags.special then
-			return false
-		end
-
-		return true
-	end,
-	on_ranged_enemy_killed = function (params, template_data, template_context, t)
-		if params.attack_result ~= attack_results.died then
-			return false
-		end
-
-		if not params.tags then
-			return false
-		end
-
-		if not params.tags.far then
-			return false
-		end
-
-		return true
-	end,
-	on_elite_or_special_minion_death = function (params, template_data, template_context, t)
-		if not params.tags then
-			return false
-		end
-
-		if not params.tags.elite and not params.tags.special then
-			return false
 		end
 
 		return true
 	end
-}
+end
+
+function CheckProcFunctions.any(...)
+	local conditions = {
+		...
+	}
+
+	return function (...)
+		for i = 1, #conditions do
+			if conditions[i](...) then
+				return true
+			end
+		end
+
+		return false
+	end
+end
+
+function CheckProcFunctions.always(params, template_data, template_context, t)
+	return true
+end
+
+function CheckProcFunctions.never(params, template_data, template_context, t)
+	return false
+end
+
+function CheckProcFunctions.on_kill(params, template_data, template_context, t)
+	if params.attack_result ~= attack_results.died then
+		return false
+	end
+
+	return true
+end
+
+function CheckProcFunctions.on_one_hit_kill(params, template_data, template_context, t)
+	if params.attack_result ~= attack_results.died then
+		return false
+	end
+
+	return params.one_hit_kill
+end
+
+function CheckProcFunctions.on_non_kill(params, template_data, template_context, t)
+	if params.attack_result == attack_results.died then
+		return false
+	end
+
+	return true
+end
+
+function CheckProcFunctions.on_weakspot_kill(params, template_data, template_context, t)
+	if params.attack_result ~= attack_results.died then
+		return false
+	end
+
+	if not params.hit_weakspot then
+		return false
+	end
+
+	return true
+end
+
+function CheckProcFunctions.on_elite_kill(params, template_data, template_context, t)
+	if params.attack_result ~= attack_results.died then
+		return false
+	end
+
+	if not params.tags or not params.tags.elite then
+		return false
+	end
+
+	return true
+end
+
+function CheckProcFunctions.on_special_kill(params, template_data, template_context, t)
+	if params.attack_result ~= attack_results.died then
+		return false
+	end
+
+	if not params.tags or not params.tags.special then
+		return false
+	end
+
+	return true
+end
+
+function CheckProcFunctions.on_elite_or_special_kill(params, template_data, template_context, t)
+	if params.attack_result ~= attack_results.died then
+		return false
+	end
+
+	if not params.tags then
+		return false
+	end
+
+	if not params.tags.elite and not params.tags.special then
+		return false
+	end
+
+	return true
+end
+
+function CheckProcFunctions.on_elite_or_special_or_monster_hit(params, template_data, template_context, t)
+	if not params.tags then
+		return false
+	end
+
+	if not params.tags.elite and not params.tags.special and not params.tags.monster then
+		return false
+	end
+
+	return true
+end
+
+function CheckProcFunctions.on_ranged_enemy_killed(params, template_data, template_context, t)
+	if params.attack_result ~= attack_results.died then
+		return false
+	end
+
+	if not params.tags then
+		return false
+	end
+
+	if not params.tags.far then
+		return false
+	end
+
+	return true
+end
+
+function CheckProcFunctions.on_elite_or_special_minion_death(params, template_data, template_context, t)
+	if not params.tags then
+		return false
+	end
+
+	if not params.tags.elite and not params.tags.special then
+		return false
+	end
+
+	return true
+end
 
 function CheckProcFunctions.on_elite_or_special_melee_kill(params, template_data, template_context, t)
 	return CheckProcFunctions.on_melee_kill(params, template_data, template_context, t) and CheckProcFunctions.on_elite_or_special_kill(params, template_data, template_context, t)
@@ -267,20 +292,19 @@ function CheckProcFunctions.on_ranged_close_kill(params, template_data, template
 		return false
 	end
 
-	local hit_world_position_box = params.hit_world_position
-	local hit_world_position = hit_world_position_box and hit_world_position_box:unbox()
+	return _is_within_close_distance(params, template_data, template_context, t)
+end
 
-	if not hit_world_position then
+function CheckProcFunctions.on_explosion_close_kill(params, template_data, template_context, t)
+	if params.attack_result ~= attack_results.died then
 		return false
 	end
 
-	local attacking_unit = params.attacking_unit
-	local close_range_squared = CLOSE_RANGE_RANGED_SQUARED
-	local attacking_pos = POSITION_LOOKUP[attacking_unit] or Unit.world_position(attacking_unit, 1)
-	local distance_squared = Vector3.distance_squared(hit_world_position, attacking_pos)
-	local is_within_distance = distance_squared <= close_range_squared
+	if params.attack_type ~= attack_types.explosion then
+		return false
+	end
 
-	return is_within_distance
+	return _is_within_close_distance(params, template_data, template_context, t)
 end
 
 function CheckProcFunctions.on_block_broken(params, template_data, template_context, t)
@@ -309,6 +333,14 @@ end
 
 function CheckProcFunctions.on_push_hit(params, template_data, template_context, t)
 	return params.attack_type == attack_types.push
+end
+
+function CheckProcFunctions.on_buff_hit(params, template_data, template_context, t)
+	return params.attack_type == attack_types.buff
+end
+
+function CheckProcFunctions.on_non_buff_hit(params, template_data, template_context, t)
+	return not CheckProcFunctions.on_buff_hit(params, template_data, template_context, t)
 end
 
 function CheckProcFunctions.on_melee_weapon_special_hit(params, template_data, template_context, t)
@@ -389,6 +421,10 @@ function CheckProcFunctions.on_ranged_weakspot_kills(params, template_data, temp
 	return CheckProcFunctions.on_weakspot_hit(params, template_data, template_context, t) and CheckProcFunctions.on_ranged_kill(params, template_data, template_context, t)
 end
 
+function CheckProcFunctions.on_melee_weakspot_kills(params, template_data, template_context, t)
+	return CheckProcFunctions.on_weakspot_hit(params, template_data, template_context, t) and CheckProcFunctions.on_melee_kill(params, template_data, template_context, t)
+end
+
 function CheckProcFunctions.on_alternative_fire_hit(params, template_data, template_context, t)
 	return params.alternative_fire
 end
@@ -455,6 +491,10 @@ function CheckProcFunctions.on_elite_hit(params, template_data, template_context
 	end
 
 	return true
+end
+
+function CheckProcFunctions.hit_has_charge_level(params, template_data, template_context, t)
+	return params.charge_level ~= nil
 end
 
 function CheckProcFunctions.would_die(params, template_data, template_context, t)
@@ -531,6 +571,23 @@ function CheckProcFunctions.on_item_match(params, template_data, template_contex
 	local is_match = attacking_item_name == buff_item_name
 
 	return is_match
+end
+
+function _is_within_close_distance(params, template_data, template_context, t)
+	local hit_world_position_box = params.hit_world_position
+	local hit_world_position = hit_world_position_box and hit_world_position_box:unbox()
+
+	if not hit_world_position then
+		return false
+	end
+
+	local attacking_unit = params.attacking_unit
+	local close_range_squared = CLOSE_RANGE_RANGED_SQUARED
+	local attacking_pos = POSITION_LOOKUP[attacking_unit] or Unit.world_position(attacking_unit, 1)
+	local distance_squared = Vector3.distance_squared(hit_world_position, attacking_pos)
+	local is_within_distance = distance_squared <= close_range_squared
+
+	return is_within_distance
 end
 
 return CheckProcFunctions

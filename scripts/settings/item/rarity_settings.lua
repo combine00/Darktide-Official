@@ -31,7 +31,7 @@ local RaritySettings = {
 	},
 	{
 		display_name = "loc_item_weapon_rarity_1",
-		max_modifications = 2,
+		max_modifications = 0,
 		color = Color.item_rarity_1(255, true),
 		color_dark = Color.item_rarity_dark_1(255, true),
 		color_desaturated = Color.item_rarity_desaturated_1(255, true),
@@ -46,7 +46,7 @@ local RaritySettings = {
 	},
 	{
 		display_name = "loc_item_weapon_rarity_2",
-		max_modifications = 2,
+		max_modifications = 1,
 		color = Color.item_rarity_2(255, true),
 		color_dark = Color.item_rarity_dark_2(255, true),
 		color_desaturated = Color.item_rarity_desaturated_2(255, true),

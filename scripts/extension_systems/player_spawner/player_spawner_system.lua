@@ -40,12 +40,22 @@ local function _sort_spawn_priority_func(a, b)
 	return priority_a < priority_b
 end
 
-function PlayerSpawnerSystem:add_spawn_point(unit, side, spawn_identifier, spawn_priority)
-	local position = POSITION_LOOKUP[unit]
-	local rotation = Unit.local_rotation(unit, 1)
+function PlayerSpawnerSystem:add_spawn_point(unit, side, spawn_identifier, spawn_priority, parent_spawned)
+	local position, rotation = nil
+
+	if Unit.has_node(unit, "spawn_location") then
+		local node = Unit.node(unit, "spawn_location")
+		rotation = Unit.world_rotation(unit, node)
+		position = Unit.world_position(unit, node)
+	else
+		rotation = Unit.local_rotation(unit, 1)
+		position = POSITION_LOOKUP[unit]
+	end
+
 	local spawn_point_data = {
 		position = Vector3Box(position),
 		rotation = QuaternionBox(rotation),
+		parent = parent_spawned and unit or nil,
 		spawn_priority = spawn_priority,
 		side = side
 	}
@@ -67,7 +77,7 @@ function PlayerSpawnerSystem:next_free_spawn_point(optional_spawn_identifier)
 	local found, position, rotation, parent, side = nil
 
 	if optional_spawn_identifier then
-		found, position, rotation, side = self:_find_spawner_spawn_point(optional_spawn_identifier)
+		found, position, rotation, parent, side = self:_find_spawner_spawn_point(optional_spawn_identifier)
 	end
 
 	local use_progression_spawn_point = not self._in_safe_volume or self:_use_progression_spawn_in_safe_zone()
@@ -78,7 +88,7 @@ function PlayerSpawnerSystem:next_free_spawn_point(optional_spawn_identifier)
 
 	if not found then
 		local identifier = PlayerSpawnerSystem.DEFAULT_SPAWN_IDENTIFIER
-		found, position, rotation, side = self:_find_spawner_spawn_point(identifier)
+		found, position, rotation, parent, side = self:_find_spawner_spawn_point(identifier)
 	end
 
 	if not found then
@@ -141,7 +151,7 @@ function PlayerSpawnerSystem:_find_spawner_spawn_point(spawn_identifier)
 	next_spawn_point_index_by_identifier[spawn_identifier] = spawn_point_index % num_spawn_points + 1
 	local spawn_point = spawn_points[spawn_point_index]
 
-	return true, spawn_point.position:unbox(), spawn_point.rotation:unbox(), spawn_point.side
+	return true, spawn_point.position:unbox(), spawn_point.rotation:unbox(), spawn_point.parent, spawn_point.side
 end
 
 local progression_players = {}

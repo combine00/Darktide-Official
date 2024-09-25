@@ -54,8 +54,24 @@ function PartyImmateriumMemberMyself:profile()
 	return self._presence_entry:character_profile()
 end
 
+function PartyImmateriumMemberMyself:archetype_name()
+	local profile = self:profile()
+
+	return profile and profile.archetype.name
+end
+
+function PartyImmateriumMemberMyself:breed_name()
+	local profile = self:profile()
+
+	return profile and profile.archetype.breed
+end
+
 function PartyImmateriumMemberMyself:account_id()
 	return self._account_id
+end
+
+function PartyImmateriumMemberMyself:psn_session_id()
+	return self._presence_entry:psn_session_id()
 end
 
 function PartyImmateriumMemberMyself:destroy()

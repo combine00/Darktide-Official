@@ -667,6 +667,10 @@ function StoreItemDetailView:_setup_description_grid(item)
 		desired_spacing = 50
 	end
 
+	if #widgets > 0 then
+		_add_spacing(10)
+	end
+
 	self._description_grid_widgets = widgets
 	self._description_grid_alignment_widgets = alignment_widgets
 	local grid_scenegraph_id = "description_grid"
@@ -1304,32 +1308,12 @@ function StoreItemDetailView:_generate_mannequin_loadout(profile, optional_item)
 	local breed_name = archetype.breed
 	local new_loadout = {}
 	local item_slot = optional_item and optional_item.slots[1]
-	local is_setup_done = false
+	local required_breed_item_names_per_slot = UISettings.item_preview_required_slot_items_per_slot_by_breed_and_gender[breed_name]
+	local required_gender_item_names_per_slot = required_breed_item_names_per_slot and required_breed_item_names_per_slot[gender_name]
+	local required_items = required_gender_item_names_per_slot and (required_gender_item_names_per_slot[item_slot] or required_gender_item_names_per_slot.default)
 
-	if item_slot then
-		local required_breed_item_names_per_slot = UISettings.item_preview_required_slot_items_per_slot_by_breed_and_gender[breed_name]
-		local required_gender_item_names_per_slot = required_breed_item_names_per_slot and required_breed_item_names_per_slot[gender_name]
-		local required_items = required_gender_item_names_per_slot and required_gender_item_names_per_slot[item_slot]
-
-		if required_items then
-			for slot_name, slot_item_name in pairs(required_items) do
-				local item_definition = MasterItems.get_item(slot_item_name)
-
-				if item_definition then
-					local slot_item = table.clone(item_definition)
-					new_loadout[slot_name] = slot_item
-				end
-			end
-
-			is_setup_done = true
-		end
-	end
-
-	if not is_setup_done then
-		local required_breed_item_names_per_slot = UISettings.item_preview_required_slot_items_set_per_slot_by_breed_and_gender[breed_name]
-		local required_gender_item_names_per_breed_and_gender = required_breed_item_names_per_slot and required_breed_item_names_per_slot[gender_name]
-
-		for slot_name, slot_item_name in pairs(required_gender_item_names_per_breed_and_gender) do
+	if required_items then
+		for slot_name, slot_item_name in pairs(required_items) do
 			local item_definition = MasterItems.get_item(slot_item_name)
 
 			if item_definition then
@@ -1522,34 +1506,17 @@ function StoreItemDetailView:_reset_mannequin(optional_item)
 	local breed_name = profile and archetype.breed or ""
 	local gender_name = profile and profile.gender or ""
 	local item_slot = optional_item and optional_item.slots[1]
+	local required_breed_item_names_per_slot = UISettings.item_preview_required_slot_items_per_slot_by_breed_and_gender[breed_name]
+	local required_gender_item_names_per_slot = required_breed_item_names_per_slot and required_breed_item_names_per_slot[gender_name]
+	local required_items = required_gender_item_names_per_slot and (required_gender_item_names_per_slot[item_slot] or required_gender_item_names_per_slot.default)
 
-	if item_slot then
-		local required_breed_item_names_per_slot = UISettings.item_preview_required_slot_items_per_slot_by_breed_and_gender[breed_name]
-		local required_gender_item_names_per_slot = required_breed_item_names_per_slot and required_breed_item_names_per_slot[gender_name]
-		local required_items = required_gender_item_names_per_slot and required_gender_item_names_per_slot[item_slot]
+	if required_items then
+		for slot_name, slot_item_name in pairs(required_items) do
+			local item_definition = MasterItems.get_item(slot_item_name)
 
-		if required_items then
-			for slot_name, slot_item_name in pairs(required_items) do
-				local item_definition = MasterItems.get_item(slot_item_name)
-
-				if item_definition then
-					local slot_item = table.clone(item_definition)
-					mannequin_loadout[slot_name] = slot_item
-				end
-			end
-		end
-	else
-		local required_breed_item_names_per_slot = UISettings.item_preview_required_slot_items_set_per_slot_by_breed_and_gender[breed_name]
-		local required_gender_item_names_per_breed_and_gender = required_breed_item_names_per_slot and required_breed_item_names_per_slot[gender_name]
-
-		if required_gender_item_names_per_breed_and_gender then
-			for required_item_slot_name, slot_item_name in pairs(required_gender_item_names_per_breed_and_gender) do
-				local item_definition = MasterItems.get_item(slot_item_name)
-
-				if item_definition then
-					local slot_item = table.clone(item_definition)
-					mannequin_loadout[required_item_slot_name] = slot_item
-				end
+			if item_definition then
+				local slot_item = table.clone(item_definition)
+				mannequin_loadout[slot_name] = slot_item
 			end
 		end
 	end
@@ -2822,6 +2789,8 @@ function StoreItemDetailView:_create_aquilas_presentation(offer, item_name)
 			platform = "microsoft"
 		elseif authenticate_method == Managers.backend.AUTH_METHOD_XBOXLIVE and Application.xbox_live and Application.xbox_live() == true then
 			platform = "microsoft"
+		elseif authenticate_method == Managers.backend.AUTH_METHOD_PSN then
+			platform = "psn"
 		else
 			platform = "steam"
 		end

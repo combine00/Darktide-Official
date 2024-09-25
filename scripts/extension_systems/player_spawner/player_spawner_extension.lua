@@ -4,15 +4,17 @@ function PlayerSpawnerExtension:init(extension_init_context, unit, extension_ini
 	self._player_side = "heroes"
 	self._spawn_identifier = "default"
 	self._spawn_priority = 1
+	self._parent_spawned = false
 	self._player_spawner_system = extension_init_context.owner_system
 end
 
-function PlayerSpawnerExtension:setup_from_component(unit, player_side, spawn_identifier, spawn_priority)
+function PlayerSpawnerExtension:setup_from_component(unit, player_side, spawn_identifier, spawn_priority, parent_spawned)
 	self._player_side = player_side
 	self._spawn_identifier = spawn_identifier
 	self._spawn_priority = spawn_priority
+	self._parent_spawned = parent_spawned
 
-	self._player_spawner_system:add_spawn_point(unit, player_side, spawn_identifier, spawn_priority)
+	self._player_spawner_system:add_spawn_point(unit, player_side, spawn_identifier, spawn_priority, parent_spawned)
 end
 
 return PlayerSpawnerExtension

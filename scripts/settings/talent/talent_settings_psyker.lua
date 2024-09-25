@@ -33,19 +33,34 @@ local talent_settings = {
 		blocking_soulbaze = {
 			stacks = 1
 		},
+		melee_weaving = {
+			warp_generation = 0.8,
+			duration = 4,
+			vent_percentage = 0.05
+		},
 		melee_attack_speed = {
 			attack_speed = 0.1
 		},
 		glass_cannon = {
-			toughness_replenish_multiplier = 0.5,
-			warp_charge_amount = 0.75
+			toughness_replenish_multiplier = 0.7,
+			warp_charge_amount = 0.6
 		},
 		warp_attacks_rending = {
+			threshold = 0.75,
 			warp_rending = 0.1
 		},
 		ranged_shots_soulblaze = {
 			stacks = 1,
 			proc_chance = 1
+		},
+		ranged_crits_vent = {
+			warp_charge_percent = 0.04,
+			proc_chance = 1
+		},
+		reload_speed_warp = {
+			reload_speed = 0.25,
+			warp_charge = 0.25,
+			threshold = 0.75
 		},
 		soulblaze_reduces_damage_taken = {
 			toughness_damage_taken_multiplier = 0.67
@@ -54,6 +69,10 @@ local talent_settings = {
 			venting = 0.1,
 			min = 0,
 			max = 1
+		},
+		psyker_force_staff_wield_speed = {
+			min = 0,
+			max = 0.5
 		}
 	},
 	psyker_1 = {
@@ -283,7 +302,7 @@ local talent_settings = {
 			active_duration = 2.5
 		},
 		coop_1 = {
-			toughness_percent = 0.5
+			toughness_percent = 1
 		},
 		coop_2 = {
 			ability_cooldown_modifier = -0.15,

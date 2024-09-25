@@ -82,6 +82,7 @@ weapon_template.actions = {
 		allowed_during_sprint = true,
 		ability_type = "grenade_ability",
 		anim_time_scale = 1.5,
+		time_scale_stat_buffs = false,
 		anim_event_last = "attack_shoot_last",
 		fire_time = 0.1,
 		anim_event_non_last = "attack_shoot_right",
@@ -181,8 +182,10 @@ weapon_template.alternate_fire_settings = {
 }
 weapon_template.spread_template = "no_spread"
 weapon_template.ammo_template = "no_ammo"
-weapon_template.uses_ammunition = true
-weapon_template.uses_overheat = false
+weapon_template.hud_configuration = {
+	uses_overheat = false,
+	uses_ammunition = true
+}
 weapon_template.sprint_ready_up_time = 0.1
 weapon_template.max_first_person_anim_movement_speed = 5.8
 weapon_template.smart_targeting_template = SmartTargetingTemplates.default_melee

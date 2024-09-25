@@ -257,6 +257,11 @@ end
 
 function SideSystem:add_aggroed_minion(unit)
 	local side = self.side_by_unit[unit]
+	local num_aggroed_minion_units = side.num_aggroed_minion_units + 1
+	side.num_aggroed_minion_units = num_aggroed_minion_units
+	local aggroed_minion_units = side.aggroed_minion_units
+	aggroed_minion_units[num_aggroed_minion_units] = unit
+	aggroed_minion_units[unit] = num_aggroed_minion_units
 	local enemy_sides = side:relation_sides("enemy")
 	local num_enemy_sides = #enemy_sides
 
@@ -272,6 +277,15 @@ end
 
 function SideSystem:remove_aggroed_minion(unit)
 	local side = self.side_by_unit[unit]
+	local aggroed_minion_units = side.aggroed_minion_units
+	local own_index = aggroed_minion_units[unit]
+	local own_last_index = side.num_aggroed_minion_units
+	local own_last_unit = aggroed_minion_units[own_last_index]
+	aggroed_minion_units[own_index] = own_last_unit
+	aggroed_minion_units[own_last_unit] = own_index
+	aggroed_minion_units[own_last_index] = nil
+	aggroed_minion_units[unit] = nil
+	side.num_aggroed_minion_units = own_last_index - 1
 	local enemy_sides = side:relation_sides("enemy")
 	local num_enemy_sides = #enemy_sides
 

@@ -94,6 +94,22 @@ function PartyImmateriumMember:profile()
 	return presence:character_profile()
 end
 
+function PartyImmateriumMember:archetype_name()
+	local profile = self:profile()
+
+	return profile and profile.archetype.name
+end
+
+function PartyImmateriumMember:breed_name()
+	local profile = self:profile()
+
+	return profile and profile.archetype.breed
+end
+
+function PartyImmateriumMember:psn_session_id()
+	return self:_get_presence():psn_session_id()
+end
+
 function PartyImmateriumMember:destroy()
 	return
 end

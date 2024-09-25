@@ -1,5 +1,5 @@
 local settings = {
-	branch = "rel_Patch1.4.0x_external",
+	branch = "rel_Patch1.5.0x_external",
 	project = "darktide"
 }
 

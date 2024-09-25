@@ -77,9 +77,9 @@ function ConditionalFunctions.has_stamina(template_data, template_context)
 	local current_stamina_fraction = template_data.stamina_read_component.current_fraction
 	local buff_template = template_context.template
 	local override_data = template_context.template_override_data
-	local condtional_threshold = override_data.condtional_threshold or buff_template.condtional_threshold or 0
+	local conditional_threshold = override_data.conditional_threshold or buff_template.conditional_threshold or 0
 
-	return current_stamina_fraction >= condtional_threshold
+	return current_stamina_fraction >= conditional_threshold
 end
 
 function ConditionalFunctions.is_reloading(template_data, template_context)

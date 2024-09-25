@@ -150,7 +150,7 @@ LuggableSynchronizer.component_data = {
 	automatic_start_on_level_spawned = {
 		ui_type = "check_box",
 		value = false,
-		ui_name = "Auto Start On Level Spawned",
+		ui_name = "Automatic Start On Mission Start",
 		category = "Side Mission"
 	},
 	inputs = {

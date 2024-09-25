@@ -250,6 +250,14 @@ local RENDER_TEMPLATES = {
 				validation_function = function (value)
 					return value == 1
 				end
+			},
+			{
+				id = "ffx_frame_gen",
+				reason = "loc_disable_rule_dlss_g_reflex",
+				disable_value = 0,
+				validation_function = function (value)
+					return value == 1
+				end
 			}
 		}
 	},
@@ -393,11 +401,11 @@ local RENDER_TEMPLATES = {
 	},
 	{
 		id = "fsr2",
-		display_name = "loc_setting_fsr2",
+		display_name = "loc_setting_fsr3",
 		require_apply = true,
 		default_value = 0,
 		apply_on_startup = true,
-		tooltip_text = "loc_setting_fsr2_mouseover",
+		tooltip_text = "loc_setting_fsr3_mouseover",
 		save_location = "master_render_settings",
 		options = {
 			{
@@ -478,6 +486,23 @@ local RENDER_TEMPLATES = {
 						dlss = 0
 					}
 				}
+			},
+			{
+				id = 5,
+				display_name = "loc_setting_fsr2_native_quality",
+				require_apply = true,
+				require_restart = false,
+				values = {
+					render_settings = {
+						upscaling_quality = "native",
+						fsr2_enabled = true
+					},
+					master_render_settings = {
+						xess = 0,
+						fsr = 0,
+						dlss = 0
+					}
+				}
 			}
 		},
 		disable_rules = {
@@ -487,6 +512,63 @@ local RENDER_TEMPLATES = {
 				disable_value = 0,
 				validation_function = function (value)
 					return value > 0
+				end
+			},
+			{
+				id = "dlss",
+				reason = "loc_disable_rule_dlss",
+				disable_value = 0,
+				validation_function = function (value)
+					return value == 1
+				end
+			}
+		}
+	},
+	{
+		display_name = "loc_setting_ffx_frame_gen",
+		require_apply = true,
+		default_value = 0,
+		apply_on_startup = true,
+		id = "ffx_frame_gen",
+		tooltip_text = "loc_setting_ffx_frame_gen_mouseover",
+		save_location = "master_render_settings",
+		validation_function = function ()
+			return Application.render_caps("ffx_frame_gen_supported")
+		end,
+		options = {
+			{
+				id = 0,
+				require_restart = true,
+				display_name = "loc_rt_setting_off",
+				values = {
+					render_settings = {
+						ffx_swapchain = false,
+						ffx_frame_gen_enabled = false
+					}
+				}
+			},
+			{
+				id = 1,
+				require_restart = true,
+				display_name = "loc_rt_setting_on",
+				values = {
+					render_settings = {
+						ffx_swapchain = true,
+						ffx_frame_gen_enabled = true
+					},
+					master_render_settings = {
+						vsync = false
+					}
+				}
+			}
+		},
+		disable_rules = {
+			{
+				id = "dlss_g",
+				reason = "loc_disable_rule_ffx_frame_gen",
+				disable_value = 0,
+				validation_function = function (value)
+					return value == 1
 				end
 			}
 		}

@@ -3,6 +3,20 @@ local MasterItems = require("scripts/backend/master_items")
 local Promise = require("scripts/foundation/utilities/promise")
 local StoreService = class("StoreService")
 
+local function _get_local_player()
+	local local_player_id = 1
+
+	return Managers.player:local_player(local_player_id)
+end
+
+local function _current_character_id()
+	local player = _get_local_player()
+
+	return player:character_id()
+end
+
+StoreService.FEATURE_KEY = "premium_store_featured"
+
 function StoreService:init(backend_interface)
 	self._backend_interface = backend_interface
 
@@ -17,27 +31,37 @@ function StoreService:init(backend_interface)
 		diamantine = GameParameters.wallet_cap_diamantine,
 		aquilas = GameParameters.wallet_cap_aquilas
 	}
+	self._current_store_id = nil
+	self._store_cache = {}
 	self._wallet_caps_backend_updated = false
 end
 
 function StoreService:update_wallet_caps()
-	if Managers.backend:authenticated() then
-		local backend_interface = self._backend_interface
-
-		return backend_interface.wallet:get_currency_configuration():next(function (data)
-			if data then
-				for i = 1, #data do
-					local currency = data[i]
-
-					if self._wallet_caps[currency.name] and currency.cap then
-						self._wallet_caps[currency.name] = currency.cap
-					end
-				end
-
-				self._wallet_caps_backend_updated = true
-			end
-		end)
+	if not Managers.backend:authenticated() then
+		return
 	end
+
+	local backend_interface = self._backend_interface
+
+	return backend_interface.wallet:get_currency_configuration():next(function (data)
+		if not data then
+			return
+		end
+
+		local wallet_caps = self._wallet_caps
+
+		for i = 1, #data do
+			local currency = data[i]
+			local currency_name = currency.name
+			local currency_cap = currency.cap
+
+			if wallet_caps[currency_name] and currency_cap then
+				wallet_caps[currency_name] = currency_cap
+			end
+		end
+
+		self._wallet_caps_backend_updated = true
+	end)
 end
 
 function StoreService:verify_wallet_caps()
@@ -52,262 +76,176 @@ function StoreService:verify_wallet_caps()
 	return wallet_caps_promise
 end
 
-function StoreService:get_wallet_caps_backend_updated_status()
-	return self._wallet_caps_backend_updated
+function StoreService:reset()
+	local wallet_cache = self._wallets_cache
+
+	if wallet_cache then
+		wallet_cache:reset()
+	end
+
+	self._current_store_id = nil
+	self._store_cache = {}
 end
 
-function StoreService:reset()
-	if self._wallets_cache then
-		self._wallets_cache:reset()
+function StoreService:_get_store(function_name)
+	if not Managers.backend:authenticated() then
+		return
 	end
+
+	local store_interace = self._backend_interface.store
+
+	if not store_interace[function_name] then
+		Log.error("StoreService", "Attempting fetch undefined store '%s'", function_name)
+
+		return
+	end
+
+	local character_id = _current_character_id()
+	local time_since_launch = Application.time_since_launch()
+
+	return store_interace[function_name](store_interace, time_since_launch, character_id):catch(function (error)
+		Log.error("StoreService", "Error fetching '%s': %s", function_name, error)
+
+		return error
+	end)
 end
+
+function StoreService:_get_cached_store(cache_key, logging_function)
+	logging_function = logging_function or Log.info
+	local cache = self._store_cache
+	local cache_data = cache[cache_key]
+
+	if not cache_data then
+		logging_function("StoreService", "No cache for '%s'.", cache_key)
+
+		return
+	end
+
+	local cache_promise = cache_data.promise
+
+	if cache_promise:is_pending() then
+		logging_function("StoreService", "Use pending promise for '%s'.", cache_key)
+
+		return cache_promise
+	end
+
+	if not cache_promise:is_fulfilled() then
+		logging_function("StoreService", "Clearing cache for '%s'. Reason, not resolved.", cache_key)
+
+		cache[cache_key] = nil
+
+		return
+	end
+
+	local current_time = Managers.time:time("main")
+	local backend_time = Managers.backend:get_server_time(current_time)
+	local valid_to = cache_data.valid_to
+
+	if valid_to == nil or valid_to < backend_time then
+		logging_function("StoreService", "Clearing cache for '%s'. Reason, no longer valid: '%s' < '%s'.", cache_key, valid_to, backend_time)
+
+		cache[cache_key] = nil
+
+		return
+	end
+
+	logging_function("StoreService", "Use resolved promise for '%s'. '%s' >= '%s'.", cache_key, valid_to, backend_time)
+
+	return cache_promise
+end
+
+function StoreService:_get_archetype_store_catalogue(store_by_archetype, catalogue_name, event_name, archetype_name)
+	if not archetype_name then
+		local player = _get_local_player()
+		archetype_name = player:archetype_name()
+	end
+
+	local function_name = store_by_archetype[archetype_name]
+	local store_promise = self:_get_store(function_name)
+	store_promise = store_promise or Promise.rejected()
+	local full_promise = store_promise:next(function (store_front)
+		local offers, current_rotation_end = nil
+
+		if store_front then
+			local store_data = store_front.data
+			offers = store_data[catalogue_name]
+			current_rotation_end = store_data.currentRotationEnd
+		end
+
+		local event_manager = Managers.event
+
+		if event_name and event_manager then
+			event_manager:trigger(event_name)
+		end
+
+		return {
+			offers = offers or {},
+			current_rotation_end = current_rotation_end
+		}
+	end)
+
+	return full_promise:next(function (t)
+		return t and table.clone_instance(t)
+	end)
+end
+
+StoreService.credit_store_archetypes = {
+	veteran = "get_veteran_credits_store",
+	psyker = "get_psyker_credits_store",
+	zealot = "get_zealot_credits_store",
+	ogryn = "get_ogryn_credits_store"
+}
 
 function StoreService:get_credits_store(ignore_event_trigger)
-	if Managers.backend:authenticated() then
-		local backend_interface = self._backend_interface
-		local local_player_id = 1
-		local player = Managers.player:local_player(local_player_id)
-		local character_id = player:character_id()
-		local archetype_name = player:archetype_name()
-		local store_promise = nil
-		local time_since_launch = Application.time_since_launch()
-
-		if archetype_name == "veteran" then
-			store_promise = backend_interface.store:get_veteran_credits_store(time_since_launch, character_id)
-		elseif archetype_name == "zealot" then
-			store_promise = backend_interface.store:get_zealot_credits_store(time_since_launch, character_id)
-		elseif archetype_name == "psyker" then
-			store_promise = backend_interface.store:get_psyker_credits_store(time_since_launch, character_id)
-		elseif archetype_name == "ogryn" then
-			store_promise = backend_interface.store:get_ogryn_credits_store(time_since_launch, character_id)
-		end
-
-		return store_promise:catch(function (error)
-			Log.error("StoreService", "Error fetching credits store: %s", error)
-		end):next(function (store_catalogue)
-			local offers, current_rotation_end = nil
-
-			if store_catalogue then
-				local store_data = store_catalogue.data
-				offers = store_data.personal
-				current_rotation_end = store_data.currentRotationEnd
-			end
-
-			if not ignore_event_trigger then
-				local event_manager = Managers.event
-
-				if event_manager then
-					event_manager:trigger("event_credits_store_fetched")
-				end
-			end
-
-			return {
-				offers = offers or {},
-				current_rotation_end = current_rotation_end
-			}
-		end)
-	end
+	return self:_get_archetype_store_catalogue(StoreService.credit_store_archetypes, "personal", ignore_event_trigger ~= true and "event_credits_store_fetched" or nil, nil)
 end
+
+StoreService.credit_goods_store_archetypes = {
+	veteran = "get_veteran_credits_goods_store",
+	psyker = "get_psyker_credits_goods_store",
+	zealot = "get_zealot_credits_goods_store",
+	ogryn = "get_ogryn_credits_goods_store"
+}
 
 function StoreService:get_credits_goods_store(ignore_event_trigger)
-	if Managers.backend:authenticated() then
-		local backend_interface = self._backend_interface
-		local local_player_id = 1
-		local player = Managers.player:local_player(local_player_id)
-		local character_id = player:character_id()
-		local archetype_name = player:archetype_name()
-		local store_promise = nil
-		local time_since_launch = Application.time_since_launch()
-
-		if archetype_name == "veteran" then
-			store_promise = backend_interface.store:get_veteran_credits_goods_store(time_since_launch, character_id)
-		elseif archetype_name == "zealot" then
-			store_promise = backend_interface.store:get_zealot_credits_goods_store(time_since_launch, character_id)
-		elseif archetype_name == "psyker" then
-			store_promise = backend_interface.store:get_psyker_credits_goods_store(time_since_launch, character_id)
-		elseif archetype_name == "ogryn" then
-			store_promise = backend_interface.store:get_ogryn_credits_goods_store(time_since_launch, character_id)
-		end
-
-		return store_promise:catch(function (error)
-			Log.error("StoreService", "Error fetching credits store: %s", error)
-		end):next(function (store_catalogue)
-			local offers, current_rotation_end = nil
-
-			if store_catalogue then
-				local store_data = store_catalogue.data
-				offers = store_data.public
-				current_rotation_end = store_data.currentRotationEnd
-			end
-
-			if not ignore_event_trigger then
-				local event_manager = Managers.event
-
-				if event_manager then
-					event_manager:trigger("event_credits_store_fetched")
-				end
-			end
-
-			return {
-				offers = offers or {},
-				current_rotation_end = current_rotation_end
-			}
-		end)
-	end
+	return self:_get_archetype_store_catalogue(StoreService.credit_goods_store_archetypes, "public", ignore_event_trigger ~= true and "event_credits_store_fetched" or nil, nil)
 end
+
+StoreService.credit_cosmetics_store_archetypes = {
+	veteran = "get_veteran_credits_cosmetics_store",
+	psyker = "get_psyker_credits_cosmetics_store",
+	zealot = "get_zealot_credits_cosmetics_store",
+	ogryn = "get_ogryn_credits_cosmetics_store"
+}
 
 function StoreService:get_credits_cosmetics_store(archetype_name)
-	if Managers.backend:authenticated() then
-		local backend_interface = self._backend_interface
-		local local_player_id = 1
-		local player = Managers.player:local_player(local_player_id)
-		local character_id = player:character_id()
-		archetype_name = archetype_name or player:archetype_name()
-		local store_promise = nil
-		local time_since_launch = Application.time_since_launch()
-
-		if archetype_name == "veteran" then
-			store_promise = backend_interface.store:get_veteran_credits_cosmetics_store(time_since_launch, character_id)
-		elseif archetype_name == "zealot" then
-			store_promise = backend_interface.store:get_zealot_credits_cosmetics_store(time_since_launch, character_id)
-		elseif archetype_name == "psyker" then
-			store_promise = backend_interface.store:get_psyker_credits_cosmetics_store(time_since_launch, character_id)
-		elseif archetype_name == "ogryn" then
-			store_promise = backend_interface.store:get_ogryn_credits_cosmetics_store(time_since_launch, character_id)
-		end
-
-		return store_promise:catch(function (error)
-			Log.error("StoreService", "Error fetching credits cosmetics store: %s", error)
-		end):next(function (store_catalogue)
-			local offers, current_rotation_end = nil
-
-			if store_catalogue then
-				local store_data = store_catalogue.data
-				offers = store_data.public
-				current_rotation_end = store_data.currentRotationEnd
-			end
-
-			return {
-				offers = offers or {},
-				current_rotation_end = current_rotation_end
-			}
-		end)
-	end
+	return self:_get_archetype_store_catalogue(StoreService.credit_cosmetics_store_archetypes, "public", nil, archetype_name)
 end
+
+StoreService.credit_weapon_cosmetics_store_archetypes = {
+	veteran = "get_veteran_credits_weapon_cosmetics_store",
+	psyker = "get_psyker_credits_weapon_cosmetics_store",
+	zealot = "get_zealot_credits_weapon_cosmetics_store",
+	ogryn = "get_ogryn_credits_weapon_cosmetics_store"
+}
 
 function StoreService:get_credits_weapon_cosmetics_store(archetype_name)
-	if Managers.backend:authenticated() then
-		local backend_interface = self._backend_interface
-		local local_player_id = 1
-		local player = Managers.player:local_player(local_player_id)
-		local character_id = player:character_id()
-		archetype_name = archetype_name or player:archetype_name()
-		local store_promise = nil
-		local time_since_launch = Application.time_since_launch()
-
-		if archetype_name == "veteran" then
-			store_promise = backend_interface.store:get_veteran_credits_weapon_cosmetics_store(time_since_launch, character_id)
-		elseif archetype_name == "zealot" then
-			store_promise = backend_interface.store:get_zealot_credits_weapon_cosmetics_store(time_since_launch, character_id)
-		elseif archetype_name == "psyker" then
-			store_promise = backend_interface.store:get_psyker_credits_weapon_cosmetics_store(time_since_launch, character_id)
-		elseif archetype_name == "ogryn" then
-			store_promise = backend_interface.store:get_ogryn_credits_weapon_cosmetics_store(time_since_launch, character_id)
-		end
-
-		return store_promise:catch(function (error)
-			Log.error("StoreService", "Error fetching credits cosmetics store: %s", error)
-		end):next(function (store_catalogue)
-			local offers, current_rotation_end = nil
-
-			if store_catalogue then
-				local store_data = store_catalogue.data
-				offers = store_data.public
-				current_rotation_end = store_data.currentRotationEnd
-			end
-
-			return {
-				offers = offers or {},
-				current_rotation_end = current_rotation_end
-			}
-		end)
-	end
+	return self:_get_archetype_store_catalogue(StoreService.credit_weapon_cosmetics_store_archetypes, "public", nil, archetype_name)
 end
 
+StoreService.mark_store_archetypes = {
+	veteran = "get_veteran_marks_store",
+	psyker = "get_psyker_marks_store",
+	zealot = "get_zealot_marks_store",
+	ogryn = "get_ogryn_marks_store"
+}
+
 function StoreService:get_marks_store()
-	if Managers.backend:authenticated() then
-		local backend_interface = self._backend_interface
-		local local_player_id = 1
-		local player = Managers.player:local_player(local_player_id)
-		local character_id = player:character_id()
-		local archetype_name = player:archetype_name()
-		local store_promise = nil
-		local time_since_launch = Application.time_since_launch()
-
-		if archetype_name == "veteran" then
-			store_promise = backend_interface.store:get_veteran_marks_store(time_since_launch, character_id)
-		elseif archetype_name == "zealot" then
-			store_promise = backend_interface.store:get_zealot_marks_store(time_since_launch, character_id)
-		elseif archetype_name == "psyker" then
-			store_promise = backend_interface.store:get_psyker_marks_store(time_since_launch, character_id)
-		elseif archetype_name == "ogryn" then
-			store_promise = backend_interface.store:get_ogryn_marks_store(time_since_launch, character_id)
-		end
-
-		return store_promise:catch(function (error)
-			Log.error("StoreService", "Error fetching marks store: %s", error)
-		end):next(function (store_catalogue)
-			local offers, current_rotation_end = nil
-
-			if store_catalogue then
-				local store_data = store_catalogue.data
-				offers = store_data.public_filtered
-			end
-
-			return {
-				offers = offers or {}
-			}
-		end)
-	end
+	return self:_get_archetype_store_catalogue(StoreService.mark_store_archetypes, "public_filtered", nil, nil)
 end
 
 function StoreService:get_marks_store_temporary()
-	if Managers.backend:authenticated() then
-		local backend_interface = self._backend_interface
-		local local_player_id = 1
-		local player = Managers.player:local_player(local_player_id)
-		local character_id = player:character_id()
-		local archetype_name = player:archetype_name()
-		local store_promise = nil
-		local time_since_launch = Application.time_since_launch()
-
-		if archetype_name == "veteran" then
-			store_promise = backend_interface.store:get_veteran_marks_store(time_since_launch, character_id)
-		elseif archetype_name == "zealot" then
-			store_promise = backend_interface.store:get_zealot_marks_store(time_since_launch, character_id)
-		elseif archetype_name == "psyker" then
-			store_promise = backend_interface.store:get_psyker_marks_store(time_since_launch, character_id)
-		elseif archetype_name == "ogryn" then
-			store_promise = backend_interface.store:get_ogryn_marks_store(time_since_launch, character_id)
-		end
-
-		return store_promise:catch(function (error)
-			Log.error("StoreService", "Error fetching credits store: %s", error)
-		end):next(function (store_catalogue)
-			local offers, current_rotation_end = nil
-
-			if store_catalogue then
-				local store_data = store_catalogue.data
-				offers = store_data.personal
-				current_rotation_end = store_data.currentRotationEnd
-			end
-
-			return {
-				offers = offers or {},
-				current_rotation_end = current_rotation_end
-			}
-		end)
-	end
+	return self:_get_archetype_store_catalogue(StoreService.mark_store_archetypes, "personal", nil, nil)
 end
 
 local function _purchased_item_to_gear(item)
@@ -319,6 +257,29 @@ local function _purchased_item_to_gear(item)
 	gear.gear_id = nil
 
 	return gear_id, gear
+end
+
+function StoreService:_decorate_item_purchase_promise(purchase_promise)
+	return purchase_promise:next(function (result)
+		Log.info("StoreService", "purchase_item done")
+
+		local items = result.items
+
+		for i = 1, #items do
+			local gear_id, gear = _purchased_item_to_gear(items[i])
+
+			Managers.data_service.gear:on_gear_created(gear_id, gear)
+			Managers.data_service.crafting:on_gear_created(gear_id, gear)
+		end
+
+		return result
+	end):catch(function (error)
+		Log.error("StoreService", "Error purchase_item: %s", error)
+		self:invalidate_wallets_cache()
+		Managers.data_service.gear:invalidate_gear_cache()
+
+		return Promise.rejected(error)
+	end)
 end
 
 function StoreService:purchase_item(offer)
@@ -333,53 +294,19 @@ function StoreService:purchase_item(offer)
 		wallet_promise = self:account_wallets()
 	end
 
-	return wallet_promise:next(function (data)
+	local purchase_promise = wallet_promise:next(function (data)
 		local wallet = data:by_type(wallet_type)
 
 		return offer:make_purchase(wallet)
-	end):next(function (result)
-		Log.info("StoreService", "purchase_item done")
-
-		local items = result.items
-
-		for i = 1, #items do
-			local gear_id, gear = _purchased_item_to_gear(items[i])
-
-			Managers.data_service.gear:on_gear_created(gear_id, gear)
-			Managers.data_service.crafting:on_gear_created(gear_id, gear)
-		end
-
-		return result
-	end):catch(function (error)
-		Log.error("StoreService", "Error purchase_item: %s", error)
-		self:invalidate_wallets_cache()
-		Managers.data_service.gear:invalidate_gear_cache()
-
-		return Promise.rejected(error)
 	end)
+
+	return self:_decorate_item_purchase_promise(purchase_promise)
 end
 
 function StoreService:purchase_item_with_wallet(offer, wallet)
-	return offer:make_purchase(wallet):next(function (result)
-		Log.info("StoreService", "purchase_item done")
+	local purchase_promise = offer:make_purchase(wallet)
 
-		local items = result.items
-
-		for i = 1, #items do
-			local gear_id, gear = _purchased_item_to_gear(items[i])
-
-			Managers.data_service.gear:on_gear_created(gear_id, gear)
-			Managers.data_service.crafting:on_gear_created(gear_id, gear)
-		end
-
-		return result
-	end):catch(function (error)
-		Log.error("StoreService", "Error purchase_item: %s", error)
-		self:invalidate_wallets_cache()
-		Managers.data_service.gear:invalidate_gear_cache()
-
-		return Promise.rejected(error)
-	end)
+	return self:_decorate_item_purchase_promise(purchase_promise)
 end
 
 function StoreService:purchase_currency(offer)
@@ -406,21 +333,31 @@ function StoreService:purchase_currency(offer)
 	end)
 end
 
-function StoreService:_decorate_wallets(wallets)
-	local wallets = {
-		wallets = wallets,
-		by_type = function (self, wallet_type)
-			for _, v in ipairs(self.wallets) do
-				if v.balance.type == wallet_type then
-					return v
-				end
-			end
+local function _find_wallet_in_array(array, wallet_type)
+	local array_size = array and #array or 0
 
-			return nil
+	for i = 1, array_size do
+		local wallet = array[i]
+
+		if wallet.balance.type == wallet_type then
+			return wallet
 		end
+	end
+end
+
+local function _get_wallet_by_type(self, wallet_type)
+	local wallets = self.wallets
+
+	return _find_wallet_in_array(wallets, wallet_type)
+end
+
+function StoreService:_decorate_wallets(wallets)
+	local decorated_wallets = {
+		wallets = wallets,
+		by_type = _get_wallet_by_type
 	}
 
-	return wallets
+	return decorated_wallets
 end
 
 function StoreService:combined_wallets()
@@ -441,59 +378,47 @@ function StoreService:combined_wallets()
 	end)
 end
 
-function StoreService:account_wallets(skip_decoration)
+function StoreService:_get_wallet(skip_decoration, cache_name, promise_function)
 	local wallets_promise = nil
+	local wallets_cache = self._wallets_cache
 
-	if self._wallets_cache then
-		wallets_promise = self._wallets_cache:get_data("__account", function ()
-			return self._backend_interface.wallet:account_wallets()
-		end)
+	if wallets_cache then
+		wallets_promise = wallets_cache:get_data(cache_name, promise_function)
 	else
-		wallets_promise = self._backend_interface.wallet:account_wallets()
+		wallets_promise = promise_function()
 	end
 
-	if skip_decoration then
-		return wallets_promise
-	else
-		return wallets_promise:next(function (wallets)
+	if not skip_decoration then
+		wallets_promise = wallets_promise:next(function (wallets)
 			return self:_decorate_wallets(wallets)
 		end)
 	end
+
+	return wallets_promise
 end
 
-local function _current_character_id()
-	local local_player_id = 1
-	local player = Managers.player:local_player(local_player_id)
-	local character_id = player:character_id()
-
-	return character_id
+function StoreService:account_wallets(skip_decoration)
+	return self:_get_wallet(skip_decoration, "__account", function ()
+		return self._backend_interface.wallet:account_wallets()
+	end)
 end
 
 function StoreService:character_wallets(skip_decoration)
 	local character_id = _current_character_id()
-	local wallets_promise = nil
 
-	if self._wallets_cache then
-		wallets_promise = self._wallets_cache:get_data(character_id, function ()
-			return self._backend_interface.wallet:character_wallets(character_id)
-		end)
-	else
-		wallets_promise = self._backend_interface.wallet:character_wallets(character_id)
-	end
-
-	if skip_decoration then
-		return wallets_promise
-	else
-		return wallets_promise:next(function (wallets)
-			return self:_decorate_wallets(wallets)
-		end)
-	end
+	return self:_get_wallet(skip_decoration, character_id, function ()
+		return self._backend_interface.wallet:character_wallets(character_id)
+	end)
 end
 
 function StoreService:invalidate_wallets_cache()
-	if self._wallets_cache then
-		self._wallets_cache:invalidate()
+	local wallets_cache = self._wallets_cache
+
+	if not wallets_cache then
+		return
 	end
+
+	wallets_cache:invalidate()
 end
 
 function StoreService:_find_cached_wallet_by_type(wallet_type)
@@ -503,72 +428,55 @@ function StoreService:_find_cached_wallet_by_type(wallet_type)
 		return nil
 	end
 
-	local account_wallets = wallets_cache:cached_data_by_key("__account")
-
-	if account_wallets then
-		for i = 1, #account_wallets do
-			local wallet = account_wallets[i]
-
-			if wallet.balance.type == wallet_type then
-				return wallet
-			end
-		end
-	end
-
+	local wallet = _find_wallet_in_array(wallets_cache:cached_data_by_key("__account"), wallet_type)
 	local character_id = _current_character_id()
-	local character_wallets = wallets_cache:cached_data_by_key(character_id)
+	wallet = wallet or _find_wallet_in_array(wallets_cache:cached_data_by_key(character_id), wallet_type)
 
-	if character_wallets then
-		for i = 1, #character_wallets do
-			local wallet = character_wallets[i]
-
-			if wallet.balance.type == wallet_type then
-				return wallet
-			end
-		end
-	end
+	return wallet
 end
 
 function StoreService:_change_cached_wallet_balance(wallet_type, change_amount, increment_transaction_id, log_prefix)
 	local cached_wallet = self:_find_cached_wallet_by_type(wallet_type)
 
-	if cached_wallet then
-		local old_amount = cached_wallet.balance.amount
-		local new_amount = old_amount + change_amount
-		local cap = self._wallet_caps[wallet_type] or math.huge
-		local capped = false
+	if not cached_wallet then
+		return
+	end
 
-		if cap < new_amount then
-			new_amount = cap
-			capped = true
-		end
+	local old_amount = cached_wallet.balance.amount
+	local new_amount = old_amount + change_amount
+	local cap = self._wallet_caps[wallet_type] or math.huge
+	local capped = false
 
-		cached_wallet.balance.amount = new_amount
+	if cap < new_amount then
+		new_amount = cap
+		capped = true
+	end
 
-		if increment_transaction_id then
-			cached_wallet.lastTransactionId = (cached_wallet.lastTransactionId or 0) + 1
-		end
+	cached_wallet.balance.amount = new_amount
+
+	if increment_transaction_id then
+		cached_wallet.lastTransactionId = (cached_wallet.lastTransactionId or 0) + 1
 	end
 end
 
 function StoreService:on_gear_deleted(backend_result)
 	local rewards = backend_result and backend_result.rewards
 
-	if rewards then
-		return self:verify_wallet_caps():next(function ()
-			for i = 1, #rewards do
-				local reward = rewards[i]
-				local reward_type = reward.type
-				local reward_amount = reward.amount
-
-				self:_change_cached_wallet_balance(reward_type, reward_amount, true, "on_gear_deleted")
-
-				return backend_result
-			end
-		end)
-	else
+	if not rewards then
 		return Promise.resolved(backend_result)
 	end
+
+	return self:verify_wallet_caps():next(function ()
+		for i = 1, #rewards do
+			local reward = rewards[i]
+			local reward_type = reward.type
+			local reward_amount = reward.amount
+
+			self:_change_cached_wallet_balance(reward_type, reward_amount, true, "on_gear_deleted")
+
+			return backend_result
+		end
+	end)
 end
 
 function StoreService:on_character_operation(operation_cost)
@@ -583,6 +491,8 @@ end
 function StoreService:on_contract_task_rerolled(reroll_cost)
 	local cost_type = reroll_cost.type
 	local cost_amount = reroll_cost.amount
+
+	Managers.event:trigger("reroll_contracts")
 
 	return self:verify_wallet_caps():next(function ()
 		self:_change_cached_wallet_balance(cost_type, -cost_amount, true, "on_contract_task_rerolled")
@@ -613,34 +523,34 @@ end
 function StoreService:on_contract_completed(backend_result)
 	local reward = backend_result and backend_result.reward
 
-	if reward then
-		local reward_type = reward.type
-		local reward_amount = reward.amount
-
-		return self:verify_wallet_caps():next(function ()
-			self:_change_cached_wallet_balance(reward_type, reward_amount, true, "on_contract_completed")
-		end)
-	else
+	if not reward then
 		return Promise.resolved()
 	end
+
+	local reward_type = reward.type
+	local reward_amount = reward.amount
+
+	return self:verify_wallet_caps():next(function ()
+		self:_change_cached_wallet_balance(reward_type, reward_amount, true, "on_contract_completed")
+	end)
 end
 
 function StoreService:on_crafting_done(costs)
-	if costs then
-		return self:verify_wallet_caps():next(function ()
-			for i = 1, #costs do
-				local cost = costs[i]
-				local cost_type = cost.type
-				local cost_amount = cost.amount
-
-				if cost_amount ~= 0 then
-					self:_change_cached_wallet_balance(cost_type, -cost_amount, true, "on_crafting_done")
-				end
-			end
-		end)
-	else
+	if not costs then
 		return Promise.resolved()
 	end
+
+	return self:verify_wallet_caps():next(function ()
+		for i = 1, #costs do
+			local cost = costs[i]
+			local cost_type = cost.type
+			local cost_amount = cost.amount
+
+			if cost_amount ~= 0 then
+				self:_change_cached_wallet_balance(cost_type, -cost_amount, true, "on_crafting_done")
+			end
+		end
+	end)
 end
 
 function StoreService:get_premium_store(storefront_key)
@@ -650,38 +560,88 @@ function StoreService:get_premium_store(storefront_key)
 		end)
 	end
 
-	local local_player_id = 1
-	local player = Managers.player:local_player(local_player_id)
-	local character_id = player:character_id()
-	local time_since_launch = Application.time_since_launch()
-	local promise = Managers.backend.interfaces.store:get_premium_storefront(storefront_key, time_since_launch, character_id)
+	local cache_key = storefront_key
+	local cached_promise = self:_get_cached_store(cache_key)
 
-	return promise:catch(function (error)
-		Log.error("StoreService", "Failed to fetch premium storefront %s %s", storefront_key, error)
-	end):next(function (store_catalogue)
-		local offers, current_rotation_end, layout_config, decorate_offer, catalog_validity, bundle_rules = nil
+	if cached_promise then
+		return cached_promise:next(function (t)
+			return t and table.clone_instance(t)
+		end)
+	end
+
+	local store_cache = self._store_cache
+	store_cache[cache_key] = {}
+
+	if StoreService:is_featured_store(storefront_key) then
+		self._current_store_id = nil
+	end
+
+	local time_since_launch = Application.time_since_launch()
+	store_cache[cache_key].promise = Managers.backend.interfaces.store:get_premium_storefront(storefront_key, time_since_launch):next(function (store_catalogue)
+		local id, offers, current_rotation_end, layout_config, catalog_validity, bundle_rules = nil
 
 		if store_catalogue then
 			local store_data = store_catalogue.data
+			current_rotation_end = store_data and store_data.currentRotationEnd
 			offers = store_catalogue.public_filtered
 			layout_config = store_catalogue.layout_config
-			current_rotation_end = store_data and store_data.currentRotationEnd
-			decorate_offer = store_catalogue.decorate_offer
 			catalog_validity = store_catalogue.catalog
 			bundle_rules = store_catalogue.bundle_rules
+			id = store_catalogue.id
+		end
+
+		local store_front = store_catalogue.storefront
+
+		store_front:set_interaction_callback(callback(self, "invalidate_store_cache", cache_key))
+
+		store_cache[cache_key].valid_to = store_front:cache_until("public_filtered")
+
+		if StoreService:is_featured_store(storefront_key) then
+			self._current_store_id = id
 		end
 
 		return {
+			id = id,
 			offers = offers or {},
 			layout_config = layout_config or {},
 			current_rotation_end = current_rotation_end,
-			decorate_offer = decorate_offer and function (self, test, is_personal)
-				decorate_offer(store_catalogue.storefront, test, is_personal)
-			end or nil,
 			catalog_validity = catalog_validity,
 			bundle_rules = bundle_rules
 		}
+	end):catch(function (error)
+		Log.error("StoreService", "Failed to fetch premium storefront %s %s", storefront_key, error)
 	end)
+
+	return store_cache[cache_key].promise:next(function (t)
+		return t and table.clone_instance(t)
+	end)
+end
+
+function StoreService:is_featured_store(key)
+	return key == StoreService.FEATURE_KEY
+end
+
+local function nop()
+	return
+end
+
+function StoreService:has_new_feature_store()
+	if not self:_get_cached_store(StoreService.FEATURE_KEY, nop) then
+		self:get_premium_store(StoreService.FEATURE_KEY)
+	end
+
+	local current_store_id = self._current_store_id
+	local saved_store_id = Managers.save:account_data().last_seen_store_id
+
+	return current_store_id and current_store_id ~= saved_store_id
+end
+
+function StoreService:invalidate_store_cache(cache_key, store_front, reason, offer)
+	if offer and not offer:is_personal() then
+		return
+	end
+
+	self._store_cache[cache_key] = nil
 end
 
 return StoreService

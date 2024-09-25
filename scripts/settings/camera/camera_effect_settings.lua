@@ -1329,6 +1329,30 @@ local CameraEffectSettings = {
 			duration = 0.5,
 			fade_in = 0,
 			octaves = 6
+		},
+		train_onboard = {
+			persistance = 0.5,
+			fade_out = 2,
+			amplitude = 0.68,
+			duration = 5000,
+			fade_in = 2,
+			octaves = 12
+		},
+		train_onboard_bump = {
+			persistance = 0.8,
+			fade_out = 1,
+			amplitude = 0.4,
+			duration = 0.3,
+			fade_in = 1,
+			octaves = 6
+		},
+		train_brakes = {
+			persistance = 1,
+			fade_out = 0.7,
+			amplitude = 0.5,
+			duration = 4,
+			fade_in = 0.2,
+			octaves = 6
 		}
 	}
 }

@@ -76,6 +76,7 @@ function VendorInteractionViewBase:on_enter()
 
 	self:_set_intro_texts(intro_texts)
 
+	self._hide_option_buttons = self._base_definitions.hide_option_buttons
 	local starting_option_index = self._base_definitions.starting_option_index
 
 	if starting_option_index then
@@ -84,6 +85,13 @@ function VendorInteractionViewBase:on_enter()
 		if option then
 			self:on_option_button_pressed(starting_option_index, option)
 		end
+	end
+
+	if self._hide_option_buttons then
+		local widgets_by_name = self._widgets_by_name
+		widgets_by_name.title_text.visible = false
+		widgets_by_name.description_text.visible = false
+		widgets_by_name.button_divider.visible = false
 	end
 end
 
@@ -385,7 +393,7 @@ function VendorInteractionViewBase:_draw_widgets(dt, t, input_service, ui_render
 
 	local button_widgets = self._button_widgets
 
-	if button_widgets then
+	if button_widgets and not self._hide_option_buttons then
 		local num_widgets = #button_widgets
 
 		for i = 1, num_widgets do

@@ -25,6 +25,7 @@ function GameplayInitStepGameMode:update(main_dt, main_t)
 		return
 	end
 
+	self._shared_state.initialized_steps.GameplayInitStepGameMode = true
 	local next_step_params = {
 		shared_state = self._shared_state
 	}

@@ -107,6 +107,9 @@ local DialogueSettings = {
 		},
 		core_research = {
 			"mission_vo_core_research"
+		},
+		op_train = {
+			"mission_vo_op_train"
 		}
 	},
 	player_load_files = {

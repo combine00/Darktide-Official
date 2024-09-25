@@ -450,7 +450,7 @@ function ConstantElementNotificationFeed:_generate_notification_data(message_typ
 			rarity_color = table.clone(rarity_color)
 			texts = {
 				{
-					display_name = ItemUtils.display_name(visual_item),
+					display_name = (item_type == "WEAPON_MELEE" or item_type == "WEAPON_RANGED") and string.format("%s • %s", ItemUtils.weapon_card_display_name(visual_item), ItemUtils.weapon_card_sub_display_name(visual_item)) or ItemUtils.display_name(visual_item),
 					color = rarity_color
 				},
 				{
@@ -922,7 +922,7 @@ function ConstantElementNotificationFeed:_generate_notification_data(message_typ
 			rarity_color = table.clone(rarity_color)
 			texts = {
 				{
-					display_name = ItemUtils.display_name(visual_item),
+					display_name = (item_type == "WEAPON_MELEE" or item_type == "WEAPON_RANGED") and string.format("%s • %s", ItemUtils.weapon_card_display_name(visual_item), ItemUtils.weapon_card_sub_display_name(visual_item)) or ItemUtils.display_name(visual_item),
 					color = rarity_color
 				},
 				{
@@ -1041,7 +1041,6 @@ end
 
 function ConstantElementNotificationFeed:_can_show_assist_notification()
 	return self._assist_notifications_enabled
-	return true
 end
 
 function ConstantElementNotificationFeed:_add_notification_message(message_type, data, callback, sound_event, done_callback)

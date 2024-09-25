@@ -75,6 +75,7 @@ function DialogueExtension:init(extension_init_context, unit, extension_init_dat
 		is_disabled_override = false,
 		class_name = "none",
 		is_consumed = "false",
+		is_grabbed = "false",
 		is_mutant_charged = "false",
 		voice_template = "none",
 		is_player = false,

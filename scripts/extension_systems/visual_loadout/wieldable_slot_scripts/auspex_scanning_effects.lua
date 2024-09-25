@@ -2,6 +2,7 @@ local Action = require("scripts/utilities/weapon/action")
 local Component = require("scripts/utilities/component")
 local PlayerUnitData = require("scripts/extension_systems/unit_data/utilities/player_unit_data")
 local Scanning = require("scripts/utilities/scanning")
+local WieldableSlotScriptInterface = require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/wieldable_slot_script_interface")
 local FX_SOURCE_NAME = "_speaker"
 local WWISE_PARAMETER_NAME_DISTANCE = "scanner_distance"
 local WWISE_PARAMETER_NAME_ANGLE = "scanner_orientation"
@@ -467,5 +468,7 @@ function AuspexScanningEffects:_set_screen_active(enabled)
 		Material.set_scalar(self._screen_material_3p, EMISSIVE_SCREEN_MATERIAL_VARIABLE_NAME, emissive_value)
 	end
 end
+
+implements(AuspexScanningEffects, WieldableSlotScriptInterface)
 
 return AuspexScanningEffects

@@ -1,5 +1,167 @@
 return function ()
 	define_rule({
+		name = "chaos_armored_infected_alerted_idle",
+		category = "enemy_vo_prio_1",
+		wwise_route = 20,
+		response = "chaos_armored_infected_alerted_idle",
+		database = "enemy_vo",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"generic_enemy_vo_event"
+			},
+			{
+				"query_context",
+				"trigger_id",
+				OP.EQ,
+				"alerted_idle"
+			},
+			{
+				"query_context",
+				"enemy_tag",
+				OP.EQ,
+				"chaos_armored_infected"
+			},
+			{
+				"user_memory",
+				"chaos_armored_infected_alerted_idle",
+				OP.TIMEDIFF,
+				OP.GT,
+				10
+			},
+			{
+				"faction_memory",
+				"chaos_armored_infected_alerted_idle",
+				OP.TIMEDIFF,
+				OP.GT,
+				5
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"chaos_armored_infected_alerted_idle",
+				OP.TIMESET
+			},
+			{
+				"faction_memory",
+				"chaos_armored_infected_alerted_idle",
+				OP.TIMESET
+			}
+		}
+	})
+	define_rule({
+		name = "chaos_armored_infected_assault",
+		category = "enemy_vo_prio_1",
+		wwise_route = 43,
+		response = "chaos_armored_infected_assault",
+		database = "enemy_vo",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"generic_enemy_vo_event"
+			},
+			{
+				"query_context",
+				"trigger_id",
+				OP.EQ,
+				"assault"
+			},
+			{
+				"query_context",
+				"enemy_tag",
+				OP.EQ,
+				"chaos_armored_infected"
+			},
+			{
+				"user_memory",
+				"chaos_armored_infected_assault",
+				OP.TIMEDIFF,
+				OP.GT,
+				8
+			},
+			{
+				"faction_memory",
+				"chaos_armored_infected_assault",
+				OP.TIMEDIFF,
+				OP.GT,
+				4
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"chaos_armored_infected_assault",
+				OP.TIMESET
+			},
+			{
+				"faction_memory",
+				"chaos_armored_infected_assault",
+				OP.TIMESET
+			}
+		}
+	})
+	define_rule({
+		name = "chaos_armored_infected_melee_idle",
+		category = "enemy_vo_prio_1",
+		wwise_route = 20,
+		response = "chaos_armored_infected_melee_idle",
+		database = "enemy_vo",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"generic_enemy_vo_event"
+			},
+			{
+				"query_context",
+				"trigger_id",
+				OP.EQ,
+				"melee_idle"
+			},
+			{
+				"query_context",
+				"enemy_tag",
+				OP.EQ,
+				"chaos_armored_infected"
+			},
+			{
+				"user_memory",
+				"chaos_armored_infected_melee_idle",
+				OP.TIMEDIFF,
+				OP.GT,
+				10
+			},
+			{
+				"faction_memory",
+				"chaos_armored_infected_melee_idle",
+				OP.TIMEDIFF,
+				OP.GT,
+				5
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"chaos_armored_infected_melee_idle",
+				OP.TIMESET
+			},
+			{
+				"faction_memory",
+				"chaos_armored_infected_melee_idle",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "disabled"
+		}
+	})
+	define_rule({
 		name = "chaos_daemonhost_aggro",
 		category = "enemy_vo_prio_0",
 		wwise_route = 15,
@@ -836,6 +998,198 @@ return function ()
 				"faction_memory",
 				"faction_memory_ogryn_start_shooting",
 				OP.TIMESET
+			}
+		}
+	})
+	define_rule({
+		name = "cultist_captain_long_death",
+		category = "enemy_vo_prio_0",
+		wwise_route = 55,
+		response = "cultist_captain_long_death",
+		database = "enemy_vo",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"generic_enemy_vo_event"
+			},
+			{
+				"query_context",
+				"trigger_id",
+				OP.EQ,
+				"long_death"
+			},
+			{
+				"query_context",
+				"enemy_tag",
+				OP.EQ,
+				"cultist_captain"
+			},
+			{
+				"user_memory",
+				"enemy_memory_cultist_captain_long_death",
+				OP.TIMEDIFF,
+				OP.GT,
+				5
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"enemy_memory_cultist_captain_long_death",
+				OP.TIMESET
+			}
+		}
+	})
+	define_rule({
+		name = "cultist_captain_reinforcements",
+		category = "enemy_vo_prio_0",
+		wwise_route = 7,
+		response = "cultist_captain_reinforcements",
+		database = "enemy_vo",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"generic_enemy_vo_event"
+			},
+			{
+				"query_context",
+				"trigger_id",
+				OP.EQ,
+				"reinforcements"
+			},
+			{
+				"query_context",
+				"enemy_tag",
+				OP.EQ,
+				"cultist_captain"
+			},
+			{
+				"user_memory",
+				"enemy_memory_cultist_captain_reinforcements",
+				OP.TIMEDIFF,
+				OP.GT,
+				25
+			},
+			{
+				"user_memory",
+				"enemy_memory_cultist_captain_taunt_combat",
+				OP.TIMEDIFF,
+				OP.GT,
+				1
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"enemy_memory_cultist_captain_reinforcements",
+				OP.TIMESET
+			}
+		}
+	})
+	define_rule({
+		name = "cultist_captain_taunt",
+		wwise_route = 55,
+		response = "cultist_captain_taunt",
+		database = "enemy_vo",
+		category = "enemy_vo_prio_0",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"generic_enemy_vo_event"
+			},
+			{
+				"query_context",
+				"trigger_id",
+				OP.EQ,
+				"taunt"
+			},
+			{
+				"query_context",
+				"enemy_tag",
+				OP.EQ,
+				"cultist_captain"
+			},
+			{
+				"user_memory",
+				"enemy_memory_cultist_captain_taunt",
+				OP.TIMEDIFF,
+				OP.GT,
+				0
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"enemy_memory_cultist_captain_taunt",
+				OP.ADD,
+				"1"
+			}
+		},
+		heard_speak_routing = {
+			target = "mission_giver_default_class"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 1
+			}
+		}
+	})
+	define_rule({
+		name = "cultist_captain_taunt_combat",
+		category = "enemy_vo_prio_0",
+		wwise_route = 7,
+		response = "cultist_captain_taunt_combat",
+		database = "enemy_vo",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"generic_enemy_vo_event"
+			},
+			{
+				"query_context",
+				"trigger_id",
+				OP.EQ,
+				"taunt_combat"
+			},
+			{
+				"query_context",
+				"enemy_tag",
+				OP.EQ,
+				"cultist_captain"
+			},
+			{
+				"user_memory",
+				"enemy_memory_cultist_captain_taunt_combat",
+				OP.TIMEDIFF,
+				OP.GT,
+				35
+			},
+			{
+				"user_memory",
+				"enemy_memory_cultist_captain_taunt",
+				OP.GT,
+				OP.GT,
+				0
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"enemy_memory_cultist_captain_taunt_combat",
+				OP.TIMESET
+			}
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 2
 			}
 		}
 	})

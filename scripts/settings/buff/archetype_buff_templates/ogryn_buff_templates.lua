@@ -558,7 +558,7 @@ templates.ogryn_increase_explosion_radius = {
 	max_stacks = 1,
 	class_name = "buff",
 	stat_buffs = {
-		[stat_buffs.explosion_radius_modifier] = 0.225
+		[stat_buffs.explosion_radius_modifier] = 0.275
 	}
 }
 templates.ogryn_targets_recieve_damage_taken_increase_debuff = {
@@ -624,6 +624,26 @@ templates.ogryn_blocking_reduces_push_cost = {
 	proc_stat_buffs = {
 		[stat_buffs.push_cost_multiplier] = 0.8
 	}
+}
+templates.ogryn_empowered_push = {
+	max_stacks = 1,
+	cooldown_duration = 8,
+	predicted = false,
+	hud_icon = "content/ui/textures/icons/buffs/hud/ogryn/ogryn_blocking_reduces_push_cost",
+	hud_icon_gradient_map = "content/ui/textures/color_ramps/talent_default",
+	class_name = "proc_buff",
+	proc_events = {
+		[proc_events.on_push_finish] = 1
+	},
+	conditional_stat_buffs = {
+		[stat_buffs.push_impact_modifier] = 2.5
+	},
+	conditional_stat_buffs_func = function (template_data, template_context)
+		return template_context.active
+	end,
+	proc_func = function (params, template_data, template_context, t)
+		return
+	end
 }
 templates.ogryn_fully_charged_attacks_gain_damage_and_stagger = {
 	predicted = true,
@@ -835,6 +855,8 @@ templates.ogryn_better_ogryn_fighting = {
 	class_name = "buff",
 	stat_buffs = {
 		[stat_buffs.damage_vs_ogryn] = talent_settings_2.offensive_1.damage_vs_ogryn,
+		[stat_buffs.damage_vs_chaos_plague_ogryn] = talent_settings_2.offensive_1.damage_vs_ogryn,
+		[stat_buffs.damage_taken_by_chaos_plague_ogryn_multiplier] = talent_settings_2.offensive_1.ogryn_damage_taken_multiplier,
 		[stat_buffs.ogryn_damage_taken_multiplier] = talent_settings_2.offensive_1.ogryn_damage_taken_multiplier
 	}
 }
@@ -1286,28 +1308,30 @@ templates.ogryn_increased_toughness_at_low_health = {
 }
 local breed_name_size = {
 	renegade_flamer = 2,
-	renegade_twin_captain_two = 2,
-	renegade_assault = 1,
-	cultist_melee = 1,
 	chaos_hound_mutator = 3,
-	chaos_newly_infected = 1,
-	chaos_beast_of_nurgle = 10,
+	renegade_assault = 1,
+	cultist_grenadier = 2,
+	cultist_melee = 1,
+	cultist_captain = 8,
 	cultist_flamer = 2,
+	chaos_beast_of_nurgle = 10,
 	cultist_mutant = 5,
 	chaos_poxwalker = 1,
-	chaos_poxwalker_bomber = 2,
+	cultist_assault = 1,
 	cultist_shocktrooper = 2,
 	chaos_ogryn_gunner = 5,
+	renegade_twin_captain_two = 2,
 	renegade_rifleman = 1,
 	renegade_shocktrooper = 2,
+	chaos_armored_infected = 1,
 	renegade_gunner = 2,
 	cultist_berzerker = 3,
 	renegade_twin_captain = 2,
-	cultist_grenadier = 2,
+	chaos_newly_infected = 1,
 	chaos_spawn = 10,
 	renegade_melee = 1,
 	chaos_ogryn_executor = 5,
-	cultist_assault = 1,
+	chaos_poxwalker_bomber = 2,
 	renegade_grenadier = 2,
 	cultist_mutant_mutator = 5,
 	chaos_daemonhost = 8,

@@ -1,4 +1,5 @@
 local Component = require("scripts/utilities/component")
+local WieldableSlotScriptInterface = require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/wieldable_slot_script_interface")
 local LasgunAmmoDisplay = class("LasgunAmmoDisplay")
 local CRITICAL_THRESHOLD_MULTIPLIER = 0.1
 
@@ -72,5 +73,7 @@ end
 function LasgunAmmoDisplay:destroy()
 	return
 end
+
+implements(LasgunAmmoDisplay, WieldableSlotScriptInterface)
 
 return LasgunAmmoDisplay

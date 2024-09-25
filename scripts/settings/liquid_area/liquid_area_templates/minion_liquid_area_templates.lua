@@ -206,6 +206,40 @@ local templates = {
 		sfx_name_start = "wwise/events/weapon/play_aoe_gas_loop",
 		in_liquid_buff_template_name = "in_twin_toxic_gas",
 		spread_function = LiquidSpread.pour
+	},
+	renegade_flamer_backpack = {
+		vfx_name_rim = "content/fx/particles/liquid_area/fire_lingering_edge",
+		end_pressure = 10,
+		leaving_liquid_buff_template_name = "leaving_liquid_fire_spread_increase",
+		start_pressure = 40,
+		sfx_name_stop = "wwise/events/weapon/stop_aoe_liquid_fire_loop",
+		max_liquid = 85,
+		cell_size = 0.85,
+		nav_cost_map_cost = 5,
+		linearized_flow = false,
+		life_time = 12,
+		vfx_name_filled = "content/fx/particles/liquid_area/fire_lingering",
+		sfx_name_start = "wwise/events/weapon/play_aoe_liquid_fire_loop",
+		in_liquid_buff_template_name = "prop_in_liquid_fire_burning_movement_slow",
+		nav_cost_map_name = "fire",
+		spread_function = LiquidSpread.pour
+	},
+	cultist_flamer_backpack = {
+		vfx_name_rim = "content/fx/particles/weapons/grenades/flame_grenade_hostile_fire_lingering_green",
+		end_pressure = 10,
+		leaving_liquid_buff_template_name = "cultist_flamer_leaving_liquid_fire_spread_increase",
+		start_pressure = 40,
+		sfx_name_stop = "wwise/events/weapon/stop_aoe_liquid_fire_loop",
+		max_liquid = 85,
+		cell_size = 0.7,
+		nav_cost_map_cost = 5,
+		linearized_flow = false,
+		life_time = 12,
+		vfx_name_filled = "content/fx/particles/weapons/grenades/flame_grenade_hostile_fire_lingering_green",
+		sfx_name_start = "wwise/events/weapon/play_aoe_liquid_fire_loop",
+		in_liquid_buff_template_name = "cultist_flamer_in_fire_liquid",
+		nav_cost_map_name = "fire",
+		spread_function = LiquidSpread.pour
 	}
 }
 

@@ -3,14 +3,13 @@ local SharedNav = require("scripts/components/utilities/shared_nav")
 local Ladder = component("Ladder")
 
 function Ladder:init(unit, is_server)
-	self._is_server = is_server
 	local run_update = false
 
 	return run_update
 end
 
 function Ladder:on_gameplay_post_init(unit, level)
-	if self._is_server then
+	if self.is_server then
 		Managers.state.bot_nav_transition:register_ladder(unit)
 
 		self._ladder_registered = true
@@ -18,7 +17,7 @@ function Ladder:on_gameplay_post_init(unit, level)
 end
 
 function Ladder:destroy(unit)
-	if self._is_server and self._ladder_registered then
+	if self.is_server and self._ladder_registered then
 		Managers.state.bot_nav_transition:unregister_ladder(unit)
 	end
 end
@@ -52,8 +51,10 @@ function Ladder:editor_init(unit)
 	end
 
 	self._my_nav_gen_guid = nil
-	self._unit = unit
-	self._should_debug_draw = false
+	self._debug_draw_enabled = false
+	local object_id = Unit.get_data(unit, "LevelEditor", "object_id")
+	self._object_id = object_id
+	self._in_active_mission_table = LevelEditor:is_level_object_in_active_mission_table(object_id)
 
 	return true
 end
@@ -107,9 +108,14 @@ function Ladder:_editor_debug_draw(unit)
 
 	drawer:reset()
 
-	local nav_world = Ladder._nav_info.nav_world
+	local nav_world, active_mission_level_id = nil
 
-	if nav_world and self._should_debug_draw then
+	if self._in_active_mission_table and self._debug_draw_enabled then
+		active_mission_level_id = LevelEditor:get_active_mission_level()
+		nav_world = Ladder._nav_info.nav_world_from_level_id[active_mission_level_id]
+	end
+
+	if nav_world then
 		local rotation = Unit.local_rotation(unit, 1)
 		local down_direction = -Quaternion.up(rotation)
 		local backward_direction = -Quaternion.forward(rotation)
@@ -127,7 +133,7 @@ function Ladder:_editor_debug_draw(unit)
 
 		local flat_backward_direction = Vector3.normalize(Vector3.flat(backward_direction))
 		local flat_forward_direction = -flat_backward_direction
-		local traverse_logic = self._traverse_logic
+		local traverse_logic = Ladder._nav_info.traverse_logic_from_level_id[active_mission_level_id]
 		local top_on_nav_mesh_postion = LadderNavTransition.find_position_on_nav_mesh(top_position, nav_world, flat_forward_direction, traverse_logic, drawer)
 		local ground_on_nav_mesh_position = nil
 
@@ -158,6 +164,16 @@ function Ladder:_editor_debug_draw(unit)
 	drawer:update(world)
 end
 
+function Ladder:editor_on_mission_changed(unit)
+	if not rawget(_G, "LevelEditor") then
+		return
+	end
+
+	self._in_active_mission_table = LevelEditor:is_level_object_in_active_mission_table(self._object_id)
+
+	self:_editor_debug_draw(unit)
+end
+
 function Ladder:editor_world_transform_modified(unit)
 	if not rawget(_G, "LevelEditor") then
 		return
@@ -171,9 +187,9 @@ function Ladder:editor_toggle_debug_draw(enable)
 		return
 	end
 
-	self._should_debug_draw = enable
+	self._debug_draw_enabled = enable
 
-	self:_editor_debug_draw(self._unit)
+	self:_editor_debug_draw(self.unit)
 end
 
 function Ladder:editor_destroy(unit)

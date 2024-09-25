@@ -299,16 +299,8 @@ function MinionAttack.shoot_hit_scan(world, physics_world, unit, target_unit, we
 	end
 
 	end_position = end_position or from_position + spread_direction * range
-	local min_position = NetworkConstants.min_position
-	local max_position = NetworkConstants.max_position
-	local network_position_extent = math.min((max_position - min_position) * 0.5, math.abs(min_position), max_position)
-	local hard_cap_extents = Vector3(network_position_extent, network_position_extent, network_position_extent)
-	local soft_cap_extents = hard_cap_extents * 0.9
-	local distance_along_ray = Intersect.ray_box(end_position, from_position - end_position, Matrix4x4.identity(), soft_cap_extents)
-
-	if distance_along_ray and distance_along_ray > 0 then
-		end_position = from_position + (end_position - from_position) * (1 - distance_along_ray)
-	end
+	local out_of_bounds_manager = Managers.state.out_of_bounds
+	end_position = out_of_bounds_manager:limit_line_end_position_to_soft_cap_extents(from_position, end_position)
 
 	return end_position
 end

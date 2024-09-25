@@ -19,6 +19,9 @@ local breed_terror_event_settings = {
 	chaos_newly_infected = {
 		point_cost = 1
 	},
+	chaos_armored_infected = {
+		point_cost = 1000
+	},
 	chaos_ogryn_bulwark = {
 		point_cost = 10
 	},
@@ -93,6 +96,9 @@ local breed_terror_event_settings = {
 	},
 	cultist_berzerker = {
 		point_cost = 6
+	},
+	cultist_captain = {
+		point_cost = 10
 	}
 }
 

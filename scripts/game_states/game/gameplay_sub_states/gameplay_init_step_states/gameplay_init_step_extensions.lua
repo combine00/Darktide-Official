@@ -44,6 +44,7 @@ function GameplayInitStepExtensions:update(main_dt, main_t)
 		return nil, nil
 	end
 
+	self._shared_state.initialized_steps.GameplayInitStepExtensions = true
 	local next_step_params = {
 		shared_state = self._shared_state
 	}
@@ -73,6 +74,9 @@ function GameplayInitStepExtensions:_init_extensions(world, physics_world, is_se
 		},
 		cinematic_scene_system = {
 			mission = mission
+		},
+		critter_spawner_system = {
+			level_seed = level_seed
 		},
 		cutscene_character_system = {
 			level_seed = level_seed

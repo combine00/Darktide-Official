@@ -81,7 +81,8 @@ PropUnitData.component_data = {
 			"hazard_prop",
 			"hazard_sphere",
 			"ice_chunk",
-			"icicle"
+			"icicle",
+			"train_cogitator"
 		},
 		options_values = {
 			"corruptor_body",
@@ -92,7 +93,8 @@ PropUnitData.component_data = {
 			"hazard_prop",
 			"hazard_sphere",
 			"ice_chunk",
-			"icicle"
+			"icicle",
+			"train_cogitator"
 		}
 	},
 	extensions = {

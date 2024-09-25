@@ -13,6 +13,18 @@ function RespawnBeacon:init(unit)
 	end
 end
 
+function RespawnBeacon:destroy(unit)
+	return
+end
+
+function RespawnBeacon:enable(unit)
+	return
+end
+
+function RespawnBeacon:disable(unit)
+	return
+end
+
 local FONT = "core/editor_slave/gui/arial"
 local FONT_MATERIAL = "core/editor_slave/gui/arial"
 local FONT_SIZE = 0.3
@@ -22,7 +34,6 @@ function RespawnBeacon:editor_init(unit)
 		return
 	end
 
-	self._unit = unit
 	local world = Application.main_world()
 	self._world = world
 	self._physics_world = World.physics_world(world)
@@ -37,7 +48,10 @@ function RespawnBeacon:editor_init(unit)
 	end
 
 	self._my_nav_gen_guid = nil
-	self._should_debug_draw = false
+	self._debug_draw_enabled = false
+	local object_id = Unit.get_data(unit, "LevelEditor", "object_id")
+	self._object_id = object_id
+	self._in_active_mission_table = LevelEditor:is_level_object_in_active_mission_table(object_id)
 
 	self:_reset_data()
 
@@ -56,22 +70,59 @@ function RespawnBeacon:editor_validate(unit)
 	return success, error_message
 end
 
+function RespawnBeacon:editor_destroy(unit)
+	if not rawget(_G, "LevelEditor") then
+		return
+	end
+
+	local world = self._world
+	local line_object = self._line_object
+
+	LineObject.reset(line_object)
+	LineObject.dispatch(world, line_object)
+	World.destroy_line_object(world, line_object)
+
+	local gui = self._gui
+
+	if self._debug_text_id then
+		Gui.destroy_text_3d(gui, self._debug_text_id)
+	end
+
+	World.destroy_gui(world, gui)
+end
+
 function RespawnBeacon:editor_update(unit)
 	if not rawget(_G, "LevelEditor") then
 		return
 	end
 
-	local with_traverse_logic = false
-	local nav_gen_guid = SharedNav.check_new_navmesh_generated(RespawnBeacon._nav_info, self._my_nav_gen_guid, with_traverse_logic)
+	if self._in_active_mission_table then
+		local with_traverse_logic = false
+		local nav_gen_guid = SharedNav.check_new_navmesh_generated(RespawnBeacon._nav_info, self._my_nav_gen_guid, with_traverse_logic)
 
-	if nav_gen_guid then
-		self:_generate_spawn_slots(unit)
-		self:_editor_debug_draw(unit)
+		if nav_gen_guid then
+			self:_generate_spawn_slots(unit)
+			self:_editor_debug_draw(unit)
 
-		self._my_nav_gen_guid = nav_gen_guid
+			self._my_nav_gen_guid = nav_gen_guid
+		end
 	end
 
 	return true
+end
+
+function RespawnBeacon:editor_on_mission_changed(unit)
+	if not rawget(_G, "LevelEditor") then
+		return
+	end
+
+	local in_active_mission_table = LevelEditor:is_level_object_in_active_mission_table(self._object_id)
+	self._in_active_mission_table = in_active_mission_table
+
+	if in_active_mission_table then
+		self:_generate_spawn_slots(unit)
+		self:_editor_debug_draw(unit)
+	end
 end
 
 function RespawnBeacon:editor_world_transform_modified(unit)
@@ -88,36 +139,16 @@ function RespawnBeacon:editor_toggle_debug_draw(enable)
 		return
 	end
 
-	self._should_debug_draw = enable
+	self._debug_draw_enabled = enable
 
-	self:_editor_debug_draw(self._unit)
+	self:_editor_debug_draw(self.unit)
 end
 
-function RespawnBeacon:editor_destroy(unit)
+function RespawnBeacon:editor_selection_changed(unit, selected)
 	if not rawget(_G, "LevelEditor") then
 		return
 	end
 
-	local line_object = self._line_object
-	local world = self._world
-
-	LineObject.reset(line_object)
-	LineObject.dispatch(world, line_object)
-	World.destroy_line_object(world, line_object)
-
-	self._line_object = nil
-	self._world = nil
-
-	if self._debug_text_id then
-		Gui.destroy_text_3d(self._gui, self._debug_text_id)
-	end
-
-	local gui = self._gui
-
-	World.destroy_gui(world, gui)
-end
-
-function RespawnBeacon:editor_selection_changed(unit, selected)
 	self._selected = selected
 
 	self:_editor_debug_draw(unit)
@@ -132,8 +163,9 @@ function RespawnBeacon:_editor_debug_draw(unit)
 
 	drawer:reset()
 
-	if self._selected and self._should_debug_draw then
-		local nav_world = RespawnBeacon._nav_info.nav_world
+	if self._selected and self._debug_draw_enabled then
+		local active_mission_level_id = LevelEditor:get_active_mission_level()
+		local nav_world = RespawnBeacon._nav_info.nav_world_from_level_id[active_mission_level_id]
 
 		if nav_world then
 			local valid_positions, on_nav_positions, fitting_positions, volume_positions = self:_unbox_positions()
@@ -150,9 +182,7 @@ function RespawnBeacon:_editor_debug_draw(unit)
 		end
 	end
 
-	local world = self._world
-
-	drawer:update(world)
+	drawer:update(self._world)
 end
 
 function RespawnBeacon:_draw_text(unit, text, success)
@@ -173,7 +203,8 @@ end
 function RespawnBeacon:_generate_spawn_slots(unit)
 	self:_reset_data()
 
-	local nav_world = RespawnBeacon._nav_info.nav_world
+	local active_mission_level_id = LevelEditor:get_active_mission_level()
+	local nav_world = RespawnBeacon._nav_info.nav_world_from_level_id[active_mission_level_id]
 
 	if nav_world then
 		local physics_world = self._physics_world
@@ -213,33 +244,33 @@ function RespawnBeacon:_store_positions(valid_positions, on_nav_positions, fitti
 end
 
 function RespawnBeacon:_unbox_positions()
-	local vector3_unbox = Vector3Box.unbox
+	local Vector3Box_unbox = Vector3Box.unbox
 	local positions = self._valid_positions
 	local valid_positions = {}
 
 	for i = 1, #positions do
-		valid_positions[i] = vector3_unbox(positions[i])
+		valid_positions[i] = Vector3Box_unbox(positions[i])
 	end
 
 	positions = self._on_nav_positions
 	local on_nav_positions = {}
 
 	for i = 1, #positions do
-		on_nav_positions[i] = vector3_unbox(positions[i])
+		on_nav_positions[i] = Vector3Box_unbox(positions[i])
 	end
 
 	positions = self._fitting_positions
 	local fitting_positions = {}
 
 	for i = 1, #positions do
-		fitting_positions[i] = vector3_unbox(positions[i])
+		fitting_positions[i] = Vector3Box_unbox(positions[i])
 	end
 
 	positions = self._volume_positions
 	local volume_positions = {}
 
 	for i = 1, #positions do
-		volume_positions[i] = vector3_unbox(positions[i])
+		volume_positions[i] = Vector3Box_unbox(positions[i])
 	end
 
 	return valid_positions, on_nav_positions, fitting_positions, volume_positions
@@ -250,18 +281,6 @@ function RespawnBeacon:_reset_data()
 	self._on_nav_positions = {}
 	self._fitting_positions = {}
 	self._volume_positions = {}
-end
-
-function RespawnBeacon:enable(unit)
-	return
-end
-
-function RespawnBeacon:disable(unit)
-	return
-end
-
-function RespawnBeacon:destroy(unit)
-	return
 end
 
 RespawnBeacon.component_data = {

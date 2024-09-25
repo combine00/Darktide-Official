@@ -333,6 +333,12 @@ local wwise_vo_routing_settings = {
 		wwise_event_path = "wwise/events/vo/play_sfx_es_npc_pa_vo",
 		display_name = "NPC PA VO",
 		wwise_sound_source = "es_npc_pa_vo"
+	},
+	{
+		is_default = false,
+		wwise_event_path = "wwise/events/vo/play_sfx_es_cultist_captain_vo_important",
+		display_name = "Named Cultist Captain Important",
+		wwise_sound_source = "es_cultist_captain_vo_important"
 	}
 }
 

@@ -722,8 +722,10 @@ weapon_template.anim_state_machine_1p = "content/characters/player/human/first_p
 weapon_template.spread_template = "no_spread"
 weapon_template.ammo_template = "no_ammo"
 weapon_template.psyker_smite = true
-weapon_template.uses_ammunition = false
-weapon_template.uses_overheat = false
+weapon_template.hud_configuration = {
+	uses_overheat = false,
+	uses_ammunition = false
+}
 weapon_template.sprint_ready_up_time = 0.1
 weapon_template.max_first_person_anim_movement_speed = 5.8
 weapon_template.smart_targeting_template = SmartTargetingTemplates.default_melee
@@ -732,29 +734,14 @@ weapon_template.crosshair = {
 }
 weapon_template.hit_marker_type = "center"
 weapon_template.fx_sources = {
-	_left_hand = "fx_left_hand",
-	_left_finger_tip_middle = "fx_left_finger_tip_middle",
-	_both = "fx_both",
-	_right_finger_tip_index = "fx_right_finger_tip_index",
-	_charge = "fx_charge",
-	_left_finger_tip_thumb = "fx_left_finger_tip_thumb",
-	_left_finger_tip_pinky = "fx_left_finger_tip_pinky",
-	_right_finger_tip_pinky = "fx_right_finger_tip_pinky",
-	_right_elbow = "fx_right_elbow",
-	_right = "fx_right",
-	_left_finger_tip_index = "fx_left_finger_tip_index",
-	_right_finger_tip_middle = "fx_right_finger_tip_middle",
-	_right_finger_tip_ring = "fx_right_finger_tip_ring",
 	_left = "fx_left",
-	_left_finger_tip_ring = "fx_left_finger_tip_ring",
-	_right_finger_tip_thumb = "fx_right_finger_tip_thumb",
-	_left_elbow = "fx_left_elbow",
-	_right_hand = "fx_right_hand"
+	_charge = "fx_charge",
+	_both = "fx_both",
+	_right = "fx_right"
 }
 weapon_template.chain_settings = {
 	right_fx_source_name = "_right",
-	left_fx_source_name = "_left",
-	use_hands_fx = true
+	left_fx_source_name = "_left"
 }
 weapon_template.dodge_template = "default"
 weapon_template.sprint_template = "default"

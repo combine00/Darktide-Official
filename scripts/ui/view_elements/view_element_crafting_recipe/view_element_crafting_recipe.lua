@@ -5,6 +5,9 @@ local UIWidget = require("scripts/managers/ui/ui_widget")
 local TextUtilities = require("scripts/utilities/ui/text")
 local UIRenderer = require("scripts/managers/ui/ui_renderer")
 local UISoundEvents = require("scripts/settings/ui/ui_sound_events")
+local MasteryUtils = require("scripts/utilities/mastery")
+local WeaponStats = require("scripts/utilities/weapon_stats")
+local ButtonPassTemplates = require("scripts/ui/pass_templates/button_pass_templates")
 local ViewElementCraftingRecipeBlueprints = require("scripts/ui/view_elements/view_element_crafting_recipe/view_element_crafting_recipe_blueprints")
 local ViewElementCraftingRecipeDefinitions = require("scripts/ui/view_elements/view_element_crafting_recipe/view_element_crafting_recipe_definitions")
 
@@ -38,6 +41,7 @@ function ViewElementCraftingRecipe:init(parent, draw_layer, start_scale, optiona
 
 		self._widgets_by_name.continue_button.content.visible = false
 		self._widgets_by_name.continue_button_background.content.visible = false
+		self._widgets_by_name.continue_button_hold.content.visible = false
 		self._widgets_by_name.grid_divider_bottom.content.texture = "content/ui/materials/dividers/horizontal_frame_big_lower"
 		local grid_size = menu_settings.grid_size
 		local mask_size = menu_settings.mask_size
@@ -45,6 +49,22 @@ function ViewElementCraftingRecipe:init(parent, draw_layer, start_scale, optiona
 		self:_set_scenegraph_size("grid_divider_bottom", mask_size[1], 36)
 		self:_set_scenegraph_position("grid_divider_bottom", nil, 12)
 	end
+
+	local ui_renderer = self._ui_resource_renderer or self._parent:ui_renderer()
+	self._widgets_by_name.continue_button_hold.content.size = {
+		420,
+		50
+	}
+
+	self:set_empty_message("")
+	ButtonPassTemplates.terminal_button_hold_small.init(self, self._widgets_by_name.continue_button_hold, ui_renderer, {
+		timer = 0.5,
+		input_action = "hotkey_menu_special_2_hold",
+		start_input_action = "hotkey_menu_special_2",
+		keep_hold_active = true,
+		text = Utf8.upper(Localize("loc_crafting_upgrade_button")),
+		complete_function = callback(self, "_cb_on_continue_pressed")
+	})
 end
 
 function ViewElementCraftingRecipe:disable_price_prasentation()
@@ -54,33 +74,6 @@ end
 
 function ViewElementCraftingRecipe:set_selected_item(item)
 	self.content.item = item
-	local insufficient_funds = self.content.insufficient_funds or {}
-	local dummy_ingredients = {
-		item = item
-	}
-
-	for i, recipe in pairs(self.content.recipes) do
-		local costs = item and recipe.get_costs(dummy_ingredients)
-		local cost_string = ""
-
-		if costs then
-			table.sort(costs, sort_wallet_currencies)
-
-			for j, cost in pairs(costs) do
-				local can_afford = self._parent._parent:can_afford(cost.amount, cost.type)
-
-				if not can_afford then
-					cost_string = ""
-
-					break
-				end
-			end
-		end
-
-		insufficient_funds[recipe.name] = cost_string
-	end
-
-	self.content.insufficient_funds = insufficient_funds
 end
 
 function ViewElementCraftingRecipe:set_navigation_button_color_intensity(multiplier)
@@ -95,7 +88,7 @@ function ViewElementCraftingRecipe:set_navigation_button_color_intensity(multipl
 	end
 end
 
-function ViewElementCraftingRecipe:present_recipe_navigation(recipes, left_click_callback, optional_on_present_callback, type)
+function ViewElementCraftingRecipe:present_recipe_navigation(recipes, left_click_callback, optional_on_present_callback, type, additional_data)
 	local layout = {
 		{
 			widget_type = "spacing_vertical"
@@ -105,12 +98,22 @@ function ViewElementCraftingRecipe:present_recipe_navigation(recipes, left_click
 
 	for i, recipe in ipairs(recipes) do
 		if not recipe.ui_hidden and not recipe.ui_show_in_vendor_view then
-			layout[#layout + 1] = {
-				widget_type = "navigation_button",
-				recipe = recipe
-			}
-			active_recipes[#active_recipes + 1] = recipe
+			local show_navigation = not recipe.validation_function or recipe.validation_function and recipe.validation_function()
+
+			if show_navigation then
+				layout[#layout + 1] = {
+					widget_type = "navigation_button",
+					recipe = recipe
+				}
+				active_recipes[#active_recipes + 1] = recipe
+			end
 		end
+	end
+
+	if #active_recipes == 0 then
+		layout[#layout + 1] = {
+			widget_type = "spacing_vertical_large"
+		}
 	end
 
 	layout[#layout + 1] = {
@@ -123,36 +126,52 @@ function ViewElementCraftingRecipe:present_recipe_navigation(recipes, left_click
 	self:present_grid_layout(layout, ViewElementCraftingRecipeBlueprints, left_click_callback, nil, nil, nil, optional_on_present_callback)
 end
 
-function ViewElementCraftingRecipe:present_recipe_navigation_with_item(recipes, left_click_callback, optional_on_present_callback, item, type)
-	local layout = {
-		{
-			widget_type = "spacing_vertical"
-		}
-	}
+function ViewElementCraftingRecipe:present_recipe_navigation_with_item(recipes, left_click_callback, optional_on_present_callback, item, type, additional_data)
+	local layout = {}
 	local active_recipes = {}
 
-	if item and (item.item_type == "WEAPON_RANGED" or item.item_type == "WEAPON_MELEE") then
-		layout[#layout + 1] = {
-			text = "loc_crafting_item_modifications_description",
-			widget_type = "description"
-		}
-		layout[#layout + 1] = {
-			widget_type = "modifications_counter",
-			item = item
-		}
-		layout[#layout + 1] = {
-			widget_type = "spacing_vertical"
+	if item and ItemUtils.is_weapon(item.item_type) then
+		-- Nothing
+	end
+
+	layout[#layout + 1] = {
+		widget_type = "spacing_vertical"
+	}
+	local item_pattern = item and item.parent_pattern
+	local mastery_data = additional_data and additional_data.masteries_data and item_pattern and additional_data.masteries_data[item_pattern]
+	local expertise_data = nil
+
+	if item and mastery_data then
+		local start_expertise = ItemUtils.expertise_level(item, true)
+		local start_value = tonumber(start_expertise)
+		local max_available_value = MasteryUtils.get_current_expertise_cap(mastery_data) or 0
+		local max_value = MasteryUtils.get_max_expertise_cap(mastery_data) or 0
+		expertise_data = {
+			start = start_value,
+			max_available = max_available_value,
+			max = max_value
 		}
 	end
 
 	for i, recipe in ipairs(recipes) do
 		if not recipe.ui_hidden and not recipe.ui_show_in_vendor_view then
-			layout[#layout + 1] = {
-				widget_type = "navigation_button",
-				recipe = recipe
-			}
-			active_recipes[#active_recipes + 1] = recipe
+			local show_navigation = not recipe.validation_function or recipe.validation_function and recipe.validation_function(item)
+
+			if show_navigation then
+				layout[#layout + 1] = {
+					widget_type = "navigation_button",
+					recipe = recipe,
+					expertise_data = expertise_data
+				}
+				active_recipes[#active_recipes + 1] = recipe
+			end
 		end
+	end
+
+	if #active_recipes == 0 then
+		layout[#layout + 1] = {
+			widget_type = "spacing_vertical_large"
+		}
 	end
 
 	layout[#layout + 1] = {
@@ -188,13 +207,6 @@ end
 function ViewElementCraftingRecipe:present_recipe(recipe, ingredients, main_action_callback, select_trait_callback, optional_on_present_callback, additional_data, update_callback, type)
 	local item = ingredients.item
 	self.content.item = item
-	local item_locked = nil
-
-	if item then
-		local num_modifications, max_modifications = ItemUtils.modifications_by_rarity(item)
-		item_locked = num_modifications == max_modifications
-	end
-
 	self.content.recipe = recipe
 	self.content.ingredients = ingredients
 	self.content.additional_data = additional_data
@@ -226,14 +238,8 @@ function ViewElementCraftingRecipe:present_recipe(recipe, ingredients, main_acti
 		end
 	end
 
-	if item and recipe.view_name ~= "crafting_extract_trait_view" and recipe.view_name ~= "crafting_upgrade_item_view" then
-		layout[#layout + 1] = {
-			widget_type = "modifications_counter",
-			item = item
-		}
-		layout[#layout + 1] = {
-			widget_type = "spacing_vertical"
-		}
+	if type ~= "crafting_mechanicus" and item and recipe.view_name ~= "crafting_extract_trait_view" and recipe.view_name ~= "crafting_upgrade_item_view" and item.item_type ~= "WEAPON_RANGED" and item.item_type == "WEAPON_MELEE" then
+		-- Nothing
 	end
 
 	layout[#layout + 1] = {
@@ -243,21 +249,44 @@ function ViewElementCraftingRecipe:present_recipe(recipe, ingredients, main_acti
 	}
 
 	if item and recipe.requires_perk_selection then
-		local filter_modified = recipe.requires_perk_selection ~= "all"
 		layout[#layout + 1] = {
 			widget_type = "spacing_vertical_small"
 		}
 
-		_push_traitlike_items(layout, "perk_button", item and item.perks, filter_modified and item_locked)
+		_push_traitlike_items(layout, "perk_button", item and item.perks)
 	end
 
 	if item and recipe.requires_trait_selection then
-		local filter_modified = recipe.requires_trait_selection ~= "all"
 		layout[#layout + 1] = {
 			widget_type = "spacing_vertical_small"
 		}
 
-		_push_traitlike_items(layout, "trait_button", item and item.traits, filter_modified and item_locked)
+		_push_traitlike_items(layout, "trait_button", item and item.traits)
+	end
+
+	if item and recipe.view_name == "crafting_mechanicus_upgrade_expertise_view" then
+		local start_value = additional_data.expertise_data.start
+		local max_available = math.max(start_value, additional_data.expertise_data.max_available)
+
+		if start_value == max_available then
+			layout[#layout + 1] = {
+				widget_type = "expertise_value_max",
+				additional_data = additional_data,
+				item = item
+			}
+		else
+			layout[#layout + 1] = {
+				widget_type = "expertise_value",
+				additional_data = additional_data,
+				item = item
+			}
+		end
+
+		self:_add_stats_to_layout(item, layout, additional_data)
+
+		self._use_continue_hold = true
+	else
+		self._use_continue_hold = nil
 	end
 
 	local costs = recipe.get_costs(ingredients, additional_data) or {}
@@ -282,12 +311,89 @@ function ViewElementCraftingRecipe:present_recipe(recipe, ingredients, main_acti
 	continue_button_widget_hotspot.on_pressed_sound = nil
 	local button_text = recipe.unlocalized_button_text or recipe.button_text and Utf8.upper(Localize(recipe.button_text)) or "n/a"
 	continue_button_widget_content.original_text = button_text
+	widgets_by_name.continue_button_hold.content.original_text = button_text
+
+	if self._use_continue_hold then
+		continue_button_widget.content.visible = false
+		widgets_by_name.continue_button_hold.content.visible = true
+	else
+		continue_button_widget.content.visible = true
+		widgets_by_name.continue_button_hold.content.visible = false
+	end
 
 	self:refresh_can_craft(additional_data)
 	self:_pre_present_height_adjust()
 	self:present_grid_layout(layout, ViewElementCraftingRecipeBlueprints, main_action_callback, select_trait_callback, nil, nil, optional_on_present_callback)
 
 	self._update_costs = true
+end
+
+function ViewElementCraftingRecipe:_add_stats_to_layout(item, layout, additional_data)
+	local weapon_stats = WeaponStats:new(item)
+	local comparing_stats = weapon_stats:get_comparing_stats()
+	local num_stats = table.size(comparing_stats)
+	local start_value = additional_data.expertise_data.start
+	local max_available = math.max(start_value, additional_data.expertise_data.max_available)
+	local start_stats = ItemUtils.preview_stats_change(item, 0, comparing_stats)
+	local end_stats = ItemUtils.preview_stats_change(item, additional_data.expertise_data.current - additional_data.expertise_data.start, comparing_stats)
+	local max_stats = ItemUtils.preview_stats_change(item, additional_data.expertise_data.max - additional_data.expertise_data.start, comparing_stats)
+	local sort_order = {
+		1,
+		5,
+		3,
+		4,
+		2
+	}
+
+	if start_value == max_available then
+		layout[#layout + 1] = {
+			widget_type = "stat_title_max"
+		}
+
+		for i = 1, num_stats do
+			local sorted_i = sort_order[i]
+			local display_name = comparing_stats[sorted_i].display_name
+			local start_stat = start_stats[display_name]
+			local max_stat = max_stats[display_name]
+			layout[#layout + 1] = {
+				widget_type = "stat_max",
+				start_stat = start_stat,
+				max_stat = max_stat,
+				display_name = display_name
+			}
+
+			if i < num_stats then
+				layout[#layout + 1] = {
+					widget_type = "spacing_vertical_small"
+				}
+			end
+		end
+	else
+		layout[#layout + 1] = {
+			widget_type = "stat_title"
+		}
+
+		for i = 1, num_stats do
+			local sorted_i = sort_order[i]
+			local display_name = comparing_stats[sorted_i].display_name
+			local start_stat = start_stats[display_name]
+			local end_stat = end_stats[display_name]
+			local max_stat = max_stats[display_name]
+			layout[#layout + 1] = {
+				widget_type = "stat",
+				start_stat = start_stat,
+				end_stat = end_stat,
+				max_stat = max_stat,
+				display_name = display_name
+			}
+
+			if i < num_stats then
+				layout[#layout + 1] = {
+					widget_type = "spacing_vertical_small"
+				}
+			end
+		end
+	end
 end
 
 function ViewElementCraftingRecipe:_update_costs_presentation(costs, ui_renderer)
@@ -379,6 +485,7 @@ function ViewElementCraftingRecipe:_update_continue_button_state(force_effect)
 	end
 
 	widget_hotspot.disabled = disabled
+	widgets_by_name.continue_button_hold.content.hotspot.disabled = disabled
 end
 
 function ViewElementCraftingRecipe:_draw_widgets(dt, t, input_service, ui_renderer, render_settings)
@@ -407,6 +514,10 @@ end
 
 function ViewElementCraftingRecipe:update(dt, t, input_service)
 	self:_update_continue_button_state()
+
+	local ui_renderer = self._ui_resource_renderer or self._parent:ui_renderer()
+
+	ButtonPassTemplates.terminal_button_hold_small.update(self, self._widgets_by_name.continue_button_hold, ui_renderer, dt)
 
 	return ViewElementCraftingRecipe.super.update(self, dt, t, input_service)
 end
@@ -441,7 +552,7 @@ end
 
 function ViewElementCraftingRecipe:refresh_can_craft(additional_data)
 	local content = self.content
-	local can_craft, fail_reason, localization_context = content.recipe.can_craft(content.ingredients, additional_data)
+	local can_craft, fail_reason, error_type = content.recipe.can_craft(content.ingredients, additional_data)
 	local costs = content.costs
 
 	if costs then
@@ -458,13 +569,14 @@ function ViewElementCraftingRecipe:refresh_can_craft(additional_data)
 		end
 
 		if not can_afford_all then
-			fail_reason = "loc_not_enough_resources"
+			fail_reason = Localize("loc_not_enough_resources")
 			can_craft = false
 		end
 	end
 
 	content.can_craft = can_craft
-	content.fail_reason = fail_reason and Localize(fail_reason, true, localization_context)
+	content.fail_reason = fail_reason
+	content.error_type = error_type
 end
 
 function ViewElementCraftingRecipe:can_craft()

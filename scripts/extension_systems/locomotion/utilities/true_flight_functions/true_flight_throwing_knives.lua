@@ -2,7 +2,7 @@ local HitZone = require("scripts/utilities/attack/hit_zone")
 local TrueFlightDefaults = require("scripts/extension_systems/locomotion/utilities/true_flight_functions/true_flight_defaults")
 local ProjectileLocomotion = require("scripts/extension_systems/locomotion/utilities/projectile_locomotion")
 local hit_zone_names = HitZone.hit_zone_names
-local true_flight_throwing_knives = {
+local TrueFlightThrowingKnives = {
 	throwing_knives_locomotion = function (physics_world, integration_data, dt, t, optional_validate_impact_func, optional_on_impact_func)
 		local velocity = integration_data.velocity
 		local position = integration_data.position
@@ -73,6 +73,7 @@ end
 local function _throwing_knives_find_best_target(integration_data, search_position, projectile_position, travel_direction, optionl_ignore_unit)
 	local true_flight_template = integration_data.true_flight_template
 	local owner_unit = integration_data.owner_unit
+	local projectile_unit = integration_data.projectile_unit
 	local owner_position = TrueFlightDefaults.get_unit_position(owner_unit, hit_zone_names.head)
 	local radius = true_flight_template.broadphase_radius
 	local radius_squared = radius * radius
@@ -82,7 +83,7 @@ local function _throwing_knives_find_best_target(integration_data, search_positi
 	local default_hit_zone = true_flight_template.target_hit_zone
 	local best_unit, best_position = nil
 	local best_score = math.huge
-	local number_of_results, results = TrueFlightDefaults.broadphase_query(owner_unit, search_position, radius)
+	local number_of_results, results = TrueFlightDefaults.broadphase_query(projectile_unit, search_position, radius)
 
 	if number_of_results > 0 then
 		for i = 1, number_of_results do
@@ -121,7 +122,7 @@ local function _throwing_knives_find_best_target(integration_data, search_positi
 	return best_unit, best_position, default_hit_zone
 end
 
-function true_flight_throwing_knives.throwing_knives_find_highest_value_target(integration_data, position, is_valid_and_legitimate_targe_func)
+function TrueFlightThrowingKnives.throwing_knives_find_highest_value_target(integration_data, position, is_valid_and_legitimate_targe_func)
 	local true_flight_template = integration_data.true_flight_template
 	local forward_search_distance_to_find_target = true_flight_template.forward_search_distance_to_find_target
 	local skip_search_time = true_flight_template.skip_search_time
@@ -151,13 +152,13 @@ function true_flight_throwing_knives.throwing_knives_find_highest_value_target(i
 	return best_unit, best_hit_zone
 end
 
-function true_flight_throwing_knives.throwing_knives_impact_valid(hit_unit, integration_data)
+function TrueFlightThrowingKnives.throwing_knives_impact_valid(hit_unit, integration_data)
 	local is_valid_impact = integration_data.last_hit_unit ~= hit_unit
 
 	return is_valid_impact
 end
 
-function true_flight_throwing_knives.throwing_knives_on_impact(hit_unit, hit, integration_data, new_position, is_server, dt, t)
+function TrueFlightThrowingKnives.throwing_knives_on_impact(hit_unit, hit, integration_data, new_position, is_server, dt, t)
 	local true_flight_template = integration_data.true_flight_template
 	local hit_normal = hit.normal or hit[3]
 	local hit_position = hit.position or hit[1]
@@ -231,4 +232,4 @@ function true_flight_throwing_knives.throwing_knives_on_impact(hit_unit, hit, in
 	return new_position, bounced_to_much
 end
 
-return true_flight_throwing_knives
+return TrueFlightThrowingKnives

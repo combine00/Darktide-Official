@@ -11,9 +11,20 @@ function TelemetryManager:init()
 	self._events = {}
 	self._batch_post_time = 0
 	self._t = 0
+	self._enable_update = true
+	local event_manager = Managers.event
+
+	if event_manager then
+		event_manager:register(self, "event_player_authenticated", "_event_player_authenticated")
+		event_manager:register(self, "event_telemetry_change", "_event_telemetry_change")
+	end
 end
 
 function TelemetryManager:update(dt, t)
+	if IS_PLAYSTATION and not self._enable_update then
+		return
+	end
+
 	self._t = t
 
 	if self:_ready_to_post_batch(t) then
@@ -111,7 +122,27 @@ function TelemetryManager:batch_in_flight()
 end
 
 function TelemetryManager:destroy()
+	local event_manager = Managers.event
+
+	if event_manager then
+		event_manager:unregister(self, "event_player_authenticated", "_event_player_authenticated")
+		event_manager:unregister(self, "event_telemetry_change", "_event_telemetry_change")
+	end
+
 	self:post_batch()
+end
+
+function TelemetryManager:_event_telemetry_change(value)
+	self._enable_update = value
+end
+
+function TelemetryManager:_event_player_authenticated()
+	local save_manager = Managers.save
+
+	if save_manager then
+		local account_data = save_manager:account_data()
+		self._enable_update = account_data.interface_settings.telemetry_enabled
+	end
 end
 
 return TelemetryManager

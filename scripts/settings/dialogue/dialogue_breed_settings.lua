@@ -16,7 +16,8 @@ local dialogue_breed_settings = {
 		"boon_vendor",
 		"tertium_noble",
 		"cargo_pilot",
-		"travelling_salesman"
+		"travelling_salesman",
+		"commissar"
 	}
 }
 dialogue_breed_settings.voice_classes_npc = dialogue_breed_settings.voice_classes_2d
@@ -96,6 +97,28 @@ dialogue_breed_settings.chaos_newly_infected = {
 		"enemy_chaos_newly_infected_male_i"
 	}
 }
+dialogue_breed_settings.chaos_armored_infected = {
+	trigger_seen_vo = false,
+	vo_class_name = "enemy_chaos_armored_infected",
+	trigger_heard_vo = false,
+	is_network_synced = false,
+	has_dialogue_extension = true,
+	vo_triggers_enemy_kill_query = false,
+	dialogue_memory_faction_name = "enemy",
+	wwise_voice_switch_group = "switch_voice_enemy_chaos_newly_infected",
+	wwise_voices = {
+		"enemy_chaos_armored_infected_male_a",
+		"enemy_chaos_armored_infected_male_b",
+		"enemy_chaos_armored_infected_male_c",
+		"enemy_chaos_newly_infected_male_e",
+		"enemy_chaos_newly_infected_male_f",
+		"enemy_chaos_newly_infected_male_g",
+		"enemy_chaos_newly_infected_male_h",
+		"enemy_chaos_newly_infected_male_i",
+		"enemy_chaos_armored_infected_male_a",
+		"enemy_chaos_armored_infected_male_b"
+	}
+}
 dialogue_breed_settings.chaos_daemonhost = {
 	trigger_seen_vo = true,
 	vo_class_name = "enemy_daemonhost",
@@ -165,6 +188,7 @@ dialogue_breed_settings.mission_giver = {
 		"sergeant_b",
 		"pilot_a",
 		"tech_priest_a",
+		"tech_priest_b",
 		"explicator_a",
 		"purser_a",
 		"contract_vendor_a",
@@ -174,6 +198,7 @@ dialogue_breed_settings.mission_giver = {
 		"enemy_wolfer_adjutant_b",
 		"enemy_wolfer_adjutant_c",
 		"enemy_wolfer_adjutant_d",
+		"enemy_wolfer_adjutant_e",
 		"dreg_lector_a",
 		"interrogator_a",
 		"training_ground_psyker_a",
@@ -185,7 +210,8 @@ dialogue_breed_settings.mission_giver = {
 		"travelling_salesman_a",
 		"travelling_salesman_b",
 		"travelling_salesman_c",
-		"cargo_pilot_a"
+		"cargo_pilot_a",
+		"commissar_a"
 	}
 }
 dialogue_breed_settings.sergeant = {
@@ -244,7 +270,8 @@ dialogue_breed_settings.tech_priest = {
 	level_requirement = 4,
 	wwise_voice_switch_group = "voice_profile",
 	wwise_voices = {
-		"tech_priest_a"
+		"tech_priest_a",
+		"tech_priest_b"
 	}
 }
 dialogue_breed_settings.enginseer = {
@@ -407,7 +434,8 @@ dialogue_breed_settings.enemy_wolfer_adjutant = {
 		"enemy_wolfer_adjutant_a",
 		"enemy_wolfer_adjutant_b",
 		"enemy_wolfer_adjutant_c",
-		"enemy_wolfer_adjutant_d"
+		"enemy_wolfer_adjutant_d",
+		"enemy_wolfer_adjutant_e"
 	}
 }
 dialogue_breed_settings.dreg_lector = {
@@ -629,6 +657,26 @@ dialogue_breed_settings.renegade_captain = {
 		"enemy_captain_brute_a",
 		"enemy_captain_sadist_b",
 		"enemy_captain_spiritual_b"
+	},
+	vo_events = {
+		event_trickle_wave_spawned = "reinforcements"
+	}
+}
+dialogue_breed_settings.cultist_captain = {
+	randomize_voice = true,
+	is_network_synced = false,
+	trigger_heard_vo = false,
+	trigger_seen_vo = true,
+	has_dialogue_extension = true,
+	vo_triggers_enemy_kill_query = true,
+	dialogue_memory_faction_name = "enemy",
+	vo_class_name = "cultist_captain",
+	spawn_vo_event = "taunt",
+	wwise_voice_switch_group = "switch_voice_enemy_captain",
+	wwise_voices = {
+		"enemy_champion_infested_a",
+		"enemy_champion_brute_a",
+		"enemy_champion_preacher_a"
 	},
 	vo_events = {
 		event_trickle_wave_spawned = "reinforcements"
@@ -1046,6 +1094,19 @@ dialogue_breed_settings.reject_npc = {
 		"reject_npc_servitor_a"
 	}
 }
+dialogue_breed_settings.mourningstar_hadron_servitor = {
+	trigger_seen_vo = false,
+	vo_class_name = "mourningstar_hadron_servitor",
+	trigger_heard_vo = false,
+	is_network_synced = true,
+	has_dialogue_extension = true,
+	vo_triggers_enemy_kill_query = false,
+	dialogue_memory_faction_name = "npc",
+	wwise_voice_switch_group = "voice_profile",
+	wwise_voices = {
+		"mourningstar_hadron_servitor_a"
+	}
+}
 dialogue_breed_settings.warp_echo = {
 	trigger_seen_vo = false,
 	vo_class_name = "warp_echo",
@@ -1087,6 +1148,20 @@ dialogue_breed_settings.travelling_salesman = {
 	wwise_voice_switch_group = "voice_profile",
 	wwise_voices = {
 		"travelling_salesman_a, travelling_salesman_b, travelling_salesman_c"
+	}
+}
+dialogue_breed_settings.commissar = {
+	trigger_seen_vo = false,
+	vo_class_name = "commissar",
+	trigger_heard_vo = false,
+	is_network_synced = true,
+	has_dialogue_extension = true,
+	vo_triggers_enemy_kill_query = false,
+	dialogue_memory_faction_name = "npc",
+	prop_name = "voice_over_2d",
+	wwise_voice_switch_group = "voice_profile",
+	wwise_voices = {
+		"commissar_a"
 	}
 }
 

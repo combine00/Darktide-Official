@@ -1,6 +1,5 @@
 require("scripts/extension_systems/destructible/destructible_extension")
 
-local LevelPropsBroadphase = require("scripts/utilities/level_props/level_props_broadphase")
 local DestructibleSystem = class("DestructibleSystem", "ExtensionSystemBase")
 local CLIENT_RPCS = {
 	"rpc_destructible_damage_taken",
@@ -60,7 +59,9 @@ function DestructibleSystem:hot_join_sync(sender, channel)
 end
 
 function DestructibleSystem:rpc_destructible_damage_taken(channel_id, unit_id, is_level_unit)
-	if unit_id ~= NetworkConstants.invalid_level_unit_id then
+	local invalid_id = is_level_unit and unit_id == NetworkConstants.invalid_level_unit_id or unit_id == NetworkConstants.invalid_game_object_id
+
+	if not invalid_id then
 		local unit = Managers.state.unit_spawner:unit(unit_id, is_level_unit)
 		local extension = self._unit_to_extension_map[unit]
 
@@ -69,7 +70,9 @@ function DestructibleSystem:rpc_destructible_damage_taken(channel_id, unit_id, i
 end
 
 function DestructibleSystem:rpc_destructible_last_destruction(channel_id, unit_id, is_level_unit)
-	if unit_id ~= NetworkConstants.invalid_level_unit_id then
+	local invalid_id = is_level_unit and unit_id == NetworkConstants.invalid_level_unit_id or unit_id == NetworkConstants.invalid_game_object_id
+
+	if not invalid_id then
 		local unit = Managers.state.unit_spawner:unit(unit_id, is_level_unit)
 		local extension = self._unit_to_extension_map[unit]
 
@@ -78,7 +81,9 @@ function DestructibleSystem:rpc_destructible_last_destruction(channel_id, unit_i
 end
 
 function DestructibleSystem:rpc_sync_destructible(channel_id, unit_id, is_level_unit, current_stage, visible, from_hot_join_sync)
-	if unit_id ~= NetworkConstants.invalid_level_unit_id then
+	local invalid_id = is_level_unit and unit_id == NetworkConstants.invalid_level_unit_id or unit_id == NetworkConstants.invalid_game_object_id
+
+	if not invalid_id then
 		local unit = Managers.state.unit_spawner:unit(unit_id, is_level_unit)
 		local extension = self._unit_to_extension_map[unit]
 

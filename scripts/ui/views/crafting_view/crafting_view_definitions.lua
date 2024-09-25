@@ -1,7 +1,9 @@
 local CraftingSettings = require("scripts/settings/item/crafting_settings")
+local CraftingMechanicusSettings = require("scripts/settings/item/crafting_mechanicus_settings")
 local UIWidget = require("scripts/managers/ui/ui_widget")
 local UIWorkspaceSettings = require("scripts/settings/ui/ui_workspace_settings")
 local InputDevice = require("scripts/managers/input/input_device")
+local ItemUtils = require("scripts/utilities/items")
 local scenegraph_definition = {
 	screen = UIWorkspaceSettings.screen,
 	corner_top_left = {
@@ -206,8 +208,16 @@ local intro_texts = {
 local button_options_definitions = {
 	{
 		display_name = "loc_crafting_view_option_modify",
+		unlocalized_name = "Mechanicus Patch Crafting",
 		callback = function (crafting_view)
-			crafting_view:go_to_crafting_view("select_item")
+			crafting_view:go_to_crafting_view("select_item_mechanicus")
+		end
+	},
+	{
+		unlocalized_name = "Mechanicus Patch Sacrifice Weapon",
+		display_name = "loc_mastery_crafting_sacrifice_weapon_title",
+		callback = function (crafting_view)
+			crafting_view:go_to_crafting_view("barter_items_mechanicus")
 		end
 	}
 }
@@ -220,22 +230,51 @@ local background_world_params = {
 	register_camera_event = "event_register_crafting_view_camera",
 	viewport_name = "ui_crafting_world_viewport",
 	viewport_layer = 1,
-	level_name = "content/levels/ui/crafting_view/crafting_view",
+	level_name = "content/levels/ui/crafting_view_itemization/crafting_view_itemization",
 	world_name = "ui_crafting_world"
 }
 local crafting_tab_params = {
-	select_item = {
+	select_item_mechanicus = {
+		crafting_level_story_event = "camera_recipe_enter_anim",
 		hide_tabs = true,
 		layer = 10,
 		tabs_params = {
 			{
 				background_alpha = 175,
 				display_name = "loc_crafting_modify_title",
-				view = "crafting_modify_view",
+				view = "crafting_mechanicus_modify_view",
 				on_active_callback = function (parent)
 					parent:show_wallets(true)
 				end,
 				input_legend_buttons = {
+					{
+						input_action = "hotkey_item_favorite",
+						display_name = "loc_inventory_add_favorite",
+						alignment = "right_alignment",
+						on_pressed_callback = "cb_on_favorite_pressed",
+						visibility_function = function (parent, id)
+							local active_view = parent._active_view
+							local view_instance = active_view and Managers.ui:view_instance(active_view)
+
+							if not view_instance then
+								return false
+							end
+
+							local widget = view_instance._item_grid and view_instance._item_grid:selected_grid_widget()
+							local gear_id = widget and widget.content.element and widget.content.element.item and widget.content.element.item.gear_id
+
+							if gear_id then
+								local is_favorite = ItemUtils.is_item_id_favorited(gear_id)
+								local display_name = is_favorite and "loc_inventory_remove_favorite" or "loc_inventory_add_favorite"
+
+								parent._input_legend_element:set_display_name(id, display_name)
+
+								return true
+							end
+
+							return false
+						end
+					},
 					{
 						input_action = "hotkey_item_inspect",
 						display_name = "loc_weapon_inventory_inspect_button",
@@ -284,10 +323,70 @@ local crafting_tab_params = {
 				}
 			}
 		}
+	},
+	barter_items_mechanicus = {
+		crafting_level_story_event = "camera_recipe_enter_anim",
+		hide_tabs = true,
+		layer = 10,
+		tabs_params = {
+			{
+				background_alpha = 175,
+				display_name = "loc_crafting_barter_items_view",
+				view = "crafting_mechanicus_barter_items_view",
+				on_active_callback = function (parent)
+					parent:show_wallets(false)
+				end,
+				input_legend_buttons = {
+					{
+						input_action = "hotkey_item_favorite",
+						display_name = "loc_inventory_add_favorite",
+						alignment = "right_alignment",
+						on_pressed_callback = "cb_on_favorite_pressed",
+						visibility_function = function (parent, id)
+							local active_view = parent._active_view
+
+							if not active_view then
+								return false
+							end
+
+							local view_instance = Managers.ui:view_instance(active_view)
+
+							if view_instance then
+								if view_instance._ui_state ~= "select_weapon" then
+									return false
+								end
+
+								local widget = nil
+
+								if view_instance._discard_items_element and view_instance._using_cursor_navigation then
+									widget = view_instance._item_grid and view_instance._item_grid:hovered_widget()
+								else
+									widget = view_instance._item_grid and view_instance._item_grid:selected_grid_widget()
+								end
+
+								local gear_id = widget and widget.content.element and widget.content.element.item and widget.content.element.item.gear_id
+
+								if gear_id then
+									local is_favorite = ItemUtils.is_item_id_favorited(gear_id)
+									local display_name = is_favorite and "loc_inventory_remove_favorite" or "loc_inventory_add_favorite"
+
+									parent._input_legend_element:set_display_name(id, display_name)
+
+									return true
+								end
+							end
+
+							return false
+						end
+					}
+				}
+			}
+		}
 	}
 }
 local used_settings = {
-	CraftingSettings
+	CraftingSettings,
+	CraftingMechanicusSettings
 }
 
 for i = 1, #used_settings do
@@ -296,6 +395,7 @@ for i = 1, #used_settings do
 	for i, recipe in pairs(setting.recipes_ui_order) do
 		local view_name = recipe.view_name
 		crafting_tab_params[view_name] = {
+			crafting_level_story_event = "camera_weapon_selection_enter_anim",
 			hide_tabs = true,
 			layer = 10,
 			tabs_params = {

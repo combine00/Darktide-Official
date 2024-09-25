@@ -1,22 +1,22 @@
 local ButtonPassTemplates = require("scripts/ui/pass_templates/button_pass_templates")
-local ContentBlueprints = require("scripts/ui/views/store_view/store_view_content_blueprints")
-local Definitions = require("scripts/ui/views/store_view/store_view_definitions")
+local Items = require("scripts/utilities/items")
+local MasterItems = require("scripts/backend/master_items")
+local Promise = require("scripts/foundation/utilities/promise")
 local ScriptWorld = require("scripts/foundation/utilities/script_world")
+local StoreViewContentBlueprints = require("scripts/ui/views/store_view/store_view_content_blueprints")
+local StoreViewDefinitions = require("scripts/ui/views/store_view/store_view_definitions")
 local StoreViewSettings = require("scripts/ui/views/store_view/store_view_settings")
+local Text = require("scripts/utilities/ui/text")
+local UIFonts = require("scripts/managers/ui/ui_fonts")
 local UIRenderer = require("scripts/managers/ui/ui_renderer")
+local UISettings = require("scripts/settings/ui/ui_settings")
 local UISoundEvents = require("scripts/settings/ui/ui_sound_events")
 local UIWidget = require("scripts/managers/ui/ui_widget")
 local UIWorldSpawner = require("scripts/managers/ui/ui_world_spawner")
 local ViewElementInputLegend = require("scripts/ui/view_elements/view_element_input_legend/view_element_input_legend")
 local ViewElementTabMenu = require("scripts/ui/view_elements/view_element_tab_menu/view_element_tab_menu")
-local Promise = require("scripts/foundation/utilities/promise")
-local MasterItems = require("scripts/backend/master_items")
-local Text = require("scripts/utilities/ui/text")
-local UISettings = require("scripts/settings/ui/ui_settings")
-local Vo = require("scripts/utilities/vo")
-local ItemUtils = require("scripts/utilities/items")
-local UIFonts = require("scripts/managers/ui/ui_fonts")
 local ViewElementWallet = require("scripts/ui/view_elements/view_element_wallet/view_element_wallet")
+local Vo = require("scripts/utilities/vo")
 local DIRECTION = {
 	RIGHT = 4,
 	UP = 1,
@@ -67,7 +67,7 @@ function StoreView:init(settings, context)
 	self._context = context or {}
 	self._storefront_request_id = 1
 
-	StoreView.super.init(self, Definitions, settings, context)
+	StoreView.super.init(self, StoreViewDefinitions, settings, context)
 
 	self._pass_draw = false
 	self._can_exit = true
@@ -256,9 +256,7 @@ end
 
 function StoreView:_update_account_items()
 	return Managers.data_service.gear:fetch_inventory():next(function (items)
-		for _, item in pairs(items) do
-			self._account_items[#self._account_items + 1] = item
-		end
+		self._account_items = items
 	end)
 end
 
@@ -290,11 +288,6 @@ function StoreView:setup_aquila_store()
 	end
 
 	self:_set_telemetry_name("aquilas")
-
-	local page_layout = category_pages_layout_data[self._selected_page_index]
-	local grid_settings = page_layout.grid_settings
-	local elements = page_layout.elements
-
 	self:_start_animation("grid_entry", self._grid_widgets, self)
 
 	self._widgets_by_name.aquila_button.content.visible = false
@@ -484,19 +477,7 @@ function StoreView:_check_owned(store_item)
 end
 
 function StoreView:is_item_owned(id)
-	local is_owned = false
-
-	for i = 1, #self._account_items do
-		local account_item = self._account_items[i]
-
-		if id == account_item.gear_id then
-			is_owned = true
-
-			break
-		end
-	end
-
-	return is_owned
+	return self._account_items[id]
 end
 
 function StoreView:_open_navigation_path(path)
@@ -635,20 +616,16 @@ function StoreView:_extract_items(offer)
 	local items = {}
 
 	if offer_type == "bundle" then
-		for i = 1, #offer.bundleInfo do
-			local bundle_item = offer.bundleInfo[i]
-			local real_item, item = self:_extract_item(bundle_item.description)
-			local item_info = table.clone(bundle_item)
+		local bundle_info = offer.bundleInfo
 
-			if item_info.price then
-				item_info.price.type = "aquilas"
-			end
-
+		for i = 1, #bundle_info do
+			local bundle_offer = bundle_info[i]
+			local real_item, item = self:_extract_item(bundle_offer.description)
 			items[#items + 1] = {
 				real_item = real_item,
-				gearId = bundle_item.description.gearId,
+				gearId = bundle_offer.description.gearId,
 				item = item,
-				offer = item_info
+				offer = bundle_offer
 			}
 		end
 	else
@@ -677,9 +654,9 @@ function StoreView:_extract_item(description)
 	local item_type = item.item_type
 
 	if item_type == "WEAPON_SKIN" then
-		visual_item = ItemUtils.weapon_skin_preview_item(item)
+		visual_item = Items.weapon_skin_preview_item(item)
 	elseif item_type == "WEAPON_TRINKET" then
-		visual_item = ItemUtils.weapon_trinket_preview_item(item)
+		visual_item = Items.weapon_trinket_preview_item(item)
 
 		if visual_item and not visual_item.slots then
 			visual_item.slots = {
@@ -720,11 +697,11 @@ function StoreView:_fill_layout_with_offers(pages, offers, bundle_rules)
 			}
 			local metadata_presentation_data = offer.sku.metadata and offer.sku.metadata.customPresentation
 			element.widget_type = metadata_presentation_data and widget_types[metadata_presentation_data] or "button"
+			local bundle_info = offer.bundleInfo
 
-			if offer.bundleInfo then
+			if bundle_info then
 				local starting_price = offer.price and offer.price.amount.amount or 0
 				local discounted_price = starting_price
-				local bundle_info = offer.bundleInfo
 				local items = self:_extract_items(offer)
 				local _, owned_items = self:_is_owned(items)
 
@@ -764,7 +741,7 @@ function StoreView:_fill_layout_with_offers(pages, offers, bundle_rules)
 				item_type = item.item_type
 			end
 
-			local item_type_display_name_localized = ItemUtils.type_display_name({
+			local item_type_display_name_localized = Items.type_display_name({
 				item_type = item_type
 			})
 			element.title = title
@@ -839,7 +816,7 @@ function StoreView:_create_aquilas_presentation(offers)
 
 	local scenegraph_id = "grid_aquilas_content"
 	local widgets = {}
-	local template = ContentBlueprints.aquila_button
+	local template = StoreViewContentBlueprints.aquila_button
 	local size_addition = {
 		20,
 		20
@@ -871,6 +848,8 @@ function StoreView:_create_aquilas_presentation(offers)
 		platform = "microsoft"
 	elseif authenticate_method == Managers.backend.AUTH_METHOD_XBOXLIVE and Application.xbox_live and Application.xbox_live() == true then
 		platform = "microsoft"
+	elseif authenticate_method == Managers.backend.AUTH_METHOD_PSN then
+		platform = "psn"
 	else
 		platform = "steam"
 	end
@@ -1029,20 +1008,20 @@ function StoreView:_create_aquilas_presentation(offers)
 	local total_width = 0
 	local total_height = (needed_rows - 1) * spacing[2]
 
-	for i = 1, needed_rows do
-		total_width = math.max(total_width, size_per_row[i][1] - spacing[1])
-		total_height = total_height + size_per_row[i][2]
+	for jj = 1, needed_rows do
+		total_width = math.max(total_width, size_per_row[jj][1] - spacing[1])
+		total_height = total_height + size_per_row[jj][2]
 	end
 
-	for i = 1, #widgets do
-		local widget = widgets[i]
+	for jj = 1, #widgets do
+		local widget = widgets[jj]
 		local row = widget.row - 1
 		local offset_height_value = 0
 		local row_width_value = size_per_row[widget.row][1]
 
 		if row > 0 then
-			for f = 1, row do
-				offset_height_value = offset_height_value + size_per_row[f][2]
+			for ff = 1, row do
+				offset_height_value = offset_height_value + size_per_row[ff][2]
 			end
 
 			offset_height_value = offset_height_value + spacing[2] * row
@@ -1124,8 +1103,17 @@ function StoreView:_fetch_storefront(storefront, on_complete_callback)
 			return
 		end
 
-		if self._destroyed or not self._store_promise then
+		if self._destroyed then
 			return
+		end
+
+		local store_id = data.id
+		local account_save_data = Managers.save:account_data()
+
+		if store_id and store_service:is_featured_store(storefront) and account_save_data.last_seen_store_id ~= store_id then
+			account_save_data.last_seen_store_id = store_id
+
+			Managers.save:queue_save()
 		end
 
 		self._catalog_timer = data.catalog_validity
@@ -1136,13 +1124,13 @@ function StoreView:_fetch_storefront(storefront, on_complete_callback)
 
 		for i = 1, #offers do
 			local offer = offers[i]
+			local bundle_info = offer.bundleInfo
 
-			if offer.bundleInfo then
+			if bundle_info then
 				local offer_valid = true
-				local is_personal = offer.is_personal()
 
-				for j = 1, #offer.bundleInfo do
-					local bundle_offer = offer.bundleInfo[j]
+				for j = 1, #bundle_info do
+					local bundle_offer = bundle_info[j]
 					local is_item = bundle_offer.sku and bundle_offer.sku.category == "item_instance"
 					local item = nil
 
@@ -1151,14 +1139,6 @@ function StoreView:_fetch_storefront(storefront, on_complete_callback)
 
 						if not item then
 							offer_valid = false
-						end
-					end
-
-					if not is_item or is_item and item then
-						bundle_offer.offerId = bundle_offer.price and bundle_offer.price.id
-
-						if bundle_offer.offerId then
-							data:decorate_offer(bundle_offer, is_personal)
 						end
 					end
 				end
@@ -1731,7 +1711,7 @@ function StoreView:_create_entry_widget_from_config(config, suffix, primary_call
 	local ui_renderer = self._ui_renderer
 	local widget_type = config.widget_type
 	local widget = nil
-	local template = ContentBlueprints[widget_type]
+	local template = StoreViewContentBlueprints[widget_type]
 	local layout_width, layout_height = self:_scenegraph_size("grid_background")
 	local size_scale = config.size_scale
 	local spacing = config.spacing
@@ -2059,8 +2039,8 @@ function StoreView:_draw_grid(dt, t, input_service)
 
 			UIWidget.draw(widget, ui_renderer)
 
-			if widget.content.widget_type and ContentBlueprints[widget.content.widget_type] and ContentBlueprints[widget.content.widget_type].update then
-				ContentBlueprints[widget.content.widget_type].update(self, widget, input_service, dt, t, ui_renderer)
+			if widget.content.widget_type and StoreViewContentBlueprints[widget.content.widget_type] and StoreViewContentBlueprints[widget.content.widget_type].update then
+				StoreViewContentBlueprints[widget.content.widget_type].update(self, widget, input_service, dt, t, ui_renderer)
 			end
 		end
 	end
@@ -2373,10 +2353,9 @@ function StoreView:_update_wallets()
 end
 
 function StoreView:_can_afford(store_item)
-	local can_afford = true
 	local cost = store_item.price.amount.amount
 	local currency = store_item.price.amount.type
-	can_afford = cost <= self._wallet_element:get_amount_by_currency(currency)
+	local can_afford = cost <= self._wallet_element:get_amount_by_currency(currency)
 
 	return can_afford
 end

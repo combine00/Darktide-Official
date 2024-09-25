@@ -1,3 +1,4 @@
+local WieldableSlotScriptInterface = require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/wieldable_slot_script_interface")
 local DeployableDeviceEffects = class("DeployableDeviceEffects")
 local FX_SOURCE_NAME = "_source"
 local SFX_STOP_ALIAS = "sfx_device_stop"
@@ -33,5 +34,7 @@ end
 function DeployableDeviceEffects:update_first_person_mode(first_person_mode)
 	return
 end
+
+implements(DeployableDeviceEffects, WieldableSlotScriptInterface)
 
 return DeployableDeviceEffects

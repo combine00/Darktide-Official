@@ -38,6 +38,7 @@ function PresenceEntryMyself:reset()
 	self._cross_play_disabled = nil
 	self._cross_play_disabled_in_party = nil
 	self._is_cross_playing = nil
+	self._psn_session_id = nil
 end
 
 function PresenceEntryMyself:account_id()
@@ -171,6 +172,16 @@ function PresenceEntryMyself:set_is_cross_playing(value)
 	self._is_cross_playing = value and "true" or "false"
 end
 
+function PresenceEntryMyself:psn_session_id()
+	local session_id = self._psn_session_id
+
+	return session_id ~= "none" and session_id or nil
+end
+
+function PresenceEntryMyself:set_psn_session_id(value)
+	self._psn_session_id = value or "none"
+end
+
 function PresenceEntryMyself:is_alive()
 	return true
 end
@@ -210,6 +221,10 @@ function PresenceEntryMyself:create_key_values(white_list)
 
 	if not white_list or white_list.is_cross_playing then
 		key_values.is_cross_playing = self._is_cross_playing
+	end
+
+	if not white_list or white_list.psn_session_id then
+		key_values.psn_session_id = self._psn_session_id
 	end
 
 	return key_values

@@ -4,12 +4,15 @@ local GameplayInitStepStateLast = class("GameplayInitStepStateLast")
 
 function GameplayInitStepStateLast:on_enter(parent, params)
 	local shared_state = params.shared_state
+	self._shared_state = shared_state
 	local is_server = shared_state.is_server
 
 	self:_finalize_network_init(is_server, shared_state)
 end
 
 function GameplayInitStepStateLast:update(main_dt, main_t)
+	self._shared_state.initialized_steps.GameplayInitStepStateLast = true
+
 	return nil, nil
 end
 

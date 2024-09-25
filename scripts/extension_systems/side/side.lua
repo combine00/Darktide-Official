@@ -22,6 +22,8 @@ function Side:init(definition, side_id)
 		allied = {},
 		neutral = {}
 	}
+	self.aggroed_minion_units = {}
+	self.num_aggroed_minion_units = 0
 
 	self:_create_relation_tables()
 

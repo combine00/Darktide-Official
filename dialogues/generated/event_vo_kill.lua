@@ -33,6 +33,12 @@ return function ()
 					"sergeant",
 					"tech_priest"
 				}
+			},
+			{
+				"global_context",
+				"current_mission",
+				OP.NEQ,
+				"op_train"
 			}
 		},
 		on_done = {},

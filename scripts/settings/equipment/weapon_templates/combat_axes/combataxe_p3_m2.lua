@@ -1221,16 +1221,16 @@ weapon_template.actions = {
 	action_right_light_pushfollow = {
 		damage_window_start = 0.3,
 		hit_armor_anim = "attack_hit_shield",
+		range_mod = 1.35,
 		kind = "sweep",
-		sprint_requires_press_to_interrupt = "true",
 		max_num_saved_entries = 20,
 		action_priority = 1,
-		anim_event_3p = "attack_swing_down",
 		weapon_handling_template = "time_scale_1",
+		anim_event_3p = "attack_swing_down",
 		num_frames_before_process = 0,
+		allowed_during_sprint = true,
 		first_person_hit_stop_anim = "hit_stop",
 		damage_window_end = 0.4,
-		range_mod = 1.35,
 		anim_end_event = "attack_finished",
 		attack_direction_override = "left",
 		uninterruptible = true,
@@ -1594,18 +1594,29 @@ weapon_template.anim_state_machine_3p = "content/characters/player/human/third_p
 weapon_template.anim_state_machine_1p = "content/characters/player/human/first_person/animations/shovel"
 weapon_template.weapon_box = combat_axe_sweep_box
 weapon_template.sprint_ready_up_time = 0.1
-weapon_template.uses_ammunition = false
-weapon_template.uses_overheat = false
+weapon_template.hud_configuration = {
+	uses_overheat = false,
+	uses_ammunition = false
+}
 weapon_template.max_first_person_anim_movement_speed = 5.8
 weapon_template.damage_window_start_sweep_trail_offset = -0.45
 weapon_template.damage_window_end_sweep_trail_offset = 0.45
 weapon_template.ammo_template = "no_ammo"
-weapon_template.allow_sprinting_with_special = true
-weapon_template.weapon_special_class = "WeaponSpeciaShovels"
+weapon_template.weapon_special_class = "WeaponSpecialShovels"
 weapon_template.weapon_special_tweak_data = {
 	deactivation_animation = "deactivate_automatic",
 	deactivation_animation_on_abort = true,
-	deactivation_animation_delay = 0.4
+	deactivation_animation_delay = 0.4,
+	set_inactive_func = function (inventory_slot_component, reason, tweak_data)
+		local disable_special_active = reason == "max_activations" or reason == "manual_toggle"
+
+		if disable_special_active then
+			inventory_slot_component.special_active = false
+			inventory_slot_component.num_special_charges = 0
+		end
+
+		return true
+	end
 }
 weapon_template.fx_sources = {
 	_block = "fx_block",
@@ -1890,6 +1901,24 @@ weapon_template.displayed_attacks = {
 		desc = "loc_weapon_special_mode_switch_foldable_desc",
 		display_name = "loc_weapon_special_mode_switch",
 		type = "activate"
+	}
+}
+weapon_template.weapon_card_data = {
+	main = {
+		{
+			icon = "tank",
+			value_func = "primary_attack",
+			header = "light"
+		},
+		{
+			icon = "smiter",
+			value_func = "secondary_attack",
+			header = "heavy"
+		}
+	},
+	weapon_special = {
+		icon = "special_attack",
+		header = "special_attack"
 	}
 }
 weapon_template.special_action_name = "action_special_activate"

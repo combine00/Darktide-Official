@@ -1,3 +1,4 @@
+local WieldableSlotScriptInterface = require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/wieldable_slot_script_interface")
 local PsykerForceFieldPlacementPreviewEffects = class("PsykerForceFieldPlacementPreviewEffects")
 
 function PsykerForceFieldPlacementPreviewEffects:init(context, slot, weapon_template, fx_sources)
@@ -87,5 +88,7 @@ function PsykerForceFieldPlacementPreviewEffects:_destroy_effects()
 		self._shield_unit = nil
 	end
 end
+
+implements(PsykerForceFieldPlacementPreviewEffects, WieldableSlotScriptInterface)
 
 return PsykerForceFieldPlacementPreviewEffects

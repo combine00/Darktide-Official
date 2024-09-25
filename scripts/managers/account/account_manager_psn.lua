@@ -1,5 +1,7 @@
 local AccountManagerBase = require("scripts/managers/account/account_manager_base")
+local PlayerSessionPSN = require("scripts/managers/account/player_session_psn")
 local ScriptWebApiPsn = require("scripts/managers/account/script_web_api_psn")
+local PSNRestrictions = require("scripts/managers/account/psn_restrictions")
 local Promise = require("scripts/foundation/utilities/promise")
 local SIGNIN_STATES = {
 	fetching_sandbox_id = "loc_signin_fetch_sandbox_id",
@@ -19,6 +21,7 @@ local FRIEND_LIST_REQUEST_LIMIT = 500
 local BLOCKED_PROFILES_REQUEST_LIMIT = 100
 local PUBLIC_PROFILES_REQUEST_LIMIT = 100
 local PORFILE_PRESENCES_REQUEST_LIMIT = 100
+local PREMIUM_NOTIFICATION_TIMER = 5
 local AccountManagerPSN = class("AccountManagerPSN", "AccountManagerBase")
 
 function AccountManagerPSN:init()
@@ -52,9 +55,24 @@ function AccountManagerPSN:reset()
 	self._wanted_state = nil
 	self._wanted_state_params = nil
 	self._leave_game = false
+
+	if self._session_id then
+		self:leave_psn_session()
+	end
+
+	self._restrictions = {
+		communication = nil,
+		cross_play = false
+	}
+	self._premium_verified = false
+	self._premium_notification_timer = 0
 end
 
 function AccountManagerPSN:destroy()
+	if self._session_id then
+		self:leave_psn_session()
+	end
+
 	self._web_api:destroy()
 
 	self._web_api = nil
@@ -66,13 +84,50 @@ function AccountManagerPSN:update(dt, t)
 	end
 
 	self._web_api:update(dt)
+
+	if self._premium_verified then
+		self._premium_notification_timer = self._premium_notification_timer + dt
+
+		if PREMIUM_NOTIFICATION_TIMER <= self._premium_notification_timer then
+			Playstation.notify_premium_feature(self._initial_user_id, NpMultiplayProperty.CROSS_PLATFORM_PLAY)
+
+			self._premium_notification_timer = 0
+		end
+	end
 end
 
 function AccountManagerPSN:signin_profile(signin_callback, optional_input_device)
 	self._signin_state = SIGNIN_STATES.signin_profile
 	self._signin_callback = signin_callback
 
-	self:cb_signin_complete()
+	PSNRestrictions:verify_premium():next(function (_)
+		self._premium_verified = true
+
+		self:cb_signin_complete()
+	end):catch(function (_)
+		local fail_cb = callback(self, "_show_fatal_error", "loc_popup_header_error", "loc_psn_premium_fail_desc")
+
+		fail_cb()
+	end)
+end
+
+function AccountManagerPSN:_show_fatal_error(title_text, description_text)
+	local context = {
+		priority_order = 1000,
+		title_text = title_text,
+		description_text = description_text,
+		options = {
+			{
+				text = "loc_popup_button_close",
+				close_on_pressed = true,
+				callback = callback(self, "return_to_title_screen")
+			}
+		}
+	}
+
+	Managers.event:trigger("event_show_ui_popup", context, function (id)
+		self._fatal_error_popup_id = id
+	end)
 end
 
 function AccountManagerPSN:cb_signin_complete()
@@ -340,11 +395,19 @@ function AccountManagerPSN:friends_list_has_changes()
 end
 
 function AccountManagerPSN:refresh_communication_restrictions()
-	return
+	if self._restrictions.communication == nil then
+		local web_api = self._web_api
+		local account_id = self._account_id
+		local restrictions = self._restrictions
+
+		PSNRestrictions:fetch_communication_restrictions(web_api, account_id):next(function (result)
+			restrictions.communication = result.restricted
+		end)
+	end
 end
 
 function AccountManagerPSN:is_muted()
-	return false
+	return self:user_has_restriction()
 end
 
 function AccountManagerPSN:is_blocked()
@@ -352,11 +415,21 @@ function AccountManagerPSN:is_blocked()
 end
 
 function AccountManagerPSN:fetch_crossplay_restrictions()
-	return
+	local save_manager = Managers.save
+
+	if save_manager then
+		local account_data = save_manager:account_data()
+		local crossplay_enabled = account_data and account_data.interface_settings.crossplay_enabled
+		self._restrictions.cross_play = not crossplay_enabled
+	end
+end
+
+function AccountManagerPSN:set_crossplay_restriction(value)
+	self._restrictions.cross_play = value
 end
 
 function AccountManagerPSN:has_crossplay_restriction()
-	return false
+	return self._restrictions.cross_play
 end
 
 function AccountManagerPSN:verify_user_restriction()
@@ -368,7 +441,7 @@ function AccountManagerPSN:verify_user_restriction_batched()
 end
 
 function AccountManagerPSN:user_has_restriction()
-	return false
+	return self._restrictions.communication or false
 end
 
 function AccountManagerPSN:user_restriction_verified()
@@ -470,6 +543,93 @@ function AccountManagerPSN:_fetch_block_list(num_to_fetch, offset, result_promis
 	end)
 
 	return result_promise
+end
+
+function AccountManagerPSN:create_psn_session(max_players, join_disabled, is_private)
+	PlayerSessionPSN.create_session(self._web_api, self:user_id(), max_players, join_disabled, is_private):next(function (session_id)
+		Log.info("PlayerSession", "Created session %s, max_players %s, join_disabled %s, is_private: %s", session_id, max_players, join_disabled, is_private)
+		self:_set_psn_session_id(session_id)
+	end)
+end
+
+function AccountManagerPSN:join_psn_session(session_id)
+	PlayerSessionPSN.join_session(self._web_api, self:user_id(), session_id):next(function ()
+		Log.info("PlayerSession", "Joined session %s", session_id)
+		self:_set_psn_session_id(session_id)
+	end)
+end
+
+function AccountManagerPSN:leave_psn_session()
+	local session_id = self._session_id
+
+	if not session_id then
+		return
+	end
+
+	PlayerSessionPSN.leave_session(self._web_api, self:user_id(), session_id):next(function ()
+		Log.info("PlayerSession", "Left session %s", session_id)
+	end)
+	self:_set_psn_session_id(nil)
+end
+
+function AccountManagerPSN:is_psn_session_leader()
+	local session_id = self._session_id
+
+	if not session_id then
+		return Promise.resolved(false)
+	end
+
+	return PlayerSessionPSN.is_session_leader(self._web_api, self:user_id(), session_id)
+end
+
+function AccountManagerPSN:update_psn_session_max_players(max_players)
+	local session_id = self._session_id
+
+	if not session_id then
+		return
+	end
+
+	PlayerSessionPSN.update_session_max_players(self._web_api, self:user_id(), session_id, max_players)
+end
+
+function AccountManagerPSN:update_psn_session_privacy(is_private)
+	local session_id = self._session_id
+
+	if not session_id then
+		return
+	end
+
+	PlayerSessionPSN.update_session_privacy(self._web_api, self:user_id(), session_id, is_private)
+end
+
+function AccountManagerPSN:update_psn_session_join_disabled(join_disabled)
+	local session_id = self._session_id
+
+	if not session_id then
+		return
+	end
+
+	PlayerSessionPSN.update_session_join_disabled(self._web_api, self:user_id(), session_id, join_disabled)
+end
+
+function AccountManagerPSN:get_immaterium_invite_code_from_psn_session(session_id)
+	return PlayerSessionPSN.get_session_invite_code(self._web_api, self:user_id(), session_id)
+end
+
+function AccountManagerPSN:send_psn_session_invite(invitee_psn_account_id)
+	local session_id = self._session_id
+
+	if not session_id then
+		return
+	end
+
+	PlayerSessionPSN.send_session_invite(self._web_api, self:user_id(), session_id, invitee_psn_account_id)
+end
+
+function AccountManagerPSN:_set_psn_session_id(session_id)
+	self._session_id = session_id
+
+	Managers.presence:set_psn_session_id(session_id)
 end
 
 return AccountManagerPSN

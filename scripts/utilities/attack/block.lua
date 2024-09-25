@@ -224,6 +224,22 @@ function Block.player_blocked_attack(target_unit, attacking_unit, hit_world_posi
 	end
 end
 
+local PERFECT_BLOCK_WINDOW = 0.3
+
+function Block.start_block_action(t, block_component)
+	block_component.is_blocking = true
+	block_component.has_blocked = false
+	block_component.is_perfect_blocking = true
+
+	return t + PERFECT_BLOCK_WINDOW
+end
+
+function Block.update_perfect_blocking(t, perfect_block_ends_at_t, block_component)
+	if t > (perfect_block_ends_at_t or 0) and block_component.is_perfect_blocking then
+		block_component.is_perfect_blocking = false
+	end
+end
+
 function _block_buff_modifier(buff_extension, attack_type)
 	if not buff_extension then
 		return 1

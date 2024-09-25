@@ -6,7 +6,6 @@ require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/ammo_co
 require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/auspex_effects")
 require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/auspex_scanning_effects")
 require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/chain_lightning_ability_hand_effects")
-require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/chain_lightning_ability_link_effects")
 require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/chain_lightning_hand_effects")
 require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/chain_lightning_link_effects")
 require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/chain_lightning_target_effects")
@@ -50,17 +49,17 @@ require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/zealot_
 
 local WeaponTemplate = require("scripts/utilities/weapon/weapon_template")
 local WieldableSlotScripts = {}
-local all_wieldable_slot_scripts = {}
+local _all_wieldable_slot_scripts = {}
 local EMPTY_TABLE = {}
 
 function WieldableSlotScripts.create(wieldable_slot_scripts_context, wieldable_slot_scripts, fx_sources, slot, item)
-	table.clear(all_wieldable_slot_scripts)
+	table.clear(_all_wieldable_slot_scripts)
 
 	local item_wieldable_slot_scripts = item.wieldable_slot_scripts or EMPTY_TABLE
 	local num_scripts = #item_wieldable_slot_scripts
 
 	for ii = 1, num_scripts do
-		all_wieldable_slot_scripts[ii] = item_wieldable_slot_scripts[ii]
+		_all_wieldable_slot_scripts[ii] = item_wieldable_slot_scripts[ii]
 	end
 
 	local weapon_template = WeaponTemplate.weapon_template_from_item(item)
@@ -68,18 +67,18 @@ function WieldableSlotScripts.create(wieldable_slot_scripts_context, wieldable_s
 
 	for ii = 1, #weapon_template_wieldable_slot_scripts do
 		local script_name = weapon_template_wieldable_slot_scripts[ii]
-		local already_defined = table.find(all_wieldable_slot_scripts, script_name)
+		local already_defined = table.find(_all_wieldable_slot_scripts, script_name)
 
 		if not already_defined then
 			num_scripts = num_scripts + 1
-			all_wieldable_slot_scripts[num_scripts] = script_name
+			_all_wieldable_slot_scripts[num_scripts] = script_name
 		end
 	end
 
 	local actual_num_scripts = 0
 
 	for ii = num_scripts, 1, -1 do
-		local script_name = all_wieldable_slot_scripts[ii]
+		local script_name = _all_wieldable_slot_scripts[ii]
 		local script_class = CLASSES[script_name]
 
 		if script_class then
@@ -172,6 +171,18 @@ function WieldableSlotScripts.update_unit_position(wieldable_slot_scripts, unit,
 
 		if wieldable_slot_script.update_unit_position then
 			wieldable_slot_script:update_unit_position(unit, dt, t)
+		end
+	end
+end
+
+function WieldableSlotScripts.update_first_person_mode(wieldable_slot_scripts, first_person_mode)
+	local num_scripts = #wieldable_slot_scripts
+
+	for ii = 1, num_scripts do
+		local wieldable_slot_script = wieldable_slot_scripts[ii]
+
+		if wieldable_slot_script.update_first_person_mode then
+			wieldable_slot_script:update_first_person_mode(first_person_mode)
 		end
 	end
 end

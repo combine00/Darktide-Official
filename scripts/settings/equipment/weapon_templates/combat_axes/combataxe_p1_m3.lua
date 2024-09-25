@@ -602,7 +602,7 @@ weapon_template.actions = {
 				0
 			}
 		},
-		damage_profile = DamageProfileTemplates.heavy_axe,
+		damage_profile = DamageProfileTemplates.heavy_axe_spike,
 		damage_type = damage_types.axe_light,
 		time_scale_stat_buffs = {
 			buff_stat_buffs.attack_speed,
@@ -851,7 +851,7 @@ weapon_template.actions = {
 				0
 			}
 		},
-		damage_profile = DamageProfileTemplates.heavy_axe,
+		damage_profile = DamageProfileTemplates.heavy_axe_spike,
 		damage_type = damage_types.axe_light,
 		time_scale_stat_buffs = {
 			buff_stat_buffs.attack_speed,
@@ -925,17 +925,17 @@ weapon_template.actions = {
 	action_right_light_pushfollow = {
 		damage_window_start = 0.26666666666666666,
 		hit_armor_anim = "hit_stop",
-		sprint_requires_press_to_interrupt = "true",
-		max_num_saved_entries = 20,
-		first_person_hit_stop_anim = "hit_stop",
-		weapon_handling_template = "time_scale_1",
-		num_frames_before_process = 0,
+		range_mod = 1.35,
 		kind = "sweep",
+		max_num_saved_entries = 20,
+		weapon_handling_template = "time_scale_1",
+		uninterruptible = true,
+		num_frames_before_process = 0,
+		allowed_during_sprint = true,
 		attack_direction_override = "right",
 		damage_window_end = 0.5,
 		anim_end_event = "attack_finished",
-		uninterruptible = true,
-		range_mod = 1.35,
+		first_person_hit_stop_anim = "hit_stop",
 		anim_event_3p = "attack_swing_right",
 		anim_event = "attack_right",
 		total_time = 1.5,
@@ -1165,8 +1165,10 @@ weapon_template.anim_state_machine_3p = "content/characters/player/human/third_p
 weapon_template.anim_state_machine_1p = "content/characters/player/human/first_person/animations/axe"
 weapon_template.weapon_box = combat_axe_sweep_box
 weapon_template.sprint_ready_up_time = 0.1
-weapon_template.uses_ammunition = false
-weapon_template.uses_overheat = false
+weapon_template.hud_configuration = {
+	uses_overheat = false,
+	uses_ammunition = false
+}
 weapon_template.max_first_person_anim_movement_speed = 5.8
 weapon_template.damage_window_start_sweep_trail_offset = -0.45
 weapon_template.damage_window_end_sweep_trail_offset = 0.45
@@ -1674,6 +1676,24 @@ weapon_template.displayed_attacks = {
 		desc = "loc_stats_special_action_special_attack_combataxe_p1m1_desc",
 		display_name = "loc_weapon_special_special_attack",
 		type = "special_attack"
+	}
+}
+weapon_template.weapon_card_data = {
+	main = {
+		{
+			icon = "smiter",
+			value_func = "primary_attack",
+			header = "light"
+		},
+		{
+			icon = "smiter",
+			value_func = "secondary_attack",
+			header = "heavy"
+		}
+	},
+	weapon_special = {
+		icon = "special_attack",
+		header = "special_attack"
 	}
 }
 weapon_template.special_action_name = "action_special_uppercut"

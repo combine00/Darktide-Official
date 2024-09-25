@@ -9,5 +9,6 @@ end
 _add_live_event("skulls")
 _add_live_event("mechanicus")
 _add_live_event("darkness")
+_add_live_event("moebian_21")
 
 return settings("LiveEvents", live_events)

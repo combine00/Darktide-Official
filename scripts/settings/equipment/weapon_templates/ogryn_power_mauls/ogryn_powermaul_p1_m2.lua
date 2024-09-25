@@ -219,7 +219,11 @@ local weapon_template = {
 			damage_profile = DamageProfileTemplates.ogryn_powermaul_light_smiter,
 			damage_type = damage_types.ogryn_pipe_club,
 			damage_profile_special_active = DamageProfileTemplates.ogryn_powermaul_light_smiter_active,
-			herding_template = HerdingTemplates.ogryn_punch
+			herding_template = HerdingTemplates.ogryn_punch,
+			time_scale_stat_buffs = {
+				buff_stat_buffs.attack_speed,
+				buff_stat_buffs.melee_attack_speed
+			}
 		},
 		action_left_heavy = {
 			damage_window_start = 0.4,
@@ -298,7 +302,11 @@ local weapon_template = {
 			damage_profile = DamageProfileTemplates.ogryn_powermaul_heavy_tank,
 			damage_type = damage_types.ogryn_pipe_club,
 			damage_profile_special_active = DamageProfileTemplates.ogryn_powermaul_heavy_tank_active,
-			herding_template = HerdingTemplates.linesman_left_heavy
+			herding_template = HerdingTemplates.linesman_left_heavy,
+			time_scale_stat_buffs = {
+				buff_stat_buffs.attack_speed,
+				buff_stat_buffs.melee_attack_speed
+			}
 		},
 		action_melee_start_right = {
 			allowed_during_sprint = true,
@@ -455,7 +463,11 @@ local weapon_template = {
 			},
 			damage_profile = DamageProfileTemplates.ogryn_powermaul_light_smiter,
 			damage_type = damage_types.ogryn_pipe_club,
-			damage_profile_special_active = DamageProfileTemplates.ogryn_powermaul_light_smiter_active
+			damage_profile_special_active = DamageProfileTemplates.ogryn_powermaul_light_smiter_active,
+			time_scale_stat_buffs = {
+				buff_stat_buffs.attack_speed,
+				buff_stat_buffs.melee_attack_speed
+			}
 		},
 		action_right_heavy = {
 			damage_window_start = 0.4,
@@ -534,7 +546,11 @@ local weapon_template = {
 			damage_profile = DamageProfileTemplates.ogryn_powermaul_heavy_tank,
 			damage_type = damage_types.ogryn_pipe_club,
 			damage_profile_special_active = DamageProfileTemplates.ogryn_powermaul_heavy_tank_active,
-			herding_template = HerdingTemplates.linesman_right_heavy
+			herding_template = HerdingTemplates.linesman_right_heavy,
+			time_scale_stat_buffs = {
+				buff_stat_buffs.attack_speed,
+				buff_stat_buffs.melee_attack_speed
+			}
 		},
 		action_melee_start_left_2 = {
 			first_person_hit_stop_anim = "attack_hit",
@@ -690,7 +706,11 @@ local weapon_template = {
 			damage_profile = DamageProfileTemplates.ogryn_powermaul_light_linesman,
 			damage_type = damage_types.ogryn_pipe_club,
 			damage_profile_special_active = DamageProfileTemplates.ogryn_powermaul_light_linesman_active,
-			herding_template = HerdingTemplates.linesman_left_heavy
+			herding_template = HerdingTemplates.linesman_left_heavy,
+			time_scale_stat_buffs = {
+				buff_stat_buffs.attack_speed,
+				buff_stat_buffs.melee_attack_speed
+			}
 		},
 		action_melee_start_right_2 = {
 			first_person_hit_stop_anim = "attack_hit",
@@ -847,7 +867,11 @@ local weapon_template = {
 			damage_profile = DamageProfileTemplates.ogryn_powermaul_light_linesman,
 			damage_type = damage_types.ogryn_pipe_club,
 			damage_profile_special_active = DamageProfileTemplates.ogryn_powermaul_light_linesman_active,
-			herding_template = HerdingTemplates.linesman_right_heavy
+			herding_template = HerdingTemplates.linesman_right_heavy,
+			time_scale_stat_buffs = {
+				buff_stat_buffs.attack_speed,
+				buff_stat_buffs.melee_attack_speed
+			}
 		},
 		action_melee_start_heavy_follow_up_part_1 = {
 			first_person_hit_stop_anim = "attack_hit",
@@ -1004,7 +1028,11 @@ local weapon_template = {
 			damage_profile = DamageProfileTemplates.ogryn_powermaul_light_linesman,
 			damage_type = damage_types.ogryn_pipe_club,
 			damage_profile_special_active = DamageProfileTemplates.ogryn_powermaul_light_linesman_active,
-			herding_template = HerdingTemplates.linesman_right_heavy
+			herding_template = HerdingTemplates.linesman_right_heavy,
+			time_scale_stat_buffs = {
+				buff_stat_buffs.attack_speed,
+				buff_stat_buffs.melee_attack_speed
+			}
 		},
 		action_weapon_special = {
 			kind = "activate_special",
@@ -1190,13 +1218,13 @@ local weapon_template = {
 		action_right_light_pushfollow = {
 			damage_window_start = 0.4,
 			hit_armor_anim = "attack_hit_shield",
-			sprint_requires_press_to_interrupt = "true",
-			kind = "sweep",
 			weapon_handling_template = "time_scale_1_2",
+			first_person_hit_stop_anim = "attack_hit",
+			kind = "sweep",
 			first_person_hit_anim = "hit_right_shake",
 			range_mod = 1.25,
-			first_person_hit_stop_anim = "attack_hit",
 			anim_event = "push_follow_up",
+			allowed_during_sprint = true,
 			attack_direction_override = "right",
 			damage_window_end = 0.5333333333333333,
 			total_time = 2,
@@ -1262,7 +1290,11 @@ local weapon_template = {
 			},
 			damage_profile = DamageProfileTemplates.ogryn_powermaul_light_linesman,
 			damage_profile_special_active = DamageProfileTemplates.ogryn_powermaul_light_linesman_active,
-			damage_type = damage_types.ogryn_pipe_club
+			damage_type = damage_types.ogryn_pipe_club,
+			time_scale_stat_buffs = {
+				buff_stat_buffs.attack_speed,
+				buff_stat_buffs.melee_attack_speed
+			}
 		},
 		action_push = {
 			push_radius = 2.5,
@@ -1581,6 +1613,24 @@ weapon_template.displayed_attacks = {
 		type = "activate"
 	}
 }
+weapon_template.weapon_card_data = {
+	main = {
+		{
+			icon = "smiter",
+			value_func = "primary_attack",
+			header = "light"
+		},
+		{
+			icon = "tank",
+			value_func = "secondary_attack",
+			header = "heavy"
+		}
+	},
+	weapon_special = {
+		icon = "activate",
+		header = "activate"
+	}
+}
 
 table.add_missing(weapon_template.actions, BaseTemplateSettings.actions)
 
@@ -1591,11 +1641,13 @@ weapon_template.weapon_box = {
 	0.7,
 	0.02
 }
-weapon_template.uses_ammunition = false
-weapon_template.uses_overheat = false
-weapon_template.allow_sprinting_with_special = true
+weapon_template.hud_configuration = {
+	uses_overheat = false,
+	uses_ammunition = false
+}
 weapon_template.weapon_special_class = "WeaponSpecialExplodeOnImpact"
 weapon_template.weapon_special_tweak_data = {
+	keep_active_on_sprint = true,
 	disorientation_type = "ogryn_powermaul_disorientation",
 	active_duration = 4,
 	explosion_template = ExplosionTemplates.powermaul_activated_impact

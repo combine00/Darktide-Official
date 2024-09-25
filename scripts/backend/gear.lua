@@ -64,6 +64,29 @@ function Gear:delete_gear(item_id)
 	end)
 end
 
+function Gear:delete_gear_batch(items)
+	local operations = {}
+
+	for i = 1, #items do
+		local item = items[i]
+		operations[#operations + 1] = {
+			op = "delete",
+			gearId = item.gear_id
+		}
+	end
+
+	return self:_gear_batch_path():next(function (path)
+		return Managers.backend:title_request(path, {
+			method = "POST",
+			body = {
+				operations = operations
+			}
+		}):next(function (data)
+			return data.body
+		end)
+	end)
+end
+
 function Gear:create(master_id, slot, character_id, overrides, allow_duplicate)
 	return Managers.backend:authenticate():next(function (account)
 		return string.format("/data/%s/account/gear?allowDuplicate=%s", account.sub, allow_duplicate)
@@ -105,6 +128,8 @@ function Gear:attach_item_as_override(item_id, attach_point, gear_id)
 
 	if gear_id then
 		string_path.body.itemRef = gear_id
+	else
+		string_path.body = nil
 	end
 
 	return BackendUtilities.make_account_title_request("account", BackendUtilities.url_builder("/gear/"):path(item_id):path("/overrides/"):path(attach_point), string_path):next(function (data)

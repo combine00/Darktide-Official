@@ -100,15 +100,16 @@ weapon_template.actions = {
 		}
 	},
 	action_melee_start_slide = {
-		anim_event_3p = "attack_swing_charge_down_left",
 		chain_anim_event = "heavy_charge_left_diagonal_pose",
+		proc_time_interval = 0.2,
 		start_input = "start_attack",
 		kind = "windup",
-		chain_anim_event_3p = "attack_swing_charge_down_left",
 		action_priority = 2,
-		anim_end_event = "attack_finished",
-		proc_time_interval = 0.2,
+		invalid_start_action_for_stat_calculation = true,
 		allowed_during_sprint = true,
+		chain_anim_event_3p = "attack_swing_charge_down_left",
+		anim_end_event = "attack_finished",
+		anim_event_3p = "attack_swing_charge_down_left",
 		anim_event = "heavy_charge_left_diagonal",
 		stop_input = "attack_cancel",
 		total_time = 3,
@@ -1004,11 +1005,11 @@ weapon_template.actions = {
 			},
 			start_attack = {
 				action_name = "action_melee_start_left_2",
-				chain_time = 0.56
+				chain_time = 0.55
 			},
 			special_action = {
 				action_name = "action_special",
-				chain_time = 0.75
+				chain_time = 0.6
 			},
 			block = {
 				action_name = "action_block",
@@ -1099,7 +1100,7 @@ weapon_template.actions = {
 			},
 			heavy_attack = {
 				action_name = "action_heavy_1",
-				chain_time = 0.71
+				chain_time = 0.6
 			},
 			block = {
 				action_name = "action_block"
@@ -1433,12 +1434,12 @@ weapon_template.actions = {
 	action_right_light_pushfollow = {
 		damage_window_start = 0.23333333333333334,
 		hit_armor_anim = "attack_hit_shield",
-		weapon_handling_template = "time_scale_1_1",
-		first_person_hit_anim = "hit_right_shake",
-		first_person_hit_stop_anim = "attack_hit",
-		sprint_requires_press_to_interrupt = true,
-		range_mod = 2.6,
 		kind = "sweep",
+		first_person_hit_anim = "hit_right_shake",
+		range_mod = 2.6,
+		first_person_hit_stop_anim = "attack_hit",
+		allowed_during_sprint = true,
+		weapon_handling_template = "time_scale_1_1",
 		damage_window_end = 0.4,
 		anim_end_event = "attack_finished",
 		attack_direction_override = "push",
@@ -1711,8 +1712,10 @@ weapon_template.weapon_box = {
 	0.7,
 	0.02
 }
-weapon_template.uses_ammunition = false
-weapon_template.uses_overheat = false
+weapon_template.hud_configuration = {
+	uses_overheat = false,
+	uses_ammunition = false
+}
 weapon_template.sprint_ready_up_time = 0.2
 weapon_template.max_first_person_anim_movement_speed = 4.8
 weapon_template.damage_window_start_sweep_trail_offset = -0.45
@@ -2121,6 +2124,24 @@ weapon_template.displayed_attacks = {
 		desc = "loc_weapon_special_hook_pull_desc",
 		display_name = "loc_weapon_special_hook_pull",
 		type = "special_attack"
+	}
+}
+weapon_template.weapon_card_data = {
+	main = {
+		{
+			icon = "smiter",
+			value_func = "primary_attack",
+			header = "light"
+		},
+		{
+			icon = "linesman",
+			value_func = "secondary_attack",
+			header = "heavy"
+		}
+	},
+	weapon_special = {
+		icon = "special_attack",
+		header = "special_attack"
 	}
 }
 

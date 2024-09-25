@@ -173,6 +173,7 @@ function PlayerCustomization:spawn_items(items, optional_mission_template)
 	local is_first_person = attach_settings.is_first_person
 	local in_editor = self._in_editor
 	local attachment_count = self._total_num_attachments
+	local item_units = {}
 
 	for i = 1, #items do
 		local item = items[i]
@@ -189,6 +190,10 @@ function PlayerCustomization:spawn_items(items, optional_mission_template)
 					Unit.set_data(unit, "attached_items", attachment_count, item_unit)
 				end
 
+				item_units[item] = {
+					item_unit,
+					attachment_units
+				}
 				local slots = item_data_clone.slots
 
 				if slots then
@@ -229,6 +234,8 @@ function PlayerCustomization:spawn_items(items, optional_mission_template)
 	end
 
 	self._total_num_attachments = attachment_count
+
+	return item_units
 end
 
 function PlayerCustomization:_spawn_facial_items(face_item_name, face_attachment_items)

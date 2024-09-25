@@ -18,6 +18,20 @@ function StatMacros:decrement(stat_data)
 	return id, stat_data[id]
 end
 
+function StatMacros:increment_by(stat_data, value)
+	local id = self.id
+	stat_data[id] = (stat_data[id] or self.default) + value
+
+	return id, stat_data[id]
+end
+
+function StatMacros:decrement_by(stat_data, value)
+	local id = self.id
+	stat_data[id] = (stat_data[id] or self.default) - value
+
+	return id, stat_data[id]
+end
+
 function StatMacros:set_to_max(stat_data, value)
 	local id = self.id
 	local current_value = stat_data[id] or self.default

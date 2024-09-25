@@ -11,6 +11,7 @@ function GameplayInitStepDebug:on_enter(parent, params)
 end
 
 function GameplayInitStepDebug:update(main_dt, main_t)
+	self._shared_state.initialized_steps.GameplayInitStepDebug = true
 	local next_step_params = {
 		shared_state = self._shared_state
 	}

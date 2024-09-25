@@ -6,9 +6,12 @@ function TimedSynchronizer:init(unit)
 
 	if timed_synchronizer_extension then
 		local objective_name = self:get_data(unit, "objective_name")
-		local automatic_start = self:get_data(unit, "automatic_start")
+		local auto_start = self:get_data(unit, "automatic_start")
+		local curve_power = self:get_data(unit, "curve_power")
+		local rubberband_ratio = self:get_data(unit, "rubberband_ratio")
+		local rubberband_over_progression = self:get_data(unit, "progression_rubberband")
 
-		timed_synchronizer_extension:setup_from_component(objective_name, automatic_start)
+		timed_synchronizer_extension:setup_from_component(objective_name, auto_start, curve_power, rubberband_ratio, rubberband_over_progression)
 
 		self._timed_synchronizer_extension = timed_synchronizer_extension
 	end
@@ -57,12 +60,29 @@ TimedSynchronizer.component_data = {
 	automatic_start = {
 		ui_type = "check_box",
 		value = false,
-		ui_name = "Auto start on mission start"
+		ui_name = "Automatic Start On Mission Start"
 	},
 	time_to_add = {
 		ui_type = "number",
 		value = 0,
 		ui_name = "Time To Add"
+	},
+	curve_power = {
+		ui_type = "number",
+		value = 1,
+		ui_name = "Curve Power"
+	},
+	rubberband_ratio = {
+		ui_type = "number",
+		value = 0,
+		ui_name = "Max Ratio",
+		category = "Rubberband"
+	},
+	progression_rubberband = {
+		ui_type = "number",
+		value = 1,
+		ui_name = "Distance In Mission Progression",
+		category = "Rubberband"
 	},
 	inputs = {
 		start_timed_event = {

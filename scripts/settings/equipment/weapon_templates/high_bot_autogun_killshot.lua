@@ -787,8 +787,10 @@ weapon_template.conditional_state_to_action_input = {
 	}
 }
 weapon_template.no_ammo_delay = 0.25
-weapon_template.uses_ammunition = true
-weapon_template.uses_overheat = false
+weapon_template.hud_configuration = {
+	uses_overheat = false,
+	uses_ammunition = true
+}
 weapon_template.sprint_ready_up_time = 0.1
 weapon_template.max_first_person_anim_movement_speed = 5.8
 weapon_template.ammo_template = "autogun_p3_m1"
@@ -1056,7 +1058,7 @@ weapon_template.displayed_attacks = {
 	},
 	special = {
 		display_name = "loc_weapon_special_weapon_bash",
-		type = "melee"
+		type = "melee_hand"
 	}
 }
 

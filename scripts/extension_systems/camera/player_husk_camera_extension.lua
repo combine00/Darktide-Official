@@ -51,7 +51,7 @@ function PlayerHuskCameraExtension:trigger_camera_shake(event_name)
 	local is_in_first_person_mode = self._first_person_extension:is_in_first_person_mode()
 
 	if is_in_first_person_mode then
-		Managers.state.camera:camera_effect_shake_event(event_name)
+		Managers.state.camera:add_camera_effect_shake_event(event_name)
 	end
 end
 

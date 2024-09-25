@@ -4,20 +4,7 @@ local SharedNav = require("scripts/components/utilities/shared_nav")
 local ToxicGasFog = component("ToxicGasFog")
 
 function ToxicGasFog:init(unit, is_server, nav_world)
-	self._unit = unit
 	local run_update = true
-	self._is_server = is_server
-
-	if rawget(_G, "LevelEditor") and ToxicGasFog._nav_info == nil then
-		ToxicGasFog._nav_info = SharedNav.create_nav_info()
-		local nav_gen_guid = SharedNav.check_new_navmesh_generated(ToxicGasFog._nav_info, self._my_nav_gen_guid, true)
-
-		if nav_gen_guid then
-			self._my_nav_gen_guid = nav_gen_guid
-
-			self:_generate_liquid_positions(unit)
-		end
-	end
 
 	return run_update
 end
@@ -28,16 +15,16 @@ end
 
 function ToxicGasFog:set_volume_enabled(enabled)
 	if enabled and not self._volume_enabled then
-		self:enable(self._unit)
+		self:enable(self.unit)
 
 		self._volume_enabled = true
 	elseif self._volume_enabled then
-		self:disable(self._unit)
+		self:disable(self.unit)
 
 		self._volume_enabled = false
 	end
 
-	if self._is_server and not rawget(_G, "LevelEditor") then
+	if self.is_server and not rawget(_G, "LevelEditor") then
 		Component.trigger_event_on_clients(self, enabled and "visibility_enable" or "visibility_disable")
 	end
 end
@@ -175,7 +162,7 @@ end
 
 function ToxicGasFog.events:create_low_gas()
 	if not self._low_gas_created then
-		Unit.flow_event(self._unit, "create_low_gas")
+		Unit.flow_event(self.unit, "create_low_gas")
 
 		self._low_gas_created = true
 	end
@@ -183,7 +170,7 @@ end
 
 function ToxicGasFog.events:despawn_low_gas()
 	if self._low_gas_created then
-		Unit.flow_event(self._unit, "despawn_low_gas")
+		Unit.flow_event(self.unit, "despawn_low_gas")
 
 		self._low_gas_created = nil
 	end
@@ -197,7 +184,7 @@ function ToxicGasFog.events:start_fading()
 end
 
 function ToxicGasFog.events:create_trigger_gas()
-	Unit.flow_event(self._unit, "create_trigger_gas")
+	Unit.flow_event(self.unit, "create_trigger_gas")
 end
 
 function ToxicGasFog:hot_join_sync(joining_client, joining_channel)
@@ -215,15 +202,9 @@ function ToxicGasFog:editor_init(unit)
 
 	if ToxicGasFog._nav_info == nil then
 		ToxicGasFog._nav_info = SharedNav.create_nav_info()
-		local with_traverse_logic = true
-		local nav_gen_guid = SharedNav.check_new_navmesh_generated(ToxicGasFog._nav_info, self._my_nav_gen_guid, with_traverse_logic)
-
-		if nav_gen_guid then
-			self._my_nav_gen_guid = nav_gen_guid
-
-			self:_generate_liquid_positions(unit)
-		end
 	end
+
+	self._my_nav_gen_guid = nil
 
 	if ToxicGasFog._fog_clouds == nil then
 		ToxicGasFog._fog_clouds = {}
@@ -233,13 +214,15 @@ function ToxicGasFog:editor_init(unit)
 		unit = unit,
 		component = self
 	}
-	self._unit = unit
 	local world = Application.main_world()
 	self._world = world
 	local line_object = World.create_line_object(world)
 	self._line_object = line_object
 	self._drawer = DebugDrawer(line_object, "retained")
-	self._gui = World.create_world_gui(world, Matrix4x4.identity(), 1, 1)
+	self._active_debug_draw = false
+	local object_id = Unit.get_data(unit, "LevelEditor", "object_id")
+	self._object_id = object_id
+	self._in_active_mission_table = LevelEditor:is_level_object_in_active_mission_table(object_id)
 
 	self:set_volume_enabled(true)
 
@@ -277,94 +260,102 @@ function ToxicGasFog:editor_destroy(unit)
 		self._volume_registered = false
 	end
 
-	local line_object = self._line_object
 	local world = self._world
-	local gui = self._gui
+	local line_object = self._line_object
 
 	LineObject.reset(line_object)
 	LineObject.dispatch(world, line_object)
 	World.destroy_line_object(world, line_object)
-
-	if self._debug_text_id then
-		Gui.destroy_text_3d(gui, self._debug_text_id)
-	end
-
-	if self._section_debug_text_id then
-		Gui.destroy_text_3d(gui, self._section_debug_text_id)
-	end
-
-	World.destroy_gui(world, gui)
-
-	self._line_object = nil
-	self._world = nil
 end
-
-local NAV_TAG_LAYER_COSTS = {
-	teleporters = 0,
-	ledges_with_fence = 0,
-	doors = 0,
-	jumps = 0,
-	ledges = 0,
-	cover_ledges = 0,
-	cover_vaults = 0,
-	monster_walls = 0
-}
 
 function ToxicGasFog:editor_update(unit)
 	if not rawget(_G, "LevelEditor") then
 		return
 	end
 
-	local draw_liquid = self:get_data(unit, "draw_liquid")
-	local with_traverse_logic = true
-	local nav_gen_guid = SharedNav.check_new_navmesh_generated(ToxicGasFog._nav_info, self._my_nav_gen_guid, with_traverse_logic, NAV_TAG_LAYER_COSTS)
+	if self._in_active_mission_table then
+		local with_traverse_logic = true
+		local nav_gen_guid = SharedNav.check_new_navmesh_generated(ToxicGasFog._nav_info, self._my_nav_gen_guid, with_traverse_logic)
 
-	if nav_gen_guid then
-		self._my_nav_gen_guid = nav_gen_guid
+		if nav_gen_guid then
+			self._my_nav_gen_guid = nav_gen_guid
+			local draw_liquid = self:get_data(unit, "draw_liquid")
 
-		if draw_liquid then
-			self:_generate_liquid_positions(unit)
-		end
-	end
-
-	if draw_liquid and self._old_liquid_position then
-		local distance = Vector3.distance(Unit.local_position(unit, 1), self._old_liquid_position:unbox())
-
-		if distance > 0.25 then
-			self:_generate_liquid_positions(unit)
+			if draw_liquid then
+				self:_generate_liquid_positions(unit)
+			end
 		end
 	end
 
 	return true
 end
 
+local TEMP_FLOOD_FILL_POSITIONS = {}
+
 function ToxicGasFog:_generate_liquid_positions(unit)
-	local nav_world = ToxicGasFog._nav_info.nav_world
+	local active_mission_level_id = LevelEditor:get_active_mission_level()
+	local nav_world = ToxicGasFog._nav_info.nav_world_from_level_id[active_mission_level_id]
 
 	if nav_world then
 		local position = Unit.local_position(unit, 1)
-		local max_liquid = self:get_data(unit, "max_liquid")
-		local flood_fill_positions = {}
-		local flood_fill_positions_boxed = {}
-		local traverse_logic = ToxicGasFog._nav_info.traverse_logic
+		local traverse_logic = ToxicGasFog._nav_info.traverse_logic_from_level_id[active_mission_level_id]
 		local position_on_navmesh = NavQueries.position_on_mesh_with_outside_position(nav_world, traverse_logic, position, 1, 1, 1)
 
 		if position_on_navmesh then
-			local num_positions = GwNavQueries.flood_fill_from_position(nav_world, position_on_navmesh, 1, 1, max_liquid, flood_fill_positions, traverse_logic)
-
-			for i = 1, num_positions do
-				flood_fill_positions_boxed[#flood_fill_positions_boxed + 1] = Vector3Box(flood_fill_positions[i])
+			if self._liquid_draw_positions then
+				table.clear_array(self._liquid_draw_positions, #self._liquid_draw_positions)
+			else
+				self._liquid_draw_positions = {}
 			end
 
-			self._liquid_draw_positions = flood_fill_positions_boxed
+			local flood_fill_positions_boxed = self._liquid_draw_positions
+			local max_liquid = self:get_data(unit, "max_liquid")
+			local num_positions = GwNavQueries.flood_fill_from_position(nav_world, position_on_navmesh, 1, 1, max_liquid, TEMP_FLOOD_FILL_POSITIONS, traverse_logic)
+
+			for i = 1, num_positions do
+				flood_fill_positions_boxed[i] = Vector3Box(TEMP_FLOOD_FILL_POSITIONS[i])
+				TEMP_FLOOD_FILL_POSITIONS[i] = nil
+			end
+
 			self._fail_liquid_position = nil
 		else
 			self._fail_liquid_position = Vector3Box(position)
 		end
 
-		self._old_liquid_position = Vector3Box(position)
-
 		self:_editor_debug_draw(unit)
+	end
+end
+
+function ToxicGasFog:editor_on_mission_changed(unit)
+	if not rawget(_G, "LevelEditor") then
+		return
+	end
+
+	local in_active_mission_table = LevelEditor:is_level_object_in_active_mission_table(self._object_id)
+	self._in_active_mission_table = in_active_mission_table
+	local draw_liquid = self:get_data(unit, "draw_liquid")
+
+	if draw_liquid and in_active_mission_table then
+		self:_generate_liquid_positions(unit)
+	elseif self._active_debug_draw and not in_active_mission_table then
+		local drawer = self._drawer
+
+		drawer:reset()
+		drawer:update(self._world)
+
+		self._active_debug_draw = false
+	end
+end
+
+function ToxicGasFog:editor_world_transform_modified(unit)
+	if not rawget(_G, "LevelEditor") then
+		return
+	end
+
+	local draw_liquid = self:get_data(unit, "draw_liquid")
+
+	if draw_liquid then
+		self:_generate_liquid_positions(unit)
 	end
 end
 
@@ -377,29 +368,43 @@ function ToxicGasFog:editor_property_changed(unit)
 
 	if draw_liquid then
 		self:_generate_liquid_positions(unit)
+	elseif self._active_debug_draw then
+		local drawer = self._drawer
+
+		drawer:reset()
+		drawer:update(self._world)
+
+		self._active_debug_draw = false
 	end
 end
 
 function ToxicGasFog:_editor_debug_draw(unit)
-	self._drawer:reset()
+	local drawer = self._drawer
 
-	if self._liquid_draw_positions then
-		for i = 1, #self._liquid_draw_positions - 1 do
-			local pos = self._liquid_draw_positions[i]:unbox()
+	drawer:reset()
 
-			if self._fail_liquid_position then
-				self._drawer:sphere(pos, 0.3, Color.red())
+	local fail_liquid_position = self._fail_liquid_position
+	local liquid_draw_positions = self._liquid_draw_positions
+
+	if liquid_draw_positions then
+		for i = 1, #liquid_draw_positions - 1 do
+			local pos = liquid_draw_positions[i]:unbox()
+
+			if fail_liquid_position then
+				drawer:sphere(pos, 0.3, Color.red())
 			else
-				self._drawer:sphere(pos, 0.3, Color.lime())
+				drawer:sphere(pos, 0.3, Color.lime())
 			end
 		end
 	end
 
-	if self._fail_liquid_position then
-		self._drawer:sphere(self._fail_liquid_position:unbox(), 1, Color.red())
+	if fail_liquid_position then
+		drawer:sphere(fail_liquid_position:unbox(), 1, Color.red())
 	end
 
-	self._drawer:update(self._world)
+	drawer:update(self._world)
+
+	self._active_debug_draw = true
 end
 
 ToxicGasFog.component_data = {

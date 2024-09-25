@@ -41,12 +41,13 @@ function DestructibleExtension:_disable_nav_volume()
 	end
 end
 
-function DestructibleExtension:setup_from_component(despawn_timer_duration, despawn_when_destroyed, collision_actor_names, mass, speed, direction, force_direction_type, start_visible, is_nav_gate, broadphase_radius, use_health_extension_health, collectible_data)
+function DestructibleExtension:setup_from_component(despawn_timer_duration, despawn_when_destroyed, collision_actor_names, mass, speed, direction, force_direction_type, start_visible, is_nav_gate, broadphase_radius, use_health_extension_health, collectible_data, network_unit)
 	local unit = self._unit
 	self._despawn_when_destroyed = despawn_when_destroyed
 	self._despawn_timer_duration = despawn_timer_duration
 	self._broadphase_radius = broadphase_radius
 	self._use_health_extension_health = use_health_extension_health
+	self._network_unit = network_unit
 	local parameters = {
 		parts_mass = mass,
 		parts_speed = speed,
@@ -208,6 +209,10 @@ function DestructibleExtension:force_destruct()
 	local damage_amount = _calculate_total_health(destruction_info)
 
 	self:_add_damage(damage_amount, nil, true)
+
+	local new_stage_index = destruction_info.current_stage_index
+
+	self:_handle_stage_zero(new_stage_index)
 end
 
 function DestructibleExtension:light_controller_setup(are_lights_enabled, fake_light)
@@ -379,7 +384,7 @@ function DestructibleExtension:_handle_stage_zero(current_stage_index)
 	if current_stage_index == 0 then
 		self:_disable_nav_volume()
 
-		if self._despawn_when_destroyed then
+		if self._despawn_when_destroyed and (not self._network_unit or not not self._is_server) then
 			if self._timer_to_despawn == nil then
 				self._timer_to_despawn = self._despawn_timer_duration
 			end

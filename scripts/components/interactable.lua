@@ -197,7 +197,7 @@ function Interactable.events:interaction_started(type, unit)
 		local is_playing_forward = self._is_playing_forward
 		is_playing_forward = is_playing_forward == nil and true or not is_playing_forward
 		self._is_playing_forward = is_playing_forward
-		self._interaction_cancled = false
+		self._interaction_canceled = false
 
 		self:_play_animation()
 
@@ -210,7 +210,7 @@ end
 function Interactable.events:interaction_canceled(type, unit)
 	if self._support_simple_animation then
 		self._is_playing_forward = not self._is_playing_forward
-		self._interaction_cancled = true
+		self._interaction_canceled = true
 
 		self:_play_animation()
 
@@ -238,12 +238,12 @@ function Interactable:_play_animation()
 		local speed = anim_data.speed * self._animation_back_speed_modifier
 
 		if state == "forward" then
-			if not self._interaction_cancled then
+			if not self._interaction_canceled then
 				local interaction_length = self._interaction_length
 				local length = interaction_length == 0 and 1 or interaction_length
 				speed = (self._anim_length - anim_time) / length
 			end
-		elseif self._interaction_cancled then
+		elseif self._interaction_canceled then
 			speed = -speed
 		else
 			local interaction_length = self._interaction_length

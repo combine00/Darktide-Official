@@ -1,6 +1,10 @@
 local StateMachine = class("StateMachine")
 StateMachine.IGNORE_EVENT = StateMachine.IGNORE_EVENT or {}
 
+local function unique_name(name, table)
+	return string.format("%s[%s]", name, string.sub(tostring(table), -8))
+end
+
 function StateMachine:init(name, parent, ...)
 	self._name = name
 	self._global_args = {

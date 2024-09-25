@@ -9,6 +9,7 @@ function GameplayInitStepFrameRate:on_enter(parent, params)
 end
 
 function GameplayInitStepFrameRate:update(main_dt, main_t)
+	self._shared_state.initialized_steps.GameplayInitStepFrameRate = true
 	local next_step_params = {
 		shared_state = self._shared_state
 	}

@@ -39,6 +39,7 @@ function StateGameplay:on_enter(parent, params, creation_context)
 	shared_state.free_flight_teleporter = nil
 	shared_state.clock_handler_client = nil
 	shared_state.breed_unit_tester = nil
+	shared_state.initialized_steps = {}
 	shared_state.network_receive_function = creation_context.network_receive_function
 	shared_state.network_transmit_function = creation_context.network_transmit_function
 

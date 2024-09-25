@@ -217,6 +217,7 @@ end
 minion_difficulty_settings.health = {
 	chaos_poxwalker = _horde_health_steps(150),
 	chaos_newly_infected = _horde_health_steps(120),
+	chaos_armored_infected = _horde_health_steps(250),
 	chaos_hound = _special_health_steps(700),
 	chaos_hound_mutator = _special_health_steps(150),
 	chaos_poxwalker_bomber = _special_health_steps(700),
@@ -226,6 +227,7 @@ minion_difficulty_settings.health = {
 	renegade_netgunner = _special_health_steps(450),
 	cultist_mutant = _special_health_steps(2000),
 	cultist_mutant_mutator = _special_health_steps(1000),
+	cultist_captain = _roamer_health_steps(14000),
 	cultist_flamer = _special_health_steps(700),
 	renegade_flamer = _special_health_steps(700),
 	cultist_grenadier = _special_health_steps(500),
@@ -253,23 +255,24 @@ minion_difficulty_settings.health = {
 }
 minion_difficulty_settings.hit_mass = {
 	renegade_flamer = 2,
-	chaos_ogryn_executor = 12.5,
 	renegade_plasma_shocktrooper = 4,
 	cultist_mutant = 10,
-	cultist_grenadier = 2,
+	chaos_ogryn_executor = 12.5,
+	renegade_flamer_mutator = 2,
 	chaos_hound_mutator = 2,
-	cultist_mutant_mutator = 8,
 	cultist_shocktrooper = 2,
 	chaos_ogryn_gunner = 12.5,
 	chaos_beast_of_nurgle = 20,
+	cultist_captain = 20,
 	renegade_twin_captain_two = 4,
 	cultist_berzerker = 4,
 	renegade_twin_captain = 4,
+	cultist_grenadier = 2,
 	chaos_spawn = 20,
 	cultist_flamer = 2,
 	chaos_poxwalker_bomber = 2.5,
 	renegade_grenadier = 2,
-	renegade_flamer_mutator = 2,
+	cultist_mutant_mutator = 8,
 	chaos_daemonhost = 20,
 	chaos_plague_ogryn = 20,
 	renegade_berzerker = 10,
@@ -295,6 +298,14 @@ minion_difficulty_settings.hit_mass = {
 		1.5,
 		1.5,
 		1.5
+	},
+	chaos_armored_infected = {
+		1.5,
+		1.5,
+		1.5,
+		1.5,
+		1.5,
+		2.5
 	},
 	cultist_assault = {
 		1.75,
@@ -381,6 +392,21 @@ minion_difficulty_settings.power_level = {
 	renegade_shotgun_shot = _step_dmg_ranged(300),
 	renegade_assault_shot = _step_dmg_ranged(225),
 	cultist_assault_shot = _step_dmg_ranged(250),
+	cultist_captain_melee_one_hand = {
+		75,
+		100,
+		250,
+		400,
+		600
+	},
+	cultist_captain_melee_two_hand = {
+		100,
+		150,
+		300,
+		500,
+		800
+	},
+	cultist_captain_default_shot = _step_dmg_ranged(225),
 	cultist_flamer_default = _step_dmg_ranged(50),
 	cultist_flamer_on_hit_fire = {
 		35,

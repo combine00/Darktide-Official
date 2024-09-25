@@ -164,7 +164,7 @@ function ExtensionManager:destroy()
 	self._extension_to_system_map = nil
 end
 
-function ExtensionManager:add_unit_extensions_from_template(world, unit, init_function, unit_spawned_function_or_nil, template_context, game_object_data_or_session, is_husk, ...)
+function ExtensionManager:add_unit_extensions_from_template(world, unit, init_function, unit_spawned_function_or_nil, template_context, game_object_data_or_session, ...)
 	local extension_config = ExtensionConfig:new()
 
 	init_function(unit, extension_config, template_context, game_object_data_or_session, ...)
@@ -172,7 +172,7 @@ function ExtensionManager:add_unit_extensions_from_template(world, unit, init_fu
 	local extensions = self:add_unit_extensions(world, unit, extension_config, game_object_data_or_session, ...)
 
 	if unit_spawned_function_or_nil then
-		unit_spawned_function_or_nil(unit, template_context, game_object_data_or_session, is_husk, ...)
+		unit_spawned_function_or_nil(unit, template_context, game_object_data_or_session, ...)
 	end
 
 	return extensions
@@ -316,7 +316,7 @@ function ExtensionManager:register_unit(world, unit, optional_category)
 	if unit_template_name then
 		local unit_template = self._unit_templates[unit_template_name]
 		local init_function = unit_template.local_init
-		local unit_spawned_function_or_nil = unit_template.unit_spawned
+		local unit_spawned_function_or_nil = unit_template.local_unit_spawned
 
 		if self:add_unit_extensions_from_template(world, unit, init_function, unit_spawned_function_or_nil, nil, nil) then
 			TEMP_TABLE[1] = unit
@@ -349,7 +349,7 @@ function ExtensionManager:add_and_register_units(world, unit_list, num_units, op
 		if unit_template_name then
 			local unit_template = self._unit_templates[unit_template_name]
 			local init_function = unit_template.local_init
-			local unit_spawned_function_or_nil = unit_template.unit_spawned
+			local unit_spawned_function_or_nil = unit_template.local_unit_spawned
 
 			if self:add_unit_extensions_from_template(world, unit, init_function, unit_spawned_function_or_nil, nil, nil) then
 				num_added = num_added + 1
@@ -417,7 +417,7 @@ function ExtensionManager:update_time_slice_add_and_register_level_units()
 		if unit_template_name then
 			local unit_template = self._unit_templates[unit_template_name]
 			local init_function = unit_template.local_init
-			local unit_spawned_function_or_nil = unit_template.unit_spawned
+			local unit_spawned_function_or_nil = unit_template.local_unit_spawned
 
 			if self:add_unit_extensions_from_template(world, unit, init_function, unit_spawned_function_or_nil, nil, nil) then
 				num_added = num_added + 1

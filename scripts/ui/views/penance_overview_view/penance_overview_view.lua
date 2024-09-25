@@ -1836,12 +1836,12 @@ function PenanceOverviewView:_update_animations(dt, t)
 		return
 	end
 
-	local currently_hovered_item = wintrack_element:currently_hovered_item()
+	local tooltip_visible = wintrack_element:tooltip_visible()
 	local anim_speed = 3
 	local previous_anim_wintrack_reward_hover_progress = self._anim_wintrack_reward_hover_progress or 0
 	local anim_wintrack_reward_hover_progress = nil
 
-	if currently_hovered_item then
+	if tooltip_visible then
 		anim_wintrack_reward_hover_progress = math.min(previous_anim_wintrack_reward_hover_progress + dt * anim_speed, 1)
 	else
 		anim_wintrack_reward_hover_progress = math.max(previous_anim_wintrack_reward_hover_progress - dt * anim_speed, 0)
@@ -2182,7 +2182,9 @@ function PenanceOverviewView:on_exit()
 		Managers.achievements:deactive_reward_claim_state()
 	end
 
-	Managers.telemetry_reporters:stop_reporter("penance_view")
+	if self._entered then
+		Managers.telemetry_reporters:stop_reporter("penance_view")
+	end
 end
 
 function PenanceOverviewView:_get_scenegraph_size(scenegraph_id)
@@ -2930,6 +2932,7 @@ function PenanceOverviewView:_on_carousel_card_secondary_pressed(index, entry)
 end
 
 function PenanceOverviewView:_setup_penance_category_buttons(options)
+	local category_count = #options
 	local button_size = {
 		70,
 		60
@@ -3071,77 +3074,77 @@ function PenanceOverviewView:_setup_penance_category_buttons(options)
 					9
 				}
 			}
-		}
-	}
-	button_template[8] = {
-		pass_type = "texture",
-		value_id = "icon",
-		style_id = "icon",
-		style = {
-			horizontal_alignment = "center",
-			vertical_alignment = "center",
-			default_color = Color.terminal_text_header(255, true),
-			disabled_color = Color.gray(255, true),
-			color = Color.terminal_text_header(255, true),
-			hover_color = Color.terminal_text_header_selected(255, true),
-			size = {
-				72,
-				52
-			},
-			original_size_addition = {
-				-10,
-				-10
-			},
-			size_addition = {
-				0,
-				0
-			},
-			offset = {
-				0,
-				-6,
-				6
-			}
 		},
-		change_function = function (content, style)
-			local hotspot = content.hotspot
-			local progress = math.max(hotspot.anim_hover_progress, hotspot.anim_focus_progress)
-			local size_addition = 2 * math.easeInCubic(progress)
-			local style_size_addition = style.size_addition
-			local original_size_addition = style.original_size_addition
-			style_size_addition[1] = original_size_addition[1] + size_addition * 2
-			style_size_addition[2] = original_size_addition[1] + size_addition * 2
+		{
+			pass_type = "texture",
+			value_id = "icon",
+			style_id = "icon",
+			style = {
+				horizontal_alignment = "center",
+				vertical_alignment = "center",
+				default_color = Color.terminal_text_header(255, true),
+				disabled_color = Color.gray(255, true),
+				color = Color.terminal_text_header(255, true),
+				hover_color = Color.terminal_text_header_selected(255, true),
+				size = {
+					72,
+					52
+				},
+				original_size_addition = {
+					-10,
+					-10
+				},
+				size_addition = {
+					0,
+					0
+				},
+				offset = {
+					0,
+					-6,
+					6
+				}
+			},
+			change_function = function (content, style)
+				local hotspot = content.hotspot
+				local progress = math.max(hotspot.anim_hover_progress, hotspot.anim_focus_progress)
+				local size_addition = 2 * math.easeInCubic(progress)
+				local style_size_addition = style.size_addition
+				local original_size_addition = style.original_size_addition
+				style_size_addition[1] = original_size_addition[1] + size_addition * 2
+				style_size_addition[2] = original_size_addition[1] + size_addition * 2
 
-			ButtonPassTemplates.list_button_label_change_function(content, style)
-		end
-	}
-	button_template[9] = {
-		style_id = "new_indicator",
-		pass_type = "texture",
-		value = "content/ui/materials/symbols/new_item_indicator",
-		style = {
-			vertical_alignment = "bottom",
-			horizontal_alignment = "center",
-			size = {
-				90,
-				90
-			},
-			offset = {
-				28,
-				-10,
-				4
-			},
-			color = Color.terminal_corner_selected(255, true)
+				ButtonPassTemplates.list_button_label_change_function(content, style)
+			end
 		},
-		visibility_function = function (content, style)
-			return content.has_unclaimed_penances
-		end
+		{
+			style_id = "new_indicator",
+			pass_type = "texture",
+			value = "content/ui/materials/symbols/new_item_indicator",
+			style = {
+				vertical_alignment = "bottom",
+				horizontal_alignment = "center",
+				size = {
+					90,
+					90
+				},
+				offset = {
+					23,
+					-5,
+					4
+				},
+				color = Color.terminal_corner_selected(255, true)
+			},
+			visibility_function = function (content, style)
+				return content.has_unclaimed_penances
+			end
+		}
 	}
 	local category_button = table.clone(button_template)
 	category_button[1].style = {
 		on_pressed_sound = UISoundEvents.tab_secondary_button_pressed
 	}
 
-	for i = 1, #options do
+	for i = 1, category_count do
 		local option = options[i]
 		local score_progress = nil
 		local category_id = option.category_id
@@ -3184,6 +3187,7 @@ function PenanceOverviewView:_setup_penance_category_buttons(options)
 	self:_update_categories_tab_bar_position()
 
 	self._penance_category_options = options
+	self._widgets_by_name.page_header.style.top_bar.size[1] = 36 + category_count * (button_size[1] + button_spacing) + button_spacing
 end
 
 function PenanceOverviewView:_get_category_option_penance_amount(option)

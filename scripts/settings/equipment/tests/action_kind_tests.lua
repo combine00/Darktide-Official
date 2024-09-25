@@ -1,10 +1,18 @@
 local action_kind_funcs = {}
 
-local function action_kind_tests(action_settings, weapon_template, action_name)
+local function _action_kind_tests(action_settings, weapon_template, action_name)
 	local action_kind_func = action_kind_funcs[action_settings.kind]
 
 	if action_kind_func then
 		local success, error_msg = action_kind_func(action_settings, weapon_template, action_name)
+	end
+end
+
+local function _check_time_scale_buffs(weapon_template, action_settings)
+	local time_scale_stat_buffs = action_settings.time_scale_stat_buffs
+
+	if time_scale_stat_buffs == nil then
+		Log.warning("ActionKindTests", "Did not find 'time_scale_stat_buffs' table in action settings for %s -> %s, is this intended?", weapon_template.name, action_settings.name)
 	end
 end
 
@@ -78,6 +86,44 @@ function action_kind_funcs.sweep(action_settings, weapon_template)
 		end
 	end
 
+	_check_time_scale_buffs(weapon_template, action_settings)
+
+	return true
+end
+
+function action_kind_funcs.shoot_hit_scan(action_settings, weapon_template)
+	_check_time_scale_buffs(weapon_template, action_settings)
+
+	return true
+end
+
+function action_kind_funcs.shoot_beam(action_settings, weapon_template)
+	_check_time_scale_buffs(weapon_template, action_settings)
+
+	return true
+end
+
+function action_kind_funcs.shoot_hit_scan(action_settings, weapon_template)
+	_check_time_scale_buffs(weapon_template, action_settings)
+
+	return true
+end
+
+function action_kind_funcs.shoot_pellets(action_settings, weapon_template)
+	_check_time_scale_buffs(weapon_template, action_settings)
+
+	return true
+end
+
+function action_kind_funcs.shoot_projectile(action_settings, weapon_template)
+	_check_time_scale_buffs(weapon_template, action_settings)
+
+	return true
+end
+
+function action_kind_funcs.spawn_projectile(action_settings, weapon_template)
+	_check_time_scale_buffs(weapon_template, action_settings)
+
 	return true
 end
 
@@ -111,4 +157,4 @@ function action_kind_funcs.overload_explosion(action_settings, weapon_template)
 	return true
 end
 
-return action_kind_tests
+return _action_kind_tests

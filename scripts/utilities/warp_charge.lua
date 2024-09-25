@@ -65,6 +65,10 @@ function WarpCharge.increase_immediate(t, charge_level, warp_charge_component, c
 	local add_percentage = buff_multiplier * base_add_percentage
 	local new_warp_charge, new_state = SharedFunctions.add_immediate(charge_level, use_charge, add_percentage, current_percentage, prevent_explosion)
 
+	if prevent_overload then
+		new_state = nil
+	end
+
 	_set_current_percentage(warp_charge_component, new_warp_charge, buff_extension)
 
 	warp_charge_component.last_charge_at_t = t

@@ -17,6 +17,7 @@ local NavQueries = require("scripts/utilities/nav_queries")
 local PlayerCharacterConstants = require("scripts/settings/player_character/player_character_constants")
 local PlayerUnitStatus = require("scripts/utilities/attack/player_unit_status")
 local Trajectory = require("scripts/utilities/trajectory")
+local Vo = require("scripts/utilities/vo")
 local attack_types = AttackSettings.attack_types
 local BtChaosSpawnGrabAction = class("BtChaosSpawnGrabAction", "BtNode")
 
@@ -135,6 +136,13 @@ function BtChaosSpawnGrabAction:run(unit, breed, blackboard, scratchpad, action_
 			scratchpad.animation_extension:anim_event(action_data.start_eat_anim)
 
 			scratchpad.start_eat_timing = nil
+			local vo_event = action_data.vo_event
+
+			if vo_event and scratchpad.grabbed_unit then
+				Vo.player_pounced_by_special_event(grabbed_unit, breed.name)
+
+				scratchpad.will_play_release_vo = true
+			end
 		end
 	elseif state == "smashing" then
 		local grabbed_unit = scratchpad.grabbed_unit
@@ -582,6 +590,14 @@ function BtChaosSpawnGrabAction:_update_throwing(unit, scratchpad, action_data, 
 			scratchpad.behavior_component.grabbed_unit = nil
 			local target_unit_disabled_state_input = scratchpad.target_unit_disabled_state_input
 			target_unit_disabled_state_input.disabling_unit = nil
+			local vo_event = action_data.vo_event_release
+
+			if vo_event and scratchpad.will_play_release_vo then
+				Vo.generic_mission_vo_event(target_unit, vo_event, true)
+				Vo.set_unit_vo_memory(target_unit, "faction_memory", "chaos_spawn_throw", t + 900)
+
+				scratchpad.will_play_release_vo = nil
+			end
 		end
 
 		if scratchpad.throw_duration and scratchpad.throw_duration < t then

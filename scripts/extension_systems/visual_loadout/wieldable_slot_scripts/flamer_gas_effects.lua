@@ -1,4 +1,5 @@
 local Action = require("scripts/utilities/weapon/action")
+local WieldableSlotScriptInterface = require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/wieldable_slot_script_interface")
 local FlamerGasEffects = class("FlamerGasEffects")
 
 function FlamerGasEffects:init(context, slot, weapon_template, fx_sources)
@@ -281,5 +282,7 @@ function FlamerGasEffects:_destroy_effects(allow_move, rotation)
 		self._source_position = nil
 	end
 end
+
+implements(FlamerGasEffects, WieldableSlotScriptInterface)
 
 return FlamerGasEffects

@@ -178,47 +178,54 @@ function TelemetryEvents:gameplay_started(params)
 		host_type = self._context.host_type
 	})
 	self._manager:register_event(event)
-	Managers.telemetry_reporters:start_reporter("com_wheel")
-	Managers.telemetry_reporters:start_reporter("combat_ability")
-	Managers.telemetry_reporters:start_reporter("enemy_spawns")
-	Managers.telemetry_reporters:start_reporter("fixed_update_missed_inputs")
-	Managers.telemetry_reporters:start_reporter("frame_time", params)
-	Managers.telemetry_reporters:start_reporter("grenade_ability")
-	Managers.telemetry_reporters:start_reporter("pacing")
-	Managers.telemetry_reporters:start_reporter("picked_items")
-	Managers.telemetry_reporters:start_reporter("used_items")
-	Managers.telemetry_reporters:start_reporter("ping", params)
-	Managers.telemetry_reporters:start_reporter("placed_items")
-	Managers.telemetry_reporters:start_reporter("player_dealt_damage")
-	Managers.telemetry_reporters:start_reporter("player_taken_damage")
-	Managers.telemetry_reporters:start_reporter("player_terminate_enemy")
-	Managers.telemetry_reporters:start_reporter("shared_items")
-	Managers.telemetry_reporters:start_reporter("smart_tag")
-	Managers.telemetry_reporters:start_reporter("tactical_overlay")
-	Managers.telemetry_reporters:start_reporter("voice_over_bank_reshuffled")
-	Managers.telemetry_reporters:start_reporter("voice_over_event_triggered")
+
+	local telemetry_reporters = Managers.telemetry_reporters
+
+	telemetry_reporters:start_reporter("com_wheel")
+	telemetry_reporters:start_reporter("combat_ability")
+	telemetry_reporters:start_reporter("enemy_spawns")
+	telemetry_reporters:start_reporter("fixed_update_missed_inputs")
+	telemetry_reporters:start_reporter("frame_time", params)
+	telemetry_reporters:start_reporter("grenade_ability")
+	telemetry_reporters:start_reporter("pacing")
+	telemetry_reporters:start_reporter("picked_items")
+	telemetry_reporters:start_reporter("used_items")
+	telemetry_reporters:start_reporter("ping", params)
+	telemetry_reporters:start_reporter("placed_items")
+	telemetry_reporters:start_reporter("player_dealt_damage")
+	telemetry_reporters:start_reporter("player_taken_damage")
+	telemetry_reporters:start_reporter("player_terminate_enemy")
+	telemetry_reporters:start_reporter("shared_items")
+	telemetry_reporters:start_reporter("smart_tag")
+	telemetry_reporters:start_reporter("tactical_overlay")
+	telemetry_reporters:start_reporter("voice_over_bank_reshuffled")
+	telemetry_reporters:start_reporter("voice_over_event_triggered")
+	telemetry_reporters:start_reporter("mispredict")
 end
 
 function TelemetryEvents:gameplay_stopped()
-	Managers.telemetry_reporters:stop_reporter("voice_over_event_triggered")
-	Managers.telemetry_reporters:stop_reporter("voice_over_bank_reshuffled")
-	Managers.telemetry_reporters:stop_reporter("tactical_overlay")
-	Managers.telemetry_reporters:stop_reporter("smart_tag")
-	Managers.telemetry_reporters:stop_reporter("shared_items")
-	Managers.telemetry_reporters:stop_reporter("player_terminate_enemy")
-	Managers.telemetry_reporters:stop_reporter("player_taken_damage")
-	Managers.telemetry_reporters:stop_reporter("player_dealt_damage")
-	Managers.telemetry_reporters:stop_reporter("placed_items")
-	Managers.telemetry_reporters:stop_reporter("ping")
-	Managers.telemetry_reporters:stop_reporter("picked_items")
-	Managers.telemetry_reporters:stop_reporter("used_items")
-	Managers.telemetry_reporters:stop_reporter("pacing")
-	Managers.telemetry_reporters:stop_reporter("grenade_ability")
-	Managers.telemetry_reporters:stop_reporter("frame_time")
-	Managers.telemetry_reporters:stop_reporter("fixed_update_missed_inputs")
-	Managers.telemetry_reporters:stop_reporter("enemy_spawns")
-	Managers.telemetry_reporters:stop_reporter("combat_ability")
-	Managers.telemetry_reporters:stop_reporter("com_wheel")
+	local telemetry_reporters = Managers.telemetry_reporters
+
+	telemetry_reporters:stop_reporter("voice_over_event_triggered")
+	telemetry_reporters:stop_reporter("voice_over_bank_reshuffled")
+	telemetry_reporters:stop_reporter("tactical_overlay")
+	telemetry_reporters:stop_reporter("smart_tag")
+	telemetry_reporters:stop_reporter("shared_items")
+	telemetry_reporters:stop_reporter("player_terminate_enemy")
+	telemetry_reporters:stop_reporter("player_taken_damage")
+	telemetry_reporters:stop_reporter("player_dealt_damage")
+	telemetry_reporters:stop_reporter("placed_items")
+	telemetry_reporters:stop_reporter("ping")
+	telemetry_reporters:stop_reporter("picked_items")
+	telemetry_reporters:stop_reporter("used_items")
+	telemetry_reporters:stop_reporter("pacing")
+	telemetry_reporters:stop_reporter("grenade_ability")
+	telemetry_reporters:stop_reporter("frame_time")
+	telemetry_reporters:stop_reporter("fixed_update_missed_inputs")
+	telemetry_reporters:stop_reporter("enemy_spawns")
+	telemetry_reporters:stop_reporter("combat_ability")
+	telemetry_reporters:stop_reporter("com_wheel")
+	telemetry_reporters:stop_reporter("mispredict")
 
 	local event = self:_create_event("gameplay_stopped")
 
@@ -376,6 +383,26 @@ function TelemetryEvents:player_terminate_enemy_report(reports)
 		event:set_data(entries)
 		self._manager:register_event(event)
 	end
+end
+
+function TelemetryEvents:mispredict_report(entries, count)
+	local t = {
+		count = count,
+		entries = {}
+	}
+	local t_count = 0
+
+	for _, component_data in pairs(entries) do
+		for _, field_data in pairs(component_data) do
+			t_count = t_count + 1
+			t.entries[t_count] = field_data
+		end
+	end
+
+	local event = self:_create_event("mispredict_report")
+
+	event:set_data(t)
+	self._manager:register_event(event)
 end
 
 function TelemetryEvents:player_knocked_down(player, data)

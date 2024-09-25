@@ -13,8 +13,14 @@ function Component.parse_components(components)
 	local event_lookup = Component.event_lookup
 	local event_index = 1
 	local component_index = 1
+	local component_names = table.keys(components)
 
-	for name, component in pairs(components) do
+	table.sort(component_names)
+
+	for component_name_index = 1, #component_names do
+		local name = component_names[component_name_index]
+		local component = components[name]
+
 		implements(component, component_interface)
 
 		for _, function_name in ipairs(component_interface) do
@@ -34,8 +40,13 @@ function Component.parse_components(components)
 		end
 
 		local events = component.events
+		local event_names = table.keys(events)
 
-		for event_name, _ in pairs(events) do
+		table.sort(event_names)
+
+		for event_name_index = 1, #event_names do
+			local event_name = event_names[event_name_index]
+
 			if not event_lookup[event_name] then
 				event_lookup[event_index] = event_name
 				event_lookup[event_name] = event_index

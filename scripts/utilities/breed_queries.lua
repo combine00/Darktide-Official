@@ -44,24 +44,21 @@ local BreedQueries = {
 					end
 				end
 
-				local score, tag_amount = nil
-
 				for j = 1, num_template_breed_tags do
 					local tags = template_breed_tags[j]
-					tag_amount = 0
-					score = 0
+					local has_all_tags = true
 
 					for k = 1, #tags do
 						local tag = tags[k]
 
-						if minion_breed_tags[tag] then
-							score = score + 1
-						end
+						if not minion_breed_tags[tag] then
+							has_all_tags = false
 
-						tag_amount = k
+							break
+						end
 					end
 
-					if score == tag_amount then
+					if has_all_tags then
 						best_breeds[#best_breeds + 1] = breed
 					end
 				end
@@ -104,20 +101,27 @@ function BreedQueries.add_spawns_single_breed(spawners, breed_name, breed_amount
 		local spawner_index = (breed_index - 1) % num_spawners + 1
 		local breed_list = breed_lists[spawner_index]
 
-		if not breed_list then
-			breed_list = {}
-			breed_lists[spawner_index] = breed_list
+		if breed_list then
+			breed_list[#breed_list + 1] = breed_name
+		else
+			breed_lists[spawner_index] = {
+				breed_name
+			}
 		end
 
-		breed_list[#breed_list + 1] = breed_name
 		breed_index = breed_index + 1
+	end
+
+	local spawner_queue_id = spawned_minion_data.spawner_queue_id
+
+	if not spawner_queue_id then
+		spawner_queue_id = Script.new_map(num_spawners)
+		spawned_minion_data.spawner_queue_id = spawner_queue_id
 	end
 
 	for i = 1, #breed_lists do
 		local spawner = spawners[i]
 		local queue_id = spawner:add_spawns(breed_lists[i], spawn_side_id, target_side_id, optional_spawn_delay, optional_mission_objective_id, optional_group_id, optional_attack_selection_template_name, optional_aggro_state, optional_max_health_modifier)
-		local spawner_queue_id = spawned_minion_data.spawner_queue_id
-		spawner_queue_id = spawner_queue_id or {}
 		local queue_ids = spawner_queue_id[spawner]
 
 		if queue_ids then
@@ -127,8 +131,6 @@ function BreedQueries.add_spawns_single_breed(spawners, breed_name, breed_amount
 				queue_id
 			}
 		end
-
-		spawned_minion_data.spawner_queue_id = spawner_queue_id
 	end
 end
 

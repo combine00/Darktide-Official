@@ -63,15 +63,15 @@ local function _get_player()
 	return player
 end
 
-local function _create_objective(objective_name, localization_key, marker_units, marker_type, is_side_mission, icon)
+local function _create_objective(objective_name, localization_key, marker_units, is_side_mission)
 	local icon = is_side_mission and "content/ui/materials/icons/objectives/bonus" or "content/ui/materials/icons/objectives/main"
 	local objective_data = {
+		marker_type = "hub_objective",
 		locally_added = true,
 		name = objective_name,
 		header = localization_key,
-		is_side_mission = is_side_mission,
-		icon = icon,
-		marker_type = marker_type or "hub_objective"
+		objective_category = is_side_mission and "side_mission" or "default",
+		icon = icon
 	}
 	local objective = MissionObjectiveGoal:new()
 
@@ -415,7 +415,7 @@ local templates = {
 			local localization_key = "loc_objective_hub_mission_board_header"
 			local interaction_type = "mission_board"
 			local marker_units = _get_interaction_units_by_type(interaction_type)
-			local objective = _create_objective(objective_name, localization_key, marker_units, nil, true)
+			local objective = _create_objective(objective_name, localization_key, marker_units, true)
 			self.objective = objective
 
 			Managers.event:trigger("event_add_mission_objective", objective)
@@ -484,7 +484,7 @@ local templates = {
 			local localization_key = "loc_objective_hub_contracts"
 			local interaction_type = "contracts"
 			local marker_units = _get_interaction_units_by_type(interaction_type)
-			local objective = _create_objective(objective_name, localization_key, marker_units, nil, true)
+			local objective = _create_objective(objective_name, localization_key, marker_units, true)
 			self.objective = objective
 
 			Managers.event:trigger("event_add_mission_objective", objective)
@@ -556,7 +556,7 @@ local templates = {
 			local localization_key = "loc_objective_hub_weapon_shop"
 			local interaction_type = "vendor"
 			local marker_units = _get_interaction_units_by_type(interaction_type)
-			local objective = _create_objective(objective_name, localization_key, marker_units, nil, true)
+			local objective = _create_objective(objective_name, localization_key, marker_units, true)
 			self.objective = objective
 
 			Managers.event:trigger("event_add_mission_objective", objective)
@@ -628,7 +628,7 @@ local templates = {
 			local localization_key = "loc_objective_hub_cosmetics_shop"
 			local interaction_type = "cosmetics_vendor"
 			local marker_units = _get_interaction_units_by_type(interaction_type)
-			local objective = _create_objective(objective_name, localization_key, marker_units, nil, true)
+			local objective = _create_objective(objective_name, localization_key, marker_units, true)
 			self.objective = objective
 
 			Managers.event:trigger("event_add_mission_objective", objective)
@@ -700,7 +700,7 @@ local templates = {
 			local localization_key = "loc_objective_hub_crafting"
 			local interaction_type = "crafting"
 			local marker_units = _get_interaction_units_by_type(interaction_type)
-			local objective = _create_objective(objective_name, localization_key, marker_units, nil, true)
+			local objective = _create_objective(objective_name, localization_key, marker_units, true)
 			self.objective = objective
 
 			Managers.event:trigger("event_add_mission_objective", objective)
@@ -809,7 +809,7 @@ local templates = {
 			local localization_key = "loc_notification_desc_penance_item_can_be_claimed"
 			local interaction_type = "penances"
 			local marker_units = _get_interaction_units_by_type(interaction_type)
-			local objective = _create_objective(objective_name, localization_key, marker_units, nil, true)
+			local objective = _create_objective(objective_name, localization_key, marker_units, true)
 			self.objective = objective
 
 			Managers.event:trigger("event_add_mission_objective", objective)

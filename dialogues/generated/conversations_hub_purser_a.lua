@@ -48,28 +48,6 @@ local conversations_hub_purser_a = {
 		},
 		randomize_indexes = {}
 	},
-	hub_idle_2nd_phase_conversation_eight_a = {
-		randomize_indexes_n = 0,
-		sound_events_n = 1,
-		sound_events = {
-			[1.0] = "loc_purser_a__hub_idle_2nd_phase_conversation_eight_a_01"
-		},
-		sound_events_duration = {
-			[1.0] = 4.353208
-		},
-		randomize_indexes = {}
-	},
-	hub_idle_2nd_phase_conversation_eight_c = {
-		randomize_indexes_n = 0,
-		sound_events_n = 1,
-		sound_events = {
-			[1.0] = "loc_purser_a__hub_idle_2nd_phase_conversation_eight_c_01"
-		},
-		sound_events_duration = {
-			[1.0] = 5.918208
-		},
-		randomize_indexes = {}
-	},
 	hub_idle_2nd_phase_conversation_eighteen_b = {
 		randomize_indexes_n = 0,
 		sound_events_n = 1,
@@ -103,25 +81,14 @@ local conversations_hub_purser_a = {
 		},
 		randomize_indexes = {}
 	},
-	hub_idle_2nd_phase_conversation_five_b = {
+	hub_idle_2nd_phase_conversation_fortytwo_c = {
 		randomize_indexes_n = 0,
 		sound_events_n = 1,
 		sound_events = {
-			[1.0] = "loc_purser_a__hub_idle_2nd_phase_conversation_five_b_01"
+			[1.0] = "loc_purser_a__hub_idle_2nd_phase_conversation_fortytwo_c_01"
 		},
 		sound_events_duration = {
-			[1.0] = 4.273333
-		},
-		randomize_indexes = {}
-	},
-	hub_idle_2nd_phase_conversation_forty_c = {
-		randomize_indexes_n = 0,
-		sound_events_n = 1,
-		sound_events = {
-			[1.0] = "loc_purser_a__hub_idle_2nd_phase_conversation_forty_c_01"
-		},
-		sound_events_duration = {
-			[1.0] = 3.913833
+			[1.0] = 4.860583
 		},
 		randomize_indexes = {}
 	},
@@ -144,28 +111,6 @@ local conversations_hub_purser_a = {
 		},
 		sound_events_duration = {
 			[1.0] = 5.297396
-		},
-		randomize_indexes = {}
-	},
-	hub_idle_2nd_phase_conversation_nine_a = {
-		randomize_indexes_n = 0,
-		sound_events_n = 1,
-		sound_events = {
-			[1.0] = "loc_purser_a__hub_idle_2nd_phase_conversation_nine_a_01"
-		},
-		sound_events_duration = {
-			[1.0] = 4.535146
-		},
-		randomize_indexes = {}
-	},
-	hub_idle_2nd_phase_conversation_nine_c = {
-		randomize_indexes_n = 0,
-		sound_events_n = 1,
-		sound_events = {
-			[1.0] = "loc_purser_a__hub_idle_2nd_phase_conversation_nine_c_01"
-		},
-		sound_events_duration = {
-			[1.0] = 6.388729
 		},
 		randomize_indexes = {}
 	},

@@ -77,8 +77,15 @@ cultist_flamer.slot = nil
 cultist_flamer.blocked = nil
 cultist_flamer.suppression = nil
 cultist_flamer.statistics = {
+	flamer_effect_id = "number",
+	flamer_backpack_impacts = "number",
 	num_attacks_done = "number",
 	num_in_liquid = "number"
+}
+cultist_flamer.gib_override = {
+	target_template = "string",
+	should_override = "boolean",
+	override_hit_zone_name = "string"
 }
 local renegade_flamer = table.clone(cultist_flamer)
 local grenadier = table.clone(ranged_base)

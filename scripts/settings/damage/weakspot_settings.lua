@@ -15,6 +15,9 @@ local finesse_boost_modifers = {
 	end,
 	[weakspot_types.shield] = function (finesse_boost_amount)
 		return 0
+	end,
+	[weakspot_types.explosive_backpack] = function (finesse_boost_amount)
+		return finesse_boost_amount
 	end
 }
 

@@ -44,9 +44,12 @@ function HudElementTacticalOverlay:init(parent, draw_layer, start_scale, optiona
 	self:_setup_left_panel_widgets()
 	self:_setup_right_panel_widgets()
 	self:on_resolution_modified()
+	Managers.event:register(self, "reroll_contracts", "reroll_contracts")
 end
 
 function HudElementTacticalOverlay:destroy(ui_renderer)
+	Managers.event:unregister(self, "reroll_contracts")
+
 	local contracts_promise = self._contracts_promise
 
 	if contracts_promise and contracts_promise:is_pending() then
@@ -256,15 +259,18 @@ function HudElementTacticalOverlay:_update_right_timer_text(dt, t, ui_renderer)
 end
 
 function HudElementTacticalOverlay:_update_right_timer()
+	local timer_widget = self._widgets_by_name.right_timer
+	self._last_seen_time = nil
 	local current_key = self._right_panel_key
 
 	if not current_key then
+		self._right_timer_function = nil
+		timer_widget.visible = false
+
 		return
 	end
 
-	self._last_seen_time = nil
 	local page_settings = self:_get_page(current_key)
-	local timer_widget = self._widgets_by_name.right_timer
 	local timer_data = page_settings.timer
 
 	if timer_data == nil then
@@ -397,12 +403,6 @@ function HudElementTacticalOverlay:_override_right_panel_category(key, data, ui_
 end
 
 function HudElementTacticalOverlay:_swap_right_grid(page_key, ui_renderer)
-	local current_key = self._right_panel_key
-
-	if page_key == current_key then
-		return
-	end
-
 	self._right_panel_key = page_key
 
 	if self._preferred_page == page_key then
@@ -483,7 +483,7 @@ function HudElementTacticalOverlay:_setup_contracts(contracts_data, ui_renderer)
 	local configs = {}
 
 	for i = 1, #tasks do
-		configs[#configs + 1] = {
+		configs[i] = {
 			blueprint = "contract",
 			task = tasks[i],
 			reward = table.nested_get(tasks[i], "reward", "amount")
@@ -491,6 +491,8 @@ function HudElementTacticalOverlay:_setup_contracts(contracts_data, ui_renderer)
 	end
 
 	if #tasks == 0 then
+		self:_delete_right_panel_widgets(page_key, ui_renderer)
+
 		return
 	end
 
@@ -577,8 +579,22 @@ function HudElementTacticalOverlay:_update_live_event(dt, ui_renderer)
 	end
 end
 
+function HudElementTacticalOverlay:reroll_contracts()
+	local contracts_promise = self._contracts_promise
+
+	if contracts_promise and contracts_promise:is_pending() then
+		contracts_promise:cancel()
+	end
+
+	self:_fetch_task_list()
+end
+
 function HudElementTacticalOverlay:_update_contracts(dt, ui_renderer)
-	if self._contracts_fetched then
+	local show_right_side = self._context.show_right_side
+	local has_data = self._contracts_fetched
+	local should_create = show_right_side and has_data
+
+	if should_create then
 		self:_setup_contracts(self._contract_data, ui_renderer)
 
 		self._contracts_fetched = false
@@ -645,9 +661,11 @@ function HudElementTacticalOverlay:_switch_right_grid(ui_renderer)
 		local key = ordered_names[index]
 		local has_entry = self._right_panel_entries[key] ~= nil
 
-		if has_entry then
+		if has_entry and key ~= current_key then
 			self:_swap_right_grid(key, ui_renderer)
+		end
 
+		if has_entry then
 			return
 		end
 	end

@@ -194,38 +194,26 @@ local widget_definitions = {
 	}, "corner_bottom_right"),
 	background = UIWidget.create_definition({
 		{
-			pass_type = "rect",
-			style = {
-				offset = {
-					0,
-					0,
-					0
-				},
-				color = {
-					255,
-					10,
-					10,
-					10
-				}
-			}
-		},
-		{
-			value_id = "rarity_background",
-			style_id = "rarity_background",
+			value = "content/ui/materials/backgrounds/weapon_views_background",
 			pass_type = "texture",
-			value = "content/ui/materials/gradients/gradient_vertical",
 			style = {
+				vertical_alignment = "center",
+				horizontal_alignment = "center",
 				offset = {
 					0,
 					0,
 					1
 				},
-				color = {
-					255,
-					100,
-					100,
-					100
+				size = {
+					1920,
+					1080
 				}
+			}
+		},
+		{
+			pass_type = "rect",
+			style = {
+				color = Color.black(255, true)
 			}
 		}
 	}, "screen")

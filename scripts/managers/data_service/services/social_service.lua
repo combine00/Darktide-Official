@@ -53,6 +53,7 @@ function SocialService:init(backend_interfaces)
 	end
 
 	self._backend_interfaces = backend_interfaces.social
+	self._cached_group_finder_tags = nil
 	self._friends_list = {}
 	self._friends_list_promise = Promise.resolved()
 	self._fatshark_friends_promise = Promise.resolved()
@@ -679,7 +680,7 @@ function SocialService:send_party_invite(invitee_player_info)
 	local same_platform = self._platform == invitee_platform
 	local is_online = invitee_online_status == OnlineStatus.online
 
-	if is_online and (not same_platform or self._platform ~= Platforms.xbox) then
+	if is_online and (not same_platform or self._platform ~= Platforms.xbox and self._platform ~= Platforms.psn) then
 		Managers.party_immaterium:invite_to_party(invitee_player_info:account_id()):catch(function (error)
 			_warning("invite_to_party failed with %s", table.tostring(error, 3))
 		end)
@@ -926,6 +927,14 @@ function SocialService:can_toggle_mute_in_text_chat(account_id, platform_user_id
 				return false, reason
 			end
 		end
+	elseif IS_PLAYSTATION then
+		local platform = player_info:platform()
+
+		if platform ~= self:platform() and Managers.account:has_crossplay_restriction() then
+			local reason = "loc_social_fail_reason_platform_muted"
+
+			return false, reason
+		end
 	end
 
 	return true
@@ -967,6 +976,14 @@ function SocialService:can_toggle_mute_in_voice_chat(account_id, platform_user_i
 
 				return false, reason
 			end
+		end
+	elseif IS_PLAYSTATION then
+		local platform = player_info:platform()
+
+		if platform ~= self:platform() and Managers.account:has_crossplay_restriction() then
+			local reason = "loc_social_fail_reason_platform_muted"
+
+			return false, reason
 		end
 	end
 
@@ -1245,6 +1262,30 @@ function SocialService:get_player_info_by_fatshark_id(fatshark_id)
 		else
 			return nil
 		end
+	end)
+end
+
+function SocialService:get_group_finder_tags()
+	local promise = nil
+
+	if self._cached_group_finder_tags then
+		promise = Promise.resolved(self._cached_group_finder_tags)
+	else
+		promise = self._backend_interfaces:fetch_group_finder_tags():next(function (data)
+			self._cached_group_finder_tags = data
+
+			return data
+		end):catch(function (error)
+			local error_string = tostring(error)
+
+			Log.error("SocialService", "Error fetching group finder tags: %s", error_string)
+
+			return {}
+		end)
+	end
+
+	return promise:next(function (data)
+		return data
 	end)
 end
 

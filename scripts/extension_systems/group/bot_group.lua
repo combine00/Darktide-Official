@@ -375,7 +375,7 @@ function BotGroup:_update_move_targets(bot_data, num_bots, nav_world, side)
 	end
 
 	local bot_follow_disabled = nil
-	local locked_on_platform = self._moveable_platform_system:units_are_locked()
+	local locked_on_platform = self._moveable_platform_system:block_bot_movement()
 
 	if locked_on_platform then
 		bot_follow_disabled = true

@@ -23,6 +23,12 @@ local husk_hud_data_component_config = {
 		"slot_grenade_ability",
 		"slot_luggable"
 	},
+	slot_primary = {
+		"overheat_state"
+	},
+	slot_secondary = {
+		"overheat_state"
+	},
 	talent_resource = {
 		max_resource = "talent_resource",
 		current_resource = "talent_resource"
@@ -34,6 +40,9 @@ local husk_hud_data_component_config = {
 	},
 	ledge_hanging_character_state = {
 		"time_to_fall_down"
+	},
+	interacting_character_state = {
+		"interaction_template"
 	},
 	movement_state = {
 		"is_crouching"

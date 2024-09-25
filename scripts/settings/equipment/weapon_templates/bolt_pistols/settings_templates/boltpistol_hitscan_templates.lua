@@ -22,6 +22,19 @@ hitscan_templates.default_boltpistol_hitscan = {
 			target_index_increase = 2,
 			stop_explosion_template = ExplosionTemplates.boltpistol_shell_stop
 		}
+	},
+	collision_tests = {
+		{
+			against = "statics",
+			test = "ray",
+			collision_filter = "filter_player_character_shooting_raycast_statics"
+		},
+		{
+			against = "dynamics",
+			test = "sphere",
+			radius = 0.1,
+			collision_filter = "filter_player_character_shooting_raycast_dynamics"
+		}
 	}
 }
 

@@ -79,6 +79,7 @@ function UIManager:init()
 	Managers.event:register(self, "event_on_render_settings_applied", "event_on_render_settings_applied")
 	Managers.event:register(self, "event_cinematic_skip_state", "event_cinematic_skip_state")
 	Managers.event:register(self, "event_portrait_render_change", "event_portrait_render_change")
+	Managers.event:register(self, "event_crossplay_change", "event_crossplay_change")
 
 	self._input_hold_tracker = InputHoldTracker:new(input_service_name)
 	self._client_waiting_loadout = false
@@ -772,6 +773,7 @@ function UIManager:destroy()
 	Managers.event:unregister(self, "event_on_render_settings_applied")
 	Managers.event:unregister(self, "event_cinematic_skip_state")
 	Managers.event:unregister(self, "event_portrait_render_change")
+	Managers.event:unregister(self, "event_crossplay_change")
 	self._view_handler:destroy()
 
 	self._view_handler = nil
@@ -1755,6 +1757,12 @@ function UIManager:event_portrait_render_change(value)
 	instance:change_render_portrait_status(value)
 end
 
+function UIManager:event_crossplay_change(enabled)
+	local restricted = not enabled
+
+	Managers.account:set_crossplay_restriction(restricted)
+end
+
 function UIManager:portrait_has_request(id)
 	local instance = self._back_buffer_render_handlers.portraits
 
@@ -1901,18 +1909,15 @@ function UIManager:load_item_icon(real_item, cb, render_context, dummy_profile, 
 
 		local required_breed_item_names_per_slot = UISettings.item_preview_required_slot_items_per_slot_by_breed_and_gender[breed_name]
 		local required_gender_item_names_per_slot = required_breed_item_names_per_slot and required_breed_item_names_per_slot[gender_name]
+		local required_items = required_gender_item_names_per_slot and (required_gender_item_names_per_slot[first_slot_name] or required_gender_item_names_per_slot.default)
 
-		if required_gender_item_names_per_slot then
-			local required_items = required_gender_item_names_per_slot[first_slot_name]
+		if required_items then
+			for slot_name, slot_item_name in pairs(required_items) do
+				local item_definition = MasterItems.get_item(slot_item_name)
 
-			if required_items then
-				for slot_name, slot_item_name in pairs(required_items) do
-					local item_definition = MasterItems.get_item(slot_item_name)
-
-					if item_definition then
-						local slot_item = table.clone(item_definition)
-						dummy_profile.loadout[slot_name] = slot_item
-					end
+				if item_definition then
+					local slot_item = table.clone(item_definition)
+					dummy_profile.loadout[slot_name] = slot_item
 				end
 			end
 		end
@@ -1977,20 +1982,17 @@ function UIManager:load_item_icon(real_item, cb, render_context, dummy_profile, 
 		local archetype = dummy_profile.archetype
 		local breed_name = archetype.breed
 		local loadout = dummy_profile.loadout
-		local required_breed_item_names_per_slot = UISettings.item_preview_required_slot_items_set_per_slot_by_breed_and_gender[breed_name]
+		local required_breed_item_names_per_slot = UISettings.item_preview_required_slot_items_per_slot_by_breed_and_gender[breed_name]
 		local required_gender_item_names_per_slot = required_breed_item_names_per_slot and required_breed_item_names_per_slot[gender_name]
+		local required_items = required_gender_item_names_per_slot and required_gender_item_names_per_slot.default
 
-		if required_gender_item_names_per_slot then
-			local required_items = required_gender_item_names_per_slot
+		if required_items then
+			for slot_name, slot_item_name in pairs(required_items) do
+				local item_definition = MasterItems.get_item(slot_item_name)
 
-			if required_items then
-				for slot_name, slot_item_name in pairs(required_items) do
-					local item_definition = MasterItems.get_item(slot_item_name)
-
-					if item_definition then
-						local slot_item = table.clone(item_definition)
-						dummy_profile.loadout[slot_name] = slot_item
-					end
+				if item_definition then
+					local slot_item = table.clone(item_definition)
+					dummy_profile.loadout[slot_name] = slot_item
 				end
 			end
 		end

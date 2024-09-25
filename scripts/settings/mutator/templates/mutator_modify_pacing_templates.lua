@@ -292,8 +292,10 @@ local mutator_templates = {
 		class = "scripts/managers/mutator/mutators/mutator_modify_pacing",
 		init_modify_pacing = {
 			replace_terror_event_tags = {
-				far = "melee",
-				close = "melee"
+				villains = {
+					far = "melee",
+					close = "melee"
+				}
 			}
 		}
 	},
@@ -347,17 +349,6 @@ local mutator_templates = {
 				high = {
 					renegade = RoamerPacks.renegade_far_high_no_melee_ogryns,
 					cultist = RoamerPacks.cultist_far_high_no_melee_ogryns
-				}
-			}
-		}
-	},
-	mutator_only_ranged_terror_events = {
-		class = "scripts/managers/mutator/mutators/mutator_modify_pacing",
-		init_modify_pacing = {
-			replace_terror_event_tags = {
-				horde = "roamer",
-				melee = {
-					"close"
 				}
 			}
 		}
@@ -495,16 +486,6 @@ local mutator_templates = {
 			terror_event_point_multiplier = 0.25
 		}
 	},
-	mutator_increase_terror_event_points_high = {
-		class = "scripts/managers/mutator/mutators/mutator_modify_pacing",
-		init_modify_pacing = {
-			terror_event_point_multiplier = 0.5,
-			replace_terror_event_tags = {
-				roamer = "elite",
-				horde = "roamer"
-			}
-		}
-	},
 	mutator_always_allow_all_spawn_types = {
 		class = "scripts/managers/mutator/mutators/mutator_modify_pacing",
 		init_modify_pacing = {
@@ -586,6 +567,15 @@ local mutator_templates = {
 	},
 	mutator_single_twin = {
 		class = "scripts/managers/mutator/mutators/mutator_base"
+	},
+	mutator_maelstrom_armored_infected = {
+		class = "scripts/managers/mutator/mutators/mutator_replace_breed",
+		init_replacement_breed = {
+			breed_replacement = {
+				chaos_poxwalker = "chaos_armored_infected",
+				chaos_newly_infected = "chaos_armored_infected"
+			}
+		}
 	}
 }
 

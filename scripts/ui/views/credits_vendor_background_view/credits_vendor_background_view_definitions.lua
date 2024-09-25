@@ -103,9 +103,12 @@ local button_options_definitions = {
 				layer = 10,
 				tabs_params = {
 					{
-						view = "credits_vendor_view",
 						display_name = "loc_credits_vendor_view_title",
 						blur_background = false,
+						view = "credits_vendor_view",
+						context = {
+							use_item_categories = true
+						},
 						input_legend_buttons = {
 							{
 								input_action = "hotkey_item_inspect",

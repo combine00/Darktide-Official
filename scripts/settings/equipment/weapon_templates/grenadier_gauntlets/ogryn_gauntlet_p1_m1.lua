@@ -1471,8 +1471,10 @@ weapon_template.conditional_state_to_action_input = {
 weapon_template.no_ammo_delay = 0.4
 weapon_template.sprint_ready_up_time = 0.3
 weapon_template.max_first_person_anim_movement_speed = 5.8
-weapon_template.uses_ammunition = true
-weapon_template.uses_overheat = false
+weapon_template.hud_configuration = {
+	uses_overheat = false,
+	uses_ammunition = true
+}
 weapon_template.ammo_template = "ogryn_gauntlet_p1_m1"
 weapon_template.fx_sources = {
 	_muzzle = "fx_muzzle",
@@ -1724,6 +1726,34 @@ weapon_template.displayed_attacks = {
 		desc = "loc_stats_special_action_special_attack_ogryn_gauntlet_p1m1_desc",
 		display_name = "loc_weapon_special_fist_attack_gauntlet",
 		type = "special_attack"
+	}
+}
+weapon_template.weapon_card_data = {
+	main = {
+		{
+			icon = "tank",
+			value_func = "primary_attack",
+			header = "light"
+		},
+		{
+			icon = "tank",
+			value_func = "secondary_attack",
+			header = "heavy"
+		},
+		{
+			value_func = "extra_attack",
+			icon = "brace",
+			sub_icon = "projectile",
+			header = "brace"
+		},
+		{
+			value_func = "ammo",
+			header = "ammo"
+		}
+	},
+	weapon_special = {
+		icon = "special_attack",
+		header = "explosive_punch"
 	}
 }
 weapon_template.displayed_weapon_stats = "ogryn_gauntlet"

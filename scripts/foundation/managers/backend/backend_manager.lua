@@ -265,18 +265,12 @@ function BackendManager:authenticate()
 				return Promise.rejected(error_data)
 			end):next(function (result)
 				local success, error_code = Backend.initialize(debug_log, result.authentication_service_url, result.title_service_url, result.telemetry_service_url)
-
-				self:_set_backend_env(Backend.get_title_url())
-
 				self._initialized = true
 
 				self._initialize_promise:resolve()
 			end)
 		else
 			local success, error_code = Backend.initialize(debug_log, DEFAULT_AUTHENTICATION_SERIVCE_URL, DEFAULT_TITLE_SERIVCE_URL, DEFAULT_TELEMERTY_SERVICE_URL)
-
-			self:_set_backend_env(Backend.get_title_url())
-
 			self._initialized = true
 
 			self._initialize_promise:resolve()
@@ -308,6 +302,7 @@ function BackendManager:authenticate()
 
 		if not Backend.is_authenticated() then
 			auth_promise:next(function (account)
+				self:_set_backend_env(Backend.get_title_url())
 				Managers.telemetry_events:player_authenticated(account)
 				Crashify.print_property("account_id", string.value_or_nil(account.sub))
 
@@ -325,7 +320,9 @@ function BackendManager:authenticate()
 			end)
 		end
 
-		return auth_promise
+		return auth_promise:catch(function (error)
+			return Promise.rejected(error)
+		end)
 	end)
 end
 

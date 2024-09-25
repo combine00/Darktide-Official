@@ -1,4 +1,6 @@
+local MinigameBalanceView = require("scripts/ui/views/scanner_display_view/minigame_balance_view")
 local MinigameDecodeSymbolsView = require("scripts/ui/views/scanner_display_view/minigame_decode_symbols_view")
+local MinigameDefuseView = require("scripts/ui/views/scanner_display_view/minigame_defuse_view")
 local MinigameDrillView = require("scripts/ui/views/scanner_display_view/minigame_drill_view")
 local MinigameNoneView = require("scripts/ui/views/scanner_display_view/minigame_none_view")
 local MinigameScanView = require("scripts/ui/views/scanner_display_view/minigame_scan_view")
@@ -11,7 +13,9 @@ local ScannerDisplayView = class("ScannerDisplayView", "BaseView")
 ScannerDisplayView.MINIGAMES = {
 	[MinigameSettings.types.none] = MinigameNoneView,
 	[MinigameSettings.types.scan] = MinigameScanView,
+	[MinigameSettings.types.balance] = MinigameBalanceView,
 	[MinigameSettings.types.decode_symbols] = MinigameDecodeSymbolsView,
+	[MinigameSettings.types.defuse] = MinigameDefuseView,
 	[MinigameSettings.types.drill] = MinigameDrillView
 }
 

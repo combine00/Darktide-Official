@@ -21,8 +21,10 @@ local weapon_template = {
 	keywords = {
 		"unarmed"
 	},
-	uses_ammunition = false,
-	uses_overheat = false,
+	hud_configuration = {
+		uses_overheat = false,
+		uses_ammunition = false
+	},
 	crosshair = {
 		crosshair_type = "ironsight"
 	},

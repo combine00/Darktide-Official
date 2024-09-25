@@ -1,4 +1,5 @@
 local Component = require("scripts/utilities/component")
+local WieldableSlotScriptInterface = require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/wieldable_slot_script_interface")
 local OverheatDisplay = class("OverheatDisplay")
 
 function OverheatDisplay:init(context, slot, weapon_template, fx_sources)
@@ -57,5 +58,7 @@ end
 function OverheatDisplay:destroy()
 	return
 end
+
+implements(OverheatDisplay, WieldableSlotScriptInterface)
 
 return OverheatDisplay

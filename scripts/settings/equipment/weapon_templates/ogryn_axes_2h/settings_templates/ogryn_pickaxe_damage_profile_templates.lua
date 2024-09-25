@@ -686,7 +686,7 @@ damage_templates.ogryn_pickaxe_pushfollowup_m2 = {
 	gib_push_force = GibbingSettings.gib_push_force.blunt_heavy
 }
 damage_templates.ogryn_pickaxe_pushfollowup_m1 = {
-	ragdoll_push_force = 550,
+	ragdoll_push_force = 400,
 	ragdoll_only = true,
 	stagger_category = "melee",
 	cleave_distribution = medium_cleave,
@@ -769,7 +769,7 @@ damage_templates.ogryn_pickaxe_blunt = {
 	weapon_special = true,
 	ragdoll_push_force = 400,
 	ragdoll_only = true,
-	stagger_category = "melee",
+	stagger_category = "uppercut",
 	cleave_distribution = big_cleave,
 	damage_type = damage_types.ogryn_pipe_club_heavy,
 	gibbing_power = GibbingPower.always,
@@ -786,8 +786,8 @@ damage_templates.ogryn_pickaxe_blunt = {
 					150
 				},
 				impact = {
-					16,
-					33
+					30,
+					70
 				}
 			}
 		},
@@ -799,8 +799,8 @@ damage_templates.ogryn_pickaxe_blunt = {
 					100
 				},
 				impact = {
-					8,
-					20
+					10,
+					60
 				}
 			}
 		},
@@ -812,8 +812,8 @@ damage_templates.ogryn_pickaxe_blunt = {
 					50
 				},
 				impact = {
-					6,
-					18
+					10,
+					35
 				}
 			}
 		},
@@ -873,6 +873,7 @@ damage_templates.ogryn_pickaxe_blunt = {
 	gib_push_force = GibbingSettings.gib_push_force.blunt_heavy
 }
 damage_templates.ogryn_pickaxe_blunt_m3 = {
+	weakspot_stagger_resistance_modifier = 0.01,
 	stagger_override = "medium",
 	ragdoll_push_force = 600,
 	ragdoll_only = true,

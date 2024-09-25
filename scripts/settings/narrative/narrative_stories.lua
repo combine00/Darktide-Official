@@ -287,6 +287,18 @@ local narrative = {
 				requirement = beyond_story_chapter("s1_twins", "s1_twins_epilogue_2")
 			}
 		},
+		s1_q3 = {
+			{
+				name = "itemization_intro",
+				backend_id = 1,
+				requirement = event_done("onboarding_step_mission_board_introduction")
+			},
+			{
+				name = "commissar_intro",
+				backend_id = 2,
+				requirement = beyond_story_chapter("s1_q3", "itemization_intro")
+			}
+		},
 		level_unlock_popups = {
 			{
 				name = "level_unlock_credits_store_popup",

@@ -135,7 +135,7 @@ function PlayerCharacterStateMinigame:_update_input(t)
 	local minigame_extension = self._minigame_extension
 
 	if minigame_extension then
-		if minigame_extension:action(primary_input, t) then
+		if minigame_extension:uses_action() and minigame_extension:action(primary_input, t) then
 			animation_extension:anim_event_1p("button_press")
 
 			local current_minigame_state = minigame_extension:current_state()

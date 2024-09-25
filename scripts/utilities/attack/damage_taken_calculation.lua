@@ -66,12 +66,11 @@ function DamageTakenCalculation.calculate_attack_result(damage_amount, damage_pr
 		return attack_results.friendly_fire, 0, 0, 0, damage_amount
 	end
 
-	local remaining_damage = damage_amount
 	local remaining_permanent_damage = 0
 	local damage_absorbed = 0
 	local toughness_damage = 0
-	local attack_result, shield_attack_result, shield_damage_absorbed = nil
-	shield_attack_result, remaining_damage, shield_damage_absorbed = _calculate_shield_damage(remaining_damage, damage_profile, shield_setting, instakill)
+	local attack_result = nil
+	local shield_attack_result, remaining_damage, shield_damage_absorbed = _calculate_shield_damage(damage_amount, damage_profile, shield_setting, instakill)
 	damage_absorbed = damage_absorbed + shield_damage_absorbed
 
 	if shield_attack_result then

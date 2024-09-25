@@ -105,6 +105,20 @@ local scenegraph_definition = {
 			0,
 			3
 		}
+	},
+	description_grid = {
+		vertical_alignment = "top",
+		parent = "center_pivot",
+		horizontal_alignment = "center",
+		size = {
+			text_max_width,
+			100
+		},
+		position = {
+			0,
+			0,
+			2
+		}
 	}
 }
 local title_text_style = table.clone(UIFontSettings.header_2)
@@ -466,6 +480,10 @@ local animations = {
 					end
 				end
 
+				if params.description_grid then
+					params.description_grid:set_alpha_multiplier(alpha_multiplier)
+				end
+
 				widgets.edge_top.style.texture.size[1] = widgets.popup_background.style.terminal.size[1]
 				widgets.edge_bottom.style.texture.size[1] = widgets.popup_background.style.terminal.size[1]
 				local popup_type = "default"
@@ -540,6 +558,10 @@ local animations = {
 						widget.alpha_multiplier = anim_progress
 					end
 				end
+
+				if params.description_grid then
+					params.description_grid:set_alpha_multiplier(anim_progress)
+				end
 			end
 		}
 	},
@@ -564,6 +586,10 @@ local animations = {
 						local widget = params.additional_widgets[i]
 						widget.alpha_multiplier = anim_progress
 					end
+				end
+
+				if params.description_grid then
+					params.description_grid:set_alpha_multiplier(anim_progress)
 				end
 			end
 		},

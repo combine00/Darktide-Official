@@ -183,14 +183,15 @@ weapon_template.actions = {
 		kind = "sweep",
 		first_person_hit_anim = "hit_left_shake",
 		allowed_during_sprint = true,
-		range_mod = 1.15,
+		range_mod = 1.35,
 		special_active_hit_stop_anim_3p = "attack_hit_power",
-		damage_window_end = 0.43333333333333335,
+		damage_window_end = 0.4666666666666667,
 		special_active_hit_stop_anim = "attack_hit_power",
 		anim_end_event = "attack_finished",
 		anim_event_3p = "attack_swing_left_diagonal",
 		anim_event = "attack_swing_left_diagonal_v01",
 		hit_stop_anim = "attack_hit",
+		disorientation_type = "thunder_hammer_m2_light",
 		total_time = 2,
 		action_movement_curve = {
 			{
@@ -264,9 +265,9 @@ weapon_template.actions = {
 		spline_settings = {
 			matrices_data_location = "content/characters/player/human/first_person/animations/thunder_hammer/swing_left_diagonal_v01",
 			anchor_point_offset = {
-				0.15,
+				0.65,
 				0,
-				-0.15
+				-0.1
 			}
 		},
 		damage_profile = DamageProfileTemplates.thunderhammer_light_linesman,
@@ -293,18 +294,19 @@ weapon_template.actions = {
 	action_left_heavy = {
 		damage_window_start = 0.36666666666666664,
 		hit_armor_anim = "attack_hit",
-		range_mod = 1.25,
+		range_mod = 1.32,
 		weapon_handling_template = "time_scale_1_1",
 		first_person_hit_anim = "hit_left_shake",
 		kind = "sweep",
 		special_active_hit_stop_anim_3p = "attack_hit_power",
-		damage_window_end = 0.4666666666666667,
+		damage_window_end = 0.5,
 		special_active_hit_stop_anim = "attack_hit_power",
 		anim_end_event = "attack_finished",
 		allowed_during_sprint = true,
 		uninterruptible = true,
 		anim_event = "attack_swing_heavy_left",
 		hit_stop_anim = "attack_hit",
+		disorientation_type = "thunder_hammer_m2_heavy",
 		total_time = 1.75,
 		action_movement_curve = {
 			{
@@ -384,7 +386,7 @@ weapon_template.actions = {
 			anchor_point_offset = {
 				0,
 				0,
-				0
+				0.1
 			}
 		},
 		damage_profile = DamageProfileTemplates.thunderhammer_heavy,
@@ -409,9 +411,10 @@ weapon_template.actions = {
 		aim_assist_ramp_template = AimAssistTemplates.tank_swing_heavy
 	},
 	action_melee_start_right = {
-		proc_time_interval = 0.2,
 		anim_end_event = "attack_finished",
+		proc_time_interval = 0.2,
 		kind = "windup",
+		allowed_during_sprint = true,
 		anim_event = "attack_swing_charge_right_pose",
 		stop_input = "attack_cancel",
 		total_time = 3,
@@ -487,18 +490,19 @@ weapon_template.actions = {
 	action_right_down_light = {
 		hit_armor_anim = "attack_hit",
 		weapon_handling_template = "time_scale_1",
-		range_mod = 1.15,
+		range_mod = 1.32,
 		kind = "sweep",
 		attack_direction_override = "push",
-		damage_window_start = 0.38,
+		damage_window_start = 0.43333333333333335,
 		first_person_hit_anim = "hit_right_shake",
 		anim_end_event = "attack_finished",
-		damage_window_end = 0.5,
+		damage_window_end = 0.5333333333333333,
 		special_active_hit_stop_anim = "attack_hit_power",
 		special_active_hit_stop_anim_3p = "attack_hit_power",
 		anim_event_3p = "attack_swing_right_diagonal",
 		anim_event = "attack_swing_right_down",
 		hit_stop_anim = "attack_hit",
+		disorientation_type = "thunder_hammer_m2_light",
 		total_time = 2,
 		action_movement_curve = {
 			{
@@ -598,7 +602,7 @@ weapon_template.actions = {
 		aim_assist_ramp_template = AimAssistTemplates.tank_swing
 	},
 	action_right_heavy = {
-		damage_window_start = 0.3,
+		damage_window_start = 0.3333333333333333,
 		hit_armor_anim = "attack_hit",
 		anim_event_3p = "attack_swing_heavy_right",
 		kind = "sweep",
@@ -608,10 +612,11 @@ weapon_template.actions = {
 		damage_window_end = 0.5,
 		special_active_hit_stop_anim = "attack_hit_power",
 		anim_end_event = "attack_finished",
-		range_mod = 1.25,
+		range_mod = 1.2,
 		uninterruptible = true,
 		anim_event = "attack_swing_heavy_right",
 		hit_stop_anim = "attack_hit",
+		disorientation_type = "thunder_hammer_m2_heavy",
 		total_time = 1.75,
 		action_movement_curve = {
 			{
@@ -692,7 +697,7 @@ weapon_template.actions = {
 			anchor_point_offset = {
 				0,
 				0,
-				0
+				-0.1
 			}
 		},
 		damage_profile = DamageProfileTemplates.thunderhammer_heavy,
@@ -717,10 +722,11 @@ weapon_template.actions = {
 		aim_assist_ramp_template = AimAssistTemplates.tank_swing_heavy
 	},
 	action_melee_start_left_2 = {
+		anim_event_3p = "attack_swing_charge_left_down",
 		anim_end_event = "attack_finished",
 		proc_time_interval = 0.2,
 		kind = "windup",
-		anim_event_3p = "attack_swing_charge_left_down",
+		allowed_during_sprint = true,
 		anim_event = "attack_swing_charge_left_down_pose",
 		stop_input = "attack_cancel",
 		total_time = 3,
@@ -794,10 +800,11 @@ weapon_template.actions = {
 		end
 	},
 	action_melee_start_left_3 = {
+		anim_event_3p = "attack_swing_charge_left_down",
 		anim_end_event = "attack_finished",
 		proc_time_interval = 0.2,
 		kind = "windup",
-		anim_event_3p = "attack_swing_charge_left_down",
+		allowed_during_sprint = true,
 		anim_event = "attack_swing_charge_left_down_pose",
 		stop_input = "attack_cancel",
 		total_time = 3,
@@ -873,17 +880,18 @@ weapon_template.actions = {
 	action_left_heavy_2 = {
 		hit_armor_anim = "attack_hit",
 		weapon_handling_template = "time_scale_1_1",
-		range_mod = 1.15,
+		range_mod = 1.3,
 		kind = "sweep",
 		first_person_hit_anim = "hit_down_shake",
-		damage_window_start = 0.36666666666666664,
+		damage_window_start = 0.38333333333333336,
 		special_active_hit_stop_anim_3p = "attack_hit_power",
 		anim_end_event = "attack_finished",
-		damage_window_end = 0.43333333333333335,
+		damage_window_end = 0.4666666666666667,
 		special_active_hit_stop_anim = "attack_hit_power",
 		uninterruptible = true,
 		anim_event = "attack_swing_heavy_left_down",
 		hit_stop_anim = "attack_hit",
+		disorientation_type = "thunder_hammer_m2_heavy",
 		total_time = 1.75,
 		action_movement_curve = {
 			{
@@ -937,7 +945,7 @@ weapon_template.actions = {
 		spline_settings = {
 			matrices_data_location = "content/characters/player/human/first_person/animations/thunder_hammer/heavy_swing_left_down",
 			anchor_point_offset = {
-				0,
+				0.2,
 				0,
 				0
 			}
@@ -1027,18 +1035,19 @@ weapon_template.actions = {
 	},
 	action_left_light_pushfollow = {
 		hit_armor_anim = "attack_hit",
-		kind = "sweep",
 		weapon_handling_template = "time_scale_1",
+		kind = "sweep",
 		first_person_hit_anim = "hit_left_shake",
-		damage_window_start = 0.2833333333333333,
-		sprint_requires_press_to_interrupt = "true",
+		damage_window_start = 0.35,
+		allowed_during_sprint = true,
 		special_active_hit_stop_anim_3p = "attack_hit_power",
-		damage_window_end = 0.45,
+		damage_window_end = 0.43333333333333335,
 		special_active_hit_stop_anim = "attack_hit_power",
 		anim_end_event = "attack_finished",
-		range_mod = 1.15,
+		range_mod = 1.28,
 		anim_event = "attack_swing_left",
 		hit_stop_anim = "attack_hit",
+		disorientation_type = "thunder_hammer_m2_light",
 		total_time = 2,
 		action_movement_curve = {
 			{
@@ -1323,8 +1332,10 @@ weapon_template.weapon_box = {
 	1,
 	0.25
 }
-weapon_template.uses_ammunition = false
-weapon_template.uses_overheat = false
+weapon_template.hud_configuration = {
+	uses_overheat = false,
+	uses_ammunition = false
+}
 weapon_template.fx_sources = {
 	_sweep = "fx_sweep",
 	_special_active = "fx_special_active",
@@ -1345,7 +1356,6 @@ weapon_template.sprint_template = "support"
 weapon_template.stamina_template = "thunderhammer_2h_p1_m1"
 weapon_template.toughness_template = "default"
 weapon_template.movement_curve_modifier_template = "default"
-weapon_template.allow_sprinting_with_special = true
 weapon_template.footstep_intervals = FootstepIntervalsTemplates.thunderhammer
 weapon_template.damage_window_start_sweep_trail_offset = -0.2
 weapon_template.damage_window_end_sweep_trail_offset = 0.2
@@ -1357,7 +1367,8 @@ weapon_template.weapon_special_class = "WeaponSpecialSelfDisorientation"
 weapon_template.weapon_special_tweak_data = {
 	active_duration = 5,
 	special_active_hit_extra_time = 0.5,
-	disorientation_type = "thunder_hammer_m2",
+	keep_active_on_sprint = true,
+	disorientation_type = "thunder_hammer_m2_light",
 	only_deactive_on_abort = true,
 	push_template = push_templates.medium
 }
@@ -1690,6 +1701,24 @@ weapon_template.displayed_attacks = {
 		desc = "loc_stats_special_action_powerup_desc",
 		display_name = "loc_weapon_special_activate",
 		type = "activate"
+	}
+}
+weapon_template.weapon_card_data = {
+	main = {
+		{
+			icon = "smiter",
+			value_func = "primary_attack",
+			header = "light"
+		},
+		{
+			icon = "tank",
+			value_func = "secondary_attack",
+			header = "heavy"
+		}
+	},
+	weapon_special = {
+		icon = "activate",
+		header = "activate"
 	}
 }
 

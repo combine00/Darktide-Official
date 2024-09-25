@@ -8,7 +8,7 @@ local DIRECTION = {
 }
 local UIWidgetGrid = class("UIWidgetGrid")
 
-function UIWidgetGrid:init(widgets, alignment_list, scenegraph, area_scenegraph_id, direction, spacing, fill_section_spacing, use_is_focused_for_navigation, use_select_on_focused, bottom_chin, top_padding, scroll_start_margin)
+function UIWidgetGrid:init(widgets, alignment_list, scenegraph, area_scenegraph_id, direction, spacing, fill_section_spacing, use_is_focused_for_navigation, use_select_on_focused, bottom_chin, top_padding, scroll_start_margin, center)
 	self._direction = direction
 	self._scenegraph = scenegraph
 	self._spacing = spacing or {
@@ -19,6 +19,7 @@ function UIWidgetGrid:init(widgets, alignment_list, scenegraph, area_scenegraph_
 	self._top_padding = top_padding or 0
 	self._area_scenegraph_id = area_scenegraph_id
 	self._handle_grid_navigation = true
+	self._center = center == true
 	alignment_list = alignment_list or widgets
 	local axis = (direction == DIRECTION.LEFT or direction == DIRECTION.RIGHT) and 1 or 2
 	local negative_direction = direction == DIRECTION.LEFT or direction == DIRECTION.UP
@@ -72,13 +73,19 @@ function UIWidgetGrid:assign_scrollbar(scrollbar_widget, pivot_scenegraph_id, in
 	self:_update_scrollbar_sizes()
 end
 
+function UIWidgetGrid:set_enable_gamepad_scrolling(enable_gamepad_scrolling)
+	self._enable_gamepad_scrolling = enable_gamepad_scrolling
+
+	if self._scrollbar_widget then
+		self._scrollbar_widget.content.enable_gamepad_scrolling = enable_gamepad_scrolling
+	end
+end
+
 function UIWidgetGrid:can_scroll()
 	local scrollbar_widget = self._scrollbar_widget
 
 	if scrollbar_widget then
-		local axis = self._axis
-		local area_size = self:_get_area_size()
-		local area_length = area_size[axis]
+		local area_length = self:area_length()
 
 		return area_length < self:length()
 	end
@@ -187,6 +194,10 @@ function UIWidgetGrid:set_scroll_step_length(step_length)
 end
 
 function UIWidgetGrid:_update_grid_position(dt, t)
+	self:_update_scroll_progress()
+end
+
+function UIWidgetGrid:_update_scroll_progress(force_update)
 	local pivot_scenegraph_id = self._pivot_scenegraph_id
 
 	if not pivot_scenegraph_id then
@@ -202,15 +213,29 @@ function UIWidgetGrid:_update_grid_position(dt, t)
 		scroll_progress = scrollbar_widget.content.value or 0
 	end
 
-	if scroll_progress ~= self._scroll_progress then
-		local axis = self._axis
+	local position = nil
+
+	if scroll_progress ~= self._scroll_progress or force_update then
 		local scroll_length = self:scroll_length()
 		local scroll_direction_multiplier = self._scroll_direction_multiplier
-		grid_scenegraph.position[axis] = scroll_length * scroll_progress * scroll_direction_multiplier
+		position = scroll_length * scroll_progress * scroll_direction_multiplier
+		self._scroll_progress = scroll_progress
+	end
+
+	local length = self:length()
+	local area_length = self:area_length()
+
+	if self._center and length < area_length then
+		local buffer = (area_length - length) / 2
+		position = buffer
+	end
+
+	local axis = self._axis
+
+	if position and grid_scenegraph.position[axis] ~= position then
+		grid_scenegraph.position[axis] = position
 
 		UIScenegraph.update_scenegraph(scenegraph, self._render_scale)
-
-		self._scroll_progress = scroll_progress
 	end
 end
 
@@ -234,12 +259,10 @@ function UIWidgetGrid:length_scrolled()
 end
 
 function UIWidgetGrid:scroll_length()
-	local axis = self._axis
-	local stale_axis = axis % 2 + 1
 	local top_padding = self._top_padding or 0
-	local area_size = self:_get_area_size()
+	local area_length = self:area_length()
 	local total_grid_length = self._total_grid_length
-	local value = math.max(total_grid_length - area_size[axis] - top_padding, 0)
+	local value = math.max(total_grid_length - area_length - top_padding, 0)
 
 	return value
 end
@@ -455,6 +478,7 @@ function UIWidgetGrid:remove_widget(widget)
 	self._total_grid_length, self._smallest_widget_length = self:_align_grid_widgets(alignment_list)
 
 	self:_update_scrollbar_sizes()
+	self:_update_scroll_progress(true)
 end
 
 function UIWidgetGrid:_align_grid_widgets(alignment_list)
@@ -648,19 +672,22 @@ function UIWidgetGrid:handle_grid_selection(input_service)
 	local current_index = self._selected_grid_index
 	local widgets = self._widgets
 	local selected_widget = widgets[current_index]
-	local using_negative_direction = self._using_negative_direction
 	local new_selection_index = nil
 
-	if input_service:get("navigate_up_continuous") then
-		local direction = using_negative_direction and DIRECTION.DOWN or DIRECTION.UP
-		new_selection_index = self:_find_closest_neighbour_vertical(current_index, direction)
-	elseif input_service:get("navigate_down_continuous") then
-		local direction = using_negative_direction and DIRECTION.UP or DIRECTION.DOWN
-		new_selection_index = self:_find_closest_neighbour_vertical(current_index, direction)
-	elseif input_service:get("navigate_left_continuous") then
-		new_selection_index = self:_find_closest_neighbour_horizontal(current_index, DIRECTION.LEFT)
-	elseif input_service:get("navigate_right_continuous") then
-		new_selection_index = self:_find_closest_neighbour_horizontal(current_index, DIRECTION.RIGHT)
+	if selected_widget then
+		local using_negative_direction = self._using_negative_direction
+
+		if input_service:get("navigate_up_continuous") then
+			local direction = using_negative_direction and DIRECTION.DOWN or DIRECTION.UP
+			new_selection_index = self:_find_closest_neighbour_vertical(current_index, direction)
+		elseif input_service:get("navigate_down_continuous") then
+			local direction = using_negative_direction and DIRECTION.UP or DIRECTION.DOWN
+			new_selection_index = self:_find_closest_neighbour_vertical(current_index, direction)
+		elseif input_service:get("navigate_left_continuous") then
+			new_selection_index = self:_find_closest_neighbour_horizontal(current_index, DIRECTION.LEFT)
+		elseif input_service:get("navigate_right_continuous") then
+			new_selection_index = self:_find_closest_neighbour_horizontal(current_index, DIRECTION.RIGHT)
+		end
 	end
 
 	if new_selection_index then
@@ -809,7 +836,7 @@ function UIWidgetGrid:select_grid_index(index, scrollbar_animation_progress, is_
 		self._focused_grid_index = index
 	elseif self._selected_grid_index ~= index then
 		self._previous_grid_index = self._selected_grid_index
-		self._selected_grid_index = index
+		self._selected_grid_index = (not index or widgets and widgets[index]) and index
 		self._ui_animations.scrollbar = nil
 	end
 

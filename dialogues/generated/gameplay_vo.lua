@@ -937,6 +937,61 @@ return function ()
 		}
 	})
 	define_rule({
+		name = "combat_monster_release_a",
+		wwise_route = 0,
+		response = "combat_monster_release_a",
+		database = "gameplay_vo",
+		category = "player_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"generic_mission_vo"
+			},
+			{
+				"query_context",
+				"trigger_id",
+				OP.EQ,
+				"monster_release"
+			},
+			{
+				"user_context",
+				"friends_close",
+				OP.LTEQ,
+				4
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.GTEQ,
+				0
+			},
+			{
+				"faction_memory",
+				"combat_monster_release_a",
+				OP.TIMEDIFF,
+				OP.GT,
+				60
+			}
+		},
+		on_done = {
+			{
+				"faction_memory",
+				"combat_monster_release_a",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "disabled"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 2
+			}
+		}
+	})
+	define_rule({
 		name = "come_back_to_squad",
 		category = "player_prio_1",
 		wwise_route = 0,

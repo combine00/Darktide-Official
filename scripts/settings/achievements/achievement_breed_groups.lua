@@ -3,6 +3,7 @@ local minion_breeds = BreedQueries.minion_breeds()
 local path = "content/ui/textures/icons/achievements/"
 local AchievementBreedGroups = {
 	all = {
+		"chaos_armored_infected",
 		"chaos_beast_of_nurgle",
 		"chaos_daemonhost",
 		"chaos_hound",
@@ -17,6 +18,7 @@ local AchievementBreedGroups = {
 		"chaos_spawn",
 		"cultist_assault",
 		"cultist_berzerker",
+		"cultist_captain",
 		"cultist_flamer",
 		"cultist_grenadier",
 		"cultist_gunner",
@@ -33,11 +35,11 @@ local AchievementBreedGroups = {
 		"renegade_gunner",
 		"renegade_melee",
 		"renegade_netgunner",
-		"renegade_twin_captain",
-		"renegade_twin_captain_two",
 		"renegade_rifleman",
 		"renegade_shocktrooper",
-		"renegade_sniper"
+		"renegade_sniper",
+		"renegade_twin_captain",
+		"renegade_twin_captain_two"
 	},
 	chaos = {
 		"chaos_hound",

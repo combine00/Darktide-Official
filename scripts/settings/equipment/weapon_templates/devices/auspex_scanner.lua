@@ -60,15 +60,19 @@ local weapon_template = {
 	look_delta_template = "auspex_scanner",
 	hud_icon = "content/ui/materials/icons/pickups/default",
 	hide_slot = true,
+	hud_configuration = {
+		uses_overheat = false,
+		uses_ammunition = false
+	},
 	require_minigame = true,
 	not_player_wieldable = true
 }
 
-local function _move_ui_validate(player)
+local function _get_minigame(player)
 	local player_unit = player.player_unit
 
 	if not player_unit then
-		return false
+		return nil
 	end
 
 	local unit_data_extension = ScriptUnit.extension(player_unit, "unit_data_system")
@@ -78,13 +82,25 @@ local function _move_ui_validate(player)
 	local interface_unit = Managers.state.unit_spawner:unit(level_unit_id, is_level_unit)
 
 	if not interface_unit then
-		return false
+		return nil
 	end
 
 	local minigame_extension = interface_unit and ScriptUnit.has_extension(interface_unit, "minigame_system")
 	local minigame = minigame_extension:minigame()
 
+	return minigame
+end
+
+local function _move_ui_validate(player)
+	local minigame = _get_minigame(player)
+
 	return minigame and minigame:uses_joystick()
+end
+
+function weapon_template.action_confirm_screen_ui_validation(wielded_slot_id, item, current_action, current_action_name, player)
+	local minigame = _get_minigame(player)
+
+	return minigame and minigame:uses_action()
 end
 
 function weapon_template.action_move_gamepad_screen_ui_validation(wielded_slot_id, item, current_action, current_action_name, player)

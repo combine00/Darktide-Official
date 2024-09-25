@@ -651,6 +651,7 @@ function StateTitle:_signin()
 		end
 
 		Managers.account:refresh_communication_restrictions()
+		Managers.account:fetch_crossplay_restrictions()
 
 		if GameParameters.prod_like_backend then
 			Managers.presence:initialize()

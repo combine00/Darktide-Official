@@ -577,15 +577,15 @@ weapon_template.actions = {
 			},
 			wield = {
 				action_name = "action_unwield",
-				chain_time = 0.54
+				chain_time = 0.4
 			},
 			shoot_pressed = {
 				action_name = "action_shoot_hip",
-				chain_time = 0.56
+				chain_time = 0.4
 			},
 			special_action = {
 				action_name = "action_push",
-				chain_time = 0.9
+				chain_time = 0.75
 			},
 			reload = {
 				action_name = "action_reload",
@@ -762,8 +762,10 @@ weapon_template.conditional_state_to_action_input = {
 	}
 }
 weapon_template.no_ammo_delay = 0.35
-weapon_template.uses_ammunition = true
-weapon_template.uses_overheat = false
+weapon_template.hud_configuration = {
+	uses_overheat = false,
+	uses_ammunition = true
+}
 weapon_template.sprint_ready_up_time = 0.051
 weapon_template.max_first_person_anim_movement_speed = 5.8
 weapon_template.fx_sources = {
@@ -864,7 +866,31 @@ weapon_template.displayed_attacks = {
 	special = {
 		desc = "loc_stats_special_action_melee_weapon_bash_desc",
 		display_name = "loc_weapon_special_weapon_bash",
-		type = "melee"
+		type = "melee_hand"
+	}
+}
+weapon_template.weapon_card_data = {
+	main = {
+		{
+			value_func = "primary_attack",
+			icon = "hipfire",
+			sub_icon = "semi_auto",
+			header = "hipfire"
+		},
+		{
+			value_func = "secondary_attack",
+			icon = "ads",
+			sub_icon = "semi_auto",
+			header = "ads"
+		},
+		{
+			value_func = "ammo",
+			header = "ammo"
+		}
+	},
+	weapon_special = {
+		icon = "melee_hand",
+		header = "weapon_bash"
 	}
 }
 weapon_template.explicit_combo = {

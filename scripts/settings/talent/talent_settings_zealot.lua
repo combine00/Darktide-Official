@@ -1,4 +1,10 @@
 local talent_settings = {
+	zealot = {
+		crits_grants_cd = {
+			cooldown_regen = 2,
+			duration = 4.25
+		}
+	},
 	zealot_1 = {
 		combat_ability = {},
 		grenade = {},
@@ -54,7 +60,7 @@ local talent_settings = {
 		passive_1 = {
 			damage_per_step = 0.08,
 			health_step = 0.15,
-			toughness_reduction_per_stack = -0.05,
+			toughness_reduction_per_stack = -0.065,
 			max_stacks = 3,
 			martyrdom_max_stacks = 7
 		},
@@ -125,8 +131,8 @@ local talent_settings = {
 			active_duration = 2
 		},
 		defensive_3 = {
-			recuperate_percentage = 0.25,
-			duration = 5,
+			recuperate_percentage = 0.2,
+			duration = 4,
 			on_damage_taken_proc_chance = 1
 		},
 		offensive_2_1 = {

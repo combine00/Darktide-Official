@@ -5,9 +5,9 @@ local ConditionalFunctions = require("scripts/settings/buff/helper_functions/con
 local FixedFrame = require("scripts/utilities/fixed_frame")
 local PlayerUnitStatus = require("scripts/utilities/attack/player_unit_status")
 local attack_results = AttackSettings.attack_results
-local buff_keywords = BuffSettings.keywords
-local buff_stat_buffs = BuffSettings.stat_buffs
-local buff_proc_events = BuffSettings.proc_events
+local keywords = BuffSettings.keywords
+local stat_buffs = BuffSettings.stat_buffs
+local proc_events = BuffSettings.proc_events
 local templates = {}
 
 table.make_unique(templates)
@@ -16,7 +16,7 @@ templates.weapon_trait_melee_common_wield_increased_attack_buff = {
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.damage] = 0.5
+		[stat_buffs.damage] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -24,7 +24,7 @@ templates.weapon_trait_melee_common_wield_increased_unarmored_damage_buff = {
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.unarmored_damage] = 0.2
+		[stat_buffs.unarmored_damage] = 0.2
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -32,7 +32,7 @@ templates.weapon_trait_melee_common_wield_increased_armored_damage_buff = {
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.armored_damage] = 0.2
+		[stat_buffs.armored_damage] = 0.2
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -40,7 +40,7 @@ templates.weapon_trait_melee_common_wield_increased_resistant_damage_buff = {
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.resistant_damage] = 0.2
+		[stat_buffs.resistant_damage] = 0.2
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -48,7 +48,7 @@ templates.weapon_trait_melee_common_wield_increased_berserker_damage_buff = {
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.berserker_damage] = 0.2
+		[stat_buffs.berserker_damage] = 0.2
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -56,7 +56,7 @@ templates.weapon_trait_melee_common_wield_increased_super_armor_damage_buff = {
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.super_armor_damage] = 0.2
+		[stat_buffs.super_armor_damage] = 0.2
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -64,7 +64,7 @@ templates.weapon_trait_melee_common_wield_increased_disgustingly_resilient_damag
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.disgustingly_resilient_damage] = 0.2
+		[stat_buffs.disgustingly_resilient_damage] = 0.2
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -72,14 +72,14 @@ templates.weapon_trait_melee_common_equip_decrease_corruption_damage_taken_buff 
 	predicted = false,
 	class_name = "buff",
 	stat_buffs = {
-		[buff_stat_buffs.corruption_taken_multiplier] = 0.5
+		[stat_buffs.corruption_taken_multiplier] = 0.5
 	}
 }
 templates.weapon_trait_melee_common_wield_decrease_corruption_damage_taken_buff = {
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.corruption_taken_multiplier] = 0.5
+		[stat_buffs.corruption_taken_multiplier] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -87,14 +87,14 @@ templates.weapon_trait_melee_common_equip_decrease_toughness_damage_taken_buff =
 	predicted = false,
 	class_name = "buff",
 	stat_buffs = {
-		[buff_stat_buffs.toughness_damage_taken_multiplier] = 0.5
+		[stat_buffs.toughness_damage_taken_multiplier] = 0.5
 	}
 }
 templates.weapon_trait_melee_common_wield_decrease_toughness_damage_taken_buff = {
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.toughness_damage_taken_multiplier] = 0.5
+		[stat_buffs.toughness_damage_taken_multiplier] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -102,14 +102,14 @@ templates.weapon_trait_melee_common_equip_decrease_damage_taken_buff = {
 	predicted = false,
 	class_name = "buff",
 	stat_buffs = {
-		[buff_stat_buffs.damage_taken_multiplier] = 0.5
+		[stat_buffs.damage_taken_multiplier] = 0.5
 	}
 }
 templates.weapon_trait_melee_common_wield_decrease_damage_taken_buff = {
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.damage_taken_multiplier] = 0.5
+		[stat_buffs.damage_taken_multiplier] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -117,14 +117,14 @@ templates.weapon_trait_melee_common_equip_increase_movement_speed_buff = {
 	predicted = false,
 	class_name = "buff",
 	stat_buffs = {
-		[buff_stat_buffs.movement_speed] = 0.5
+		[stat_buffs.movement_speed] = 0.5
 	}
 }
 templates.weapon_trait_melee_common_wield_increase_movement_speed_buff = {
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.movement_speed] = 0.5
+		[stat_buffs.movement_speed] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -132,7 +132,7 @@ templates.weapon_trait_melee_common_wield_increase_crit_chance_buff = {
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.critical_strike_chance] = 1
+		[stat_buffs.critical_strike_chance] = 1
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -140,7 +140,7 @@ templates.weapon_trait_increase_crit_chance = {
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.critical_strike_chance] = 0.05
+		[stat_buffs.critical_strike_chance] = 0.05
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -148,7 +148,7 @@ templates.weapon_trait_increase_crit_damage = {
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.critical_strike_damage] = 0.1
+		[stat_buffs.critical_strike_damage] = 0.1
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -156,7 +156,7 @@ templates.weapon_trait_increase_stamina = {
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.stamina_modifier] = 1
+		[stat_buffs.stamina_modifier] = 1
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -164,7 +164,7 @@ templates.weapon_trait_increase_weakspot_damage = {
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.weakspot_damage] = 0.1
+		[stat_buffs.weakspot_damage] = 0.1
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -172,7 +172,7 @@ templates.weapon_trait_increase_attack_speed = {
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.attack_speed] = 0.05
+		[stat_buffs.attack_speed] = 0.05
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -180,7 +180,7 @@ templates.weapon_trait_increase_damage = {
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.damage] = 0.04
+		[stat_buffs.damage] = 0.04
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -188,7 +188,7 @@ templates.weapon_trait_increase_finesse = {
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.finesse_modifier_bonus] = 0.04
+		[stat_buffs.finesse_modifier_bonus] = 0.04
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -196,7 +196,7 @@ templates.weapon_trait_increase_power = {
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.power_level_modifier] = 0.04
+		[stat_buffs.power_level_modifier] = 0.04
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -204,7 +204,7 @@ templates.weapon_trait_increase_impact = {
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.impact_modifier] = 0.04
+		[stat_buffs.impact_modifier] = 0.04
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -212,7 +212,7 @@ templates.weapon_trait_reduced_block_cost = {
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.block_cost_multiplier] = 0.8
+		[stat_buffs.block_cost_multiplier] = 0.8
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -220,7 +220,7 @@ templates.weapon_trait_increase_damage_elites = {
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.damage_vs_elites] = 0.1
+		[stat_buffs.damage_vs_elites] = 0.1
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -228,7 +228,7 @@ templates.weapon_trait_increase_damage_hordes = {
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.damage_vs_horde] = 0.1
+		[stat_buffs.damage_vs_horde] = 0.1
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -236,7 +236,7 @@ templates.weapon_trait_increase_damage_specials = {
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.damage_vs_specials] = 0.1
+		[stat_buffs.damage_vs_specials] = 0.1
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -244,7 +244,7 @@ templates.weapon_trait_reduce_sprint_cost = {
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.sprinting_cost_multiplier] = 0.8
+		[stat_buffs.sprinting_cost_multiplier] = 0.8
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -252,7 +252,7 @@ templates.weapon_trait_melee_common_wield_increase_impact_buff = {
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.melee_impact_modifier] = 0.5
+		[stat_buffs.melee_impact_modifier] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -260,7 +260,7 @@ templates.weapon_trait_melee_common_wield_power_modifier_bonus_buff = {
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.power_level_modifier] = 0.1
+		[stat_buffs.power_level_modifier] = 0.1
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -268,7 +268,7 @@ templates.weapon_trait_melee_common_wield_finesse_modifier_bonus_buff = {
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.finesse_modifier_bonus] = 0.2
+		[stat_buffs.finesse_modifier_bonus] = 0.2
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
@@ -278,10 +278,10 @@ templates.weapon_trait_melee_common_wield_on_hit_damage_bonus_buff = {
 	class_name = "proc_buff",
 	active_duration = 5,
 	proc_events = {
-		[buff_proc_events.on_hit] = 0.05
+		[proc_events.on_hit] = 0.05
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.damage] = 0.1
+		[stat_buffs.damage] = 0.1
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
@@ -293,10 +293,10 @@ templates.weapon_trait_melee_common_wield_on_hit_power_bonus_buff = {
 	class_name = "proc_buff",
 	active_duration = 5,
 	proc_events = {
-		[buff_proc_events.on_hit] = 0.05
+		[proc_events.on_hit] = 0.05
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.power_level_modifier] = 0.1
+		[stat_buffs.power_level_modifier] = 0.1
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
@@ -308,10 +308,10 @@ templates.weapon_trait_melee_common_wield_on_hit_impact_bonus_buff = {
 	class_name = "proc_buff",
 	active_duration = 5,
 	proc_events = {
-		[buff_proc_events.on_hit] = 0.05
+		[proc_events.on_hit] = 0.05
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.melee_impact_modifier] = 0.5
+		[stat_buffs.melee_impact_modifier] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
@@ -323,10 +323,10 @@ templates.weapon_trait_melee_common_wield_on_hit_increased_unarmored_damage_buff
 	class_name = "proc_buff",
 	active_duration = 5,
 	proc_events = {
-		[buff_proc_events.on_hit] = 0.05
+		[proc_events.on_hit] = 0.05
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.unarmored_damage] = 0.5
+		[stat_buffs.unarmored_damage] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
@@ -338,10 +338,10 @@ templates.weapon_trait_melee_common_wield_on_hit_increased_armored_damage_buff =
 	class_name = "proc_buff",
 	active_duration = 5,
 	proc_events = {
-		[buff_proc_events.on_hit] = 0.05
+		[proc_events.on_hit] = 0.05
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.armored_damage] = 0.5
+		[stat_buffs.armored_damage] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
@@ -353,10 +353,10 @@ templates.weapon_trait_melee_common_wield_on_hit_increased_resistant_damage_buff
 	class_name = "proc_buff",
 	active_duration = 5,
 	proc_events = {
-		[buff_proc_events.on_hit] = 0.05
+		[proc_events.on_hit] = 0.05
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.resistant_damage] = 0.5
+		[stat_buffs.resistant_damage] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
@@ -368,10 +368,10 @@ templates.weapon_trait_melee_common_wield_on_hit_increased_berserker_damage_buff
 	class_name = "proc_buff",
 	active_duration = 5,
 	proc_events = {
-		[buff_proc_events.on_hit] = 0.05
+		[proc_events.on_hit] = 0.05
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.berserker_damage] = 0.5
+		[stat_buffs.berserker_damage] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
@@ -383,10 +383,10 @@ templates.weapon_trait_melee_common_wield_on_hit_increased_super_armor_damage_bu
 	class_name = "proc_buff",
 	active_duration = 5,
 	proc_events = {
-		[buff_proc_events.on_hit] = 0.05
+		[proc_events.on_hit] = 0.05
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.super_armor_damage] = 0.5
+		[stat_buffs.super_armor_damage] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
@@ -398,10 +398,10 @@ templates.weapon_trait_melee_common_wield_on_hit_increased_disgustingly_resilien
 	class_name = "proc_buff",
 	active_duration = 5,
 	proc_events = {
-		[buff_proc_events.on_hit] = 0.05
+		[proc_events.on_hit] = 0.05
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.disgustingly_resilient_damage] = 0.5
+		[stat_buffs.disgustingly_resilient_damage] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
@@ -411,7 +411,7 @@ templates.weapon_trait_melee_common_wield_on_hit_bleed_buff = {
 	class_name = "proc_buff",
 	predicted = false,
 	proc_events = {
-		[buff_proc_events.on_hit] = 0.2
+		[proc_events.on_hit] = 0.2
 	},
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
 	check_proc_func = CheckProcFunctions.on_melee_hit,
@@ -433,10 +433,10 @@ templates.weapon_trait_melee_common_wield_on_hit_staggered_power_bonus_buff = {
 	class_name = "proc_buff",
 	active_duration = 5,
 	proc_events = {
-		[buff_proc_events.on_hit] = 0.1
+		[proc_events.on_hit] = 0.1
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.power_level_modifier] = 0.15
+		[stat_buffs.power_level_modifier] = 0.15
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
@@ -446,7 +446,7 @@ templates.weapon_trait_melee_common_wield_on_heavy_attack_grant_power_bonus_buff
 	class_name = "proc_buff",
 	predicted = false,
 	proc_events = {
-		[buff_proc_events.on_hit] = 0.2
+		[proc_events.on_hit] = 0.2
 	},
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
 	check_proc_func = CheckProcFunctions.on_heavy_hit,
@@ -464,10 +464,10 @@ templates.weapon_trait_melee_common_wield_on_heavy_attack_grant_power_bonus_temp
 	max_stacks = 1,
 	class_name = "proc_buff",
 	proc_events = {
-		[buff_proc_events.on_hit] = 1
+		[proc_events.on_hit] = 1
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.power_level_modifier] = 0.5
+		[stat_buffs.power_level_modifier] = 0.5
 	},
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
 	proc_func = function (params, template_data, template_context)
@@ -483,10 +483,10 @@ templates.weapon_trait_melee_common_wield_on_heavy_hit_damage_bonus_buff = {
 	class_name = "proc_buff",
 	active_duration = 2.5,
 	proc_events = {
-		[buff_proc_events.on_hit] = 1
+		[proc_events.on_hit] = 1
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.melee_damage] = 0.5
+		[stat_buffs.melee_damage] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
@@ -502,10 +502,10 @@ templates.weapon_trait_melee_common_wield_on_heavy_hit_power_bonus_buff = {
 	class_name = "proc_buff",
 	active_duration = 2.5,
 	proc_events = {
-		[buff_proc_events.on_hit] = 1
+		[proc_events.on_hit] = 1
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.power_level_modifier] = 0.5
+		[stat_buffs.power_level_modifier] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
@@ -521,10 +521,10 @@ templates.weapon_trait_melee_common_wield_on_heavy_hit_impact_bonus_buff = {
 	class_name = "proc_buff",
 	active_duration = 2.5,
 	proc_events = {
-		[buff_proc_events.on_hit] = 1
+		[proc_events.on_hit] = 1
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.melee_impact_modifier] = 0.5
+		[stat_buffs.melee_impact_modifier] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
@@ -540,10 +540,10 @@ templates.weapon_trait_melee_common_wield_on_heavy_hit_increased_unarmored_damag
 	class_name = "proc_buff",
 	active_duration = 2.5,
 	proc_events = {
-		[buff_proc_events.on_hit] = 1
+		[proc_events.on_hit] = 1
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.unarmored_damage] = 0.5
+		[stat_buffs.unarmored_damage] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
@@ -559,10 +559,10 @@ templates.weapon_trait_melee_common_wield_on_heavy_hit_increased_armored_damage_
 	class_name = "proc_buff",
 	active_duration = 2.5,
 	proc_events = {
-		[buff_proc_events.on_hit] = 1
+		[proc_events.on_hit] = 1
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.armored_damage] = 0.5
+		[stat_buffs.armored_damage] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
@@ -578,10 +578,10 @@ templates.weapon_trait_melee_common_wield_on_heavy_hit_increased_resistant_damag
 	class_name = "proc_buff",
 	active_duration = 2.5,
 	proc_events = {
-		[buff_proc_events.on_hit] = 1
+		[proc_events.on_hit] = 1
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.resistant_damage] = 0.5
+		[stat_buffs.resistant_damage] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
@@ -597,10 +597,10 @@ templates.weapon_trait_melee_common_wield_on_heavy_hit_increased_berserker_damag
 	class_name = "proc_buff",
 	active_duration = 2.5,
 	proc_events = {
-		[buff_proc_events.on_hit] = 1
+		[proc_events.on_hit] = 1
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.berserker_damage] = 0.5
+		[stat_buffs.berserker_damage] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
@@ -616,10 +616,10 @@ templates.weapon_trait_melee_common_wield_on_heavy_hit_increased_super_armor_dam
 	class_name = "proc_buff",
 	active_duration = 2.5,
 	proc_events = {
-		[buff_proc_events.on_hit] = 1
+		[proc_events.on_hit] = 1
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.super_armor_damage] = 0.5
+		[stat_buffs.super_armor_damage] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
@@ -635,10 +635,10 @@ templates.weapon_trait_melee_common_wield_on_heavy_hit_increased_disgustingly_re
 	class_name = "proc_buff",
 	active_duration = 2.5,
 	proc_events = {
-		[buff_proc_events.on_hit] = 1
+		[proc_events.on_hit] = 1
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.disgustingly_resilient_damage] = 0.5
+		[stat_buffs.disgustingly_resilient_damage] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
@@ -652,7 +652,7 @@ templates.weapon_trait_melee_common_wield_power_modifier_bonus_on_full_toughness
 	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
-		[buff_stat_buffs.power_level_modifier] = 0.15
+		[stat_buffs.power_level_modifier] = 0.15
 	},
 	conditional_stat_buffs_func = function (template_data, template_context)
 		if not ConditionalFunctions.is_item_slot_wielded(template_data, template_context) then
@@ -662,11 +662,11 @@ templates.weapon_trait_melee_common_wield_power_modifier_bonus_on_full_toughness
 		return ConditionalFunctions.has_full_toughness(template_data, template_context)
 	end
 }
-templates.weapon_trait_melee_common_wield_surpression_immunity_on_full_toughness_buff = {
+templates.weapon_trait_melee_common_wield_supression_immunity_on_full_toughness_buff = {
 	predicted = false,
 	class_name = "buff",
 	conditional_keywords = {
-		buff_keywords.suppression_immune
+		keywords.suppression_immune
 	},
 	conditional_stat_buffs_func = function (template_data, template_context)
 		if not ConditionalFunctions.is_item_slot_wielded(template_data, template_context) then
@@ -682,39 +682,39 @@ templates.weapon_trait_melee_common_wield_on_player_toughness_broken_grant_power
 	class_name = "proc_buff",
 	active_duration = 2.5,
 	proc_events = {
-		[buff_proc_events.on_player_toughness_broken] = 1
+		[proc_events.on_player_toughness_broken] = 1
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.power_level_modifier] = 0.1
+		[stat_buffs.power_level_modifier] = 0.1
 	},
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded
 }
-templates.weapon_trait_melee_common_wield_on_successful_dodge_grant_finess_bonus_buff = {
+templates.weapon_trait_melee_common_wield_on_successful_dodge_grant_finesse_bonus_buff = {
 	class_name = "proc_buff",
 	predicted = false,
 	proc_events = {
-		[buff_proc_events.on_successful_dodge] = 1
+		[proc_events.on_successful_dodge] = 1
 	},
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
 	proc_func = function (params, template_data, template_context)
 		local unit = template_context.unit
-		local buff_to_add = "weapon_trait_melee_common_wield_on_successful_dodge_grant_finess_bonus_temporary_buff"
+		local buff_to_add = "weapon_trait_melee_common_wield_on_successful_dodge_grant_finesse_bonus_temporary_buff"
 		local buff_extension = ScriptUnit.extension(unit, "buff_system")
 		local t = FixedFrame.get_latest_fixed_time()
 
 		buff_extension:add_internally_controlled_buff(buff_to_add, t)
 	end
 }
-templates.weapon_trait_melee_common_wield_on_successful_dodge_grant_finess_bonus_temporary_buff = {
+templates.weapon_trait_melee_common_wield_on_successful_dodge_grant_finesse_bonus_temporary_buff = {
 	predicted = false,
 	max_stacks = 1,
 	class_name = "proc_buff",
 	proc_events = {
-		[buff_proc_events.on_hit] = 1
+		[proc_events.on_hit] = 1
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.finesse_modifier_bonus] = 0.5
+		[stat_buffs.finesse_modifier_bonus] = 0.5
 	},
 	proc_func = function (params, template_data, template_context)
 		template_data.finished = true
@@ -727,7 +727,7 @@ templates.weapon_trait_melee_common_wield_on_successful_dodge_grant_crit_chance_
 	class_name = "proc_buff",
 	predicted = false,
 	proc_events = {
-		[buff_proc_events.on_successful_dodge] = 1
+		[proc_events.on_successful_dodge] = 1
 	},
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
 	proc_func = function (params, template_data, template_context)
@@ -744,10 +744,10 @@ templates.weapon_trait_melee_common_wield_on_successful_dodge_grant_crit_chance_
 	max_stacks = 1,
 	class_name = "proc_buff",
 	proc_events = {
-		[buff_proc_events.on_hit] = 1
+		[proc_events.on_hit] = 1
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.critical_strike_chance] = 0.5
+		[stat_buffs.critical_strike_chance] = 0.5
 	},
 	proc_func = function (params, template_data, template_context)
 		template_data.finished = true
@@ -760,7 +760,7 @@ templates.weapon_trait_melee_common_wield_on_successful_dodge_grant_bleed_buff =
 	class_name = "proc_buff",
 	predicted = false,
 	proc_events = {
-		[buff_proc_events.on_successful_dodge] = 1
+		[proc_events.on_successful_dodge] = 1
 	},
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
 	proc_func = function (params, template_data, template_context)
@@ -777,7 +777,7 @@ templates.weapon_trait_melee_common_wield_on_successful_dodge_grant_bleed_tempor
 	max_stacks = 1,
 	class_name = "proc_buff",
 	proc_events = {
-		[buff_proc_events.on_hit] = 1
+		[proc_events.on_hit] = 1
 	},
 	proc_func = function (params, template_data, template_context)
 		local attacked_unit = params.attacked_unit
@@ -800,7 +800,7 @@ templates.weapon_trait_melee_common_wield_low_health_grant_suppression_immunity_
 	predicted = false,
 	class_name = "buff",
 	conditional_keywords = {
-		buff_keywords.suppression_immune
+		keywords.suppression_immune
 	},
 	start_func = function (template_data, template_context)
 		local unit = template_context.unit
@@ -823,7 +823,7 @@ templates.weapon_trait_melee_common_wield_low_health_grant_power_modifier_buff =
 	predicted = false,
 	class_name = "buff",
 	conditional_lerped_stat_buffs = {
-		[buff_stat_buffs.damage] = {
+		[stat_buffs.damage] = {
 			max = 0.2,
 			min = 0
 		}
@@ -850,10 +850,10 @@ templates.weapon_trait_melee_common_equip_immunity_on_all_allies_down_buff = {
 	class_name = "proc_buff",
 	active_duration = 5,
 	proc_keywords = {
-		buff_keywords.damage_immune
+		keywords.damage_immune
 	},
 	proc_events = {
-		[buff_proc_events.on_ally_knocked_down] = 1
+		[proc_events.on_ally_knocked_down] = 1
 	},
 	check_proc_func = function (params, template_data, template_context)
 		local unit = template_context.unit
@@ -890,7 +890,7 @@ templates.weapon_trait_melee_common_wield_push_hit_grants_increased_attack_buff 
 	class_name = "proc_buff",
 	predicted = false,
 	proc_events = {
-		[buff_proc_events.on_push_hit] = 1
+		[proc_events.on_push_hit] = 1
 	},
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
@@ -910,10 +910,10 @@ templates.weapon_trait_melee_common_wield_push_hit_grants_increased_attack_tempo
 	predicted = false,
 	class_name = "proc_buff",
 	proc_events = {
-		[buff_proc_events.on_hit] = 1
+		[proc_events.on_hit] = 1
 	},
 	conditional_stat_buffs = {
-		[buff_stat_buffs.melee_damage] = 0.5
+		[stat_buffs.melee_damage] = 0.5
 	},
 	check_proc_func = CheckProcFunctions.on_melee_and_check_item_slot,
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
@@ -934,10 +934,10 @@ templates.weapon_trait_melee_common_wield_on_block_break_grant_power_bonus_buff 
 	class_name = "proc_buff",
 	active_duration = 3,
 	proc_events = {
-		[buff_proc_events.on_block] = 1
+		[proc_events.on_block] = 1
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.power_level_modifier] = 0.15
+		[stat_buffs.power_level_modifier] = 0.15
 	},
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
 	check_proc_func = CheckProcFunctions.on_block_broken
@@ -948,10 +948,10 @@ templates.weapon_trait_melee_common_wield_on_block_damage_bonus_buff = {
 	class_name = "proc_buff",
 	active_duration = 5,
 	proc_events = {
-		[buff_proc_events.on_block] = 0.05
+		[proc_events.on_block] = 0.05
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.damage] = 0.1
+		[stat_buffs.damage] = 0.1
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
@@ -963,10 +963,10 @@ templates.weapon_trait_melee_common_wield_on_block_power_bonus_buff = {
 	class_name = "proc_buff",
 	active_duration = 5,
 	proc_events = {
-		[buff_proc_events.on_block] = 0.05
+		[proc_events.on_block] = 0.05
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.power_level_modifier] = 0.1
+		[stat_buffs.power_level_modifier] = 0.1
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded
@@ -977,10 +977,10 @@ templates.weapon_trait_melee_common_wield_on_block_impact_bonus_buff = {
 	class_name = "proc_buff",
 	active_duration = 5,
 	proc_events = {
-		[buff_proc_events.on_block] = 0.05
+		[proc_events.on_block] = 0.05
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.melee_impact_modifier] = 0.5
+		[stat_buffs.melee_impact_modifier] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded
@@ -991,10 +991,10 @@ templates.weapon_trait_melee_common_wield_on_block_increased_unarmored_damage_bu
 	class_name = "proc_buff",
 	active_duration = 5,
 	proc_events = {
-		[buff_proc_events.on_block] = 0.05
+		[proc_events.on_block] = 0.05
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.unarmored_damage] = 0.5
+		[stat_buffs.unarmored_damage] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded
@@ -1005,10 +1005,10 @@ templates.weapon_trait_melee_common_wield_on_block_increased_armored_damage_buff
 	class_name = "proc_buff",
 	active_duration = 5,
 	proc_events = {
-		[buff_proc_events.on_block] = 0.05
+		[proc_events.on_block] = 0.05
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.armored_damage] = 0.5
+		[stat_buffs.armored_damage] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded
@@ -1019,10 +1019,10 @@ templates.weapon_trait_melee_common_wield_on_block_increased_resistant_damage_bu
 	class_name = "proc_buff",
 	active_duration = 5,
 	proc_events = {
-		[buff_proc_events.on_block] = 0.05
+		[proc_events.on_block] = 0.05
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.resistant_damage] = 0.5
+		[stat_buffs.resistant_damage] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded
@@ -1033,10 +1033,10 @@ templates.weapon_trait_melee_common_wield_on_block_increased_berserker_damage_bu
 	class_name = "proc_buff",
 	active_duration = 5,
 	proc_events = {
-		[buff_proc_events.on_block] = 0.05
+		[proc_events.on_block] = 0.05
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.berserker_damage] = 0.5
+		[stat_buffs.berserker_damage] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded
@@ -1047,10 +1047,10 @@ templates.weapon_trait_melee_common_wield_on_block_increased_super_armor_damage_
 	class_name = "proc_buff",
 	active_duration = 5,
 	proc_events = {
-		[buff_proc_events.on_block] = 0.05
+		[proc_events.on_block] = 0.05
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.super_armor_damage] = 0.5
+		[stat_buffs.super_armor_damage] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded
@@ -1061,10 +1061,10 @@ templates.weapon_trait_melee_common_wield_on_block_increased_disgustingly_resili
 	class_name = "proc_buff",
 	active_duration = 5,
 	proc_events = {
-		[buff_proc_events.on_block] = 0.05
+		[proc_events.on_block] = 0.05
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.disgustingly_resilient_damage] = 0.5
+		[stat_buffs.disgustingly_resilient_damage] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded
@@ -1073,7 +1073,7 @@ templates.weapon_trait_melee_common_wield_on_weakspot_grant_power_bonus_buff = {
 	class_name = "proc_buff",
 	predicted = false,
 	proc_events = {
-		[buff_proc_events.on_hit] = 0.25
+		[proc_events.on_hit] = 0.25
 	},
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
 	proc_func = function (params, template_data, template_context)
@@ -1094,10 +1094,10 @@ templates.weapon_trait_melee_common_wield_on_weakspot_grant_power_bonus_temporar
 	max_stacks = 1,
 	class_name = "proc_buff",
 	proc_events = {
-		[buff_proc_events.on_hit] = 1
+		[proc_events.on_hit] = 1
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.power_level_modifier] = 0.5
+		[stat_buffs.power_level_modifier] = 0.5
 	},
 	proc_func = function (params, template_data, template_context)
 		template_data.finished = true
@@ -1111,7 +1111,7 @@ templates.weapon_trait_melee_common_wield_on_weakspot_grant_bleeding_buff = {
 	predicted = false,
 	class_name = "proc_buff",
 	proc_events = {
-		[buff_proc_events.on_hit] = 0.2
+		[proc_events.on_hit] = 0.2
 	},
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
 	proc_func = function (params, template_data, template_context)
@@ -1133,7 +1133,7 @@ templates.weapon_trait_melee_common_wield_on_weakspot_grant_bleeding_temporary_b
 	class_name = "proc_buff",
 	allow_proc_while_active = true,
 	proc_events = {
-		[buff_proc_events.on_hit] = 1
+		[proc_events.on_hit] = 1
 	},
 	check_proc_func = CheckProcFunctions.on_melee_hit,
 	proc_func = function (params, template_data, template_context)
@@ -1154,10 +1154,10 @@ templates.weapon_trait_melee_common_wield_on_heavy_attack_kill_increase_attack_b
 	class_name = "proc_buff",
 	active_duration = 2.5,
 	proc_events = {
-		[buff_proc_events.on_kill] = 1
+		[proc_events.on_kill] = 1
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.melee_damage] = 0.5
+		[stat_buffs.melee_damage] = 0.5
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
@@ -1174,10 +1174,10 @@ templates.weapon_trait_melee_common_wield_on_heavy_attack_kill_increase_attack_s
 	class_name = "proc_buff",
 	active_duration = 2.5,
 	proc_events = {
-		[buff_proc_events.on_kill] = 1
+		[proc_events.on_kill] = 1
 	},
 	proc_stat_buffs = {
-		[buff_stat_buffs.melee_attack_speed] = 0.1
+		[stat_buffs.melee_attack_speed] = 0.1
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,

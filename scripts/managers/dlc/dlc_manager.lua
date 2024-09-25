@@ -24,6 +24,8 @@ function DLCManager:init()
 end
 
 function DLCManager:initialize()
+	local is_psn = Backend.get_auth_method() == Backend.AUTH_METHOD_PSN
+
 	if IS_XBS or IS_GDK then
 		if not rawget(_G, "XboxDLC") then
 			return
@@ -32,6 +34,8 @@ function DLCManager:initialize()
 		self._evaluate_consumables_timer = 0
 
 		XboxDLC.enumerate_dlcs()
+	elseif is_psn then
+		self._evaluate_consumables_timer = 0
 	else
 		self._check_steam_dlc = true
 	end
@@ -81,7 +85,9 @@ function DLCManager:_try_check_steam_dlc(t)
 		return
 	end
 
-	if IS_XBS or IS_GDK then
+	local is_psn = Backend.get_auth_method() == Backend.AUTH_METHOD_PSN
+
+	if IS_XBS or IS_GDK or is_psn then
 		self._check_steam_dlc = false
 
 		return
@@ -102,7 +108,9 @@ function DLCManager:_try_evaluate_consumables(t)
 		return
 	end
 
-	if not IS_XBS and not IS_GDK then
+	local is_psn = Backend.get_auth_method() == Backend.AUTH_METHOD_PSN
+
+	if not IS_XBS and not IS_GDK and not is_psn then
 		self._evaluate_consumables = false
 
 		return
@@ -125,9 +133,15 @@ function DLCManager:_try_evaluate_consumables(t)
 	end
 
 	if self._evaluate_consumables_timer < t then
-		local success_cb = callback(self, "cb_get_entitlements")
+		if IS_XBS or IS_GDK then
+			local success_cb = callback(self, "cb_get_entitlements")
 
-		XboxLiveUtils.get_entitlements():next(success_cb)
+			XboxLiveUtils.get_entitlements():next(success_cb)
+		else
+			local cb_query_backend_result = callback(self, "cb_query_backend_result")
+
+			Managers.backend.interfaces.external_payment:reconcile_dlc():next(cb_query_backend_result)
+		end
 
 		self._evaluate_consumables_timer = t + EVALUATE_CONSUMABLES_TIMER
 		self._evaluate_consumables = false
@@ -333,6 +347,8 @@ function DLCStates.idle(dlc_manager, dt, t)
 		return
 	end
 
+	local is_psn = Backend.get_auth_method() == Backend.AUTH_METHOD_PSN
+
 	if IS_XBS or IS_GDK then
 		local dlc_status = XboxDLC.state()
 
@@ -341,6 +357,8 @@ function DLCStates.idle(dlc_manager, dt, t)
 		else
 			dlc_manager:_try_evaluate_consumables(t)
 		end
+	elseif is_psn then
+		dlc_manager:_try_evaluate_consumables(t)
 	else
 		dlc_manager:_try_check_steam_dlc(t)
 	end

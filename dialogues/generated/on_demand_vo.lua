@@ -160,6 +160,46 @@ return function ()
 		}
 	})
 	define_rule({
+		name = "com_wheel_vo_my_pleasure_a",
+		category = "player_on_demand_vo",
+		wwise_route = 0,
+		response = "com_wheel_vo_my_pleasure_a",
+		database = "on_demand_vo",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"on_demand_com_wheel"
+			},
+			{
+				"query_context",
+				"trigger_id",
+				OP.EQ,
+				"com_my_pleasure"
+			},
+			{
+				"user_memory",
+				"time_since_com_wheel_vo_my_pleasure",
+				OP.TIMEDIFF,
+				OP.GT,
+				5
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"time_since_com_wheel_vo_my_pleasure",
+				OP.TIMESET
+			}
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.15
+			}
+		}
+	})
+	define_rule({
 		name = "com_wheel_vo_need_ammo",
 		category = "player_on_demand_vo",
 		wwise_route = 0,
@@ -360,6 +400,46 @@ return function ()
 		}
 	})
 	define_rule({
+		name = "com_wheel_vo_take_this_a",
+		category = "player_on_demand_vo",
+		wwise_route = 0,
+		response = "com_wheel_vo_take_this_a",
+		database = "on_demand_vo",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"on_demand_com_wheel"
+			},
+			{
+				"query_context",
+				"trigger_id",
+				OP.EQ,
+				"com_take_this"
+			},
+			{
+				"user_memory",
+				"time_since_com_wheel_vo_take_this",
+				OP.TIMEDIFF,
+				OP.GT,
+				5
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"time_since_com_wheel_vo_take_this",
+				OP.TIMESET
+			}
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.15
+			}
+		}
+	})
+	define_rule({
 		name = "com_wheel_vo_thank_you",
 		category = "player_on_demand_vo",
 		wwise_route = 0,
@@ -529,6 +609,166 @@ return function ()
 		on_pre_rule_execution = {
 			delay_vo = {
 				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "smart_tag_stimm_concentration_a",
+		category = "player_on_demand_vo",
+		wwise_route = 0,
+		response = "smart_tag_stimm_concentration_a",
+		database = "on_demand_vo",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"on_demand_vo_tag_item"
+			},
+			{
+				"query_context",
+				"item_tag",
+				OP.EQ,
+				"pup_stimm_concentration"
+			},
+			{
+				"user_memory",
+				"time_since_smart_tag_item",
+				OP.TIMEDIFF,
+				OP.GT,
+				5
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"time_since_smart_tag_item",
+				OP.TIMESET
+			}
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.15
+			}
+		}
+	})
+	define_rule({
+		name = "smart_tag_stimm_health_a",
+		category = "player_on_demand_vo",
+		wwise_route = 0,
+		response = "smart_tag_stimm_health_a",
+		database = "on_demand_vo",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"on_demand_vo_tag_item"
+			},
+			{
+				"query_context",
+				"item_tag",
+				OP.EQ,
+				"pup_stimm_health"
+			},
+			{
+				"user_memory",
+				"time_since_smart_tag_item",
+				OP.TIMEDIFF,
+				OP.GT,
+				5
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"time_since_smart_tag_item",
+				OP.TIMESET
+			}
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.15
+			}
+		}
+	})
+	define_rule({
+		name = "smart_tag_stimm_power_a",
+		category = "player_on_demand_vo",
+		wwise_route = 0,
+		response = "smart_tag_stimm_power_a",
+		database = "on_demand_vo",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"on_demand_vo_tag_item"
+			},
+			{
+				"query_context",
+				"item_tag",
+				OP.EQ,
+				"pup_stimm_power"
+			},
+			{
+				"user_memory",
+				"time_since_smart_tag_item",
+				OP.TIMEDIFF,
+				OP.GT,
+				5
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"time_since_smart_tag_item",
+				OP.TIMESET
+			}
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.15
+			}
+		}
+	})
+	define_rule({
+		name = "smart_tag_stimm_speed_a",
+		category = "player_on_demand_vo",
+		wwise_route = 0,
+		response = "smart_tag_stimm_speed_a",
+		database = "on_demand_vo",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"on_demand_vo_tag_item"
+			},
+			{
+				"query_context",
+				"item_tag",
+				OP.EQ,
+				"pup_stimm_speed"
+			},
+			{
+				"user_memory",
+				"time_since_smart_tag_item",
+				OP.TIMEDIFF,
+				OP.GT,
+				5
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"time_since_smart_tag_item",
+				OP.TIMESET
+			}
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.15
 			}
 		}
 	})

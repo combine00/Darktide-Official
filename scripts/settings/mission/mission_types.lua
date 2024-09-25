@@ -34,6 +34,10 @@ local MissionTypes = {
 		name = "loc_mission_type_07_name",
 		icon = "content/ui/materials/icons/mission_types/mission_type_07"
 	},
+	operations = {
+		icon = "content/ui/materials/icons/mission_types/mission_type_operations",
+		name = "loc_mission_type_operations_name"
+	},
 	undefined = {
 		icon = "content/ui/materials/icons/mission_types/mission_type_operations",
 		name = "loc_mission_type_undefined_name"

@@ -26,6 +26,7 @@ function GameplayInitStepNavSpawnPoints:update(main_dt, main_t)
 		return nil, nil
 	end
 
+	self._shared_state.initialized_steps.GameplayInitStepNavSpawnPoints = true
 	local next_step_params = {
 		shared_state = self._shared_state
 	}

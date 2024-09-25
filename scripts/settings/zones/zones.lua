@@ -19,6 +19,16 @@ local zones = {
 			mission_board_details = "content/ui/materials/icons/zones/entertainment"
 		}
 	},
+	operations = {
+		name_short = "loc_zone_name_operations_short",
+		name = "loc_zone_operations",
+		map_node = "operations_01",
+		images = {
+			mission_vote = "content/ui/materials/icons/missions/zone_operations_standard",
+			default = "content/ui/materials/icons/missions/zone_operations_standard",
+			mission_board_details = "content/ui/materials/icons/zones/operations"
+		}
+	},
 	hub = {
 		not_needed_for_penance = true,
 		name = "loc_zone_hub"

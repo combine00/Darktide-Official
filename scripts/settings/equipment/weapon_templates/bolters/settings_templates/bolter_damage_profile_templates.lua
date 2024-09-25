@@ -21,11 +21,13 @@ local no_cleave = DamageProfileSettings.no_cleave
 local single_cleave = DamageProfileSettings.single_cleave
 local double_cleave = DamageProfileSettings.double_cleave
 damage_templates.default_bolter_killshot = {
-	suppression_value = 10,
-	ragdoll_only = true,
+	accumulative_stagger_strength_multiplier = 0.55,
 	shield_multiplier = 10,
-	ragdoll_push_force = 600,
+	ragdoll_only = true,
+	suppression_value = 10,
+	ignore_roamer_hitzone_multipliers = true,
 	stagger_category = "ranged",
+	ragdoll_push_force = 600,
 	cleave_distribution = double_cleave,
 	ranges = {
 		max = 40,
@@ -39,8 +41,8 @@ damage_templates.default_bolter_killshot = {
 				[armor_types.resistant] = damage_lerp_values.lerp_1,
 				[armor_types.player] = damage_lerp_values.lerp_1,
 				[armor_types.berserker] = damage_lerp_values.lerp_1,
-				[armor_types.super_armor] = damage_lerp_values.lerp_0_4,
-				[armor_types.disgustingly_resilient] = damage_lerp_values.lerp_0_5,
+				[armor_types.super_armor] = damage_lerp_values.lerp_0_5,
+				[armor_types.disgustingly_resilient] = damage_lerp_values.lerp_0_9,
 				[armor_types.void_shield] = damage_lerp_values.lerp_0_25
 			},
 			impact = {
@@ -61,8 +63,8 @@ damage_templates.default_bolter_killshot = {
 				[armor_types.resistant] = damage_lerp_values.lerp_1,
 				[armor_types.player] = damage_lerp_values.lerp_1,
 				[armor_types.berserker] = damage_lerp_values.lerp_1,
-				[armor_types.super_armor] = damage_lerp_values.lerp_0_4,
-				[armor_types.disgustingly_resilient] = damage_lerp_values.lerp_0_5,
+				[armor_types.super_armor] = damage_lerp_values.lerp_0_5,
+				[armor_types.disgustingly_resilient] = damage_lerp_values.lerp_1,
 				[armor_types.void_shield] = damage_lerp_values.lerp_0_25
 			},
 			impact = {
@@ -104,6 +106,7 @@ damage_templates.default_bolter_killshot = {
 	}
 }
 damage_templates.bolter_stop_explosion = {
+	ignore_roamer_hitzone_multipliers = true,
 	suppression_value = 0.5,
 	ragdoll_push_force = 200,
 	stagger_category = "flamer",
@@ -181,6 +184,7 @@ damage_templates.bolter_stop_explosion = {
 	gib_push_force = GibbingSettings.gib_push_force.ranged_heavy
 }
 damage_templates.bolter_kill_explosion = {
+	ignore_roamer_hitzone_multipliers = true,
 	suppression_value = 0.5,
 	ragdoll_push_force = 200,
 	stagger_category = "flamer",

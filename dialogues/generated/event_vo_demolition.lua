@@ -128,7 +128,8 @@ return function ()
 					"pilot",
 					"tech_priest",
 					"contract_vendor",
-					"purser"
+					"purser",
+					"enginseer"
 				}
 			},
 			{

@@ -284,7 +284,7 @@ weapon_template.actions = {
 				t = 0.05
 			},
 			{
-				modifier = 0.65,
+				modifier = 0.6,
 				t = 0.1
 			},
 			{
@@ -304,7 +304,7 @@ weapon_template.actions = {
 				t = 0.55
 			},
 			{
-				modifier = 0.3,
+				modifier = 0.9,
 				t = 1.2
 			},
 			start_modifier = 1
@@ -568,7 +568,7 @@ weapon_template.actions = {
 				t = 0.05
 			},
 			{
-				modifier = 0.65,
+				modifier = 0.6,
 				t = 0.1
 			},
 			{
@@ -588,7 +588,7 @@ weapon_template.actions = {
 				t = 0.55
 			},
 			{
-				modifier = 0.3,
+				modifier = 0.9,
 				t = 1.2
 			},
 			start_modifier = 1
@@ -744,7 +744,7 @@ weapon_template.actions = {
 		num_frames_before_process = 0,
 		hit_armor_anim = "attack_hit_shield",
 		damage_window_start = 0.23333333333333334,
-		damage_window_end = 0.3333333333333333,
+		damage_window_end = 0.4,
 		anim_end_event = "attack_finished",
 		anim_event_3p = "attack_swing_heavy_down_left",
 		anim_event = "heavy_attack_left_down",
@@ -818,7 +818,7 @@ weapon_template.actions = {
 		spline_settings = {
 			matrices_data_location = "content/characters/player/human/first_person/animations/chain_axe/heavy_attack_left_down",
 			anchor_point_offset = {
-				-0.15,
+				0,
 				0,
 				-0.44
 			}
@@ -909,14 +909,14 @@ weapon_template.actions = {
 	action_right_light_pushfollow = {
 		damage_window_start = 0.28,
 		hit_armor_anim = "attack_hit_shield",
-		weapon_handling_template = "time_scale_1",
 		anim_end_event = "attack_finished",
+		anim_event_3p = "attack_swing_stab",
 		kind = "sweep",
 		max_num_saved_entries = 20,
-		sprint_requires_press_to_interrupt = "true",
 		range_mod = 1.35,
+		weapon_handling_template = "time_scale_1",
 		num_frames_before_process = 0,
-		anim_event_3p = "attack_swing_stab",
+		allowed_during_sprint = true,
 		damage_window_end = 0.4,
 		attack_direction_override = "push",
 		uninterruptible = true,
@@ -1108,24 +1108,26 @@ weapon_template.anim_state_machine_3p = "content/characters/player/human/third_p
 weapon_template.anim_state_machine_1p = "content/characters/player/human/first_person/animations/chain_axe"
 weapon_template.weapon_box = chain_axe_sweep_box
 weapon_template.chain_speed_template = ChainSpeedTemplates.chainaxe
-weapon_template.uses_ammunition = false
-weapon_template.uses_overheat = false
+weapon_template.hud_configuration = {
+	uses_overheat = false,
+	uses_ammunition = false
+}
 weapon_template.sprint_ready_up_time = 0.1
 weapon_template.max_first_person_anim_movement_speed = 5.8
 weapon_template.smart_targeting_template = SmartTargetingTemplates.default_melee
 weapon_template.damage_window_start_sweep_trail_offset = -0.2
 weapon_template.damage_window_end_sweep_trail_offset = 0.2
 weapon_template.ammo_template = "no_ammo"
-weapon_template.allow_sprinting_with_special = true
 weapon_template.weapon_special_class = "WeaponSpecialDeactivateAfterNumActivations"
 weapon_template.weapon_special_tweak_data = {
-	active_duration = 4,
-	num_activations = 1
+	keep_active_on_sprint = true,
+	num_activations = 1,
+	active_duration = 4
 }
 weapon_template.fx_sources = {
 	_sticky = "fx_sawing",
 	_special_active = "fx_weapon_special",
-	_engine = "fx_engine",
+	_melee_idling = "fx_engine",
 	_block = "fx_block",
 	_sweep = "fx_sweep"
 }
@@ -1139,9 +1141,9 @@ weapon_template.keywords = {
 	"p1",
 	"activated"
 }
-weapon_template.dodge_template = "smiter"
+weapon_template.dodge_template = "smiter_plus"
 weapon_template.sprint_template = "default"
-weapon_template.stamina_template = "default"
+weapon_template.stamina_template = "linesman"
 weapon_template.toughness_template = "default"
 weapon_template.movement_curve_modifier_template = "chainsword_p1_m1"
 weapon_template.footstep_intervals = FootstepIntervalsTemplates.default
@@ -1473,6 +1475,24 @@ weapon_template.displayed_attacks = {
 		desc = "loc_stats_special_action_powerup_desc",
 		display_name = "loc_weapon_special_activate",
 		type = "activate"
+	}
+}
+weapon_template.weapon_card_data = {
+	main = {
+		{
+			icon = "tank",
+			value_func = "primary_attack",
+			header = "light"
+		},
+		{
+			icon = "smiter",
+			value_func = "secondary_attack",
+			header = "heavy"
+		}
+	},
+	weapon_special = {
+		icon = "activate",
+		header = "activate"
 	}
 }
 

@@ -1,4 +1,7 @@
 local MissionSoundEvents = require("scripts/settings/sound/mission_sound_events")
+local FixedFrame = require("scripts/utilities/fixed_frame")
+local PlayerUnitVisualLoadout = require("scripts/extension_systems/visual_loadout/utilities/player_unit_visual_loadout")
+local PlayerUnitStatus = require("scripts/utilities/attack/player_unit_status")
 local DecoderSynchronizerExtension = class("DecoderSynchronizerExtension", "EventSynchronizerBaseExtension")
 local STATES = table.enum("none", "activating_devices", "timer_on", "timer_paused", "complete")
 
@@ -9,6 +12,7 @@ function DecoderSynchronizerExtension:init(extension_init_context, unit, extensi
 	self._max_time_until_stalling = 20
 	self._time_till_next_stall = 0
 	self._num_active_units = 10
+	self._stalled_decoder = nil
 	self._pause_timer = 0
 	self._attached_devices = {}
 	self._used_devices = {}
@@ -17,18 +21,28 @@ function DecoderSynchronizerExtension:init(extension_init_context, unit, extensi
 	self._networked_timer_extension = ScriptUnit.extension(unit, "networked_timer_system")
 	self._event_active = false
 	self._setup_only = false
+	self._progress_in_minigame = false
+	self._auto_open_auspex = false
 	self._loaded_view = false
 	self._event_synchronizer_system = Managers.state.extension:system("event_synchronizer_system")
 end
 
-function DecoderSynchronizerExtension:setup_from_component(min_time_until_stalling, max_time_until_stalling, num_active_units, stall_once_per_device, objective_name, auto_start, setup_only)
+function DecoderSynchronizerExtension:setup_from_component(objective_name, auto_start, min_time_until_stalling, max_time_until_stalling, num_active_units, stall_once_per_device, setup_only, progress_in_minigame, auto_open_auspex)
+	self._objective_name = objective_name
+	self._auto_start = auto_start
 	self._min_time_until_stalling = min_time_until_stalling
 	self._max_time_until_stalling = max_time_until_stalling
 	self._num_active_units = num_active_units
 	self._stall_once_per_device = stall_once_per_device
-	self._objective_name = objective_name
-	self._auto_start = auto_start
 	self._setup_only = setup_only
+	self._progress_in_minigame = progress_in_minigame
+	local mission_name = Managers.state.mission:mission_name()
+
+	if mission_name == "op_train" then
+		self._progress_in_minigame = true
+	end
+
+	self._auto_open_auspex = auto_open_auspex
 	local unit = self._unit
 
 	self._mission_objective_system:register_objective_synchronizer(objective_name, unit)
@@ -86,24 +100,41 @@ end
 
 function DecoderSynchronizerExtension:fixed_update(unit, dt, t)
 	if self._is_server and self._event_active then
-		if self._current_state == STATES.none then
-			-- Nothing
-		elseif self._current_state == STATES.activating_devices then
-			-- Nothing
-		elseif self._current_state == STATES.timer_on then
-			if self._pause_timer < self._time_till_next_stall then
-				self._pause_timer = self._pause_timer + dt
-			else
-				self:pause_event()
-				self._mission_objective_system:sound_event(MissionSoundEvents.decode_blocked)
-				self:_set_state(STATES.timer_paused)
-			end
-
+		if self._current_state == STATES.timer_on then
 			if self:_network_timer_is_finished() then
 				self:_set_state(STATES.complete)
+			else
+				local stall = false
+
+				if not self._progress_in_minigame then
+					if self._pause_timer < self._time_till_next_stall then
+						self._pause_timer = self._pause_timer + dt
+					else
+						stall = true
+					end
+				elseif not self._stalled_decoder:is_minigame_active() then
+					stall = true
+				else
+					local counting = not self:is_stuck()
+					local progressing = self._stalled_decoder:is_minigame_progressing()
+
+					if counting ~= progressing then
+						if progressing then
+							self:_start_network_timer()
+						else
+							self:_pause_network_timer()
+						end
+					end
+				end
+
+				if stall then
+					self:pause_event()
+				end
 			end
 		elseif self._current_state == STATES.timer_paused then
-			-- Nothing
+			if self._progress_in_minigame and self._stalled_decoder:is_minigame_active() then
+				self:unblock_decoding_progression()
+			end
 		elseif self._current_state == STATES.complete then
 			self:finished_stage()
 		end
@@ -183,10 +214,15 @@ function DecoderSynchronizerExtension:unblock_decoding_progression()
 				decoder_device_extension:start_decode()
 			end
 
-			self:_start_network_timer()
-			self:_set_state(STATES.timer_on)
-			Unit.flow_event(self._unit, "lua_event_decoding_started")
-			self._mission_objective_system:sound_event(MissionSoundEvents.decode_moving)
+			if self._progress_in_minigame and self._current_state == STATES.activating_devices then
+				self:pause_event()
+			else
+				Unit.flow_event(self._unit, "lua_event_decoding_started")
+				self:_start_network_timer()
+				self:_set_state(STATES.timer_on)
+				self._mission_objective_system:set_objective_ui_state(self._objective_name, "default")
+				self._mission_objective_system:sound_event(MissionSoundEvents.decode_moving)
+			end
 		else
 			self:_set_state(STATES.complete)
 		end
@@ -245,14 +281,40 @@ function DecoderSynchronizerExtension:pause_event()
 
 			decoder_device_extension:decode_interrupt()
 
+			self._stalled_decoder = decoder_device_extension
 			local unit_id = Managers.state.unit_spawner:level_index(self._unit)
 
 			Managers.state.game_session:send_rpc_clients("rpc_event_synchronizer_paused", unit_id)
 			Unit.flow_event(self._unit, "lua_event_paused")
+
+			local placing_unit = decoder_device_extension:placing_unit()
+
+			if self._auto_open_auspex and PlayerUnitStatus.can_interact_with_objective(placing_unit) then
+				local decoder_unit = rnd_unit
+				local unit_data_extension = ScriptUnit.extension(placing_unit, "unit_data_system")
+				local minigame_character_state = unit_data_extension:write_component("minigame_character_state")
+				minigame_character_state.interface_unit_id = Managers.state.unit_spawner:level_index(decoder_unit)
+				local interactee_extension = ScriptUnit.extension(decoder_unit, "interactee_system")
+				local item = interactee_extension:interactor_item_to_equip()
+				local fixed_t = FixedFrame.get_latest_fixed_time()
+				local inventory_component = unit_data_extension:read_component("inventory")
+				local visual_loadout_extension = ScriptUnit.extension(placing_unit, "visual_loadout_system")
+
+				if PlayerUnitVisualLoadout.slot_equipped(inventory_component, visual_loadout_extension, "slot_device") then
+					PlayerUnitVisualLoadout.unequip_item_from_slot(placing_unit, "slot_device", fixed_t)
+				end
+
+				PlayerUnitVisualLoadout.equip_item_to_slot(placing_unit, item, "slot_device", nil, fixed_t)
+				PlayerUnitVisualLoadout.wield_slot("slot_device", placing_unit, fixed_t)
+			end
 		end
 	else
 		Unit.flow_event(self._unit, "lua_event_paused")
 	end
+
+	self._mission_objective_system:set_objective_ui_state(self._objective_name, "alert")
+	self._mission_objective_system:sound_event(MissionSoundEvents.decode_blocked)
+	self:_set_state(STATES.timer_paused)
 end
 
 function DecoderSynchronizerExtension:finished_event()
@@ -300,6 +362,10 @@ end
 
 function DecoderSynchronizerExtension:is_stuck()
 	return not self._networked_timer_extension:is_counting()
+end
+
+function DecoderSynchronizerExtension:auto_open_auspex()
+	return self._auto_open_auspex
 end
 
 function DecoderSynchronizerExtension:_network_timer_is_finished()

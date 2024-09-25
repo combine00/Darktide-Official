@@ -985,12 +985,12 @@ weapon_template.actions = {
 	action_right_light_pushfollow = {
 		damage_window_start = 0.3,
 		hit_armor_anim = "attack_hit_shield",
-		kind = "sweep",
 		weapon_handling_template = "time_scale_1",
+		kind = "sweep",
 		first_person_hit_anim = "hit_right_shake",
-		first_person_hit_stop_anim = "attack_hit",
-		sprint_requires_press_to_interrupt = "true",
 		range_mod = 1.25,
+		first_person_hit_stop_anim = "attack_hit",
+		allowed_during_sprint = true,
 		attack_direction_override = "right",
 		damage_window_end = 0.4666666666666667,
 		anim_end_event = "attack_finished",
@@ -1842,6 +1842,24 @@ weapon_template.displayed_attacks = {
 		type = "melee_hand"
 	}
 }
+weapon_template.weapon_card_data = {
+	main = {
+		{
+			icon = "linesman",
+			value_func = "primary_attack",
+			header = "light"
+		},
+		{
+			icon = "tank",
+			value_func = "secondary_attack",
+			header = "heavy"
+		}
+	},
+	weapon_special = {
+		icon = "melee_hand",
+		header = "weapon_bash"
+	}
+}
 
 table.add_missing(weapon_template.actions, BaseTemplateSettings.actions)
 
@@ -1852,8 +1870,10 @@ weapon_template.weapon_box = {
 	0.7,
 	0.02
 }
-weapon_template.uses_ammunition = false
-weapon_template.uses_overheat = false
+weapon_template.hud_configuration = {
+	uses_overheat = false,
+	uses_ammunition = false
+}
 weapon_template.sprint_ready_up_time = 0.2
 weapon_template.max_first_person_anim_movement_speed = 4.8
 weapon_template.has_first_person_dodge_events = true

@@ -334,7 +334,7 @@ base_templates.heavy_chained_hits_increases_killing_blow_chance_child = {
 
 			if target_breed then
 				local tags = target_breed.tags
-				local excluded = tags and (tags.captain or tags.monster or tags.ogryn)
+				local excluded = tags and (tags.captain or tags.monster or tags.ogryn or tags.cultist_captain)
 
 				if excluded then
 					return false
@@ -599,7 +599,7 @@ base_templates.targets_receive_rending_debuff_on_charged_shots = {
 		num_stacks_on_proc = 1
 	},
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
-	check_proc_func = CheckProcFunctions.all(CheckProcFunctions.on_item_match, CheckProcFunctions.attacked_unit_is_minion),
+	check_proc_func = CheckProcFunctions.all(CheckProcFunctions.on_item_match, CheckProcFunctions.attacked_unit_is_minion, CheckProcFunctions.hit_has_charge_level),
 	start_func = _add_debuff_on_hit_start,
 	proc_func = _add_debuff_on_hit_proc,
 	num_stacks_on_proc_func = function (t, params, template_data, template_context)
@@ -1134,7 +1134,7 @@ base_templates.movement_speed_on_activation = {
 	class_name = "proc_buff",
 	active_duration = 2,
 	proc_events = {
-		[proc_events.on_weapon_special] = 1
+		[proc_events.on_weapon_special_activate] = 1
 	},
 	proc_stat_buffs = {
 		[stat_buffs.movement_speed] = 0.5
@@ -1195,7 +1195,8 @@ base_templates.extended_activation_duration_on_chained_attacks = {
 	stack_offset = -1,
 	class_name = "stepped_stat_buff",
 	conditional_stat_buffs = {
-		[stat_buffs.weapon_special_max_activations] = 1
+		[stat_buffs.weapon_special_max_activations] = 1,
+		[stat_buffs.melee_impact_modifier] = 0.025
 	},
 	conditional_stepped_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_stat_buffs_func = ConditionalFunctions.all(ConditionalFunctions.is_item_slot_wielded, function (template_data, template_context)
@@ -1390,9 +1391,9 @@ base_templates.suppression_on_close_kill = {
 	class_name = "proc_buff",
 	active_duration = 1.5,
 	proc_events = {
-		[proc_events.on_hit] = 1
+		[proc_events.on_kill] = 1
 	},
-	check_proc_func = CheckProcFunctions.all(CheckProcFunctions.on_item_match, CheckProcFunctions.on_ranged_close_kill),
+	check_proc_func = CheckProcFunctions.all(CheckProcFunctions.on_item_match, CheckProcFunctions.any(CheckProcFunctions.on_ranged_close_kill, CheckProcFunctions.on_explosion_close_kill)),
 	proc_func = function (params, template_data, template_context)
 		local template_override_data = template_context.template_override_data
 		local suppression_settings = template_override_data.suppression_settings
@@ -1676,7 +1677,7 @@ base_templates.consecutive_hits_increases_close_damage_parent = {
 		[proc_events.on_hit] = 1
 	},
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
-	check_proc_func = CheckProcFunctions.on_item_match,
+	check_proc_func = CheckProcFunctions.all(CheckProcFunctions.on_item_match, CheckProcFunctions.on_non_buff_hit),
 	proc_func = _consecutive_hits_proc_func
 }
 base_templates.consecutive_hits_increases_close_damage_child = {
@@ -1834,7 +1835,7 @@ local function _continuous_fire_start_func(template_data, template_context)
 	template_data.inventory_slot_component = unit_data_extension and unit_data_extension:read_component(item_slot_name)
 end
 
-local function _get_number_of_continuous_fire_steps(template_data, template_context, uncapped_fire_steps)
+local function _number_of_continuous_fire_steps(template_data, template_context, uncapped_fire_steps)
 	local template = template_context.template
 	local use_combo = template.use_combo
 
@@ -1887,7 +1888,7 @@ base_templates.conditional_buff_on_continuous_fire = {
 			return false
 		end
 
-		local number_of_steps = _get_number_of_continuous_fire_steps(template_data, template_context)
+		local number_of_steps = _number_of_continuous_fire_steps(template_data, template_context)
 
 		return number_of_steps > 0
 	end
@@ -1903,7 +1904,7 @@ base_templates.stacking_buff_on_continuous_fire = {
 	min_max_step_func = function (template_data, template_context)
 		return 0, 5
 	end,
-	bonus_step_func = _get_number_of_continuous_fire_steps
+	bonus_step_func = _number_of_continuous_fire_steps
 }
 base_templates.stacking_buff_on_continuous_alternative_fire = {
 	predicted = false,
@@ -1916,7 +1917,7 @@ base_templates.stacking_buff_on_continuous_alternative_fire = {
 	min_max_step_func = function (template_data, template_context)
 		return 0, 5
 	end,
-	bonus_step_func = _get_number_of_continuous_fire_steps
+	bonus_step_func = _number_of_continuous_fire_steps
 }
 base_templates.toughness_on_continuous_fire = {
 	show_in_hud_if_slot_is_wielded = true,
@@ -1934,7 +1935,7 @@ base_templates.toughness_on_continuous_fire = {
 		[proc_events.on_ammo_consumed] = function (params, template_data, template_context, t)
 			local current_num_fire_steps = template_data.num_fire_steps or 0
 			local uncapped_fire_steps = true
-			local num_fire_steps = _get_number_of_continuous_fire_steps(template_data, template_context, uncapped_fire_steps)
+			local num_fire_steps = _number_of_continuous_fire_steps(template_data, template_context, uncapped_fire_steps)
 			local give_the_thing = nil
 			give_the_thing = template_context.template.use_combo and num_fire_steps == NetworkConstants.action_combo_count.max and true or current_num_fire_steps < num_fire_steps
 			template_data.num_fire_steps = num_fire_steps
@@ -1957,7 +1958,7 @@ base_templates.toughness_on_continuous_fire = {
 		end
 	},
 	visual_stack_count = function (template_data, template_context)
-		return _get_number_of_continuous_fire_steps(template_data, template_context) or 0
+		return _number_of_continuous_fire_steps(template_data, template_context) or 0
 	end
 }
 base_templates.bleed_on_ranged = {
@@ -2164,7 +2165,7 @@ base_templates.vents_warpcharge_on_weakspot_hits = {
 	proc_func = SharedBuffFunctions.vent_warp_charge_proc_func,
 	update_func = SharedBuffFunctions.vent_warp_charge_update_func
 }
-base_templates.warpfire_on_crits_ranged = {
+base_templates.warp_burninating_on_crits_ranged = {
 	predicted = false,
 	max_stacks = 1,
 	class_name = "proc_buff",
@@ -2181,7 +2182,7 @@ base_templates.warpfire_on_crits_ranged = {
 	start_func = _add_debuff_on_hit_start,
 	proc_func = _add_debuff_on_hit_proc
 }
-base_templates.warpfire_on_crits_melee = {
+base_templates.warp_burninating_on_crits_melee = {
 	predicted = false,
 	max_stacks = 1,
 	class_name = "proc_buff",
@@ -2582,12 +2583,18 @@ base_templates.crit_chance_based_on_ammo_left = {
 	end
 }
 base_templates.sticky_projectiles = {
-	predicted = false,
 	class_name = "buff",
+	predicted = false,
 	hide_icon_in_hud = true,
 	keywords = {
 		keywords.sticky_projectiles
-	}
+	},
+	conditional_stat_buffs = {
+		[stat_buffs.damage_vs_ogryn_and_monsters] = 1.5
+	},
+	conditional_stat_buffs_func = function (template_data, template_context)
+		return ConditionalFunctions.is_item_slot_wielded(template_data, template_context)
+	end
 }
 base_templates.chance_to_explode_elites_on_kill = {
 	class_name = "proc_buff",
@@ -2656,7 +2663,7 @@ base_templates.power_scales_with_clip_percentage = {
 	stack_offset = -1,
 	class_name = "stepped_stat_buff",
 	conditional_stat_buffs = {
-		[stat_buffs.ranged_power_level_modifier] = 0.05
+		[stat_buffs.power_level_modifier] = 0.05
 	},
 	conditional_stepped_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
@@ -2725,7 +2732,7 @@ base_templates.can_block_ranged = {
 		keywords.can_block_ranged
 	},
 	conditional_stat_buffs = {
-		[stat_buffs.block_cost_ranged_multiplier] = 1
+		[stat_buffs.block_cost_multiplier] = 1
 	},
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
 	check_active_func = ConditionalFunctions.all(ConditionalFunctions.is_item_slot_wielded, ConditionalFunctions.is_blocking)

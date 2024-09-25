@@ -1060,8 +1060,9 @@ function DialogueSystem:_play_dialogue_event_implementation(go_id, is_level_unit
 	local speaker_name = extension:get_context().voice_template
 	dialogue.speaker_name = speaker_name
 	local wwise_route_key = dialogue.wwise_route
+	local class_name = extension:get_context().class_name
 
-	if speaker_name == "tech_priest_a" and wwise_route_key == 1 then
+	if class_name == "tech_priest" and wwise_route_key == 1 then
 		wwise_route_key = 21
 	end
 

@@ -5,6 +5,7 @@ local Pickups = require("scripts/settings/pickup/pickups")
 local PlayerAssistNotifications = require("scripts/utilities/player_assist_notifications")
 local PlayerUnitVisualLoadout = require("scripts/extension_systems/visual_loadout/utilities/player_unit_visual_loadout")
 local Pocketable = require("scripts/utilities/pocketable")
+local Vo = require("scripts/utilities/vo")
 local ActionGivePocketable = class("ActionGivePocketable", "ActionWeaponBase")
 local RECIEVE_GIFTED_ITEM_ALIAS = "recieve_gifted_item"
 
@@ -65,6 +66,12 @@ function ActionGivePocketable:fixed_update(dt, t, time_in_action)
 					local fx_extension = ScriptUnit.extension(target_unit, "fx_system")
 
 					fx_extension:trigger_exclusive_gear_wwise_event(RECIEVE_GIFTED_ITEM_ALIAS, external_properties)
+
+					local voice_event_data = action_settings.voice_event_data
+
+					if voice_event_data then
+						Vo.on_demand_vo_event(player_unit, voice_event_data.voice_tag_concept, voice_event_data.voice_tag_id)
+					end
 				end
 			end
 		end

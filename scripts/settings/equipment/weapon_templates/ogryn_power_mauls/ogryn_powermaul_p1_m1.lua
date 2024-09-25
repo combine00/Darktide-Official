@@ -1043,14 +1043,15 @@ weapon_template.actions = {
 		herding_template = HerdingTemplates.linesman_right_heavy
 	},
 	action_melee_start_slide = {
-		allowed_during_sprint = true,
 		chain_anim_event = "attack_swing_charge_left_pose",
+		proc_time_interval = 0.2,
 		start_input = "start_attack",
 		kind = "windup",
-		chain_anim_event_3p = "attack_swing_charge_left",
 		action_priority = 2,
+		invalid_start_action_for_stat_calculation = true,
+		allowed_during_sprint = true,
+		chain_anim_event_3p = "attack_swing_charge_left",
 		anim_end_event = "attack_finished",
-		proc_time_interval = 0.2,
 		uninterruptible = true,
 		anim_event = "attack_swing_charge_left",
 		stop_input = "attack_cancel",
@@ -1341,12 +1342,12 @@ weapon_template.actions = {
 	action_right_light_pushfollow = {
 		damage_window_start = 0.4,
 		hit_armor_anim = "attack_hit_shield",
+		weapon_handling_template = "time_scale_1_2",
 		range_mod = 1.25,
 		kind = "sweep",
-		weapon_handling_template = "time_scale_1_2",
 		first_person_hit_anim = "hit_right_shake",
 		first_person_hit_stop_anim = "attack_hit",
-		sprint_requires_press_to_interrupt = "true",
+		allowed_during_sprint = true,
 		attack_direction_override = "right",
 		damage_window_end = 0.5333333333333333,
 		anim_event_3p = "attack_swing_right_slow",
@@ -2018,6 +2019,24 @@ weapon_template.displayed_attacks = {
 		type = "activate"
 	}
 }
+weapon_template.weapon_card_data = {
+	main = {
+		{
+			icon = "smiter",
+			value_func = "primary_attack",
+			header = "light"
+		},
+		{
+			icon = "tank",
+			value_func = "secondary_attack",
+			header = "heavy"
+		}
+	},
+	weapon_special = {
+		icon = "activate",
+		header = "activate"
+	}
+}
 
 table.add_missing(weapon_template.actions, BaseTemplateSettings.actions)
 
@@ -2028,12 +2047,14 @@ weapon_template.weapon_box = {
 	0.7,
 	0.02
 }
-weapon_template.uses_ammunition = false
-weapon_template.uses_overheat = false
-weapon_template.allow_sprinting_with_special = true
+weapon_template.hud_configuration = {
+	uses_overheat = false,
+	uses_ammunition = false
+}
 weapon_template.weapon_special_class = "WeaponSpecialExplodeOnImpact"
 weapon_template.weapon_special_tweak_data = {
 	active_on_abort = true,
+	keep_active_on_sprint = true,
 	disorientation_type = "ogryn_powermaul_disorientation",
 	active_duration = 4,
 	explosion_template = ExplosionTemplates.powermaul_activated_impact

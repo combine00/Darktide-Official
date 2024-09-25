@@ -1,5 +1,6 @@
 local Action = require("scripts/utilities/weapon/action")
 local Breed = require("scripts/utilities/breed")
+local WieldableSlotScriptInterface = require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/wieldable_slot_script_interface")
 local ChainLightningTargetEffects = class("ChainLightningTargetEffects")
 local Unit_world_position = Unit.world_position
 
@@ -138,5 +139,7 @@ function ChainLightningTargetEffects:_destroy_effects()
 		targeting_effects[targeted_unit] = nil
 	end
 end
+
+implements(ChainLightningTargetEffects, WieldableSlotScriptInterface)
 
 return ChainLightningTargetEffects

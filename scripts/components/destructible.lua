@@ -17,6 +17,7 @@ function Destructible:init(unit, is_server)
 
 		if not disable_physics then
 			local start_visible = self:get_data(unit, "start_visible")
+			local network_unit = self:get_data(unit, "network_unit")
 			local despawn_timer_duration = self:get_data(unit, "despawn_timer_duration")
 			local despawn_when_destroyed = self:get_data(unit, "despawn_when_destroyed")
 			local collision_actors = self:get_data(unit, "collision_actors")
@@ -58,7 +59,7 @@ function Destructible:init(unit, is_server)
 				}
 			end
 
-			destructible_extension:setup_from_component(despawn_timer_duration, despawn_when_destroyed, collision_actors, mass, speed, direction, force_direction, start_visible, is_nav_gate, broadphase_radius, use_health_extension_health, collectible_data)
+			destructible_extension:setup_from_component(despawn_timer_duration, despawn_when_destroyed, collision_actors, mass, speed, direction, force_direction, start_visible, is_nav_gate, broadphase_radius, use_health_extension_health, collectible_data, network_unit)
 			destructible_extension:set_enabled_from_component(start_enabled)
 
 			self._destructible_extension = destructible_extension
@@ -348,6 +349,11 @@ Destructible.component_data = {
 		ui_type = "check_box",
 		value = true,
 		ui_name = "Start visible"
+	},
+	network_unit = {
+		ui_type = "check_box",
+		value = false,
+		ui_name = "Is Network Unit"
 	},
 	despawn_when_destroyed = {
 		ui_type = "check_box",

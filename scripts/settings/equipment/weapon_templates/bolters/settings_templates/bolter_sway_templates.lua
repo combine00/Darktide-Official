@@ -23,7 +23,7 @@ end
 
 sway_templates.default_bolter_killshot = {
 	still = {
-		intensity = 1,
+		intensity = 0.3,
 		horizontal_speed = 0.2,
 		visual_pitch_impact_mod = 4,
 		rotation_speed = 0.125,

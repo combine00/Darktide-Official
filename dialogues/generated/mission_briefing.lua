@@ -2524,6 +2524,132 @@ return function ()
 		}
 	})
 	define_rule({
+		post_wwise_event = "play_radio_static_end",
+		concurrent_wwise_event = "play_vox_static_loop",
+		pre_wwise_event = "play_radio_static_start",
+		name = "mission_train_briefing_a",
+		response = "mission_train_briefing_a",
+		database = "mission_briefing",
+		wwise_route = 41,
+		category = "vox_prio_0",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"mission_brief"
+			},
+			{
+				"query_context",
+				"starter_line",
+				OP.EQ,
+				"mission_train_briefing_a"
+			},
+			{
+				"user_context",
+				"class_name",
+				OP.SET_INCLUDES,
+				args = {
+					"sergeant",
+					"enginseer"
+				}
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "mission_givers"
+		}
+	})
+	define_rule({
+		post_wwise_event = "play_radio_static_end",
+		concurrent_wwise_event = "play_vox_static_loop",
+		pre_wwise_event = "play_radio_static_start",
+		name = "mission_train_briefing_b",
+		response = "mission_train_briefing_b",
+		database = "mission_briefing",
+		wwise_route = 41,
+		category = "vox_prio_0",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"mission_train_briefing_a"
+				}
+			},
+			{
+				"user_context",
+				"class_name",
+				OP.SET_INCLUDES,
+				args = {
+					"sergeant",
+					"enginseer"
+				}
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "mission_givers"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		post_wwise_event = "play_radio_static_end",
+		concurrent_wwise_event = "play_vox_static_loop",
+		pre_wwise_event = "play_radio_static_start",
+		name = "mission_train_briefing_c",
+		response = "mission_train_briefing_c",
+		database = "mission_briefing",
+		wwise_route = 41,
+		category = "vox_prio_0",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"mission_train_briefing_b"
+				}
+			},
+			{
+				"user_context",
+				"class_name",
+				OP.SET_INCLUDES,
+				args = {
+					"explicator",
+					"pilot",
+					"sergeant"
+				}
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "disabled"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
 		pre_wwise_event = "play_radio_static_start",
 		concurrent_wwise_event = "play_vox_static_loop",
 		name = "mission_twins_briefing_a",

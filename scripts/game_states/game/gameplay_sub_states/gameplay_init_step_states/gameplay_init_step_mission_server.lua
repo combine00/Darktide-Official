@@ -12,6 +12,7 @@ function GameplayInitStepMissionServer:on_enter(parent, params)
 end
 
 function GameplayInitStepMissionServer:update(main_dt, main_t)
+	self._shared_state.initialized_steps.GameplayInitStepMissionServer = true
 	local next_step_params = {
 		shared_state = self._shared_state
 	}

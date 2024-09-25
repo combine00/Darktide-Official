@@ -11,6 +11,7 @@ function GameplayInitStepNetworkStory:on_enter(parent, params)
 end
 
 function GameplayInitStepNetworkStory:update(main_dt, main_t)
+	self._shared_state.initialized_steps.GameplayInitStepNetworkStory = true
 	local next_step_params = {
 		shared_state = self._shared_state
 	}

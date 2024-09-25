@@ -36,6 +36,12 @@ local catapulting_templates = {
 		direction_from_node = "j_spine",
 		use_hit_position = true
 	},
+	flamer_explosion = {
+		force = 7,
+		z_force = 5,
+		direction_from_node = "j_spine",
+		use_hit_position = true
+	},
 	twin_gas_grenade_explosion = {
 		force = 7,
 		z_force = 4,

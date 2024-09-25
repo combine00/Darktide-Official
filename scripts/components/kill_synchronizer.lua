@@ -5,9 +5,9 @@ function KillSynchronizer:init(unit)
 
 	if kill_synchronizer_extension then
 		local objective_name = self:get_data(unit, "objective_name")
-		local automatic_start = self:get_data(unit, "automatic_start")
+		local auto_start = self:get_data(unit, "automatic_start")
 
-		kill_synchronizer_extension:setup_from_component(objective_name, automatic_start)
+		kill_synchronizer_extension:setup_from_component(objective_name, auto_start)
 
 		self._kill_synchronizer_extension = kill_synchronizer_extension
 	end
@@ -48,7 +48,7 @@ KillSynchronizer.component_data = {
 	automatic_start = {
 		ui_type = "check_box",
 		value = false,
-		ui_name = "Auto start on mission start"
+		ui_name = "Automatic Start On Mission Start"
 	},
 	inputs = {
 		start_kill_event = {
