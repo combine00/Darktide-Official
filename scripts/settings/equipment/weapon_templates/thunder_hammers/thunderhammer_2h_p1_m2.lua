@@ -1368,6 +1368,7 @@ weapon_template.weapon_special_tweak_data = {
 	active_duration = 5,
 	special_active_hit_extra_time = 0.5,
 	keep_active_on_sprint = true,
+	allow_reactivation_while_active = true,
 	disorientation_type = "thunder_hammer_m2_light",
 	only_deactive_on_abort = true,
 	push_template = push_templates.medium

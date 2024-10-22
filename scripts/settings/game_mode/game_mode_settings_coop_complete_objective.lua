@@ -3,6 +3,7 @@ local settings = {
 	bot_backfilling_allowed = true,
 	name = "coop_complete_objective",
 	class_file_name = "scripts/managers/game_mode/game_modes/game_mode_coop_complete_objective",
+	is_premium_feature = true,
 	mission_end_grace_time_dead = 4,
 	mission_end_grace_time_disabled = 10,
 	use_side_color = false,

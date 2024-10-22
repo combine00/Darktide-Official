@@ -525,14 +525,6 @@ function HudElementTacticalOverlay:_setup_live_event(ui_renderer)
 	self._live_event_id = live_event_id
 	local page_key = "event"
 	local template = Managers.live_event:active_template()
-	local event_icon = template.icon
-
-	self:_override_right_panel_category(page_key, {
-		icon = {
-			value = event_icon
-		}
-	})
-
 	local event_name = template.name
 	local event_description = template.description
 	local configs = {
@@ -547,20 +539,46 @@ function HudElementTacticalOverlay:_setup_live_event(ui_renderer)
 		{
 			blueprint = "body",
 			text = Localize(event_description)
-		},
-		{
-			blueprint = "header",
-			text = Localize("loc_event_objectives")
 		}
 	}
 	local tiers = Managers.live_event:active_tiers()
+	local tier_count = tiers and #tiers or 0
+	local max_tiers = ElementSettings.max_live_event_tiers
+	local shown_tiers = math.min(max_tiers, tier_count)
 
-	for i = 1, #tiers do
+	if shown_tiers > 0 then
+		configs[#configs + 1] = {
+			blueprint = "header",
+			text = Localize("loc_event_objectives")
+		}
+	end
+
+	local progress = Managers.live_event:active_progress()
+	local start_from = tier_count - shown_tiers + 1
+
+	while start_from > 1 and progress < tiers[start_from - 1].target do
+		start_from = start_from - 1
+	end
+
+	local end_at = start_from + shown_tiers - 1
+
+	for i = start_from, end_at do
 		local tier = tiers[i]
 		configs[#configs + 1] = {
 			blueprint = "event_tier",
 			target = tier.target,
 			rewards = tier.rewards
+		}
+	end
+
+	local remaining_tiers = tier_count - end_at
+
+	if remaining_tiers > 0 then
+		configs[#configs + 1] = {
+			blueprint = "divider",
+			text = Localize("loc_tactical_overlay_extra_entries", true, {
+				amount = remaining_tiers
+			})
 		}
 	end
 

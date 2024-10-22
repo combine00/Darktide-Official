@@ -24,10 +24,11 @@ local single_cleave = DamageProfileSettings.single_cleave
 local double_cleave = DamageProfileSettings.double_cleave
 local medium_cleave = DamageProfileSettings.medium_cleave
 damage_templates.default_plasma_killshot = {
-	suppression_value = 10,
 	gibbing_power = 0,
 	ignore_shield = false,
 	ragdoll_only = true,
+	suppression_value = 10,
+	ignore_roamer_hitzone_multipliers = true,
 	stagger_category = "melee",
 	ragdoll_push_force = 300,
 	ignore_stagger_reduction = true,
@@ -112,6 +113,7 @@ damage_templates.default_plasma_killshot = {
 	gib_push_force = GibbingSettings.gib_push_force.ranged_heavy
 }
 damage_templates.default_plasma_bfg = {
+	ignore_roamer_hitzone_multipliers = true,
 	ignore_stagger_reduction = true,
 	ignore_shield = true,
 	ragdoll_only = true,
@@ -208,6 +210,7 @@ damage_templates.default_plasma_bfg = {
 	gib_push_force = GibbingSettings.gib_push_force.ranged_heavy
 }
 damage_templates.default_plasma_demolition = {
+	ignore_roamer_hitzone_multipliers = true,
 	suppression_value = 0.5,
 	ragdoll_push_force = 800,
 	ignore_stagger_reduction = true,
@@ -270,6 +273,7 @@ damage_templates.default_plasma_demolition = {
 }
 damage_templates.close_light_plasma_demolition = {
 	suppression_value = 0.5,
+	ignore_roamer_hitzone_multipliers = true,
 	ragdoll_push_force = 800,
 	stagger_category = "ranged",
 	cleave_distribution = {
@@ -329,6 +333,7 @@ damage_templates.close_light_plasma_demolition = {
 }
 damage_templates.light_plasma_demolition = {
 	suppression_value = 0.5,
+	ignore_roamer_hitzone_multipliers = true,
 	ragdoll_push_force = 800,
 	stagger_category = "ranged",
 	cleave_distribution = {

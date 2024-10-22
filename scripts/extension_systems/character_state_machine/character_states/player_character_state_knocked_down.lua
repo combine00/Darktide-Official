@@ -60,6 +60,8 @@ function PlayerCharacterStateKnockedDown:game_object_initialized(game_session, g
 end
 
 function PlayerCharacterStateKnockedDown:on_enter(unit, dt, t, previous_state, params)
+	PlayerCharacterStateKnockedDown.super.on_enter(self, unit, dt, t, previous_state, params)
+
 	local is_server = self._is_server
 	local animation_extension = self._animation_extension
 	local fx_extension = self._fx_extension
@@ -116,6 +118,8 @@ function PlayerCharacterStateKnockedDown:on_enter(unit, dt, t, previous_state, p
 end
 
 function PlayerCharacterStateKnockedDown:on_exit(unit, t, next_state)
+	PlayerCharacterStateKnockedDown.super.on_exit(self, unit, t, next_state)
+
 	local is_server = self._is_server
 	local fx_extension = self._fx_extension
 	local health_extension = self._health_extension

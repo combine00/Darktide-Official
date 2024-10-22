@@ -10,7 +10,8 @@ local weapon_stats_grid_size = weapon_stats_context.grid_size
 local mastery_pattern_display_name_text_style = table.clone(UIFontSettings.header_3)
 mastery_pattern_display_name_text_style.horizontal_alignment = "center"
 mastery_pattern_display_name_text_style.text_horizontal_alignment = "center"
-mastery_pattern_display_name_text_style.text_vertical_alignment = "top"
+mastery_pattern_display_name_text_style.text_vertical_alignment = "bottom"
+mastery_pattern_display_name_text_style.vertical_alignment = "top"
 mastery_pattern_display_name_text_style.size = {
 	nil,
 	40
@@ -20,7 +21,7 @@ mastery_pattern_display_name_text_style.size_addition = {
 }
 mastery_pattern_display_name_text_style.offset = {
 	10,
-	20,
+	-40,
 	6
 }
 mastery_pattern_display_name_text_style.font_size = 40
@@ -37,7 +38,7 @@ mastery_pattern_mastery_level_text_style.size_addition = {
 }
 mastery_pattern_mastery_level_text_style.offset = {
 	10,
-	65,
+	20,
 	6
 }
 mastery_pattern_mastery_level_text_style.font_size = 24
@@ -215,16 +216,16 @@ local scenegraph_definition = {
 		}
 	},
 	mastery_info_details = {
-		vertical_alignment = "top",
-		parent = "mastery_info",
+		vertical_alignment = "bottom",
+		parent = "canvas",
 		horizontal_alignment = "left",
 		size = {
 			650,
 			250
 		},
 		position = {
-			0,
-			320,
+			790,
+			-200,
 			1
 		}
 	},
@@ -374,15 +375,24 @@ local widget_definitions = {
 			pass_type = "texture",
 			value = "content/ui/materials/icons/contracts/contracts_store/uknown_melee_weapon",
 			style = {
-				vertical_alignment = "center",
 				horizontal_alignment = "center",
+				vertical_alignment = "center",
 				color = Color.terminal_text_body(255, true),
 				default_color = Color.terminal_text_body(nil, true),
 				selected_color = Color.terminal_icon(nil, true),
+				original_offset = {
+					0,
+					0,
+					5
+				},
 				offset = {
 					0,
-					30,
+					0,
 					5
+				},
+				original_size = {
+					358.4,
+					134.39999999999998
 				},
 				size = {
 					358.4,
@@ -534,7 +544,14 @@ local widget_definitions = {
 			style_id = "display_name",
 			pass_type = "text",
 			value = Localize("loc_mastery_crafting_sacrifice_weapon_title"),
-			style = mastery_pattern_display_name_text_style
+			style = table.merge(table.clone(mastery_pattern_display_name_text_style), {
+				text_vertical_alignment = "top",
+				offset = {
+					mastery_pattern_display_name_text_style.offset[1],
+					20,
+					mastery_pattern_display_name_text_style.offset[3]
+				}
+			})
 		},
 		{
 			value_id = "description",
@@ -542,11 +559,12 @@ local widget_definitions = {
 			pass_type = "text",
 			value = "",
 			style = table.merge(table.clone(mastery_pattern_mastery_experience_text_style), {
-				vertical_alignment = "top",
+				vertical_alignment = "bottom",
+				text_vertical_alignment = "bottom",
 				text_horizontal_alignment = "left",
 				offset = {
 					0,
-					80,
+					-20,
 					mastery_pattern_mastery_experience_text_style.offset[3]
 				}
 			})

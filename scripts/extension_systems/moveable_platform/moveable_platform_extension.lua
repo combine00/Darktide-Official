@@ -469,8 +469,6 @@ function MoveablePlatformExtension:_update_passengers()
 						else
 							self:_unparent_passenger(passenger_unit)
 						end
-					elseif is_bot and not self._wall_collision_enabled then
-						self:_unparent_passenger(passenger_unit)
 					end
 				else
 					self._passenger_units[passenger_unit] = nil
@@ -494,6 +492,33 @@ function MoveablePlatformExtension:_update_passengers()
 			for passenger_unit, _ in pairs(overlapping_units) do
 				passenger_units[passenger_unit] = true
 			end
+		end
+	end
+end
+
+function MoveablePlatformExtension:teleport_bots_to_node(node_name)
+	local unit = self._unit
+	local current_node_name = node_name
+	local has_node = Unit.has_node(unit, current_node_name)
+
+	if not has_node then
+		return
+	end
+
+	local bot_players = Managers.player:bot_players()
+	local node = Unit.node(unit, current_node_name)
+	local node_position = Unit.world_position(unit, node)
+
+	for _, bot_player in pairs(bot_players) do
+		local bot_unit = bot_player.player_unit
+
+		if bot_unit then
+			local blackboard = BLACKBOARDS[bot_unit]
+			local follow_component = Blackboard.write_component(blackboard, "follow")
+			follow_component.level_forced_teleport = true
+
+			follow_component.level_forced_teleport_position:store(node_position)
+			self:_unparent_passenger(bot_unit)
 		end
 	end
 end

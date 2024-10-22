@@ -460,4 +460,11 @@ function GameModeManager:player_unit_template_name()
 	return template_name
 end
 
+function GameModeManager:is_premium_feature()
+	local game_mode_settings = self._game_mode:settings()
+	local is_premium_feature = game_mode_settings.is_premium_feature or false
+
+	return is_premium_feature
+end
+
 return GameModeManager

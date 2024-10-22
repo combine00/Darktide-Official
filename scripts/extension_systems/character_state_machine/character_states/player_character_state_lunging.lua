@@ -65,6 +65,8 @@ end
 local stop_action_data = {}
 
 function PlayerCharacterStateLunging:on_enter(unit, dt, t, previous_state, params)
+	PlayerCharacterStateLunging.super.on_enter(self, unit, dt, t, previous_state, params)
+
 	local locomotion_steering = self._locomotion_steering_component
 	locomotion_steering.move_method = "script_driven"
 	locomotion_steering.calculate_fall_velocity = true
@@ -204,6 +206,8 @@ end
 local temp_hit_units = {}
 
 function PlayerCharacterStateLunging:on_exit(unit, t, next_state)
+	PlayerCharacterStateLunging.super.on_exit(self, unit, t, next_state)
+
 	local movement_state_component = self._movement_state_component
 	movement_state_component.is_dodging = false
 	local lunge_character_state_component = self._lunge_character_state_component

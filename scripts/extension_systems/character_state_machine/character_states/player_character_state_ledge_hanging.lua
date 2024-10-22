@@ -102,6 +102,8 @@ function PlayerCharacterStateLedgeHanging:game_object_initialized(game_session, 
 end
 
 function PlayerCharacterStateLedgeHanging:on_enter(unit, dt, t, previous_state, params)
+	PlayerCharacterStateLedgeHanging.super.on_enter(self, unit, dt, t, previous_state, params)
+
 	local hang_ledge_unit = params.hang_ledge_unit
 	local inventory_component = self._inventory_component
 	local visual_loadout_extension = self._visual_loadout_extension
@@ -139,6 +141,8 @@ function PlayerCharacterStateLedgeHanging:on_enter(unit, dt, t, previous_state, 
 end
 
 function PlayerCharacterStateLedgeHanging:on_exit(unit, t, next_state)
+	PlayerCharacterStateLedgeHanging.super.on_exit(self, unit, t, next_state)
+
 	local is_server = self._is_server
 
 	if next_state and next_state ~= "ledge_hanging_falling" then

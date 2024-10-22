@@ -436,6 +436,13 @@ function ConstantElementNotificationFeed:_generate_notification_data(message_typ
 		notification_data = slot4
 	elseif message_type == MESSAGE_TYPES.item_granted then
 		local item = data
+		local reason = nil
+
+		if data.reason then
+			reason = data.reason
+			item = data.item
+		end
+
 		local item_type = item.item_type
 		local visual_item = item
 		local has_rarity = not not visual_item.rarity
@@ -454,7 +461,7 @@ function ConstantElementNotificationFeed:_generate_notification_data(message_typ
 					color = rarity_color
 				},
 				{
-					display_name = ItemUtils.rarity_display_name(data),
+					display_name = ItemUtils.rarity_display_name(item),
 					color = rarity_color
 				},
 				{
@@ -531,6 +538,10 @@ function ConstantElementNotificationFeed:_generate_notification_data(message_typ
 		if background_rarity_color then
 			background_rarity_color = table.clone(background_rarity_color)
 			background_rarity_color[1] = background_rarity_color[1] * ConstantElementNotificationFeedSettings.default_alpha_value
+		end
+
+		if reason and texts[3] then
+			texts[3].display_name = reason
 		end
 
 		notification_data = {

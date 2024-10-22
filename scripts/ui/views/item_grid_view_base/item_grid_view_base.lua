@@ -480,7 +480,7 @@ function ItemGridViewBase:_setup_weapon_preview()
 		local layer = 10
 		local context = {
 			ignore_blur = true,
-			draw_background = false
+			draw_background = true
 		}
 		self._weapon_preview = self:_add_element(ViewElementInventoryWeaponPreview, reference_name, layer, context)
 		self._weapon_zoom_fraction = -3

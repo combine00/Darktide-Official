@@ -34,6 +34,8 @@ function PlayerCharacterStatePounced:init(character_state_init_context, ...)
 end
 
 function PlayerCharacterStatePounced:on_enter(unit, dt, t, previous_state, params)
+	PlayerCharacterStatePounced.super.on_enter(self, unit, dt, t, previous_state, params)
+
 	local locomotion_steering_component = self._locomotion_steering_component
 	local disabled_state_input = self._disabled_state_input
 	locomotion_steering_component.move_method = "script_driven"
@@ -77,6 +79,8 @@ function PlayerCharacterStatePounced:on_enter(unit, dt, t, previous_state, param
 end
 
 function PlayerCharacterStatePounced:on_exit(unit, t, next_state)
+	PlayerCharacterStatePounced.super.on_exit(self, unit, t, next_state)
+
 	local disabled_character_state_component = self._disabled_character_state_component
 	local disabling_unit = disabled_character_state_component.disabling_unit
 	disabled_character_state_component.is_disabled = false

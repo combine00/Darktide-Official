@@ -33,6 +33,8 @@ function PlayerCharacterStateStunned:init(character_state_init_context, ...)
 end
 
 function PlayerCharacterStateStunned:on_enter(unit, dt, t, previous_state, params)
+	PlayerCharacterStateStunned.super.on_enter(self, unit, dt, t, previous_state, params)
+
 	local animation_extension = self._animation_extension
 	local locomotion_component = self._locomotion_component
 	local locomotion_steering_component = self._locomotion_steering_component
@@ -76,6 +78,8 @@ function PlayerCharacterStateStunned:on_enter(unit, dt, t, previous_state, param
 end
 
 function PlayerCharacterStateStunned:on_exit(unit, t, next_state)
+	PlayerCharacterStateStunned.super.on_exit(self, unit, t, next_state)
+
 	local stunned_character_state_component = self._stunned_character_state_component
 	stunned_character_state_component.stunned = false
 	stunned_character_state_component.start_time = 0
@@ -126,7 +130,7 @@ function PlayerCharacterStateStunned:fixed_update(unit, dt, t, next_state_params
 		self._ability_extension:update_ability_actions(fixed_frame)
 	else
 		local current_weapon_template = self._weapon_extension:weapon_template()
-		local current_weapon_special_tweak_data = current_weapon_template.weapon_special_tweak_data
+		local current_weapon_special_tweak_data = current_weapon_template and current_weapon_template.weapon_special_tweak_data
 
 		if current_weapon_special_tweak_data and current_weapon_special_tweak_data.keep_active_on_stun then
 			self._weapon_extension:update_weapon_special_implementation(fixed_frame)

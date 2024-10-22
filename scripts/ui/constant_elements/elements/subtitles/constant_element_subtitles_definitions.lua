@@ -57,7 +57,7 @@ local widget_definitions = {
 			value_id = "text",
 			style_id = "text",
 			pass_type = "text",
-			value = "<text>",
+			value = "",
 			style = text_style
 		}
 	}, "secondary_subtitles")

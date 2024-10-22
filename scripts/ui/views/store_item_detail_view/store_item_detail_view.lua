@@ -47,6 +47,10 @@ function StoreItemDetailView:init(settings, context)
 	self._profile = player:profile()
 	self._aquilas_showing = false
 	self._url_textures = {}
+
+	if IS_PLAYSTATION then
+		self._ps_store_icon_showing = false
+	end
 end
 
 function StoreItemDetailView:_setup_offscreen_gui()
@@ -2264,7 +2268,7 @@ function StoreItemDetailView:_setup_weapon_preview()
 	local layer = 1
 	self._weapon_preview = self:_add_element(ViewElementInventoryWeaponPreview, reference_name, layer, {
 		ignore_blur = true,
-		draw_background = false
+		draw_background = true
 	})
 
 	self:_update_weapon_preview_viewport()
@@ -2994,6 +2998,20 @@ function StoreItemDetailView:_create_aquilas_presentation(offer, item_name)
 			offer = item_name,
 			value = money_required
 		}))
+
+		if IS_PLAYSTATION then
+			local POSITION = {
+				RIGHT = 2,
+				CENTER = 0,
+				LEFT = 1
+			}
+
+			if not self._ps_store_icon_showing then
+				NpCommerceDialog.show_ps_store_icon(POSITION.RIGHT)
+
+				self._ps_store_icon_showing = true
+			end
+		end
 	end):catch(function (error)
 		self._store_promise = nil
 	end)
@@ -3046,6 +3064,12 @@ function StoreItemDetailView:_destroy_aquilas_presentation()
 	local widgets_by_name = self._widgets_by_name
 	widgets_by_name.required_aquilas_text.content.visible = false
 	widgets_by_name.aquilas_background.content.visible = false
+
+	if IS_PLAYSTATION and self._ps_store_icon_showing then
+		NpCommerceDialog.hide_ps_store_icon()
+
+		self._ps_store_icon_showing = false
+	end
 end
 
 function StoreItemDetailView:_select_aquila_widget_by_row(direction)

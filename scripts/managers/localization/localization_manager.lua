@@ -63,7 +63,7 @@ local function ps5_format_locale(language_id)
 		["es-419"] = "es",
 		["ru-ru"] = "ru",
 		["fr-ca"] = "fr",
-		["pl-pl"] = "pl",
+		["zh-cn"] = "zh-cn",
 		["fr-fr"] = "fr",
 		["de-de"] = "de",
 		["en-gb"] = "en",
@@ -72,8 +72,8 @@ local function ps5_format_locale(language_id)
 		["pt-br"] = "pt-br",
 		["en-us"] = "en",
 		["it-it"] = "it",
-		["zh-hans"] = "zh-cn",
-		["zh-hant"] = "zh-tw"
+		["zh-tw"] = "zh-tw",
+		["pl-pl"] = "pl"
 	}
 
 	return supported_languages[string.lower(language_id)] or "en"

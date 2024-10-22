@@ -1,5 +1,5 @@
-local UIWorkspaceSettings = require("scripts/settings/ui/ui_workspace_settings")
 local UIWidget = require("scripts/managers/ui/ui_widget")
+local UIWorkspaceSettings = require("scripts/settings/ui/ui_workspace_settings")
 local scenegraph_definition = {
 	screen = UIWorkspaceSettings.screen,
 	video_canvas = {
@@ -39,34 +39,6 @@ local widget_definitions = {
 		}
 	}, "screen")
 }
-
-if IS_PLAYSTATION then
-	widget_definitions.playstation_dummy_text = UIWidget.create_definition({
-		{
-			value = "placeholder_name",
-			value_id = "text",
-			pass_type = "text",
-			style = {
-				font_size = 48,
-				text_vertical_alignment = "center",
-				font_type = "machine_medium",
-				text_horizontal_alignment = "center",
-				text_color = {
-					255,
-					255,
-					0,
-					0
-				},
-				offset = {
-					0,
-					0,
-					10
-				}
-			}
-		}
-	}, "screen")
-end
-
 local legend_inputs = {
 	{
 		input_action = "skip_cinematic_hold",

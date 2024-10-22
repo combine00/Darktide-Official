@@ -54,7 +54,7 @@ end
 
 function InboxView:_set_player_profile_information(player)
 	local profile = player:profile()
-	local character_name = ProfileUtils.character_name(profile)
+	local character_name = player:name()
 	local current_level = profile.current_level
 	local character_archetype_title = ProfileUtils.character_archetype_title(profile)
 	local widgets_by_name = self._widgets_by_name

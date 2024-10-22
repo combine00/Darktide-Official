@@ -83,7 +83,7 @@ function InputDevice:_any_analog_input()
 end
 
 function InputDevice:_verify_device()
-	if not IS_XBS then
+	if not IS_XBS and not IS_PLAYSTATION then
 		return true
 	end
 

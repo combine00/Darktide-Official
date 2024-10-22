@@ -53,6 +53,7 @@ function PlayerSpawnerSystem:add_spawn_point(unit, side, spawn_identifier, spawn
 	end
 
 	local spawn_point_data = {
+		unit = unit,
 		position = Vector3Box(position),
 		rotation = QuaternionBox(rotation),
 		parent = parent_spawned and unit or nil,
@@ -70,6 +71,24 @@ function PlayerSpawnerSystem:add_spawn_point(unit, side, spawn_identifier, spawn
 		self._spawn_points_by_identifier[spawn_identifier] = {
 			spawn_point_data
 		}
+	end
+end
+
+function PlayerSpawnerSystem:remove_spawn_point(unit, spawn_identifier)
+	local spawn_points = self._spawn_points_by_identifier[spawn_identifier]
+
+	if spawn_points then
+		for i = 1, #spawn_points do
+			local spawn_point_data = spawn_points[i]
+
+			if spawn_point_data.unit == unit then
+				table.remove(spawn_points, i)
+
+				return
+			end
+		end
+	else
+		Log.warning("PlayerSpawnerSystem", "[remove_spawn_point] Trying to remove spawner for unit: %s but there are no spawners for spawn_identifier %s\n%s", unit, spawn_identifier, Script.callstack())
 	end
 end
 

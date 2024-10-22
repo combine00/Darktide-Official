@@ -67,6 +67,56 @@ local function _show_premium_dialogue()
 	end)
 end
 
+local function _show_signin_dialogue()
+	return Promise.until_value_is_true(function ()
+		local status = NpSigninDialog.update()
+
+		if status == NpSigninDialog.NONE then
+			NpSigninDialog.initialize()
+
+			return false
+		end
+
+		if status == NpSigninDialog.INITIALIZED then
+			NpSigninDialog.open()
+
+			return false
+		end
+
+		if status == NpSigninDialog.RUNNING then
+			return false
+		end
+
+		NpSigninDialog.terminate()
+
+		local result = Playstation.signed_in(PS5.initial_user_id())
+
+		if result then
+			return {
+				success = true
+			}
+		else
+			return {
+				success = false
+			}
+		end
+	end)
+end
+
+function PSNRestrictions:psn_signin()
+	if Playstation.signed_in(PS5.initial_user_id()) then
+		return Promise.resolved()
+	end
+
+	return _show_signin_dialogue():next(function ()
+		if Playstation.signed_in(PS5.initial_user_id()) then
+			return Promise.resolved()
+		else
+			return Promise.rejected({})
+		end
+	end)
+end
+
 function PSNRestrictions:verify_premium()
 	return _check_premium():next(function (status)
 		if status.success then

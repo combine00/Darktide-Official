@@ -96,7 +96,7 @@ credits_item_display_name_text_style.offset = {
 }
 credits_item_display_name_text_style.font_size = 16
 credits_item_display_name_text_style.size = {
-	ItemPassTemplates.store_item_credits_goods_size[1] * 0.66
+	ItemPassTemplates.store_item_credits_goods_size[1] * 0.6
 }
 local item_sub_display_name_text_style = table.clone(UIFontSettings.body_small)
 item_sub_display_name_text_style.text_horizontal_alignment = "left"
@@ -3968,42 +3968,12 @@ ItemPassTemplates.credits_goods_item = {
 		value_id = "display_name",
 		style = table.merge(table.clone(credits_item_display_name_text_style), {
 			vertical_alignment = "top",
-			text_vertical_alignment = "top",
+			text_vertical_alignment = "center",
 			offset = {
 				10,
-				8,
+				0,
 				6
 			}
-		}),
-		change_function = function (content, style)
-			local hotspot = content.hotspot
-			local default_text_color = style.default_color
-			local hover_color = style.hover_color
-			local text_color = style.text_color
-			local progress = math.max(math.max(hotspot.anim_hover_progress, hotspot.anim_select_progress), hotspot.anim_focus_progress)
-
-			ColorUtilities.color_lerp(default_text_color, hover_color, progress, text_color)
-		end,
-		visibility_function = function (content, style)
-			return content.level_requirement_met
-		end
-	},
-	{
-		style_id = "sub_display_name",
-		pass_type = "text",
-		value = "n/a",
-		value_id = "sub_display_name",
-		style = table.merge(table.clone(credits_item_display_name_text_style), {
-			vertical_alignment = "top",
-			text_vertical_alignment = "bottom",
-			offset = {
-				10,
-				-8,
-				6
-			},
-			text_color = Color.terminal_text_body(255, true),
-			default_color = Color.terminal_text_body(255, true),
-			hover_color = Color.terminal_text_header(255, true)
 		}),
 		change_function = function (content, style)
 			local hotspot = content.hotspot

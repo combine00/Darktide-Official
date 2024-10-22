@@ -394,14 +394,20 @@ local CameraSettings = require("scripts/settings/camera/camera_settings")
 local num_trees = 0
 local num_nodes = 0
 local parsed_nodes = {}
+local sorted_camera = table.keys(CameraSettings)
 
-for _, tree in pairs(CameraSettings) do
-	num_nodes = _gather_camera_tree_nodes(tree, parsed_nodes, num_nodes, CAMERA_NODES)
+table.sort(sorted_camera)
+
+for _, key in ipairs(sorted_camera) do
+	num_nodes = _gather_camera_tree_nodes(CameraSettings[key], parsed_nodes, num_nodes, CAMERA_NODES)
 end
 
 local CameraTrees = require("scripts/settings/camera/camera_trees")
+sorted_camera = table.keys(CameraTrees)
 
-for tree_id, tree_name in pairs(CameraTrees) do
+table.sort(sorted_camera)
+
+for _, tree_id in ipairs(sorted_camera) do
 	num_trees = num_trees + 1
 	CAMERA_TREES[num_trees] = tree_id
 end

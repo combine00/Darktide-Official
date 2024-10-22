@@ -37,6 +37,24 @@ function OptionsView:on_enter()
 	self:_setup_input_legend()
 	self:_enable_settings_overlay(false)
 	self:_update_grid_navigation_selection()
+	self:_register_event("set_option_value")
+end
+
+function OptionsView:set_option_value(category, id, value)
+	local settings_category_default_values = self._settings_category_default_values
+	local settings_default_values = category and settings_category_default_values[category]
+
+	if settings_default_values then
+		for setting, _ in pairs(settings_default_values) do
+			if setting.id == id then
+				local on_activated = setting.on_activated
+
+				if on_activated then
+					on_activated(value, setting)
+				end
+			end
+		end
+	end
 end
 
 function OptionsView:_map_validations(config)
@@ -1119,8 +1137,10 @@ end
 function OptionsView:cb_on_settings_changed(widget, entry, option_id)
 	if not self._require_restart then
 		if option_id then
-			for i = 1, #entry.options do
-				local option = entry.options[i]
+			local options = entry.options or entry.options_function and entry.options_function()
+
+			for i = 1, #options do
+				local option = options[i]
 
 				if option.id == option_id then
 					self._require_restart = option.require_restart

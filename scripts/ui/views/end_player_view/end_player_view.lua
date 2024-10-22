@@ -5,6 +5,7 @@ local UISoundEvents = require("scripts/settings/ui/ui_sound_events")
 local UIWidget = require("scripts/managers/ui/ui_widget")
 local ViewSettings = require("scripts/ui/views/end_player_view/end_player_view_settings")
 local ViewStyles = require("scripts/ui/views/end_player_view/end_player_view_styles")
+local Items = require("scripts/utilities/items")
 local MasteryUtils = require("scripts/utilities/mastery")
 local CARD_CAROUSEL_SCENEGRAPH_ID = "card_carousel"
 local CARD_TYPES = table.enum("xp", "levelUp", "salary", "weaponDrop", "weapon_unlock", "weapon")
@@ -555,7 +556,12 @@ function EndPlayerView:_get_item(card_reward)
 	local item_group = item_type_group_lookup[item_type]
 	local item_overrides = card_reward.overrides
 	local rarity = item_overrides and item_overrides.rarity
-	local item_level = item_overrides and item_overrides.itemLevel
+	local dummy_item = {
+		item_type = item.item_type,
+		baseItemLevel = item_overrides and item_overrides.baseItemLevel
+	}
+	local item_level_text, has_level = Items.expertise_level(dummy_item, true)
+	local item_level = has_level and tonumber(item_level_text)
 
 	return item, item_group, rarity, item_level
 end

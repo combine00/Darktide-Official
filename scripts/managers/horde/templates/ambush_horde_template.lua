@@ -1,4 +1,3 @@
-local Breeds = require("scripts/settings/breed/breeds")
 local NavQueries = require("scripts/utilities/nav_queries")
 local PerceptionSettings = require("scripts/settings/perception/perception_settings")
 local SpawnPointQueries = require("scripts/managers/main_path/utilities/spawn_point_queries")
@@ -157,19 +156,22 @@ function horde_template.execute(physics_world, nav_world, side, target_side, com
 	local group_id = group_system:generate_group_id()
 	horde.group_id = group_id
 	local num_spawned = 0
-	local spawns_per_location = math.floor(num_to_spawn / num_spawn_locations)
 
-	for i = 1, #nearby_spawners do
-		local spawner = nearby_spawners[i]
-		local breed_list = {}
+	if num_spawn_locations <= num_to_spawn then
+		local spawns_per_location = math.floor(num_to_spawn / num_spawn_locations)
 
-		for j = 1, spawns_per_location do
-			local breed_name = spawn_list[num_spawned + 1]
-			num_spawned = num_spawned + 1
-			breed_list[#breed_list + 1] = breed_name
+		for i = 1, #nearby_spawners do
+			local spawner = nearby_spawners[i]
+			local breed_list = {}
+
+			for j = 1, spawns_per_location do
+				local breed_name = spawn_list[num_spawned + 1]
+				num_spawned = num_spawned + 1
+				breed_list[#breed_list + 1] = breed_name
+			end
+
+			spawner:add_spawns(breed_list, side_id, target_side_id, nil, nil, group_id)
 		end
-
-		spawner:add_spawns(breed_list, side_id, target_side_id, nil, nil, group_id)
 	end
 
 	local spawns_left = num_to_spawn - num_spawned

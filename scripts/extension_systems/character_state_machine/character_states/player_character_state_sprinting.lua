@@ -46,6 +46,8 @@ function PlayerCharacterStateSprinting:init(...)
 end
 
 function PlayerCharacterStateSprinting:on_enter(unit, dt, t, previous_state, params)
+	PlayerCharacterStateSprinting.super.on_enter(self, unit, dt, t, previous_state, params)
+
 	local locomotion_steering = self._locomotion_steering_component
 	locomotion_steering.move_method = "script_driven"
 	locomotion_steering.calculate_fall_velocity = true
@@ -78,6 +80,8 @@ function PlayerCharacterStateSprinting:on_enter(unit, dt, t, previous_state, par
 end
 
 function PlayerCharacterStateSprinting:on_exit(unit, t, next_state)
+	PlayerCharacterStateSprinting.super.on_exit(self, unit, t, next_state)
+
 	local sprint_character_state_component = self._sprint_character_state_component
 	sprint_character_state_component.is_sprinting = false
 	sprint_character_state_component.last_sprint_time = t

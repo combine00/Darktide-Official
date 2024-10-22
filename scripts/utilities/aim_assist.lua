@@ -34,8 +34,7 @@ function AimAssist.update_ramp_multiplier(dt, t, aim_assist_ramp_component)
 end
 
 function AimAssist.apply_aim_assist(main_t, main_dt, input, targeting_data, aim_assist_ramp_component, weapon_action_component, look_yaw, look_pitch, position)
-	local last_pressed_device = InputDevice.last_pressed_device
-	local gamepad_active = last_pressed_device and last_pressed_device:type() == "xbox_controller"
+	local gamepad_active = Managers.input:is_using_gamepad()
 	local enable_aim_assist = gamepad_active
 	enable_aim_assist = enable_aim_assist and targeting_data and not not targeting_data.unit
 	local aim_assist_type = Managers.save:account_data().input_settings.controller_aim_assist

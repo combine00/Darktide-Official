@@ -38,16 +38,19 @@ local dialogue_lookup_context_names = {
 }
 
 local function _create_lookup(hashtable)
-	local i = 0
-	local new_table = {}
+	local hashtable_keys = table.keys(hashtable)
 
-	for key, _ in pairs(hashtable) do
-		i = i + 1
-		new_table[i] = key
-		new_table[key] = i
+	table.sort(hashtable_keys)
+
+	local lookup = {}
+
+	for i = 1, #hashtable_keys do
+		lookup[i] = hashtable_keys[i]
 	end
 
-	return new_table
+	table.mirror_array_inplace(lookup)
+
+	return lookup
 end
 
 dialogue_lookup_context_names.ability_name = _create_lookup(dialogue_lookup_context_names.ability_name)

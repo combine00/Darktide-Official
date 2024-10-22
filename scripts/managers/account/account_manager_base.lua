@@ -120,4 +120,12 @@ function AccountManagerBase:communication_restriction_iteration()
 	return nil
 end
 
+function AccountManagerBase:return_to_title_screen()
+	return
+end
+
+function AccountManagerBase:region_has_restriction(restriction)
+	return false
+end
+
 return AccountManagerBase

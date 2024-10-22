@@ -36,6 +36,13 @@ local default_view_input_settings = {
 			description = "loc_alias_view_next",
 			bindable = false
 		},
+		validate = {
+			"keyboard_enter",
+			"xbox_controller_a",
+			"ps4_controller_cross",
+			description = "loc_alias_view_validate",
+			bindable = false
+		},
 		hotkey_system = {
 			"keyboard_esc",
 			"xbox_controller_start",
@@ -47,7 +54,7 @@ local default_view_input_settings = {
 		hotkey_inventory = {
 			"keyboard_i",
 			"xbox_controller_d_left",
-			"ps4_controller_touch",
+			"ps4_controller_d_left",
 			description = "loc_alias_view_hotkey_inventory",
 			group = "input_group_hotkeys"
 		},
@@ -241,6 +248,7 @@ local default_view_input_settings = {
 		send_chat_message = {
 			"keyboard_enter",
 			"keyboard_numpad enter",
+			"ps4_controller_r2",
 			description = "loc_alias_view_open_chat",
 			bindable = false,
 			group = "input_group_interface"
@@ -493,6 +501,25 @@ local default_view_input_settings = {
 			"ps4_controller_r3",
 			description = "",
 			bindable = false
+		},
+		group_finder_start_group = {
+			"xbox_controller_y",
+			"ps4_controller_triangle",
+			description = "",
+			bindable = false
+		},
+		group_finder_cancel_group = {
+			"xbox_controller_y",
+			"ps4_controller_triangle",
+			description = "",
+			bindable = false
+		},
+		mission_board_group_finder_open = {
+			"keyboard_p",
+			"xbox_controller_right_thumb",
+			"ps4_controller_r3",
+			description = "",
+			bindable = false
 		}
 	},
 	settings = {
@@ -518,6 +545,10 @@ local default_view_input_settings = {
 		},
 		next_hint = {
 			key_alias = "next_hint",
+			type = "pressed"
+		},
+		validate = {
+			key_alias = "validate",
 			type = "pressed"
 		},
 		hotkey_system = {
@@ -994,6 +1025,26 @@ local default_view_input_settings = {
 		},
 		group_finder_refresh_groups = {
 			key_alias = "group_finder_refresh_groups",
+			type = "pressed"
+		},
+		group_finder_start_group = {
+			key_alias = "group_finder_start_group",
+			type = "pressed"
+		},
+		group_finder_start_group_hold = {
+			key_alias = "group_finder_start_group",
+			type = "held"
+		},
+		group_finder_cancel_group = {
+			key_alias = "group_finder_cancel_group",
+			type = "pressed"
+		},
+		group_finder_cancel_group_hold = {
+			key_alias = "group_finder_cancel_group",
+			type = "held"
+		},
+		mission_board_group_finder_open = {
+			key_alias = "mission_board_group_finder_open",
 			type = "pressed"
 		}
 	}

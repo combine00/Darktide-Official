@@ -275,8 +275,7 @@ function FreeFlightManager:_update_camera(input, dt, camera_data)
 	local roll_left = input:get("roll_left")
 	local roll_right = input:get("roll_right")
 	local move_controller = input:get("move_controller")
-	local last_pressed_device = InputDevice.last_pressed_device
-	local using_gamepad = not last_pressed_device or last_pressed_device:type() == "xbox_controller"
+	local using_gamepad = Managers.input:is_using_gamepad()
 
 	if not using_gamepad then
 		move_controller = Vector3.zero()

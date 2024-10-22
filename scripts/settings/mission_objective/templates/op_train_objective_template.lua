@@ -40,6 +40,7 @@ local mission_objective_templates = {
 				description = "loc_objective_op_train_defuse_two_desc",
 				music_wwise_state = "operation_stage_2",
 				header = "loc_objective_op_train_defuse_two_header",
+				turn_off_backfill = true,
 				progress_bar = true,
 				mission_objective_type = "decode"
 			},
@@ -59,7 +60,6 @@ local mission_objective_templates = {
 				description = "loc_objective_op_train_defuse_final_desc",
 				music_wwise_state = "operation_stage_2",
 				header = "loc_objective_op_train_defuse_final_header",
-				turn_off_backfill = true,
 				progress_bar = true,
 				mission_objective_type = "decode"
 			},

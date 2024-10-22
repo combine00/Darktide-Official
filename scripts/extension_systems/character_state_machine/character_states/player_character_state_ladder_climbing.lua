@@ -32,6 +32,8 @@ function PlayerCharacterStateLadderClimbing:init(character_state_init_context, .
 end
 
 function PlayerCharacterStateLadderClimbing:on_enter(unit, dt, t, previous_state, params)
+	PlayerCharacterStateLadderClimbing.super.on_enter(self, unit, dt, t, previous_state, params)
+
 	local ladder_unit = params.ladder_unit
 	local locomotion_steering = self._locomotion_steering_component
 	locomotion_steering.move_method = "script_driven"
@@ -57,6 +59,8 @@ function PlayerCharacterStateLadderClimbing:on_enter(unit, dt, t, previous_state
 end
 
 function PlayerCharacterStateLadderClimbing:on_exit(unit, t, next_state)
+	PlayerCharacterStateLadderClimbing.super.on_exit(self, unit, t, next_state)
+
 	if next_state ~= "ladder_top_leaving" then
 		ForceRotation.stop(self._locomotion_force_rotation_component)
 		self._animation_extension:anim_event("climb_end_ladder")

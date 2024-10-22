@@ -11,7 +11,7 @@ local StateTitle = class("StateTitle")
 local STATES = table.enum("idle", "account_signin", "signing_in", "loading_packages", "authenticating_eos", "legal_verification", "name_verification", "done", "error")
 
 local function _should_skip(skip_title_screen_on_invite)
-	if IS_XBS and BUILD == "release" then
+	if (IS_XBS or IS_PLAYSTATION) and BUILD == "release" then
 		return false
 	end
 
@@ -84,17 +84,13 @@ function StateTitle:on_enter(parent, params, creation_context)
 	end
 
 	if _should_skip(skip_title_screen_on_invite) then
-		if IS_XBS or IS_GDK then
-			local raw_input_device = nil
+		local raw_input_device = nil
 
-			if IS_XBS then
-				raw_input_device = not GameParameters.testify and raw_input_device
-			end
-
-			self:_continue_cb(raw_input_device)
-		else
-			self:_signin()
+		if IS_XBS then
+			raw_input_device = not GameParameters.testify and raw_input_device
 		end
+
+		self:_continue_cb(raw_input_device)
 	else
 		local context = {
 			parent = self

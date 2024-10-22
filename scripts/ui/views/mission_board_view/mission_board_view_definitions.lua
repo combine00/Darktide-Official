@@ -2584,6 +2584,12 @@ MissionBoardViewDefinitions.legend_inputs = {
 		visibility_function = function (parent, id)
 			return not parent._mission_board_options and not parent._is_in_matchmaking
 		end
+	},
+	{
+		on_pressed_callback = "_on_group_finder_pressed",
+		input_action = "mission_board_group_finder_open",
+		display_name = "loc_group_finder_menu_title",
+		alignment = "right_alignment"
 	}
 }
 

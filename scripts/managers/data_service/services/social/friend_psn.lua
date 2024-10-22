@@ -27,7 +27,7 @@ function FriendPSN:platform()
 end
 
 function FriendPSN:platform_icon()
-	return ""
+	return "{#color(255,255,255)}{#reset()}", true
 end
 
 function FriendPSN:name()
@@ -40,6 +40,10 @@ end
 
 function FriendPSN:is_blocked()
 	return self._is_blocked or Managers.account:is_blocked(self._account_id)
+end
+
+function FriendPSN:set_is_blocked(value)
+	self._is_blocked = value
 end
 
 function FriendPSN:online_status()

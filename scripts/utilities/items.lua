@@ -302,7 +302,7 @@ function Items.display_name(item)
 		local lore_pattern_name = Items.weapon_lore_pattern_name(item)
 		local lore_mark_name = Items.weapon_lore_mark_name(item)
 
-		return string.format("%s %s %s", lore_pattern_name, lore_mark_name, lore_family_name)
+		return string.format("%s %s %s", lore_family_name, lore_pattern_name, lore_mark_name)
 	end
 
 	local localization_function = Localize
@@ -1412,8 +1412,8 @@ function Items.compare_item_type(a, b)
 end
 
 function Items.compare_item_name(a, b)
-	local a_display_name = a.display_name and Localize(a.display_name) or ""
-	local b_display_name = b.display_name and Localize(b.display_name) or ""
+	local a_display_name = Items.display_name(a) or ""
+	local b_display_name = Items.display_name(b) or ""
 	a_display_name = a_display_name:gsub("[\n\r]", "")
 	b_display_name = b_display_name:gsub("[\n\r]", "")
 
@@ -1793,6 +1793,8 @@ function Items.preview_stats_change(item, expertise_increase, stats, max_stat_va
 	end
 
 	while remaining_budget > 0 and #trait_indices > 0 do
+		local indices_to_remove = {}
+
 		for i = 1, #this_round_indices do
 			local current_index = this_round_indices[i]
 
@@ -1802,11 +1804,20 @@ function Items.preview_stats_change(item, expertise_increase, stats, max_stat_va
 				filled_stats[current_index].value = filled_stats[current_index].value + stat_increase
 				remaining_budget = remaining_budget - (filled_stats[current_index].value - previous_value)
 			else
-				table.remove(trait_indices, i)
+				indices_to_remove[#indices_to_remove + 1] = current_index
 			end
 
 			if remaining_budget <= 0 then
 				break
+			end
+		end
+
+		for i = 1, #indices_to_remove do
+			local index_to_remove = indices_to_remove[i]
+			local found_index = table.find(trait_indices, index_to_remove)
+
+			if found_index then
+				table.remove(trait_indices, found_index)
 			end
 		end
 

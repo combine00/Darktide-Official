@@ -28,6 +28,8 @@ function PlayerCharacterStateWalking:init(character_state_init_context, ...)
 end
 
 function PlayerCharacterStateWalking:on_enter(unit, dt, t, previous_state, params)
+	PlayerCharacterStateWalking.super.on_enter(self, unit, dt, t, previous_state, params)
+
 	local locomotion = self._locomotion_component
 	local locomotion_steering = self._locomotion_steering_component
 	locomotion_steering.move_method = "script_driven"
@@ -57,6 +59,8 @@ function PlayerCharacterStateWalking:on_enter(unit, dt, t, previous_state, param
 end
 
 function PlayerCharacterStateWalking:on_exit(unit, t, next_state)
+	PlayerCharacterStateWalking.super.on_exit(self, unit, t, next_state)
+
 	local height_time_to_change = nil
 
 	if next_state == "dodging" then

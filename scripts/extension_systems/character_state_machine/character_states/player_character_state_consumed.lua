@@ -41,6 +41,8 @@ local SET_CONSUMED_TIMING = {
 local FOLLOW_CONSUMED_TARGET_CAMERA_TIMING = 0.5
 
 function PlayerCharacterStateConsumed:on_enter(unit, dt, t, previous_state, params)
+	PlayerCharacterStateConsumed.super.on_enter(self, unit, dt, t, previous_state, params)
+
 	if not params.cancel_assist then
 		local inventory_component = self._inventory_component
 		local visual_loadout_extension = self._visual_loadout_extension
@@ -113,6 +115,8 @@ local THROW_TELEPORT_FWD_OFFSET_HUMAN = 3.2
 local THROW_TELEPORT_FWD_OFFSET_OGRYN = 3.2
 
 function PlayerCharacterStateConsumed:on_exit(unit, t, next_state)
+	PlayerCharacterStateConsumed.super.on_exit(self, unit, t, next_state)
+
 	local locomotion_force_rotation_component = self._locomotion_force_rotation_component
 
 	if locomotion_force_rotation_component.use_force_rotation then

@@ -54,6 +54,8 @@ local TRAINING_GROUNDS_GAME_MODE_NAME = "training_grounds"
 local FX_SOURCE_NAME = "right_foot"
 
 function PlayerCharacterStateSliding:on_enter(unit, dt, t, previous_state, params)
+	PlayerCharacterStateSliding.super.on_enter(self, unit, dt, t, previous_state, params)
+
 	local locomotion_steering = self._locomotion_steering_component
 	locomotion_steering.move_method = "script_driven"
 	locomotion_steering.calculate_fall_velocity = true
@@ -94,6 +96,8 @@ function PlayerCharacterStateSliding:on_enter(unit, dt, t, previous_state, param
 end
 
 function PlayerCharacterStateSliding:on_exit(unit, t, next_state)
+	PlayerCharacterStateSliding.super.on_exit(self, unit, t, next_state)
+
 	self._movement_state_component.method = "idle"
 
 	self._animation_extension:anim_event_1p("slide_out")

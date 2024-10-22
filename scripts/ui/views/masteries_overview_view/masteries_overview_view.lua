@@ -42,6 +42,7 @@ end
 function MasteriesOverviewView:on_enter()
 	MasteriesOverviewView.super.on_enter(self)
 	self:_register_event("event_mastery_updated", "_update_mastery_data")
+	self:_register_event("event_mastery_traits_update", "_update_mastery_presentation")
 	self:_setup_patterns_grid()
 	self:_set_button_callbacks()
 end
@@ -82,23 +83,11 @@ function MasteriesOverviewView:_update_mastery_data(mastery_id)
 			local mastery_xp = parent_mastery_data.current_xp or 0
 			local mastery_start_exp = parent_mastery_data.start_xp or 0
 			local mastery_end_exp = parent_mastery_data.end_xp or 0
-			self._masteries[mastery_id].mastery_level = mastery_level
-			self._masteries[mastery_id].claimed_level = claimed_level
-			self._masteries[mastery_id].current_xp = mastery_xp
-			self._masteries[mastery_id].start_exp = mastery_start_exp
-			self._masteries[mastery_id].end_exp = mastery_end_exp
-
-			for i = 1, #self._masteries_layout do
-				local layout = self._masteries_layout[i]
-
-				if layout.mastery_id == mastery_id then
-					layout.mastery_level = mastery_level
-					layout.claimed_level = claimed_level
-
-					break
-				end
-			end
-
+			mastery_data.mastery_level = mastery_level
+			mastery_data.claimed_level = claimed_level
+			mastery_data.current_xp = mastery_xp
+			mastery_data.start_exp = mastery_start_exp
+			mastery_data.end_exp = mastery_end_exp
 			local trait_cat_id = Mastery.get_pattern_id_to_category_id(mastery_id)
 
 			Managers.data_service.crafting:get_trait_sticker_book_by_id(trait_cat_id):next(function (data)
@@ -122,7 +111,25 @@ function MasteriesOverviewView:_update_mastery_data(mastery_id)
 				end)
 
 				self._mastery_traits[mastery_id] = valid_traits
-				self._masteries[mastery_id].syncing = parent_mastery_data.syncing
+				local points_spent = Mastery.get_spent_points(valid_traits)
+				local points_total = Mastery.get_all_unlocked_points(mastery_data)
+				local points_available = Mastery.get_available_points(mastery_data, valid_traits)
+				mastery_data.points_available = points_available
+				mastery_data.points_used = points_spent
+				mastery_data.points_total = points_total
+				mastery_data.syncing = parent_mastery_data.syncing
+
+				for i = 1, #self._masteries_layout do
+					local layout = self._masteries_layout[i]
+
+					if layout.mastery_id == mastery_id then
+						layout.mastery_level = mastery_level
+						layout.claimed_level = claimed_level
+						layout.show_alert = points_available > 0
+
+						break
+					end
+				end
 
 				self:_update_mastery_presentation(mastery_id)
 				Managers.event:trigger("event_mastery_overview_updated", mastery_id)
@@ -658,7 +665,7 @@ function MasteriesOverviewView:_present_mastery(mastery_id)
 		local mastery_current_xp = mastery_data.current_xp
 		local is_max_level = mastery_max_level <= mastery_level
 		local mastery_end_exp_text = mastery_end_exp - mastery_start_exp
-		local mastery_current_xp_text = mastery_current_xp - mastery_start_exp
+		local mastery_current_xp_text = is_max_level and mastery_end_exp_text or mastery_current_xp - mastery_start_exp
 		local mastery_next_level = math.min(mastery_level + 1, mastery_max_level)
 		mastery_info_widget.content.weapon_panel = nil
 

@@ -29,6 +29,8 @@ function PlayerCharacterStateHubJog:init(character_state_init_context, ...)
 end
 
 function PlayerCharacterStateHubJog:on_enter(unit, dt, t, previous_state, params)
+	PlayerCharacterStateHubJog.super.on_enter(self, unit, dt, t, previous_state, params)
+
 	local locomotion_steering = self._locomotion_steering_component
 	locomotion_steering.move_method = "script_driven_hub"
 	locomotion_steering.calculate_fall_velocity = true
@@ -44,7 +46,7 @@ function PlayerCharacterStateHubJog:on_enter(unit, dt, t, previous_state, params
 end
 
 function PlayerCharacterStateHubJog:on_exit(unit, t, next_state)
-	return
+	PlayerCharacterStateHubJog.super.on_exit(self, unit, t, next_state)
 end
 
 function PlayerCharacterStateHubJog:fixed_update(unit, dt, t, next_state_params, fixed_frame)

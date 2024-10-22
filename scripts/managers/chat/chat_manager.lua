@@ -17,10 +17,10 @@ local function _sound_setting_option_voice_chat()
 		end
 	end
 
-	if IS_XBS then
-		return SOUND_SETTING_OPTIONS_VOICE_CHAT.voice_activated
-	else
+	if IS_WINDOWS then
 		return SOUND_SETTING_OPTIONS_VOICE_CHAT.push_to_talk
+	else
+		return SOUND_SETTING_OPTIONS_VOICE_CHAT.voice_activated
 	end
 end
 
@@ -758,10 +758,11 @@ function ChatManager:_validate_participants()
 							text_mute = Managers.account:has_crossplay_restriction(relation, XblPermission.CommunicateUsingText) or text_mute
 							voice_mute = Managers.account:has_crossplay_restriction(relation, XblPermission.CommunicateUsingVoice) or voice_mute
 						else
+							local is_blocked = player_info:is_blocked()
 							local platform_muted = Managers.account:is_muted(platform_user_id)
 							local communication_restricted = Managers.account:user_has_restriction(platform_user_id, XblPermission.CommunicateUsingVoice)
-							text_mute = communication_restricted or text_mute
-							voice_mute = platform_muted or voice_mute
+							text_mute = communication_restricted or text_mute or is_blocked
+							voice_mute = platform_muted or voice_mute or is_blocked
 
 							if not Managers.account:user_restriction_verified(platform_user_id, XblPermission.CommunicateUsingVoice) then
 								local batch_type = "CHAT_" .. channel.tag
@@ -779,9 +780,10 @@ function ChatManager:_validate_participants()
 							voice_mute = voice_mute or crossplay_restricted
 						end
 
+						local is_blocked = player_info:is_blocked()
 						local communication_restricted = Managers.account:user_has_restriction()
-						text_mute = text_mute or communication_restricted
-						voice_mute = voice_mute or communication_restricted
+						text_mute = text_mute or communication_restricted or is_blocked
+						voice_mute = voice_mute or communication_restricted or is_blocked
 					end
 
 					if text_mute ~= participant.is_text_muted_for_me then

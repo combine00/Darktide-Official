@@ -116,6 +116,7 @@ hud_element_tactical_overlay_settings.buffer = 8
 hud_element_tactical_overlay_settings.section_buffer = 4
 hud_element_tactical_overlay_settings.internal_buffer = 2
 hud_element_tactical_overlay_settings.max_penance_description_height = 64
+hud_element_tactical_overlay_settings.max_live_event_tiers = 3
 hud_element_tactical_overlay_settings.right_grid_width = 450
 hud_element_tactical_overlay_settings.right_header_height = 40
 hud_element_tactical_overlay_settings.right_timer_height = 30
@@ -124,8 +125,22 @@ hud_element_tactical_overlay_settings.right_grid_spacing = {
 	hud_element_tactical_overlay_settings.internal_buffer
 }
 hud_element_tactical_overlay_settings.right_panel_grids = {
-	achievements = {
+	event = {
 		index = 1,
+		loc_key = "loc_event_category_label",
+		icon = {
+			value = "content/ui/materials/icons/circumstances/live_event_01",
+			blueprint_type = "texture_icon"
+		},
+		timer = {
+			loc_key = "loc_event_time_left",
+			func = function (t)
+				return Managers.live_event:active_time_left(t)
+			end
+		}
+	},
+	achievements = {
+		index = 2,
 		loc_key = "loc_achievements_view_display_name",
 		icon = {
 			value = "",
@@ -133,25 +148,11 @@ hud_element_tactical_overlay_settings.right_panel_grids = {
 		}
 	},
 	contracts = {
-		index = 2,
+		index = 3,
 		loc_key = "loc_contracts_view_display_name",
 		icon = {
 			value = "content/ui/materials/hud/interactions/icons/contracts",
 			blueprint_type = "texture_icon"
-		}
-	},
-	event = {
-		index = 3,
-		loc_key = "loc_event_category_label",
-		icon = {
-			value = "",
-			blueprint_type = "text_icon"
-		},
-		timer = {
-			loc_key = "loc_event_time_left",
-			func = function (t)
-				return Managers.live_event:active_time_left(t)
-			end
 		}
 	}
 }

@@ -361,6 +361,7 @@ function MasteryView:draw(dt, t, input_service, layer)
 
 	UIWidget.draw(self._widgets_by_name.mastery_level, ui_forward_renderer)
 	UIRenderer.end_pass(ui_forward_renderer)
+	MasteryView.super.draw(self, dt, t, input_service, layer)
 
 	if tutorial_overlay then
 		tutorial_overlay:draw_end(self._ui_renderer)
@@ -371,8 +372,6 @@ function MasteryView:draw(dt, t, input_service, layer)
 			tutorial_overlay:draw_end(self._wintrack_element:ui_resource_renderer())
 		end
 	end
-
-	MasteryView.super.draw(self, dt, t, input_service, layer)
 end
 
 function MasteryView:_draw_elements(dt, t, ui_renderer, render_settings, input_service)
@@ -1090,6 +1089,10 @@ function MasteryView:_can_trait_be_acquired(trait_item_element)
 end
 
 function MasteryView:_cb_trait_left_pressed(trait_widget, config)
+	if self._wintracks_focused then
+		return
+	end
+
 	if self._using_cursor_navigation and self._trait_widgets then
 		for i = 1, #self._trait_widgets do
 			local widget = self._trait_widgets[i]
@@ -1163,6 +1166,10 @@ function MasteryView:_cb_trait_left_pressed(trait_widget, config)
 	end
 
 	self:_update_traits(trait_widget)
+	Managers.event:trigger("event_mastery_traits_update", self._mastery_id, {
+		trait_name = trait_name,
+		rarity = rarity
+	})
 end
 
 function MasteryView:_set_button_callbacks()
@@ -1262,6 +1269,10 @@ function MasteryView:_find_closest_neighbour_vertical(index, input_direction)
 		end
 	end
 
+	if not max_index then
+		return
+	end
+
 	local current_row = index / columns
 	local start_row = 1
 	local end_row = rows
@@ -1299,6 +1310,10 @@ function MasteryView:_find_closest_neighbour_horizontal(index, input_direction)
 		end
 	end
 
+	if not max_index then
+		return
+	end
+
 	local current_row = math.floor((index - 1) / columns)
 	local start_column = current_row * columns + 1
 	local end_column = math.min(start_column + columns - 1, max_index)
@@ -1317,12 +1332,7 @@ function MasteryView:_handle_input(input_service, dt, t)
 		local new_selection_index = nil
 		local current_index = self._selected_trait_index or 1
 
-		if input_service:get("confirm_pressed") then
-			if self._selected_trait_index then
-				local widget = self._trait_widgets[self._selected_trait_index]
-				local config = widget.content.element
-			end
-		elseif input_service:get("navigate_up_continuous") then
+		if input_service:get("navigate_up_continuous") then
 			new_selection_index = self:_find_closest_neighbour_vertical(current_index, DIRECTION.UP)
 		elseif input_service:get("navigate_down_continuous") then
 			new_selection_index = self:_find_closest_neighbour_vertical(current_index, DIRECTION.DOWN)

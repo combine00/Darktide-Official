@@ -31,6 +31,8 @@ function PlayerCharacterStateInteracting:init(character_state_init_context, ...)
 end
 
 function PlayerCharacterStateInteracting:on_enter(unit, dt, t, previous_state, params)
+	PlayerCharacterStateInteracting.super.on_enter(self, unit, dt, t, previous_state, params)
+
 	local inventory_component = self._inventory_component
 	local visual_loadout_extension = self._visual_loadout_extension
 
@@ -125,6 +127,8 @@ function PlayerCharacterStateInteracting:on_enter(unit, dt, t, previous_state, p
 end
 
 function PlayerCharacterStateInteracting:on_exit(unit, t, next_state)
+	PlayerCharacterStateInteracting.super.on_exit(self, unit, t, next_state)
+
 	local interacting_character_state = self._interacting_character_state_component
 	local interaction_component = self._interaction_component
 	local interactee_unit = interaction_component.target_unit

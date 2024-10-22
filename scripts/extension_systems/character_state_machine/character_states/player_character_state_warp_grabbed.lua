@@ -28,6 +28,8 @@ function PlayerCharacterStateWarpGrabbed:init(character_state_init_context, ...)
 end
 
 function PlayerCharacterStateWarpGrabbed:on_enter(unit, dt, t, previous_state, params)
+	PlayerCharacterStateWarpGrabbed.super.on_enter(self, unit, dt, t, previous_state, params)
+
 	if not params.cancel_assist then
 		local inventory_component = self._inventory_component
 		local visual_loadout_extension = self._visual_loadout_extension
@@ -68,6 +70,8 @@ function PlayerCharacterStateWarpGrabbed:on_enter(unit, dt, t, previous_state, p
 end
 
 function PlayerCharacterStateWarpGrabbed:on_exit(unit, t, next_state)
+	PlayerCharacterStateWarpGrabbed.super.on_exit(self, unit, t, next_state)
+
 	local locomotion_force_rotation_component = self._locomotion_force_rotation_component
 
 	if locomotion_force_rotation_component.use_force_rotation then

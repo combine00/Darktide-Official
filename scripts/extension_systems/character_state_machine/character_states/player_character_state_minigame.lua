@@ -30,6 +30,8 @@ function PlayerCharacterStateMinigame:init(character_state_init_context, ...)
 end
 
 function PlayerCharacterStateMinigame:on_enter(unit, dt, t, previous_state, params)
+	PlayerCharacterStateMinigame.super.on_enter(self, unit, dt, t, previous_state, params)
+
 	local inventory_component = self._inventory_component
 	local visual_loadout_extension = self._visual_loadout_extension
 
@@ -69,6 +71,7 @@ function PlayerCharacterStateMinigame:on_enter(unit, dt, t, previous_state, para
 end
 
 function PlayerCharacterStateMinigame:on_exit(unit, t, next_state)
+	PlayerCharacterStateMinigame.super.on_exit(self, unit, t, next_state)
 	self:_deinitialize_minigame()
 
 	self._minigame_character_state_component.interface_unit_id = NetworkConstants.invalid_level_unit_id

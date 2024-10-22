@@ -192,20 +192,6 @@ local scenegraph_definition = {
 			1
 		}
 	},
-	button_options = {
-		vertical_alignment = "left",
-		parent = "canvas",
-		horizontal_alignment = "top",
-		size = {
-			0,
-			0
-		},
-		position = {
-			0,
-			0,
-			1
-		}
-	},
 	weapon_discard_pivot = {
 		vertical_alignment = "top",
 		parent = "canvas",

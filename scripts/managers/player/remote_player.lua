@@ -38,6 +38,7 @@ function RemotePlayer:init(unique_id, session_id, channel_id, peer_id, local_pla
 	self._cached_name = nil
 	self._human_controlled = human_controlled
 	self._game_state_object = nil
+	self._social_service_manager = Managers.data_service.social
 
 	self:set_profile(profile)
 end
@@ -107,6 +108,16 @@ function RemotePlayer:is_human_controlled()
 end
 
 function RemotePlayer:name()
+	local account_id = self._account_id
+
+	if account_id then
+		local player_info = self._social_service_manager:get_player_info_by_account_id(self._account_id)
+
+		if player_info then
+			return player_info:character_name()
+		end
+	end
+
 	if self._profile and self._profile.name then
 		return self._profile.name
 	elseif HAS_STEAM and self._human_controlled then

@@ -169,14 +169,6 @@ function MinionSpawnerExtension:add_spawns(breed_list, spawn_side_id, optional_t
 	return queue_id
 end
 
-function MinionSpawnerExtension:remove_spawns_by_id(queue_id)
-	self._spawn_queue:remove(queue_id)
-end
-
-function MinionSpawnerExtension:clear_all_spawns()
-	self._spawn_queue:clear()
-end
-
 function MinionSpawnerExtension:is_spawning()
 	return self._next_spawn_time and true or false
 end

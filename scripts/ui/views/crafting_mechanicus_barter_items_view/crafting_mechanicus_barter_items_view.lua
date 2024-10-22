@@ -19,6 +19,8 @@ local WeaponTemplate = require("scripts/utilities/weapon/weapon_template")
 local WeaponUnlockSettings = require("scripts/settings/weapon_unlock_settings_new")
 local UIWorldSpawner = require("scripts/managers/ui/ui_world_spawner")
 local RaritySettings = require("scripts/settings/item/rarity_settings")
+local UIFonts = require("scripts/managers/ui/ui_fonts")
+local UIRenderer = require("scripts/managers/ui/ui_renderer")
 local CraftingMechanicusBarterItemsView = class("CraftingMechanicusBarterItemsView", "BaseView")
 
 function CraftingMechanicusBarterItemsView:init(settings, context)
@@ -268,7 +270,11 @@ function CraftingMechanicusBarterItemsView:update(dt, t, input_service)
 		self._ui_state = self._ui_state_next_frame
 		self._ui_state_next_frame = nil
 
-		self:_update_mastery_xp_increase()
+		if self._ui_state == "select_pattern" then
+			self:_reset_master_xp_increase()
+		else
+			self:_update_mastery_xp_increase()
+		end
 	end
 
 	return CraftingMechanicusBarterItemsView.super.update(self, dt, t, input_service)
@@ -302,11 +308,6 @@ function CraftingMechanicusBarterItemsView:_handle_input(input_service)
 				self._item_grid:scroll_to_grid_index(selected_index)
 
 				self._selected_item_index = nil
-				local item = self._current_item
-
-				if item then
-					self._weapon_stats:start_presenting(item)
-				end
 			elseif input_service:get("navigate_right_continuous") and self._discard_items_element:input_disabled() then
 				self._discard_items_element:disable_input(false)
 				self._discard_items_element:select_first_index()
@@ -328,22 +329,6 @@ end
 function CraftingMechanicusBarterItemsView:cb_on_recipe_button_pressed(_, config)
 	self._parent:previously_active_view_name()
 	self._parent:go_to_crafting_view(config.recipe.view_name, self._previewed_item)
-end
-
-function CraftingMechanicusBarterItemsView:_preview_item(item)
-	CraftingMechanicusBarterItemsView.super._preview_item(self, item)
-
-	if not self._current_item and not self._preselected_item then
-		self._current_item = item
-	elseif self._current_item ~= item then
-		self._current_item = item
-	end
-
-	local weapon_stats = self:_element("weapon_stats")
-	local grid_height = weapon_stats:grid_height()
-
-	self:_set_scenegraph_size("weapon_stats_pivot", nil, grid_height)
-	self:_set_preview_widgets_visibility(false)
 end
 
 function CraftingMechanicusBarterItemsView:on_exit()
@@ -896,7 +881,18 @@ function CraftingMechanicusBarterItemsView:_present_sacrifice_layout(layout)
 	local selected_sort_function = selected_sort_option.sort_function
 
 	function self:_current_present_grid_layout_callback(new_layout)
-		self._item_grid:present_grid_layout(new_layout, ItemContentBlueprints)
+		self._item_grid:present_grid_layout(new_layout, ItemContentBlueprints, nil, nil, nil, nil, function ()
+			if not self._using_cursor_navigation then
+				self._item_grid:select_first_index()
+
+				local widget = self._item_grid:selected_grid_widget()
+				local item = widget and widget.content.element and widget.content.element.item
+
+				if item then
+					self._weapon_stats:present_item(item)
+				end
+			end
+		end)
 	end
 
 	self:_sort_grid_layout(selected_sort_function)
@@ -1171,17 +1167,36 @@ function CraftingMechanicusBarterItemsView:_on_navigation_input_changed()
 			end
 		end
 	elseif self._ui_state == "select_weapon" then
-		if self._discard_items_element:visible() and self._item_grid and self._item_grid:input_disabled() and self._item_grid:grid() then
-			self._item_grid:select_grid_index(self._selected_item_index or 1)
-			self._item_grid:scroll_to_grid_index(self._selected_item_index or 1)
+		if self._item_grid then
+			if self._selected_item_index then
+				self._item_grid:select_grid_index(self._selected_item_index)
+				self._item_grid:scroll_to_grid_index(self._selected_item_index)
 
-			self._selected_item_index = nil
+				self._selected_item_index = nil
+			else
+				self._item_grid:select_first_index()
+				self._item_grid:scroll_to_grid_index(1)
+			end
+
+			local widget = self._item_grid:selected_grid_widget()
+			local item = widget and widget.content.element and widget.content.element.item
+
+			if item then
+				self._weapon_stats:present_item(item)
+			end
+
+			self._item_grid:disable_input(false)
 		end
 
 		self._discard_items_element:disable_input(true)
+	elseif self._ui_state == "sacrifice_weapon" then
+		self._item_grid:select_first_index()
 
-		if self._item_grid then
-			self._item_grid:disable_input(false)
+		local widget = self._item_grid:selected_grid_widget()
+		local item = widget and widget.content.element and widget.content.element.item
+
+		if item then
+			self._weapon_stats:present_item(item)
 		end
 	end
 end
@@ -1262,22 +1277,54 @@ function CraftingMechanicusBarterItemsView:_change_state(state_name)
 		self._selected_items = {}
 	end
 
+	self._ui_scenegraph.mastery_info.vertical_alignment = "top"
+
 	if state_name == "select_pattern" then
 		self._widgets_by_name.patterns_grid_panels.content.visible = true
 		self._widgets_by_name.sacrifice_intro.content.visible = true
 		local mastery_id = self._selected_pattern
 
 		self:_present_mastery(mastery_id)
-		self:_set_scenegraph_position("mastery_info", 760, 315)
-		self:_set_scenegraph_size("mastery_info", 650, 280)
+
+		local sacrifice_title_text = self._widgets_by_name.sacrifice_intro.content.display_name
+		local sacrifice_title_style = self._widgets_by_name.sacrifice_intro.style.display_name
+		local sacrifice_title_font_data = UIFonts.data_by_type(sacrifice_title_style.font_type)
+		local sacrifice_title_text_options = UIFonts.get_font_options_by_style(sacrifice_title_style)
+		local sacrifice_description_text = self._widgets_by_name.sacrifice_intro.content.description
+		local sacrifice_description_style = self._widgets_by_name.sacrifice_intro.style.description
+		local sacrifice_description_font_data = UIFonts.data_by_type(sacrifice_description_style.font_type)
+		local sacrifice_description_text_options = UIFonts.get_font_options_by_style(sacrifice_description_style)
+		local _, sacrifice_intro_title_height = UIRenderer.text_size(self._ui_renderer, sacrifice_title_text, sacrifice_title_style.font_type, sacrifice_title_style.font_size, {
+			650,
+			2000
+		}, sacrifice_title_text_options)
+		local _, sacrifice_description_text_height = UIRenderer.text_size(self._ui_renderer, sacrifice_description_text, sacrifice_description_style.font_type, sacrifice_description_style.font_size, {
+			650,
+			2000
+		}, sacrifice_description_text_options)
+		local text_margin = 60
+		local mastery_info_height = sacrifice_intro_title_height + sacrifice_description_text_height + text_margin
+
+		self:_set_scenegraph_size("mastery_info_details", 650, mastery_info_height)
+		self:_set_scenegraph_position("mastery_info_details", 760, nil)
+
+		self._ui_scenegraph.mastery_info.vertical_alignment = "bottom"
+		local mastery_info_start_position = self._ui_scenegraph.mastery_info_details.position[2] - mastery_info_height - 20
+
+		self:_set_scenegraph_position("mastery_info", 760, mastery_info_start_position)
+		self:_set_scenegraph_size("mastery_info", 650, 240)
 		self:_set_scenegraph_position("confirm_button", 900, 920)
 
+		self._widgets_by_name.mastery_info.style.icon.size = {
+			self._widgets_by_name.mastery_info.style.icon.original_size[1],
+			self._widgets_by_name.mastery_info.style.icon.original_size[2]
+		}
+		self._widgets_by_name.mastery_info.style.icon.offset[2] = self._widgets_by_name.mastery_info.style.icon.original_offset[2]
 		self._widgets_by_name.confirm_button.content.original_text = Utf8.upper(Localize("loc_continue"))
 		self._widgets_by_name.confirm_button.content.hotspot.on_pressed_sound = UISoundEvents.default_click
 		self._widgets_by_name.confirm_button.content.gamepad_action = "confirm_pressed"
 		self._widgets_by_name.confirm_button.content.hotspot.disabled = not self._selected_pattern
 
-		self:_reset_master_xp_increase()
 		self._patterns_grid:set_visibility(true)
 		self._patterns_tab_menu_element:set_visibility(true)
 		self._patterns_tab_menu_element:disable_input(false)
@@ -1289,10 +1336,15 @@ function CraftingMechanicusBarterItemsView:_change_state(state_name)
 			self._discard_items_element:disable_input(false)
 		end
 
-		self:_set_scenegraph_position("mastery_info", 1320, 60)
-		self:_set_scenegraph_size("mastery_info", 500, 230)
+		self:_set_scenegraph_position("mastery_info", 1320, 100)
+		self:_set_scenegraph_size("mastery_info", 500, 190)
 		self:_set_scenegraph_position("confirm_button", 840, 900)
 
+		self._widgets_by_name.mastery_info.style.icon.size = {
+			self._widgets_by_name.mastery_info.style.icon.original_size[1] * 0.6,
+			self._widgets_by_name.mastery_info.style.icon.original_size[2] * 0.6
+		}
+		self._widgets_by_name.mastery_info.style.icon.offset[2] = self._widgets_by_name.mastery_info.style.icon.original_offset[2] - 10
 		local mastery_id = self._selected_pattern
 		self._widgets_by_name.confirm_button.content.original_text = Utf8.upper(Localize("loc_continue"))
 		self._widgets_by_name.confirm_button.content.hotspot.on_pressed_sound = UISoundEvents.default_click
@@ -1326,7 +1378,6 @@ function CraftingMechanicusBarterItemsView:_change_state(state_name)
 			end
 		end)
 		self:_present_mastery(mastery_id)
-		self:_update_mastery_xp_increase()
 		self._item_grid:set_visibility(true)
 		self._item_grid:disable_input(false)
 	elseif state_name == "sacrifice_weapon" then
@@ -1345,6 +1396,11 @@ function CraftingMechanicusBarterItemsView:_change_state(state_name)
 		self:_present_mastery(mastery_id)
 		self:_set_scenegraph_position("confirm_button", 840, 900)
 
+		self._widgets_by_name.mastery_info.style.icon.size = {
+			self._widgets_by_name.mastery_info.style.icon.original_size[1] * 0.6,
+			self._widgets_by_name.mastery_info.style.icon.original_size[2] * 0.6
+		}
+		self._widgets_by_name.mastery_info.style.icon.offset[2] = self._widgets_by_name.mastery_info.style.icon.original_offset[2] - 10
 		self._widgets_by_name.confirm_button.content.original_text = Utf8.upper(Localize("loc_mastery_button_sacrifice_weapon"))
 		self._widgets_by_name.confirm_button.content.hotspot.on_pressed_sound = UISoundEvents.default_click
 		self._widgets_by_name.confirm_button.content.gamepad_action = "secondary_action_pressed"

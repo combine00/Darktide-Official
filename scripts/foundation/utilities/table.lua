@@ -844,7 +844,7 @@ function table.add_meta_logging(real_table, debug_enabled, debug_name)
 
 	if debug_enabled then
 		local front_table = {
-			__index = function (table, key)
+			__index = function (t, key)
 				local value = rawget(real_table, key)
 
 				print("meta getting", debug_name, key, value)
@@ -855,7 +855,7 @@ function table.add_meta_logging(real_table, debug_enabled, debug_name)
 
 		setmetatable(front_table, front_table)
 
-		function front_table.__newindex(table, key, value)
+		function front_table.__newindex(t, key, value)
 			print("meta setting", debug_name, key, value)
 			rawset(real_table, key, value)
 		end
@@ -889,9 +889,9 @@ function table.swap_delete(t, index)
 	t[table_length] = nil
 end
 
-function table.set_readonly(table)
+function table.set_readonly(t)
 	return setmetatable({}, {
-		__index = table,
+		__index = t,
 		__newindex = function (_, key, value)
 			error("Attempt to modify read-only table")
 		end
@@ -969,7 +969,7 @@ function table.make_non_unique(t)
 	return table.clone_instance(t.__data)
 end
 
-function table.make_strict(table, name, optional_error_message__index, optional_error_message__newindex)
+function table.make_strict(t, name, optional_error_message__index, optional_error_message__newindex)
 	local __index_err_msg = optional_error_message__index or ""
 	local __newindex_err_msg = optional_error_message__newindex or ""
 	local metatable = {
@@ -981,7 +981,7 @@ function table.make_strict(table, name, optional_error_message__index, optional_
 		end
 	}
 
-	setmetatable(table, metatable)
+	setmetatable(t, metatable)
 end
 
 function table.make_strict_with_interface(t, name, interface)
@@ -992,12 +992,16 @@ function table.make_strict_with_interface(t, name, interface)
 		valid_keys[field_name] = true
 	end
 
+	for field_name, field in pairs(t) do
+		-- Nothing
+	end
+
 	return setmetatable(t, {
 		__index = function (t, key)
 			return nil
 		end,
 		__newindex = function (t, key, val)
-			return rawset(t, key, val)
+			rawset(t, key, val)
 		end
 	})
 end

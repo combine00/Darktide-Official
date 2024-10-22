@@ -30,6 +30,8 @@ local HEIGHT_DISTANCE_CONSIDERED_VAULT = 0.9
 local HEIGHT_DISTANCE_CONSIDERED_VAULT_FROM_AIRBORNE = 0.9
 
 function PlayerCharacterStateLedgeVaulting:on_enter(unit, dt, t, previous_state, params)
+	PlayerCharacterStateLedgeVaulting.super.on_enter(self, unit, dt, t, previous_state, params)
+
 	local ledge = params.ledge
 	local ledge_vaulting = self._ledge_vaulting_character_state_component
 	local left_point = ledge.left:unbox()
@@ -130,6 +132,8 @@ function PlayerCharacterStateLedgeVaulting:_play_on_enter_vault_event(ledge_mid_
 end
 
 function PlayerCharacterStateLedgeVaulting:on_exit(unit, t, next_state)
+	PlayerCharacterStateLedgeVaulting.super.on_exit(self, unit, t, next_state)
+
 	local ledge_vaulting = self._ledge_vaulting_character_state_component
 	local animation_extension = self._animation_extension
 

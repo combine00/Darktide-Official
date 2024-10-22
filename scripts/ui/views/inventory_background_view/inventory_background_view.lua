@@ -71,6 +71,7 @@ function InventoryBackgroundView:on_enter()
 	self:_register_event("event_player_talent_node_updated", "event_player_talent_node_updated")
 	self:_register_event("event_item_icon_updated", "event_item_icon_updated")
 	self:_register_event("event_switch_mark", "event_switch_mark")
+	self:_register_event("event_mastery_traits_update", "event_mastery_traits_update")
 	self:_setup_input_legend()
 	self:_setup_background_world()
 
@@ -158,7 +159,7 @@ end
 
 function InventoryBackgroundView:_set_player_profile_information(player)
 	local profile = player:profile()
-	local character_name = ProfileUtils.character_name(profile)
+	local character_name = player:name()
 	local current_level = profile.current_level
 	local character_archetype_title = ProfileUtils.character_archetype_title(profile)
 	local widgets_by_name = self._widgets_by_name
@@ -2503,18 +2504,29 @@ function InventoryBackgroundView:_fetch_inventory_items()
 
 		return Managers.data_service.mastery:get_all_masteries()
 	end):next(function (masteries_data)
+		self._syncing_mastery = {}
 		self.masteries_data = masteries_data
+		self._mastery_traits = Managers.data_service.mastery:get_all_traits_data(masteries_data)
 
 		Managers.data_service.mastery:check_and_claim_all_masteries_levels(masteries_data):next(function (data)
 			for id, mastery_data in pairs(data) do
 				self.masteries_data[id] = mastery_data
 			end
+
+			for id, mastery_data in pairs(masteries_data) do
+				self._syncing_mastery[id] = nil
+			end
+
+			self._has_mastery_points_available = MasteryUtils.has_available_points(self.masteries_data, self._mastery_traits)
 		end)
 
-		local traits_data = Managers.data_service.mastery:get_all_traits_data(masteries_data)
-		self._has_mastery_points_available = MasteryUtils.has_available_points(self.masteries_data, traits_data)
-		self._mastery_traits = traits_data
+		self._has_mastery_points_available = MasteryUtils.has_available_points(self.masteries_data, self._mastery_traits)
 		self._inventory_synced = true
+
+		for id, mastery_data in pairs(masteries_data) do
+			local claiming = Managers.data_service.mastery:is_mastery_claim_in_progress(id)
+			self._syncing_mastery[id] = claiming or nil
+		end
 
 		self:_check_mastery_sync_status()
 	end):catch(function ()
@@ -2525,11 +2537,31 @@ function InventoryBackgroundView:_fetch_inventory_items()
 	end)
 end
 
+function InventoryBackgroundView:event_mastery_traits_update(mastery_id, traits_data)
+	local mastery_data = self.masteries_data[mastery_id]
+
+	if mastery_data then
+		for i = 1, #self._mastery_traits[mastery_id] do
+			local traits = self._mastery_traits[mastery_id][i]
+
+			if traits.trait_name == traits_data.trait_name then
+				if traits.trait_status[traits_data.rarity] then
+					traits.trait_status[traits_data.rarity] = "seen"
+				end
+
+				break
+			end
+		end
+
+		self._has_mastery_points_available = MasteryUtils.has_available_points(self.masteries_data, self._mastery_traits)
+	end
+end
+
 function InventoryBackgroundView:_check_mastery_sync_status()
 	self._mastery_previous_state = self._mastery_previous_state or {}
 
 	for id, mastery_data in pairs(self.masteries_data) do
-		mastery_data.syncing = Managers.data_service.mastery:is_mastery_claim_in_progress(id)
+		mastery_data.syncing = self._syncing_mastery[id]
 
 		if self._mastery_previous_state[id] ~= mastery_data.syncing then
 			if not mastery_data.syncing then
@@ -2540,7 +2572,7 @@ function InventoryBackgroundView:_check_mastery_sync_status()
 		end
 	end
 
-	local all_claimed = Managers.data_service.mastery:are_all_masteries_claimed()
+	local all_claimed = table.is_empty(self._syncing_mastery)
 
 	if all_claimed then
 		self._mastery_previous_state = nil

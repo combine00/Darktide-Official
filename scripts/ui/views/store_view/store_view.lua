@@ -80,6 +80,10 @@ function StoreView:init(settings, context)
 	self._vo_callback = callback(self, "_cb_on_play_vo")
 	self._vo_world_spawner = nil
 	self._hub_interaction = context and context.hub_interaction
+
+	if IS_PLAYSTATION then
+		self._ps_store_icon_showing = false
+	end
 end
 
 function StoreView:on_enter()
@@ -1054,6 +1058,20 @@ function StoreView:_create_aquilas_presentation(offers)
 	end
 
 	self._widgets_by_name.aquilas_background.content.visible = true
+
+	if IS_PLAYSTATION then
+		local POSITION = {
+			RIGHT = 2,
+			CENTER = 0,
+			LEFT = 1
+		}
+
+		if not self._ps_store_icon_showing then
+			NpCommerceDialog.show_ps_store_icon(POSITION.RIGHT)
+
+			self._ps_store_icon_showing = true
+		end
+	end
 end
 
 function StoreView:_destroy_aquilas_presentation()
@@ -1069,6 +1087,12 @@ function StoreView:_destroy_aquilas_presentation()
 	end
 
 	self._widgets_by_name.aquilas_background.content.visible = false
+
+	if IS_PLAYSTATION and self._ps_store_icon_showing then
+		NpCommerceDialog.hide_ps_store_icon()
+
+		self._ps_store_icon_showing = false
+	end
 end
 
 function StoreView:_fetch_storefront(storefront, on_complete_callback)
@@ -1527,8 +1551,8 @@ function StoreView:update(dt, t, input_service)
 
 	if self._store_promise or self._purchase_promise then
 		input_service = input_service:null_service()
-		self._show_loading = true
 		self._widgets_by_name.loading.content.visible = true
+		self._show_loading = true
 	elseif self._show_loading then
 		self._show_loading = false
 		self._widgets_by_name.loading.content.visible = false

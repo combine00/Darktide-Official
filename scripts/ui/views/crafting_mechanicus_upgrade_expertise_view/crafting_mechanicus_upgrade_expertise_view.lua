@@ -106,6 +106,7 @@ function CraftingMechanicusUpgradeExpertiseView:_present_crafting(mastery_data, 
 			optional_present_callback()
 		end
 
+		self._crafting_recipe:force_update_list_size()
 		self:_update_element_position("crafting_recipe_pivot", self._crafting_recipe)
 	end
 
@@ -163,7 +164,12 @@ function CraftingMechanicusUpgradeExpertiseView:_expertise_updated(new_value)
 		self:_expertise_updated(new_value)
 	end
 
-	self._crafting_recipe:present_recipe(self._recipe, self._ingredients, nil, nil, nil, self._can_craft_context, on_update_callback, CraftingSettings.type)
+	local function on_present_callback()
+		self._crafting_recipe:force_update_list_size()
+		self:_update_element_position("crafting_recipe_pivot", self._crafting_recipe)
+	end
+
+	self._crafting_recipe:present_recipe(self._recipe, self._ingredients, nil, nil, on_present_callback, self._can_craft_context, on_update_callback, CraftingSettings.type)
 	self._weapon_stats:update_expertise_value(expertise_data.start, current)
 
 	self._can_craft_context.expertise_data = expertise_data

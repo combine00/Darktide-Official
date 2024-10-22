@@ -311,9 +311,19 @@ function ExternalPaymentPlatformPlaystation:_decorate_option(option, platform_en
 							return data
 						end)
 					else
-						self.pending_txn_promise:resolve(FAILED_TXN)
+						return Managers.backend.interfaces.external_payment:fail_txn(order_id):next(function (data)
+							self.pending_txn_promise:resolve(FAILED_TXN)
 
-						self.pending_txn_promise = nil
+							self.pending_txn_promise = nil
+
+							return data
+						end):catch(function (data)
+							self.pending_txn_promise:resolve(FAILED_TXN)
+
+							self.pending_txn_promise = nil
+
+							return data
+						end)
 					end
 				end)
 			else

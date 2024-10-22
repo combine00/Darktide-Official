@@ -2569,10 +2569,9 @@ AchievementDefinitions.team_chaos_beast_of_nurgle_slain_no_corruption = {
 }
 local missions = AchievementMissionGroups.missions
 local category_name = "missions_general"
-local excluded_maps = {
-	op_train = true
-}
-local excluded_zones = {
+local excluded_maps = {}
+local excluded_zones = {}
+local excluded_zones_for_destructible = {
 	operations = true
 }
 
@@ -2719,6 +2718,9 @@ for _, zone in ipairs(AchievementMissionGroups.zones) do
 			25,
 			50
 		})
+	end
+
+	if not excluded_zones_for_destructible[zone.name] then
 		target_family("mission_zone_" .. zone.name .. "_destructible_{index:%d}", {
 			description = "loc_achievement_zone_mission_destructibles_description",
 			title = "loc_achievement_zone_mission_destructibles_name",
@@ -2824,31 +2826,6 @@ old_numeric_target_family("mission_circumstace_{index:%d}", {
 	100,
 	250
 })
-old_numeric_target_family("mission_flash_{index:%d}", {
-	description = "loc_achievement_mission_flash_x_description",
-	icon = "content/ui/textures/icons/achievements/achievement_icon_0074",
-	stat_name = "mission_flash",
-	type = AchievementTypesLookup.increasing_stat,
-	category = category_name,
-	flags = {}
-}, {
-	1,
-	10,
-	50,
-	100,
-	200
-})
-
-AchievementDefinitions.difficult_flash_win = {
-	description = "loc_achievement_difficult_flash_win_description",
-	title = "loc_achievement_difficult_flash_win_name",
-	icon = "content/ui/textures/icons/achievements/achievement_icon_0075",
-	target = 5,
-	stat_name = "max_difficulty_flash",
-	type = AchievementTypesLookup.increasing_stat,
-	category = category_name,
-	flags = {}
-}
 
 local function _generate_mission_completion_per_difficulty_stats(index, config)
 	local difficulty = config.difficulty

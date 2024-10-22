@@ -313,6 +313,7 @@ function ViewElementPlayerSocialPopup:_set_player_info(parent, player_info, menu
 	self._player_info = player_info
 	local player_display_name, user_display_name = nil
 	local character_name = player_info:character_name()
+	local no_platform_icon = true
 
 	if character_name and #character_name > 0 then
 		local character_level = player_info:character_level()
@@ -324,22 +325,25 @@ function ViewElementPlayerSocialPopup:_set_player_info(parent, player_info, menu
 		if not player_info:is_myself() and (IS_XBS or IS_GDK) and player_info:platform() == "xbox" then
 			local xuid = player_info:platform_user_id()
 			local platform_profile = parent:get_platform_profile(xuid)
-			user_display_name = platform_profile and platform_profile.gamertag or player_info:user_display_name() or "N/A"
+			user_display_name = platform_profile and platform_profile.gamertag or player_info:user_display_name(nil, no_platform_icon) or "N/A"
 		else
-			user_display_name = player_info:user_display_name()
+			user_display_name = player_info:user_display_name(nil, no_platform_icon)
 		end
 	else
 		if not player_info:is_myself() and (IS_XBS or IS_GDK) and player_info:platform() == "xbox" then
 			local xuid = player_info:platform_user_id()
 			local platform_profile = parent:get_platform_profile(xuid)
-			player_display_name = platform_profile and platform_profile.gamertag or player_info:user_display_name() or "N/A"
+			player_display_name = platform_profile and platform_profile.gamertag or player_info:user_display_name(nil, no_platform_icon) or "N/A"
 		else
-			player_display_name = player_info:user_display_name()
+			player_display_name = player_info:user_display_name(nil, no_platform_icon)
 		end
 
 		user_display_name = ""
 	end
 
+	local platform_icon, color_override = player_info:platform_icon()
+	header_content.player_platform_icon = platform_icon
+	header_content.platform_icon_color_override = color_override
 	header_content.player_display_name = player_display_name
 	header_content.user_display_name = user_display_name
 	local player_display_name_style = header_style.player_display_name

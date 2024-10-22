@@ -2054,6 +2054,7 @@ weapon_template.hud_configuration = {
 weapon_template.weapon_special_class = "WeaponSpecialExplodeOnImpact"
 weapon_template.weapon_special_tweak_data = {
 	active_on_abort = true,
+	allow_reactivation_while_active = true,
 	keep_active_on_sprint = true,
 	disorientation_type = "ogryn_powermaul_disorientation",
 	active_duration = 4,

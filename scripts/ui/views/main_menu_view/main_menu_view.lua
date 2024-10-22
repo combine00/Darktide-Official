@@ -187,6 +187,7 @@ function MainMenuView:_update_counts_refreshes(dt, t)
 
 	if t >= friends_time then
 		Managers.data_service.social:fetch_friends():next(callback(self, "cb_update_friends_count"))
+		Managers.data_service.social:fetch_blocked_accounts()
 
 		self._refresh_friends_time = t + 30
 	end

@@ -1729,16 +1729,15 @@ templates.psyker_venting_improvements = {
 	end
 }
 templates.psyker_smite_on_hit = {
-	class_name = "proc_buff",
 	predicted = false,
 	hud_priority = 4,
 	hud_icon = "content/ui/textures/icons/buffs/hud/psyker/psyker_2_tier_5_name_3",
 	hud_icon_gradient_map = "content/ui/textures/color_ramps/talent_blitz",
+	class_name = "proc_buff",
 	cooldown_duration = talent_settings_2.offensive_2_3.cooldown,
 	proc_events = {
 		[proc_events.on_hit] = talent_settings_2.offensive_2_3.smite_chance
 	},
-	check_proc_func = CheckProcFunctions.on_elite_or_special_or_monster_hit,
 	start_func = function (template_data, template_context)
 		local unit = template_context.unit
 		template_data.next_allowed_t = 0
@@ -1831,6 +1830,10 @@ templates.psyker_smite_on_hit = {
 		local breed = unit_data_extension:breed()
 
 		if not breed then
+			return false
+		end
+
+		if not params.tags.elite and not params.tags.special and not params.tags.monster then
 			return false
 		end
 

@@ -154,6 +154,18 @@ local widget_definitions = {
 			content_id = "hotspot"
 		},
 		{
+			value_id = "player_platform_icon",
+			pass_type = "text",
+			style_id = "player_platform_icon",
+			change_function = function (content, style)
+				if content.platform_icon_color_override then
+					style.material = nil
+				else
+					style.material = style.default_material
+				end
+			end
+		},
+		{
 			style_id = "player_display_name",
 			value_id = "player_display_name",
 			pass_type = "text"

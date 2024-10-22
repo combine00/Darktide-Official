@@ -906,8 +906,11 @@ function PlayerUnitWeaponExtension:set_wielded_weapon_weapon_special_active(t, w
 	local weapon_special_implementation = wielded_weapon.weapon_special_implementation
 	local inventory_slot_component = wielded_weapon.inventory_slot_component
 	local was_special_active = inventory_slot_component.special_active
+	local weapon_template = wielded_weapon.weapon_template
+	local tweak_data_or_nil = weapon_template.weapon_special_tweak_data
+	local can_set_active = not was_special_active or was_special_active and tweak_data_or_nil and tweak_data_or_nil.allow_reactivation_while_active
 
-	if want_active and not was_special_active then
+	if want_active and can_set_active then
 		local last_start_time = inventory_slot_component.special_active_start_t
 		inventory_slot_component.special_active_start_t = t
 		inventory_slot_component.special_active = true
@@ -930,8 +933,6 @@ function PlayerUnitWeaponExtension:set_wielded_weapon_weapon_special_active(t, w
 		end
 	elseif not want_active and was_special_active then
 		local did_deactivate = false
-		local weapon_template = wielded_weapon.weapon_template
-		local tweak_data_or_nil = weapon_template.weapon_special_tweak_data
 		local set_inactive_func = tweak_data_or_nil and tweak_data_or_nil.set_inactive_func
 
 		if set_inactive_func then

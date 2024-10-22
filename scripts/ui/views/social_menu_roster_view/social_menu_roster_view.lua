@@ -31,6 +31,8 @@ local ROSTER_GRID_SCENEGRAPH_ID = "roster_grid_content"
 local PARTY_GRID_SCENEGRAPH_ID = "party_grid"
 local PARTY_GRID_ID = 1
 local ROSTER_GRID_ID = 2
+local last_tab_index = -1
+local current_time = 0
 local _SCENEGRAPH_IDS = {
 	[PARTY_GRID_ID] = PARTY_GRID_SCENEGRAPH_ID,
 	[ROSTER_GRID_ID] = ROSTER_GRID_SCENEGRAPH_ID
@@ -954,7 +956,7 @@ function SocialMenuRosterView:_update_list_refreshes(dt)
 	refresh_roster_delay = refresh_roster_delay - dt
 
 	if refresh_roster_delay <= 0 and self._show_rooster_list then
-		self:_refresh_roster_lists()
+		self:_refresh_roster_lists(false, SocialMenuSettings.roster_list_refresh_time)
 
 		refresh_roster_delay = SocialMenuSettings.roster_list_refresh_time
 	end
@@ -1378,6 +1380,12 @@ function SocialMenuRosterView:_get_roster_widget(context, blueprint_name, grid_i
 		local content = widget.content
 
 		if content.blueprint_name == blueprint_name then
+			if widget_blueprint.init then
+				local ui_renderer = self._offscreen_renderer or self._ui_renderer
+
+				widget_blueprint.init(self, widget, context, callback(self, "cb_show_popup_menu_for_player", context), ui_renderer)
+			end
+
 			return widget
 		else
 			self:_unregister_widget_name(widget.name)
@@ -1816,7 +1824,7 @@ function SocialMenuRosterView:_refresh_party_list()
 	end
 end
 
-function SocialMenuRosterView:_refresh_roster_lists(force_refresh)
+function SocialMenuRosterView:_refresh_roster_lists(force_refresh, dt)
 	if not self._show_rooster_list then
 		return
 	end
@@ -1844,12 +1852,18 @@ function SocialMenuRosterView:_refresh_roster_lists(force_refresh)
 		promises[1] = social_service:fetch_blocked_players(force_refresh)
 	end
 
+	last_tab_index = current_tab_index
+
 	if #promises == 0 then
 		return
 	end
 
-	if current_tab_index ~= BLOCKED_PLAYERS_LIST and not social_service:has_initialized_block() then
-		promises[#promises + 1] = social_service:initialize_block()
+	if current_tab_index ~= FRIENDS_LIST then
+		promises[#promises + 1] = social_service:fetch_friends()
+	end
+
+	if current_tab_index ~= BLOCKED_PLAYERS_LIST then
+		promises[#promises + 1] = social_service:fetch_blocked_players()
 	end
 
 	self._roster_lists_promise = Promise.all(unpack(promises)):next(function (lists)

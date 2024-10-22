@@ -16,6 +16,7 @@ local function _queue_index_from_id(queue, queue_id)
 end
 
 function MinionSpawnerQueue:enqueue(breed_list, spawn_data)
+	local breed_list_size = #breed_list
 	local queue_id = self._queue_id
 	self._queue_id = queue_id + 1
 	local queue = self._queue
@@ -23,7 +24,7 @@ function MinionSpawnerQueue:enqueue(breed_list, spawn_data)
 		breed_list_index = 1,
 		queue_id = queue_id,
 		breed_list = breed_list,
-		breed_list_size = #breed_list,
+		breed_list_size = breed_list_size,
 		spawn_data = table.set_readonly(spawn_data)
 	}
 

@@ -50,77 +50,13 @@ function InventoryWeaponsView:on_enter()
 	self:_setup_input_legend()
 	self:_setup_background_world()
 	self:_setup_item_grid_materials()
+	self:_setup_weapon_options()
 
 	local profile = self._preview_player:profile()
 	local profile_archetype = profile.archetype
 	local archetype_name = profile_archetype.name
 
 	self:_setup_background_frames_by_archetype(archetype_name)
-
-	local ITEM_TYPES = UISettings.ITEM_TYPES
-
-	if self.item_type == ITEM_TYPES.WEAPON_MELEE or self.item_type == ITEM_TYPES.WEAPON_RANGED then
-		local button_size = self._definitions.blueprints.button.size
-		local top_padding = 30
-		local grid_size = {
-			button_size[1],
-			(button_size[2] + 20) * 3 + top_padding
-		}
-		local grid_options = {
-			scrollbar_width = 7,
-			edge_padding = 40,
-			use_select_on_focused = true,
-			use_is_focused_for_navigation = false,
-			use_terminal_background = true,
-			title_height = 0,
-			grid_spacing = {
-				10,
-				10
-			},
-			grid_size = grid_size,
-			mask_size = {
-				grid_size[1] + 40,
-				grid_size[2] + 40
-			},
-			top_padding = top_padding
-		}
-		self._weapon_options_element = self:_add_element(ViewElementGrid, "weapon_options", 10, grid_options)
-		local layout = {
-			{
-				display_icon = "",
-				widget_type = "button",
-				display_name = Localize("loc_inventory_weapon_button_marks"),
-				callback = callback(self, "cb_on_marks_pressed")
-			},
-			{
-				display_icon = "",
-				widget_type = "button",
-				display_name = Localize("loc_inventory_weapon_button_cosmetics"),
-				callback = callback(self, "cb_on_customize_pressed")
-			},
-			{
-				display_icon = "",
-				widget_type = "button",
-				display_name = Localize("loc_inventory_weapon_button_inspect"),
-				callback = callback(self, "cb_on_inspect_pressed")
-			}
-		}
-
-		self._weapon_options_element:update_dividers("content/ui/materials/frames/marks_top", {
-			413.28,
-			58.8
-		}, {
-			0,
-			-20,
-			20
-		})
-		self._weapon_options_element:present_grid_layout(layout, self._definitions.blueprints)
-
-		local position = self:_scenegraph_world_position("button_options")
-
-		self._weapon_options_element:set_pivot_offset(position[1], position[2])
-		self._weapon_options_element:disable_input(true)
-	end
 end
 
 function InventoryWeaponsView:event_switch_mark_complete(item)
@@ -278,6 +214,14 @@ end
 function InventoryWeaponsView:cb_on_discard_pressed()
 	self._selected_items = {}
 
+	if self._item_compare_toggled then
+		self:cb_on_toggle_item_compare()
+	end
+
+	if self._weapon_options_element then
+		self._weapon_options_element:set_visibility(false)
+	end
+
 	if self._discard_items_element then
 		self:_remove_element("discard_items")
 
@@ -306,32 +250,30 @@ function InventoryWeaponsView:cb_on_discard_pressed()
 		end
 
 		self:present_grid_layout(filtered_items_layout, function ()
-			if self._selected_widget_before_discard then
-				local widget = self._selected_widget_before_discard
-				local element = widget.content.element
+			local index = self._item_grid:first_interactable_grid_index()
+			local widget = self:widget_by_index(index)
+			local element = widget.content.element
 
-				self:cb_on_grid_entry_left_pressed(widget, element)
+			self._item_grid:select_grid_index(index)
 
-				self._selected_widget_before_discard = nil
+			local scrollbar_animation_progress = self._item_grid:get_scrollbar_percentage_by_index(index) or 0
+
+			self._item_grid:set_scrollbar_progress(scrollbar_animation_progress, true)
+			self._item_grid:disable_input(false)
+
+			local item = element and element.item
+
+			if item then
+				self:_preview_item(item)
 			end
 		end)
 
 		self._current_layout = filtered_items_layout
 		local widget_index = self:selected_grid_index()
 		local widget = self:selected_grid_widget()
-		local scrollbar_animation_progress = widget_index and self._item_grid:get_scrollbar_percentage_by_index(widget_index) or 0
-
-		self._item_grid:set_scrollbar_progress(scrollbar_animation_progress, true)
-
-		local item = widget and widget.element and widget.element.item
-
-		if item then
-			self:_preview_item(item)
-		end
 
 		self:_play_sound(UISoundEvents.weapons_discard_exit)
 	else
-		self._selected_widget_before_discard = self._item_grid:selected_grid_widget()
 		local selected_slot = self._selected_slot
 		local selected_slot_name = selected_slot.name
 		local filtered_items_layout = {}
@@ -368,7 +310,9 @@ function InventoryWeaponsView:cb_on_discard_pressed()
 
 		self._discard_layout = table.clone_instance(filtered_items_layout)
 
-		self:present_grid_layout(filtered_items_layout)
+		self:present_grid_layout(filtered_items_layout, function ()
+			self:_stop_previewing()
+		end)
 
 		self._current_layout = filtered_items_layout
 		self._widgets_by_name.discard_button.content.visible = true
@@ -382,15 +326,11 @@ function InventoryWeaponsView:cb_on_discard_pressed()
 
 		if not self._using_cursor_navigation then
 			self._discard_items_element:disable_input(true)
+		else
+			self._discard_items_element:disable_input(false)
 		end
 
 		self:_play_sound(UISoundEvents.weapons_discard_enter)
-	end
-
-	self._update_callback_remove_next_frame = callback(self, "_stop_previewing")
-
-	if self._weapon_options_element then
-		self._weapon_options_element:set_visibility(not self._discard_items_element)
 	end
 end
 
@@ -420,10 +360,22 @@ function InventoryWeaponsView:cb_on_discard_button_pressed()
 			table.sort(selected_layout, selected_sort_function)
 		end
 
-		self:present_grid_layout(selected_layout)
+		self:present_grid_layout(selected_layout, function ()
+			self._item_grid:disable_input(false)
+			self._item_grid:select_first_index()
+
+			local selected_widget = self:selected_grid_widget()
+			local item = selected_widget and selected_widget.content.element
+		end)
 
 		self._current_layout = selected_layout
 		self._widgets_by_name.discard_button.content.original_text = Utf8.upper(Localize("loc_confirm"))
+
+		if not self._using_cursor_navigation then
+			self._discard_items_element:disable_input(true)
+		else
+			self._discard_items_element:disable_input(false)
+		end
 
 		self._discard_items_element:set_visibility(false)
 		self:_play_sound(UISoundEvents.weapons_discard_continue)
@@ -433,6 +385,8 @@ function InventoryWeaponsView:cb_on_discard_button_pressed()
 		for gear_id, item in pairs(self._selected_items) do
 			items[#items + 1] = item
 		end
+
+		self._selected_items = {}
 
 		Managers.event:trigger("event_discard_items", items)
 
@@ -461,6 +415,12 @@ function InventoryWeaponsView:cb_on_discard_button_pressed()
 		self:present_grid_layout(selected_layout, function ()
 			self._discard_items_element:refresh(filtered_items)
 			self._discard_items_element:set_visibility(true)
+
+			if not self._using_cursor_navigation then
+				self._discard_items_element:disable_input(true)
+			else
+				self._discard_items_element:disable_input(false)
+			end
 		end)
 
 		self._current_layout = self._discard_layout
@@ -662,12 +622,6 @@ function InventoryWeaponsView:update(dt, t, input_service)
 		self:_item_hover_update()
 	end
 
-	if self._update_callback_remove_next_frame then
-		self._update_callback_remove_next_frame()
-
-		self._update_callback_remove_next_frame = nil
-	end
-
 	return InventoryWeaponsView.super.update(self, dt, t, input_service)
 end
 
@@ -683,10 +637,16 @@ function InventoryWeaponsView:_handle_input(input_service)
 			if input_service:get("navigate_left_continuous") and not self._discard_items_element:input_disabled() then
 				self._discard_items_element:disable_input(true)
 				self._item_grid:disable_input(false)
-				self._item_grid:select_grid_index(self._selected_item_index or 1)
+
+				if self._selected_item_index then
+					self._item_grid:select_grid_index(self._selected_item_index)
+				else
+					self._item_grid:select_first_index()
+				end
 
 				self._selected_item_index = nil
-				local item = self:previewed_item()
+				local selected_widget = self:selected_grid_widget()
+				local item = selected_widget and selected_widget.content.element and selected_widget.content.element.item
 
 				if item then
 					self:_preview_item(item)
@@ -801,6 +761,7 @@ function InventoryWeaponsView:_on_navigation_input_changed()
 			self._selected_item_index = nil
 
 			self._item_grid:select_grid_index()
+			self:_stop_previewing()
 		end
 
 		self._item_grid:disable_input(false)
@@ -813,11 +774,15 @@ function InventoryWeaponsView:_on_navigation_input_changed()
 		if selected_options then
 			self._weapon_options_element:select_first_index()
 		end
-	elseif self._discard_items_element and self._discard_items_element:visible() then
+	elseif self._discard_items_element then
 		if self._discard_items_element:visible() and self._item_grid:input_disabled() then
-			self._item_grid:select_grid_index(self._selected_item_index or 1)
+			if self._selected_item_index then
+				self._item_grid:select_grid_index(self._selected_item_index)
 
-			self._selected_item_index = nil
+				self._selected_item_index = nil
+			else
+				self._item_grid:select_first_index()
+			end
 		end
 
 		self._discard_items_element:disable_input(true)
@@ -1039,6 +1004,68 @@ function InventoryWeaponsView:_fetch_inventory_items(selected_slot)
 			self:focus_grid_index(start_index, scrollbar_animation_progress, instant_scroll)
 		end
 	end)
+end
+
+function InventoryWeaponsView:_setup_weapon_options()
+	if ItemUtils.is_weapon(self.item_type) then
+		local button_size = self._definitions.blueprints.button.size
+		local top_padding = 30
+		local grid_size = {
+			button_size[1],
+			(button_size[2] + 20) * 3 + top_padding
+		}
+		local grid_options = {
+			scrollbar_width = 7,
+			edge_padding = 40,
+			use_select_on_focused = true,
+			use_is_focused_for_navigation = false,
+			use_terminal_background = true,
+			title_height = 0,
+			grid_spacing = {
+				10,
+				10
+			},
+			grid_size = grid_size,
+			mask_size = {
+				grid_size[1] + 40,
+				grid_size[2] + 40
+			},
+			top_padding = top_padding
+		}
+		self._weapon_options_element = self:_add_element(ViewElementGrid, "weapon_options", 10, grid_options)
+		local layout = {
+			{
+				display_icon = "",
+				widget_type = "button",
+				display_name = Localize("loc_inventory_weapon_button_marks"),
+				callback = callback(self, "cb_on_marks_pressed")
+			},
+			{
+				display_icon = "",
+				widget_type = "button",
+				display_name = Localize("loc_inventory_weapon_button_cosmetics"),
+				callback = callback(self, "cb_on_customize_pressed")
+			},
+			{
+				display_icon = "",
+				widget_type = "button",
+				display_name = Localize("loc_inventory_weapon_button_inspect"),
+				callback = callback(self, "cb_on_inspect_pressed")
+			}
+		}
+
+		self._weapon_options_element:update_dividers("content/ui/materials/frames/marks_top", {
+			413.28,
+			58.8
+		}, {
+			0,
+			-20,
+			20
+		})
+		self._weapon_options_element:present_grid_layout(layout, self._definitions.blueprints)
+		self._weapon_options_element:disable_input(true)
+		self._weapon_options_element:set_visibility(false)
+	end
 end
 
 function InventoryWeaponsView:_calc_text_size(widget, text_and_style_id)
@@ -1341,7 +1368,7 @@ function InventoryWeaponsView:event_discard_items(items)
 		end
 	end
 
-	local new_grid_index = 1
+	local new_grid_index = self._item_grid:first_interactable_grid_index()
 	local new_element = new_grid_index and self:element_by_index(new_grid_index)
 
 	if new_element then
@@ -1361,6 +1388,10 @@ function InventoryWeaponsView:_stop_previewing()
 	if self._weapon_actions then
 		self._weapon_actions:stop_presenting()
 	end
+
+	if self._weapon_options_element then
+		self._weapon_options_element:set_visibility(false)
+	end
 end
 
 function InventoryWeaponsView:_preview_item(item)
@@ -1368,8 +1399,14 @@ function InventoryWeaponsView:_preview_item(item)
 
 	local slots = item.slots
 
-	if slots and (table.find(slots, "slot_primary") or table.find(slots, "slot_secondary")) and self._weapon_actions then
-		self._weapon_actions:present_item(item)
+	if slots and (table.find(slots, "slot_primary") or table.find(slots, "slot_secondary")) then
+		if self._weapon_actions then
+			self._weapon_actions:present_item(item)
+		end
+
+		if self._weapon_options_element and not self._discard_items_element and not self._item_compare_toggled then
+			self._weapon_options_element:set_visibility(true)
+		end
 	end
 end
 

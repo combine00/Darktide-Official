@@ -46,6 +46,8 @@ local STINGER_PROPERTIES = {
 }
 
 function PlayerCharacterStateCatapulted:on_enter(unit, dt, t, previous_state, params)
+	PlayerCharacterStateCatapulted.super.on_enter(self, unit, dt, t, previous_state, params)
+
 	local velocity = params.velocity
 	local first_person = self._first_person_component
 	local locomotion_steering = self._locomotion_steering_component
@@ -106,6 +108,8 @@ function PlayerCharacterStateCatapulted:_trigger_anim_event(direction, reason)
 end
 
 function PlayerCharacterStateCatapulted:on_exit(unit, t, next_state)
+	PlayerCharacterStateCatapulted.super.on_exit(self, unit, t, next_state)
+
 	local locomotion_force_rotation_component = self._locomotion_force_rotation_component
 
 	if locomotion_force_rotation_component.use_force_rotation then
