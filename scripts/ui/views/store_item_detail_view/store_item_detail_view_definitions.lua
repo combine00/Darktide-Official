@@ -1003,7 +1003,14 @@ local widget_definitions = {
 			}
 		}
 	}, "title"),
-	description_scrollbar = UIWidget.create_definition(ScrollbarPassTemplates.terminal_scrollbar, "description_scrollbar"),
+	description_scrollbar = UIWidget.create_definition(ScrollbarPassTemplates.terminal_scrollbar, "description_scrollbar", {
+		focused = true,
+		enable_gamepad_scrolling = true,
+		gamepad_axis_name = "navigate_controller",
+		hotspot = {
+			is_focused = true
+		}
+	}),
 	description_mask = UIWidget.create_definition({
 		{
 			value = "content/ui/materials/offscreen_masks/ui_overlay_offscreen_straight_blur_viewport_2",
@@ -1610,8 +1617,6 @@ local bundle_button_definition = {
 		end
 	}
 }
-local menu_zoom_out = "loc_inventory_menu_zoom_out"
-local menu_zoom_in = "loc_inventory_menu_zoom_in"
 local menu_preview_with_gear_off = "loc_inventory_menu_preview_with_gear_off"
 local menu_preview_with_gear_on = "loc_inventory_menu_preview_with_gear_on"
 local weapon_preview_skin_off = "loc_premium_store_preview_weapon_no_skin_button"
@@ -1672,27 +1677,11 @@ local legend_inputs = {
 		alignment = "right_alignment",
 		on_pressed_callback = "cb_on_camera_zoom_toggled",
 		visibility_function = function (parent, id)
-			if parent:_can_zoom() and not parent._aquilas_showing then
-				local display_name = parent._camera_zoomed_in and menu_zoom_out or menu_zoom_in
-				local input_legend = parent:_element("input_legend")
+			local display_name = parent._zoom_level >= 0.5 and "loc_inventory_menu_zoom_out" or "loc_inventory_menu_zoom_in"
 
-				if input_legend then
-					input_legend:set_display_name(id, display_name)
-				end
+			parent._input_legend_element:set_display_name(id, display_name)
 
-				return parent._on_enter_animation_triggered
-			end
-
-			return false
-		end
-	},
-	{
-		display_name = "loc_preview_voice",
-		input_action = "hotkey_item_inspect",
-		alignment = "right_alignment",
-		on_pressed_callback = "cb_preview_voice",
-		visibility_function = function (parent, id)
-			return parent:_can_preview_voice()
+			return parent:_can_zoom()
 		end
 	}
 }

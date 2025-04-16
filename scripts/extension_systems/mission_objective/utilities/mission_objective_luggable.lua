@@ -5,7 +5,8 @@ local MissionObjectiveLuggable = class("MissionObjectiveLuggable", "MissionObjec
 function MissionObjectiveLuggable:init()
 	MissionObjectiveLuggable.super.init(self)
 
-	self._override_marked_units = nil
+	self._show_sockets = false
+	self._override_marked_units = {}
 
 	self:set_updated_externally(true)
 end
@@ -51,20 +52,27 @@ end
 
 function MissionObjectiveLuggable:display_socket_markers(show_markers)
 	if show_markers then
-		local luggable_synchronizer_extension = self:synchronizer_extension()
-		local socket_units = luggable_synchronizer_extension:active_socket_units()
-		self._override_marked_units = {}
+		self._show_sockets = true
 
-		for i = 1, #socket_units do
-			local socket_unit = socket_units[i]
-			local socket_extension = ScriptUnit.extension(socket_unit, "luggable_socket_system")
-
-			if not socket_extension:is_occupied() then
-				self._override_marked_units[socket_units[i]] = true
-			end
-		end
+		self:_update_override_markers()
 	else
-		self._override_marked_units = nil
+		self._show_sockets = false
+	end
+end
+
+function MissionObjectiveLuggable:_update_override_markers()
+	local luggable_synchronizer_extension = self:synchronizer_extension()
+	local socket_units = luggable_synchronizer_extension:active_socket_units()
+
+	table.clear(self._override_marked_units)
+
+	for i = 1, #socket_units do
+		local socket_unit = socket_units[i]
+		local socket_extension = ScriptUnit.extension(socket_unit, "luggable_socket_system")
+
+		if not socket_extension:is_occupied() then
+			self._override_marked_units[socket_units[i]] = true
+		end
 	end
 end
 
@@ -77,11 +85,19 @@ function MissionObjectiveLuggable:add_marker_on_hot_join(unit)
 end
 
 function MissionObjectiveLuggable:marked_units()
-	if self._override_marked_units then
+	if self._show_sockets then
 		return self._override_marked_units
 	end
 
 	return MissionObjectiveLuggable.super.marked_units(self)
+end
+
+function MissionObjectiveLuggable:set_progression(progression)
+	MissionObjectiveLuggable.super.set_progression(self, progression)
+
+	if self._show_sockets then
+		self:_update_override_markers()
+	end
 end
 
 return MissionObjectiveLuggable

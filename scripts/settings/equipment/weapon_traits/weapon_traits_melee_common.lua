@@ -6,6 +6,20 @@ table.make_unique(weapon_traits_melee_common)
 local stat_buffs = BuffSettings.stat_buffs
 local proc_events = BuffSettings.proc_events
 weapon_traits_melee_common.weapon_trait_melee_common_wield_increased_attack = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_increased_attack_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.damage
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_increased_attack_buff = {
 			{
@@ -32,6 +46,20 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_increased_attack = {
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_increased_unarmored_damage = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_increased_unarmored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.unarmored_damage
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_increased_unarmored_damage_buff = {
 			{
@@ -58,6 +86,20 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_increased_unarmored_d
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_increased_armored_damage = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_increased_armored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.armored_damage
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_increased_armored_damage_buff = {
 			{
@@ -84,6 +126,20 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_increased_armored_dam
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_increased_resistant_damage = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_increased_resistant_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.resistant_damage
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_increased_resistant_damage_buff = {
 			{
@@ -110,6 +166,20 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_increased_resistant_d
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_increased_berserker_damage = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_increased_berserker_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.berserker_damage
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_increased_berserker_damage_buff = {
 			{
@@ -136,6 +206,20 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_increased_berserker_d
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_increased_super_armor_damage = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_increased_super_armor_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.super_armor_damage
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_increased_super_armor_damage_buff = {
 			{
@@ -162,6 +246,20 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_increased_super_armor
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_increased_disgustingly_resilient_damage = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_increased_disgustingly_resilient_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.disgustingly_resilient_damage
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_increased_disgustingly_resilient_damage_buff = {
 			{
@@ -188,6 +286,20 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_increased_disgustingl
 	}
 }
 weapon_traits_melee_common.weapon_trait_increase_crit_chance = {
+	format_values = {
+		crit_chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_increase_crit_chance",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.critical_strike_chance
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_increase_crit_chance = {
 			{
@@ -214,6 +326,20 @@ weapon_traits_melee_common.weapon_trait_increase_crit_chance = {
 	}
 }
 weapon_traits_melee_common.weapon_trait_increase_crit_damage = {
+	format_values = {
+		crit_damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_increase_crit_damage",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.critical_strike_damage
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_increase_crit_damage = {
 			{
@@ -240,6 +366,20 @@ weapon_traits_melee_common.weapon_trait_increase_crit_damage = {
 	}
 }
 weapon_traits_melee_common.weapon_trait_increase_stamina = {
+	format_values = {
+		stamina = {
+			prefix = "+",
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_increase_stamina",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.stamina_modifier
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_increase_stamina = {
 			{
@@ -266,6 +406,20 @@ weapon_traits_melee_common.weapon_trait_increase_stamina = {
 	}
 }
 weapon_traits_melee_common.weapon_trait_increase_weakspot_damage = {
+	format_values = {
+		weakspot_damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_increase_weakspot_damage",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.weakspot_damage
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_increase_weakspot_damage = {
 			{
@@ -292,6 +446,20 @@ weapon_traits_melee_common.weapon_trait_increase_weakspot_damage = {
 	}
 }
 weapon_traits_melee_common.weapon_trait_increase_attack_speed = {
+	format_values = {
+		attack_speed = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_increase_attack_speed",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.attack_speed
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_increase_attack_speed = {
 			{
@@ -318,6 +486,20 @@ weapon_traits_melee_common.weapon_trait_increase_attack_speed = {
 	}
 }
 weapon_traits_melee_common.weapon_trait_increase_damage = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_increase_damage",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.damage
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_increase_damage = {
 			{
@@ -344,6 +526,20 @@ weapon_traits_melee_common.weapon_trait_increase_damage = {
 	}
 }
 weapon_traits_melee_common.weapon_trait_increase_finesse = {
+	format_values = {
+		finesse_modifier = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_increase_finesse",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.finesse_modifier_bonus
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_increase_finesse = {
 			{
@@ -370,6 +566,20 @@ weapon_traits_melee_common.weapon_trait_increase_finesse = {
 	}
 }
 weapon_traits_melee_common.weapon_trait_increase_power = {
+	format_values = {
+		power_mod = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_increase_power",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.power_level_modifier
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_increase_power = {
 			{
@@ -396,6 +606,20 @@ weapon_traits_melee_common.weapon_trait_increase_power = {
 	}
 }
 weapon_traits_melee_common.weapon_trait_increase_impact = {
+	format_values = {
+		impact_power = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_increase_impact",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.impact_modifier
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_increase_impact = {
 			{
@@ -422,6 +646,23 @@ weapon_traits_melee_common.weapon_trait_increase_impact = {
 	}
 }
 weapon_traits_melee_common.weapon_trait_reduced_block_cost = {
+	format_values = {
+		reduced_block_cost = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_reduced_block_cost",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.block_cost_multiplier
+				}
+			},
+			value_manipulation = function (value)
+				return 100 - value * 100
+			end
+		}
+	},
 	buffs = {
 		weapon_trait_reduced_block_cost = {
 			{
@@ -448,6 +689,20 @@ weapon_traits_melee_common.weapon_trait_reduced_block_cost = {
 	}
 }
 weapon_traits_melee_common.weapon_trait_increase_damage_elites = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_increase_damage_elites",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.damage_vs_elites
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_increase_damage_elites = {
 			{
@@ -474,6 +729,20 @@ weapon_traits_melee_common.weapon_trait_increase_damage_elites = {
 	}
 }
 weapon_traits_melee_common.weapon_trait_increase_damage_hordes = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_increase_damage_hordes",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.damage_vs_horde
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_increase_damage_hordes = {
 			{
@@ -500,6 +769,20 @@ weapon_traits_melee_common.weapon_trait_increase_damage_hordes = {
 	}
 }
 weapon_traits_melee_common.weapon_trait_increase_damage_specials = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_increase_damage_specials",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.damage_vs_specials
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_increase_damage_specials = {
 			{
@@ -526,6 +809,23 @@ weapon_traits_melee_common.weapon_trait_increase_damage_specials = {
 	}
 }
 weapon_traits_melee_common.weapon_trait_reduce_sprint_cost = {
+	format_values = {
+		sprinting_cost_multiplier = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_reduce_sprint_cost",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.sprinting_cost_multiplier
+				}
+			},
+			value_manipulation = function (value)
+				return 100 - value * 100
+			end
+		}
+	},
 	buffs = {
 		weapon_trait_reduce_sprint_cost = {
 			{
@@ -552,6 +852,20 @@ weapon_traits_melee_common.weapon_trait_reduce_sprint_cost = {
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_equip_decrease_corruption_damage_taken = {
+	format_values = {
+		corruption_damage_taken = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_equip_decrease_corruption_damage_taken_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.corruption_taken_multiplier
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_equip_decrease_corruption_damage_taken_buff = {
 			{
@@ -578,6 +892,20 @@ weapon_traits_melee_common.weapon_trait_melee_common_equip_decrease_corruption_d
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_decrease_corruption_damage_taken = {
+	format_values = {
+		corruption_damage_taken = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_decrease_corruption_damage_taken_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.corruption_taken_multiplier
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_decrease_corruption_damage_taken_buff = {
 			{
@@ -604,6 +932,20 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_decrease_corruption_d
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_equip_decrease_toughness_damage_taken = {
+	format_values = {
+		toughness_damage_taken = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_equip_decrease_toughness_damage_taken_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.toughness_damage_taken_multiplier
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_equip_decrease_toughness_damage_taken_buff = {
 			{
@@ -630,6 +972,20 @@ weapon_traits_melee_common.weapon_trait_melee_common_equip_decrease_toughness_da
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_decrease_toughness_damage_taken = {
+	format_values = {
+		toughness_damage_taken = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_decrease_toughness_damage_taken_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.toughness_damage_taken_multiplier
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_decrease_toughness_damage_taken_buff = {
 			{
@@ -656,6 +1012,20 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_decrease_toughness_da
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_equip_decrease_damage_taken = {
+	format_values = {
+		damage_taken = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_equip_decrease_damage_taken_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.damage_taken_multiplier
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_equip_decrease_damage_taken_buff = {
 			{
@@ -682,6 +1052,20 @@ weapon_traits_melee_common.weapon_trait_melee_common_equip_decrease_damage_taken
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_decrease_damage_taken = {
+	format_values = {
+		damage_taken = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_decrease_damage_taken_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.damage_taken_multiplier
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_decrease_damage_taken_buff = {
 			{
@@ -708,6 +1092,20 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_decrease_damage_taken
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_equip_increase_movement_speed = {
+	format_values = {
+		movement_speed = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_equip_increase_movement_speed_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.movement_speed
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_equip_increase_movement_speed_buff = {
 			{
@@ -734,6 +1132,20 @@ weapon_traits_melee_common.weapon_trait_melee_common_equip_increase_movement_spe
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_increase_movement_speed = {
+	format_values = {
+		movement_speed = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_increase_movement_speed_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.movement_speed
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_increase_movement_speed_buff = {
 			{
@@ -760,6 +1172,20 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_increase_movement_spe
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_increase_crit_chance = {
+	format_values = {
+		crit_chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_increase_crit_chance_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.critical_strike_chance
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_increase_crit_chance_buff = {
 			{
@@ -786,6 +1212,20 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_increase_crit_chance 
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_increase_impact = {
+	format_values = {
+		impact = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_increase_impact_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.melee_impact_modifier
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_increase_impact_buff = {
 			{
@@ -812,6 +1252,20 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_increase_impact = {
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_power_modifier_bonus = {
+	format_values = {
+		power = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_power_modifier_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.power_level_modifier
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_power_modifier_bonus_buff = {
 			{
@@ -838,6 +1292,20 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_power_modifier_bonus 
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_finesse_modifier_bonus = {
+	format_values = {
+		finesse = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_finesse_modifier_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.finesse_modifier_bonus
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_finesse_modifier_bonus_buff = {
 			{
@@ -864,6 +1332,52 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_finesse_modifier_bonu
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_hit_damage_bonus = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_damage_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_hit
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_damage_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.damage
+				}
+			}
+		},
+		duration = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_damage_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_damage_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_hit_damage_bonus_buff = {
 			{
@@ -910,6 +1424,52 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_hit_damage_bonus =
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_hit_power_bonus = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_power_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_hit
+				}
+			}
+		},
+		power = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_power_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.power_level_modifier
+				}
+			}
+		},
+		duration = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_power_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_power_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_hit_power_bonus_buff = {
 			{
@@ -956,6 +1516,52 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_hit_power_bonus = 
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_hit_impact_bonus = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_impact_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_hit
+				}
+			}
+		},
+		impact = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_impact_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.melee_impact_modifier
+				}
+			}
+		},
+		duration = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_impact_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_impact_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_hit_impact_bonus_buff = {
 			{
@@ -1002,6 +1608,52 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_hit_impact_bonus =
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_hit_increased_unarmored_damage = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_increased_unarmored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_hit
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_increased_unarmored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.unarmored_damage
+				}
+			}
+		},
+		duration = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_increased_unarmored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_increased_unarmored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_hit_increased_unarmored_damage_buff = {
 			{
@@ -1048,6 +1700,52 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_hit_increased_unar
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_hit_increased_armored_damage = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_increased_armored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_hit
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_increased_armored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.armored_damage
+				}
+			}
+		},
+		duration = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_increased_armored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_increased_armored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_hit_increased_armored_damage_buff = {
 			{
@@ -1094,6 +1792,52 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_hit_increased_armo
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_hit_increased_resistant_damage = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_increased_resistant_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_hit
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_increased_resistant_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.resistant_damage
+				}
+			}
+		},
+		duration = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_increased_resistant_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_increased_resistant_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_hit_increased_resistant_damage_buff = {
 			{
@@ -1140,6 +1884,52 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_hit_increased_resi
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_hit_increased_berserker_damage = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_increased_berserker_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_hit
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_increased_berserker_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.berserker_damage
+				}
+			}
+		},
+		duration = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_increased_berserker_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_increased_berserker_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_hit_increased_berserker_damage_buff = {
 			{
@@ -1186,6 +1976,52 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_hit_increased_bers
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_hit_increased_super_armor_damage = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_increased_super_armor_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_hit
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_increased_super_armor_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.super_armor_damage
+				}
+			}
+		},
+		duration = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_increased_super_armor_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_increased_super_armor_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_hit_increased_super_armor_damage_buff = {
 			{
@@ -1232,6 +2068,52 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_hit_increased_supe
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_hit_increased_disgustingly_resilient_damage = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_increased_disgustingly_resilient_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_hit
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_increased_disgustingly_resilient_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.disgustingly_resilient_damage
+				}
+			}
+		},
+		duration = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_increased_disgustingly_resilient_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_increased_disgustingly_resilient_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_hit_increased_disgustingly_resilient_damage_buff = {
 			{
@@ -1278,6 +2160,20 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_hit_increased_disg
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_hit_bleed = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_bleed_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_hit
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_hit_bleed_buff = {
 			{
@@ -1304,6 +2200,52 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_hit_bleed = {
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_hit_staggered_power_bonus = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_staggered_power_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_hit
+				}
+			}
+		},
+		power = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_staggered_power_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.power_level_modifier
+				}
+			}
+		},
+		duration = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_staggered_power_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_hit_staggered_power_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_hit_staggered_power_bonus_buff = {
 			{
@@ -1350,6 +2292,32 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_hit_staggered_powe
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_heavy_attack_grant_power_bonus = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_attack_grant_power_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_hit
+				}
+			}
+		},
+		power = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_attack_grant_power_bonus_temporary_buff",
+				find_value_type = "buff_template",
+				path = {
+					"proc_stat_buffs",
+					stat_buffs.power_level_modifier
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_heavy_attack_grant_power_bonus_buff = {
 			{
@@ -1376,6 +2344,52 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_heavy_attack_grant
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_heavy_hit_damage_bonus = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_damage_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_hit
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_damage_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.damage
+				}
+			}
+		},
+		duration = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_damage_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_damage_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_heavy_hit_damage_bonus_buff = {
 			{
@@ -1422,6 +2436,52 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_heavy_hit_damage_b
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_heavy_hit_power_bonus = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_power_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_hit
+				}
+			}
+		},
+		power = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_power_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.power_level_modifier
+				}
+			}
+		},
+		duration = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_power_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_power_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_heavy_hit_power_bonus_buff = {
 			{
@@ -1468,6 +2528,52 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_heavy_hit_power_bo
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_heavy_hit_impact_bonus = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_impact_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_hit
+				}
+			}
+		},
+		impact = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_impact_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.melee_impact_modifier
+				}
+			}
+		},
+		duration = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_impact_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_impact_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_heavy_hit_impact_bonus_buff = {
 			{
@@ -1514,6 +2620,52 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_heavy_hit_impact_b
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_heavy_hit_increased_unarmored_damage = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_increased_unarmored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_hit
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_increased_unarmored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.unarmored_damage
+				}
+			}
+		},
+		duration = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_increased_unarmored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_increased_unarmored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_heavy_hit_increased_unarmored_damage_buff = {
 			{
@@ -1560,6 +2712,52 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_heavy_hit_increase
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_heavy_hit_increased_armored_damage = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_increased_armored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_hit
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_increased_armored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.armored_damage
+				}
+			}
+		},
+		duration = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_increased_armored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_increased_armored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_heavy_hit_increased_armored_damage_buff = {
 			{
@@ -1606,6 +2804,52 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_heavy_hit_increase
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_heavy_hit_increased_resistant_damage = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_increased_resistant_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_hit
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_increased_resistant_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.resistant_damage
+				}
+			}
+		},
+		duration = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_increased_resistant_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_increased_resistant_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_heavy_hit_increased_resistant_damage_buff = {
 			{
@@ -1652,6 +2896,52 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_heavy_hit_increase
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_heavy_hit_increased_berserker_damage = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_increased_berserker_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_hit
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_increased_berserker_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.berserker_damage
+				}
+			}
+		},
+		duration = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_increased_berserker_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_increased_berserker_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_heavy_hit_increased_berserker_damage_buff = {
 			{
@@ -1698,6 +2988,52 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_heavy_hit_increase
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_heavy_hit_increased_super_armor_damage = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_increased_super_armor_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_hit
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_increased_super_armor_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.super_armor_damage
+				}
+			}
+		},
+		duration = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_increased_super_armor_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_increased_super_armor_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_heavy_hit_increased_super_armor_damage_buff = {
 			{
@@ -1744,6 +3080,52 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_heavy_hit_increase
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_heavy_hit_increased_disgustingly_resilient_damage = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_increased_disgustingly_resilient_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_hit
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_increased_disgustingly_resilient_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.disgustingly_resilient_damage
+				}
+			}
+		},
+		duration = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_increased_disgustingly_resilient_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_hit_increased_disgustingly_resilient_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_heavy_hit_increased_disgustingly_resilient_damage_buff = {
 			{
@@ -1790,6 +3172,20 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_heavy_hit_increase
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_power_modifier_bonus_on_full_toughness = {
+	format_values = {
+		power = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_power_modifier_bonus_on_full_toughness_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.power_level_modifier
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_power_modifier_bonus_on_full_toughness_buff = {
 			{
@@ -1826,6 +3222,41 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_supression_immunity_o
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_player_toughness_broken_grant_power_level = {
+	format_values = {
+		power = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_player_toughness_broken_grant_power_level_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.power_level_modifier
+				}
+			}
+		},
+		duration = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_player_toughness_broken_grant_power_level_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_player_toughness_broken_grant_power_level_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_player_toughness_broken_grant_power_level_buff = {
 			{
@@ -1872,6 +3303,20 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_player_toughness_b
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_successful_dodge_grant_finesse_bonus = {
+	format_values = {
+		finesse = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_successful_dodge_grant_finesse_bonus_temporary_buff",
+				find_value_type = "buff_template",
+				path = {
+					"proc_stat_buffs",
+					stat_buffs.finesse_modifier_bonus
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_successful_dodge_grant_finesse_bonus_buff = {
 			{
@@ -1898,6 +3343,19 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_successful_dodge_g
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_successful_dodge_grant_crit_chance = {
+	format_values = {
+		crit_chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_successful_dodge_grant_crit_chance_temporary_buff",
+				find_value_type = "buff_template",
+				path = {
+					"max_stacks"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_successful_dodge_grant_crit_chance_buff = {
 			{
@@ -1996,6 +3454,20 @@ weapon_traits_melee_common.weapon_trait_melee_common_equip_immunity_on_all_allie
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_push_hit_grants_increased_attack = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_push_hit_grants_increased_attack_temporary_buff",
+				find_value_type = "buff_template",
+				path = {
+					"conditional_stat_buffs",
+					stat_buffs.melee_damage
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_push_hit_grants_increased_attack_buff = {
 			{
@@ -2022,6 +3494,41 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_push_hit_grants_incre
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_block_break_grant_power_bonus = {
+	format_values = {
+		power = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_break_grant_power_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.power_level_modifier
+				}
+			}
+		},
+		duration = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_break_grant_power_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_break_grant_power_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_block_break_grant_power_bonus_buff = {
 			{
@@ -2068,6 +3575,41 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_block_break_grant_
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_block_damage_bonus = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_damage_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.damage
+				}
+			}
+		},
+		duration = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_damage_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_damage_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_block_damage_bonus_buff = {
 			{
@@ -2114,6 +3656,41 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_block_damage_bonus
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_block_power_bonus = {
+	format_values = {
+		power = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_power_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.power_level_modifier
+				}
+			}
+		},
+		duration = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_power_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_power_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_block_power_bonus_buff = {
 			{
@@ -2160,6 +3737,41 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_block_power_bonus 
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_block_impact_bonus = {
+	format_values = {
+		impact = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_impact_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.melee_impact_modifier
+				}
+			}
+		},
+		duration = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_impact_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_impact_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_block_impact_bonus_buff = {
 			{
@@ -2206,6 +3818,41 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_block_impact_bonus
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_block_increased_unarmored_damage = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_increased_unarmored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.unarmored_damage
+				}
+			}
+		},
+		duration = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_increased_unarmored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_increased_unarmored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_block_increased_unarmored_damage_buff = {
 			{
@@ -2252,6 +3899,41 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_block_increased_un
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_block_increased_armored_damage = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_increased_armored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.armored_damage
+				}
+			}
+		},
+		duration = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_increased_armored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_increased_armored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_block_increased_armored_damage_buff = {
 			{
@@ -2298,6 +3980,41 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_block_increased_ar
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_block_increased_resistant_damage = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_increased_resistant_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.resistant_damage
+				}
+			}
+		},
+		duration = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_increased_resistant_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_increased_resistant_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_block_increased_resistant_damage_buff = {
 			{
@@ -2344,6 +4061,41 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_block_increased_re
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_block_increased_berserker_damage = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_increased_berserker_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.berserker_damage
+				}
+			}
+		},
+		duration = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_increased_berserker_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_increased_berserker_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_block_increased_berserker_damage_buff = {
 			{
@@ -2390,6 +4142,41 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_block_increased_be
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_block_increased_super_armor_damage = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_increased_super_armor_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.super_armor_damage
+				}
+			}
+		},
+		duration = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_increased_super_armor_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_increased_super_armor_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_block_increased_super_armor_damage_buff = {
 			{
@@ -2436,6 +4223,41 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_block_increased_su
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_block_increased_disgustingly_resilient_damage = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_increased_disgustingly_resilient_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.disgustingly_resilient_damage
+				}
+			}
+		},
+		duration = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_increased_disgustingly_resilient_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_block_increased_disgustingly_resilient_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_block_increased_disgustingly_resilient_damage_buff = {
 			{
@@ -2482,6 +4304,32 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_block_increased_di
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_weakspot_grant_power_bonus = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_weakspot_grant_power_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_hit
+				}
+			}
+		},
+		power = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_weakspot_grant_power_bonus_temporary_buff",
+				find_value_type = "buff_template",
+				path = {
+					"proc_stat_buffs",
+					stat_buffs.power_level_modifier
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_weakspot_grant_power_bonus_buff = {
 			{
@@ -2508,6 +4356,30 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_weakspot_grant_pow
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_weakspot_grant_bleeding = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_weakspot_grant_bleeding_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_hit
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_weakspot_grant_bleeding_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_weakspot_grant_bleeding_buff = {
 			{
@@ -2538,6 +4410,40 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_weakspot_grant_ble
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_heavy_attack_kill_increase_attack = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_attack_kill_increase_attack_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.melee_damage
+				}
+			}
+		},
+		duration = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_attack_kill_increase_attack_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_attack_kill_increase_attack_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_heavy_attack_kill_increase_attack_buff = {
 			{
@@ -2584,6 +4490,40 @@ weapon_traits_melee_common.weapon_trait_melee_common_wield_on_heavy_attack_kill_
 	}
 }
 weapon_traits_melee_common.weapon_trait_melee_common_wield_on_heavy_attack_kill_increase_attack_speed = {
+	format_values = {
+		attack_speed = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_attack_kill_increase_attack_speed_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.melee_attack_speed
+				}
+			}
+		},
+		duration = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_attack_kill_increase_attack_speed_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_melee_common_wield_on_heavy_attack_kill_increase_attack_speed_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_melee_common_wield_on_heavy_attack_kill_increase_attack_speed_buff = {
 			{

@@ -296,20 +296,26 @@ function ItemGridViewBase:_present_layout_by_slot_filter(slot_filter, item_type_
 			end
 		end
 
-		self._filtered_offer_items_layout = filtered_layout
 		self._grid_display_name = optional_display_name
-		local sort_options = self._sort_options
 
-		if sort_options then
-			local sort_index = self._selected_sort_option_index or 1
-			local selected_sort_option = sort_options[sort_index]
-			local selected_sort_function = selected_sort_option.sort_function
+		self:present_grid_layout(layout, function ()
+			local sort_options = self._sort_options
 
-			self:_sort_grid_layout(selected_sort_function)
-		else
-			self:_sort_grid_layout()
-		end
+			if sort_options then
+				local sort_index = self._selected_sort_option_index or 1
+				local selected_sort_option = sort_options[sort_index]
+				local selected_sort_function = selected_sort_option.sort_function
+
+				self:_sort_grid_layout(selected_sort_function, filtered_layout)
+			else
+				self:_sort_grid_layout(nil, filtered_layout)
+			end
+		end)
 	end
+end
+
+function ItemGridViewBase:grid_layout()
+	return self._item_grid:grid_layout()
 end
 
 function ItemGridViewBase:grid_widgets()
@@ -326,6 +332,10 @@ end
 
 function ItemGridViewBase:update_grid_widgets_visibility()
 	return self._item_grid:update_grid_widgets_visibility()
+end
+
+function ItemGridViewBase:force_update_grid_widget_icon(index)
+	return self._item_grid:force_update_grid_widget_icon(index)
 end
 
 function ItemGridViewBase:_update_tab_bar_position()
@@ -589,6 +599,10 @@ function ItemGridViewBase:_setup_item_grid(optional_grid_settings)
 	self:_setup_sort_options()
 end
 
+function ItemGridViewBase:get_loading_state()
+	return self._item_grid and self._item_grid:get_loading_state()
+end
+
 function ItemGridViewBase:set_loading_state(is_loading)
 	if self._item_grid then
 		self._item_grid:set_loading_state(is_loading)
@@ -707,29 +721,32 @@ function ItemGridViewBase:cb_on_sort_button_pressed(option)
 	end
 end
 
-function ItemGridViewBase:_cb_on_present()
-	local new_selection_index = nil
+function ItemGridViewBase:_requested_index_on_present()
 	local grid_widgets = self._item_grid:widgets()
 	local selected_gear_id = self._selected_gear_id
+	local new_selection_index = nil
 
 	for i = 1, #grid_widgets do
 		local widget = grid_widgets[i]
-		local content = widget.content
-		local element = content.element
 
-		if element then
-			local item = element.item
+		if widget then
+			local content = widget.content
+			local element = content.element
 
-			if item then
-				if item.gear_id == selected_gear_id then
-					new_selection_index = i
+			if element then
+				local item = element.item
 
-					break
-				elseif not new_selection_index then
-					new_selection_index = i
+				if item then
+					if item.gear_id == selected_gear_id then
+						new_selection_index = i
 
-					if not selected_gear_id then
 						break
+					elseif not new_selection_index then
+						new_selection_index = i
+
+						if not selected_gear_id then
+							break
+						end
 					end
 				end
 			end
@@ -738,26 +755,61 @@ function ItemGridViewBase:_cb_on_present()
 
 	self._selected_gear_id = nil
 
-	if new_selection_index then
-		self._item_grid:focus_grid_index(new_selection_index)
-	else
-		self._item_grid:select_first_index()
-	end
-
-	self._item_grid:scroll_to_grid_index(new_selection_index or 1, true)
-
-	self._synced_grid_index = nil
+	return new_selection_index
 end
 
-function ItemGridViewBase:_sort_grid_layout(sort_function)
-	if not self._filtered_offer_items_layout then
+function ItemGridViewBase:_cb_on_present()
+	self._synced_grid_index = nil
+	local item_grid = self._item_grid
+	local grid_widgets = item_grid and item_grid:widgets()
+
+	if not grid_widgets then
 		return
 	end
 
-	local layout = table.append({}, self._filtered_offer_items_layout)
+	local new_selection_index = self:_requested_index_on_present()
 
-	if sort_function and #layout > 1 then
-		table.sort(layout, sort_function)
+	if new_selection_index then
+		item_grid:focus_grid_index(new_selection_index)
+	else
+		item_grid:select_first_index()
+	end
+
+	item_grid:scroll_to_grid_index(new_selection_index or 1, true)
+end
+
+function ItemGridViewBase:_sort_grid_layout(sort_function, optional_filter_layout)
+	local item_grid = self._item_grid
+	local visible_layout = optional_filter_layout or item_grid._visible_grid_layout
+
+	if not visible_layout then
+		return
+	end
+
+	local filtered_layout = {}
+	local external_layouts = {}
+
+	for i = 1, #visible_layout do
+		local layout = visible_layout[i]
+
+		if not layout.is_external then
+			filtered_layout[#filtered_layout + 1] = layout
+		else
+			external_layouts[#external_layouts + 1] = {
+				index = i,
+				layout = layout
+			}
+		end
+	end
+
+	if sort_function and #filtered_layout > 1 then
+		table.sort(filtered_layout, sort_function)
+	end
+
+	for i = 1, #external_layouts do
+		local external_layout = external_layouts[i]
+
+		table.insert(filtered_layout, external_layout.index, external_layout.layout)
 	end
 
 	local item_grid = self._item_grid
@@ -767,7 +819,7 @@ function ItemGridViewBase:_sort_grid_layout(sort_function)
 	self._selected_gear_id = self._selected_gear_id or selected_item and selected_item.gear_id
 	local on_present_callback = callback(self, "_cb_on_present")
 
-	self:present_grid_layout(layout, on_present_callback)
+	self:present_grid_layout(filtered_layout, on_present_callback)
 end
 
 function ItemGridViewBase:present_grid_layout(layout, on_present_callback)
@@ -779,16 +831,24 @@ function ItemGridViewBase:present_grid_layout(layout, on_present_callback)
 	local grid_settings = self._definitions.grid_settings
 	local grid_size = grid_settings.grid_size
 	local ContentBlueprints = generate_blueprints_function(grid_size)
+
+	if layout[1] and not layout[1].is_external then
+		self:_add_external_layout(layout)
+	end
+
+	local grow_direction = self._grow_direction or "down"
+
+	self._item_grid:present_grid_layout(layout, ContentBlueprints, left_click_callback, right_click_callback, grid_display_name, grow_direction, on_present_callback, left_double_click_callback)
+end
+
+function ItemGridViewBase:_add_external_layout(layout)
 	local spacing_entry = {
+		is_external = true,
 		widget_type = "spacing_vertical"
 	}
 
 	table.insert(layout, 1, spacing_entry)
 	table.insert(layout, #layout + 1, spacing_entry)
-
-	local grow_direction = self._grow_direction or "down"
-
-	self._item_grid:present_grid_layout(layout, ContentBlueprints, left_click_callback, right_click_callback, grid_display_name, grow_direction, on_present_callback, left_double_click_callback)
 end
 
 function ItemGridViewBase:cb_on_grid_entry_right_pressed(widget, element)
@@ -1008,26 +1068,42 @@ function ItemGridViewBase:focus_on_item(item)
 	end
 end
 
-function ItemGridViewBase:item_grid_index(item)
-	if not item then
-		return
-	end
-
+function ItemGridViewBase:_index_by_condition(condition)
 	local item_grid = self._item_grid
-	local widgets = item_grid:widgets()
+	local widgets = item_grid and item_grid:widgets()
+	local widget_count = widgets and #widgets or 0
 
-	for i = 1, #widgets do
+	for i = 1, widget_count do
 		local widget = widgets[i]
 		local content = widget.content
 		local element = content.element
-		local element_item = element.item
 
-		if element_item and element_item.gear_id == item.gear_id then
-			local widget_index = item_grid:widget_index(widget) or 1
-
-			return widget_index
+		if element and condition(element) then
+			return i
 		end
 	end
+end
+
+function ItemGridViewBase:index_by_item_name(item_name)
+	return self:_index_by_condition(function (element)
+		return element and element.item.name and element.item.name == item_name
+	end)
+end
+
+function ItemGridViewBase:index_by_gear_id(gear_id)
+	return self:_index_by_condition(function (element)
+		return element and element.item.gear_id and element.item.gear_id == gear_id
+	end)
+end
+
+function ItemGridViewBase:item_grid_index(item)
+	local target_gear_id = item and item.gear_id
+
+	if not target_gear_id then
+		return
+	end
+
+	return self:index_by_gear_id(target_gear_id)
 end
 
 function ItemGridViewBase:first_grid_item()

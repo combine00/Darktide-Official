@@ -1,10 +1,9 @@
 local Definitions = require("scripts/ui/views/node_builder_view_base/node_builder_view_base_definitions")
-local BaseView = require("scripts/ui/views/base_view")
+local Colors = require("scripts/utilities/ui/colors")
 local UIFonts = require("scripts/managers/ui/ui_fonts")
 local UIRenderer = require("scripts/managers/ui/ui_renderer")
-local UIWidget = require("scripts/managers/ui/ui_widget")
 local UIScenegraph = require("scripts/managers/ui/ui_scenegraph")
-local ColorUtilities = require("scripts/utilities/ui/colors")
+local UIWidget = require("scripts/managers/ui/ui_widget")
 local NODE_STATUS = table.enum("locked", "available", "unavailable", "capped")
 local NodeBuilderViewBase = class("NodeBuilderViewBase", "BaseView")
 NodeBuilderViewBase.NODE_STATUS = NODE_STATUS
@@ -681,7 +680,7 @@ end
 
 function NodeBuilderViewBase:_set_node_points_spent_text(widget, points_spent, max_points)
 	local content = widget.content
-	content.text = tostring(points_spent) .. " / " .. tostring(max_points)
+	content.text = tostring(points_spent) .. "/" .. tostring(max_points)
 end
 
 function NodeBuilderViewBase:_node_on_hovered(node)
@@ -1561,14 +1560,14 @@ function NodeBuilderViewBase:_apply_node_connection_line_colors(color_status)
 	local node_connection_style = node_connection_widget.style
 	local line_color = node_connection_style.line.color
 
-	ColorUtilities.color_copy(color, line_color)
+	Colors.color_copy(color, line_color)
 
 	local arrow_style = node_connection_style.arrow
 
 	if arrow_style then
 		local arrow_color = arrow_style.color
 
-		ColorUtilities.color_copy(color, arrow_color)
+		Colors.color_copy(color, arrow_color)
 	end
 end
 

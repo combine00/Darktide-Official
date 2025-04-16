@@ -22,6 +22,11 @@ local melee_base = {
 		last_weapon_switch_t = "number",
 		wanted_weapon_slot = "string",
 		wanted_combat_range = "string"
+	},
+	gib_override = {
+		target_template = "string",
+		should_override = "boolean",
+		override_hit_zone_name = "string"
 	}
 }
 
@@ -69,13 +74,22 @@ melee_patroller_can_be_suppressed.patrol = {
 	walk_position = "Vector3Box",
 	auto_patrol = "boolean"
 }
+local unarmed = {
+	behavior = {
+		move_state = "string"
+	}
+}
+
+table.merge(unarmed, base_template)
+
 local templates = {
 	melee_base = melee_base,
 	melee_shield = melee_shield,
 	melee_patroller = melee_patroller,
 	melee_shield_patroller = melee_shield_patroller,
 	melee_can_be_suppressed = melee_can_be_suppressed,
-	melee_patroller_can_be_suppressed = melee_patroller_can_be_suppressed
+	melee_patroller_can_be_suppressed = melee_patroller_can_be_suppressed,
+	unarmed = unarmed
 }
 
 return templates

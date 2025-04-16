@@ -1,3 +1,4 @@
+local ActionInputHierarchy = require("scripts/utilities/action/action_input_hierarchy")
 local ArmorSettings = require("scripts/settings/damage/armor_settings")
 local BaseTemplateSettings = require("scripts/settings/equipment/weapon_templates/base_template_settings")
 local BuffSettings = require("scripts/settings/buff/buff_settings")
@@ -5,6 +6,7 @@ local DamageProfileTemplates = require("scripts/settings/damage/damage_profile_t
 local DamageSettings = require("scripts/settings/damage/damage_settings")
 local ExplosionTemplates = require("scripts/settings/damage/explosion_templates")
 local FootstepIntervalsTemplates = require("scripts/settings/equipment/footstep/footstep_intervals_templates")
+local HapticTriggerTemplates = require("scripts/settings/equipment/haptic_trigger_templates")
 local HitScanTemplates = require("scripts/settings/projectile/hit_scan_templates")
 local LineEffects = require("scripts/settings/effects/line_effects")
 local PlayerCharacterConstants = require("scripts/settings/player_character/player_character_constants")
@@ -133,41 +135,125 @@ local weapon_template = {
 table.add_missing(weapon_template.action_inputs, BaseTemplateSettings.action_inputs)
 
 weapon_template.action_input_hierarchy = {
-	reload = "base",
-	wield = "stay",
-	shoot_charge = {
-		wield = "base",
-		charged_enough = "base",
-		grenade_ability = "base",
-		vent = "base",
-		vent_override = "base",
-		reload = "base",
-		combat_ability = "base",
-		shoot_cancel = "base"
+	{
+		input = "shoot_charge",
+		transition = {
+			{
+				transition = "base",
+				input = "charged_enough"
+			},
+			{
+				transition = "base",
+				input = "shoot_cancel"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "grenade_ability"
+			},
+			{
+				transition = "base",
+				input = "reload"
+			},
+			{
+				transition = "base",
+				input = "vent"
+			},
+			{
+				transition = "base",
+				input = "vent_override"
+			}
+		}
 	},
-	brace = {
-		wield = "base",
-		brace_release = "base",
-		grenade_ability = "base",
-		shoot_braced = "base",
-		reload = "base",
-		combat_ability = "base"
+	{
+		input = "brace",
+		transition = {
+			{
+				transition = "base",
+				input = "brace_release"
+			},
+			{
+				transition = "base",
+				input = "shoot_braced"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "grenade_ability"
+			},
+			{
+				transition = "base",
+				input = "reload"
+			}
+		}
 	},
-	vent = {
-		wield = "base",
-		vent_release = "base",
-		combat_ability = "base",
-		grenade_ability = "base"
+	{
+		input = "vent",
+		transition = {
+			{
+				transition = "base",
+				input = "vent_release"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "grenade_ability"
+			}
+		}
 	},
-	vent_override = {
-		wield = "base",
-		vent_release = "base",
-		combat_ability = "base",
-		grenade_ability = "base"
+	{
+		input = "vent_override",
+		transition = {
+			{
+				transition = "base",
+				input = "vent_release"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "grenade_ability"
+			}
+		}
+	},
+	{
+		transition = "base",
+		input = "reload"
+	},
+	{
+		transition = "stay",
+		input = "wield"
 	}
 }
 
-table.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
+ActionInputHierarchy.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
 
 weapon_template.actions = {
 	action_unwield = {
@@ -690,7 +776,8 @@ weapon_template.actions = {
 		},
 		time_scale_stat_buffs = {
 			buff_stat_buffs.reload_speed
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_overheat_explode = {
 		death_on_explosion = true,
@@ -717,7 +804,8 @@ weapon_template.actions = {
 		},
 		sfx = {
 			on_start = "weapon_about_to_explode"
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_inspect = {
 		skip_3p_anims = false,
@@ -730,7 +818,8 @@ weapon_template.actions = {
 		total_time = math.huge,
 		crosshair = {
 			crosshair_type = "inspect"
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	}
 }
 weapon_template.base_stats = {
@@ -1033,6 +1122,7 @@ weapon_template.stamina_template = "default"
 weapon_template.toughness_template = "default"
 weapon_template.footstep_intervals = FootstepIntervalsTemplates.plasmagun
 weapon_template.smart_targeting_template = SmartTargetingTemplates.assault
+weapon_template.haptic_trigger_template = HapticTriggerTemplates.ranged.plasmagun
 weapon_template.traits = {}
 local bespoke_plasmagun_p1_traits = table.ukeys(WeaponTraitsBespokePlasmagunP1)
 

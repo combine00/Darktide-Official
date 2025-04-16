@@ -14,7 +14,13 @@ function MinionAttackSelection.generate(attack_selection_template_name, initial_
 	local amount_from_category = attack_selection_template.amount_from_category
 
 	if amount_from_category then
-		for category, amount in pairs(amount_from_category) do
+		local category_keys = table.keys(amount_from_category)
+
+		table.sort(category_keys)
+
+		for category_index = 1, #category_keys do
+			local category = category_keys[category_index]
+			local amount = amount_from_category[category]
 			local entries = TEMP_CATEGORY_ATTACK_ENTRIES[category]
 			local num_entries = #entries
 

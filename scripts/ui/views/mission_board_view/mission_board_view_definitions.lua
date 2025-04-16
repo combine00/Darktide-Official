@@ -492,7 +492,7 @@ MissionBoardViewDefinitions.scenegraph_definition = {
 		},
 		position = {
 			0,
-			0,
+			20,
 			0
 		}
 	},
@@ -587,7 +587,7 @@ MissionBoardViewDefinitions.scenegraph_definition = {
 		size = ButtonPassTemplates.default_button.size,
 		position = {
 			0,
-			460,
+			480,
 			100
 		}
 	},
@@ -2898,6 +2898,21 @@ function MissionBoardViewDefinitions.widget_definitions_functions.detail_pass_fu
 			pass_type = "text",
 			value = Utf8.upper(Localize("loc_mission_board_maelstrom_header")),
 			visibility_function = _is_flash
+		},
+		{
+			scenegraph_id = "detail_location",
+			style_id = "unlock_text_background",
+			pass_type = "rect",
+			visibility_function = function (content)
+				return content.unlock_text ~= ""
+			end
+		},
+		{
+			value_id = "unlock_text",
+			style_id = "unlock_text",
+			pass_type = "text",
+			scenegraph_id = "detail_location",
+			value = ""
 		}
 	}, "detail", nil, nil, MissionBoardViewStyles.detail_widget_style_function(mission_type))
 end

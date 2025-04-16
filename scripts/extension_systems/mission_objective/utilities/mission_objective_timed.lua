@@ -8,6 +8,7 @@ function MissionObjectiveTimed:init()
 	self._duration = 0
 	self._time_left = 0
 	self._time_elapsed = 0
+	self._paused = false
 end
 
 function MissionObjectiveTimed:_get_duration(mission_objective_data)
@@ -16,7 +17,7 @@ function MissionObjectiveTimed:_get_duration(mission_objective_data)
 	end
 
 	if mission_objective_data.duration_by_difficulty then
-		local difficulty = Managers.state.difficulty:get_difficulty()
+		local difficulty = Managers.state.difficulty:get_initial_challenge()
 
 		if difficulty > #mission_objective_data.duration_by_difficulty then
 			Log.error("MissionObjectiveTimed", "duration_by_difficulty misses a duration corresponding to difficulty '%d', falling back to the duration on the highest index instead (duration will be '%d')", difficulty, mission_objective_data.duration_by_difficulty[#mission_objective_data.duration_by_difficulty])
@@ -49,20 +50,28 @@ end
 function MissionObjectiveTimed:update(dt)
 	MissionObjectiveTimed.super.update(self, dt)
 
-	local timed_synchronizer_extension = self:synchronizer_extension()
-
-	if timed_synchronizer_extension then
-		dt = timed_synchronizer_extension:rubberband_time(dt)
+	if not self._paused then
+		self._time_elapsed = self._time_elapsed + dt
+		self._time_elapsed = math.min(self._time_elapsed, self._duration)
+		self._time_left = self._duration - self._time_elapsed
 	end
-
-	self._time_elapsed = self._time_elapsed + dt
-	self._time_elapsed = math.min(self._time_elapsed, self._duration)
-	self._time_left = self._duration - self._time_elapsed
 end
 
 function MissionObjectiveTimed:add_time(time)
 	self._time_elapsed = math.clamp(self._time_elapsed + time, 0, self._duration)
 	self._time_left = self._duration - self._time_elapsed
+end
+
+function MissionObjectiveTimed:pause()
+	self._paused = true
+end
+
+function MissionObjectiveTimed:resume()
+	self._paused = false
+end
+
+function MissionObjectiveTimed:timer_paused()
+	return self._paused
 end
 
 function MissionObjectiveTimed:update_progression()

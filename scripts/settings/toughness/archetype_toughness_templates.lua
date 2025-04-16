@@ -25,7 +25,7 @@ local archetype_toughness_templates = {
 	},
 	psyker = {
 		regeneration_delay = 3,
-		max = 60,
+		max = 75,
 		template_type = template_types.player,
 		regeneration_speed = {
 			still = 5,
@@ -62,7 +62,7 @@ local archetype_toughness_templates = {
 	},
 	ogryn = {
 		regeneration_delay = 3,
-		max = 50,
+		max = 75,
 		template_type = template_types.player,
 		regeneration_speed = {
 			still = 5,

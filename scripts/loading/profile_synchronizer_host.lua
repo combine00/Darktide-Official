@@ -227,10 +227,10 @@ function ProfileSynchronizerHost:profile_updates_profile(peer_id, local_player_i
 	return profile_updates[local_player_id]
 end
 
-function ProfileSynchronizerHost:profiles_synced(peer_ids)
+function ProfileSynchronizerHost:profiles_synced(peer_ids, peers_filter_map)
 	for i = 1, #peer_ids do
 		local peer_id = peer_ids[i]
-		local peer_synced = self:peer_profiles_synced(peer_id)
+		local peer_synced = self:peer_profiles_synced(peer_id, peers_filter_map)
 
 		if not peer_synced then
 			return false
@@ -240,11 +240,88 @@ function ProfileSynchronizerHost:profiles_synced(peer_ids)
 	return true
 end
 
-function ProfileSynchronizerHost:peer_profiles_synced(peer_id)
+local temp_non_synced_peers_map = {
+	peer_to_others = Script.new_array(8),
+	others_to_peer = Script.new_array(8)
+}
+
+function ProfileSynchronizerHost:peers_not_synced_with(peer_id, peers_filter_map)
+	local non_synced_peers_map = temp_non_synced_peers_map
+	local peer_to_others = non_synced_peers_map.peer_to_others
+	local others_to_peer = non_synced_peers_map.others_to_peer
+
+	table.clear(peer_to_others)
+	table.clear(others_to_peer)
+
+	local profile_sync_states = self._profile_sync_states
+	local empty_table = peer_to_others
+	local peer_states = profile_sync_states[peer_id] or empty_table
+
+	for sync_peer_id, player_states in pairs(peer_states) do
+		repeat
+			if peers_filter_map and not peers_filter_map[sync_peer_id] then
+				break
+			end
+
+			local synced = true
+
+			for _, sync_state in pairs(player_states) do
+				if sync_state ~= SYNC_STATES.synced then
+					synced = false
+
+					break
+				end
+			end
+
+			if not synced then
+				peer_to_others[#peer_to_others + 1] = sync_peer_id
+			end
+		until true
+	end
+
+	for sync_peer_id, sync_peer_states in pairs(profile_sync_states) do
+		repeat
+			if peers_filter_map and not peers_filter_map[sync_peer_id] then
+				break
+			elseif sync_peer_id == peer_id then
+				break
+			end
+
+			local synced = true
+			local player_states = sync_peer_states[peer_id]
+
+			if not player_states then
+				if peer_id ~= self._peer_id then
+					synced = false
+				end
+			else
+				for _, sync_state in pairs(player_states) do
+					if sync_state ~= SYNC_STATES.synced then
+						synced = false
+
+						break
+					end
+				end
+			end
+
+			if not synced then
+				others_to_peer[#others_to_peer + 1] = sync_peer_id
+			end
+		until true
+	end
+
+	return peer_to_others, others_to_peer
+end
+
+function ProfileSynchronizerHost:peer_profiles_synced(peer_id, peers_filter_map)
 	local profile_sync_states = self._profile_sync_states
 
 	for other_peer_id, peer_states in pairs(profile_sync_states) do
 		repeat
+			if peers_filter_map and not peers_filter_map[other_peer_id] then
+				break
+			end
+
 			local player_states = peer_states[peer_id]
 
 			if not player_states then
@@ -284,11 +361,7 @@ function ProfileSynchronizerHost:peer_disconnected(peer_id, channel_id)
 	profile_sync_states[peer_id] = nil
 
 	for _, peer_states in pairs(profile_sync_states) do
-		for sync_peer_id, _ in pairs(peer_states) do
-			if sync_peer_id == peer_id then
-				peer_states[sync_peer_id] = nil
-			end
-		end
+		peer_states[peer_id] = nil
 	end
 
 	for _, other_channel_id in pairs(self._connected_peers) do
@@ -394,6 +467,11 @@ function ProfileSynchronizerHost:rpc_player_profile_synced(channel_id, profile_p
 	end
 
 	local peer_states = self._profile_sync_states[peer_id]
+
+	if not peer_states[profile_peer_id] then
+		return
+	end
+
 	local current_state = peer_states[profile_peer_id][profile_local_player_id]
 
 	if current_state == SYNC_STATES.syncing_need_resync then

@@ -1,3 +1,5 @@
+local TalentSettings = require("scripts/settings/talent/talent_settings")
+local talent_settings = TalentSettings.overcharge_stance
 local ability_template = {
 	action_inputs = {
 		stance_pressed = {
@@ -11,26 +13,31 @@ local ability_template = {
 		}
 	},
 	action_input_hierarchy = {
-		stance_pressed = "stay"
+		{
+			transition = "stay",
+			input = "stance_pressed"
+		}
 	},
 	actions = {
 		action_stance_change = {
-			refill_toughness = false,
-			use_ability_charge = true,
+			anim_3p = "ability_buff",
+			anim = "ability_overcharge",
 			start_input = "stance_pressed",
-			use_charge_at_start = true,
+			allowed_during_explode = true,
 			kind = "stance_change",
 			sprint_ready_up_time = 0,
-			vo_tag = "ability_buff_stance",
-			anim_3p = "ability_buff",
-			abort_sprint = true,
+			refill_toughness = false,
 			uninterruptible = true,
-			anim = "ability_overcharge",
 			allowed_during_sprint = true,
 			ability_type = "combat_ability",
 			block_weapon_actions = false,
+			use_charge_at_start = true,
+			vo_tag = "ability_buff_stance",
+			abort_sprint = true,
+			use_ability_charge = true,
 			prevent_sprint = true,
-			total_time = 1
+			total_time = 1,
+			vent_warp_charge = talent_settings.venting
 		}
 	},
 	fx_sources = {},

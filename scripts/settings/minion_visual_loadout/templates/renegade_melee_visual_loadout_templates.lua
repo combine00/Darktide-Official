@@ -6,6 +6,7 @@ local templates = {
 local basic_renegade_melee_template = {
 	slots = {
 		slot_upperbody = {
+			use_outline = true,
 			items = {
 				"content/items/characters/minions/chaos_traitor_guard/attachments_base/upperbody_a",
 				"content/items/characters/minions/chaos_traitor_guard/attachments_base/upperbody_a_color_var_01",
@@ -18,6 +19,7 @@ local basic_renegade_melee_template = {
 			}
 		},
 		slot_lowerbody = {
+			use_outline = true,
 			items = {
 				"content/items/characters/minions/chaos_traitor_guard/attachments_base/lowerbody_a",
 				"content/items/characters/minions/chaos_traitor_guard/attachments_base/lowerbody_a_color_var_01",
@@ -30,6 +32,7 @@ local basic_renegade_melee_template = {
 			}
 		},
 		slot_face = {
+			use_outline = true,
 			items = {
 				"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_01",
 				"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_01_tattoo_01",
@@ -37,6 +40,7 @@ local basic_renegade_melee_template = {
 			}
 		},
 		slot_hair = {
+			use_outline = true,
 			items = {
 				"content/items/characters/minions/chaos_traitor_guard/attachments_base/hair_b",
 				"content/items/characters/minions/chaos_traitor_guard/attachments_base/hair_b_var_01",
@@ -49,8 +53,9 @@ local basic_renegade_melee_template = {
 			}
 		},
 		slot_melee_weapon = {
-			drop_on_death = true,
+			use_outline = true,
 			is_weapon = true,
+			drop_on_death = true,
 			items = {
 				"content/items/weapons/minions/melee/chaos_traitor_guard_melee_weapon_02",
 				"content/items/weapons/minions/melee/chaos_traitor_guard_melee_weapon_04",
@@ -58,6 +63,7 @@ local basic_renegade_melee_template = {
 			}
 		},
 		slot_decal = {
+			use_outline = true,
 			items = {
 				"content/items/characters/minions/chaos_traitor_guard/attachments_gear/chaos_traitor_guard_decal_01_a",
 				"content/items/characters/minions/chaos_traitor_guard/attachments_gear/chaos_traitor_guard_decal_01_d",
@@ -65,6 +71,7 @@ local basic_renegade_melee_template = {
 			}
 		},
 		slot_variation_gear = {
+			use_outline = true,
 			items = {
 				"content/items/characters/minions/chaos_traitor_guard/attachments_gear/melee_a"
 			}
@@ -98,6 +105,7 @@ default_2.gib_variations = {
 	"var_01"
 }
 default_2.slots.slot_variation_gear = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/melee_a_var_01"
 	}
@@ -107,6 +115,7 @@ default_3.gib_variations = {
 	"var_01"
 }
 default_3.slots.slot_variation_gear = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/melee_a_var_02"
 	}
@@ -116,6 +125,7 @@ default_4.gib_variations = {
 	"var_03"
 }
 default_4.slots.slot_variation_gear = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/melee_a_var_03"
 	}
@@ -125,6 +135,7 @@ default_5.gib_variations = {
 	"face_01_b"
 }
 default_5.slots.slot_face = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_01_b",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_01_b_tattoo_01",
@@ -137,11 +148,13 @@ default_6.gib_variations = {
 	"var_01"
 }
 default_6.slots.slot_variation_gear = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/melee_a_var_01"
 	}
 }
 default_6.slots.slot_face = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_01_b",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_01_b_tattoo_01",
@@ -154,11 +167,13 @@ default_7.gib_variations = {
 	"var_02"
 }
 default_7.slots.slot_variation_gear = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/melee_a_var_02"
 	}
 }
 default_7.slots.slot_face = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_01_b",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_01_b_tattoo_01",
@@ -171,11 +186,13 @@ default_8.gib_variations = {
 	"var_03"
 }
 default_8.slots.slot_variation_gear = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/melee_a_var_03"
 	}
 }
 default_8.slots.slot_face = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_01_b",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_01_b_tattoo_01",
@@ -187,6 +204,7 @@ default_9.gib_variations = {
 	"face_02"
 }
 default_9.slots.slot_face = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_02",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_02_tattoo_01",
@@ -199,11 +217,13 @@ default_10.gib_variations = {
 	"var_01"
 }
 default_10.slots.slot_variation_gear = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/melee_a_var_01"
 	}
 }
 default_10.slots.slot_face = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_02",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_02_tattoo_01",
@@ -216,11 +236,13 @@ default_11.gib_variations = {
 	"var_02"
 }
 default_11.slots.slot_variation_gear = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/melee_a_var_02"
 	}
 }
 default_11.slots.slot_face = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_02",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_02_tattoo_01",
@@ -233,11 +255,13 @@ default_12.gib_variations = {
 	"var_03"
 }
 default_12.slots.slot_variation_gear = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/melee_a_var_03"
 	}
 }
 default_12.slots.slot_face = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_02",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_02_tattoo_01",
@@ -249,6 +273,7 @@ default_13.gib_variations = {
 	"face_02_b"
 }
 default_13.slots.slot_face = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_02_b",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_02_b_tattoo_01",
@@ -261,11 +286,13 @@ default_14.gib_variations = {
 	"var_01"
 }
 default_14.slots.slot_variation_gear = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/melee_a_var_01"
 	}
 }
 default_14.slots.slot_face = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_02_b",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_02_b_tattoo_01",
@@ -278,11 +305,13 @@ default_15.gib_variations = {
 	"var_02"
 }
 default_15.slots.slot_variation_gear = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/melee_a_var_02"
 	}
 }
 default_15.slots.slot_face = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_02_b",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_02_b_tattoo_01",
@@ -295,11 +324,13 @@ default_16.gib_variations = {
 	"var_03"
 }
 default_16.slots.slot_variation_gear = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/melee_a_var_03"
 	}
 }
 default_16.slots.slot_face = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_02_b",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_02_b_tattoo_01",
@@ -311,6 +342,7 @@ default_17.gib_variations = {
 	"face_03"
 }
 default_17.slots.slot_face = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_03",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_03_tattoo_01",
@@ -323,11 +355,13 @@ default_18.gib_variations = {
 	"var_01"
 }
 default_18.slots.slot_variation_gear = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/melee_a_var_01"
 	}
 }
 default_18.slots.slot_face = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_03",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_03_tattoo_01",
@@ -340,11 +374,13 @@ default_19.gib_variations = {
 	"var_02"
 }
 default_19.slots.slot_variation_gear = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/melee_a_var_02"
 	}
 }
 default_19.slots.slot_face = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_03",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_03_tattoo_01",
@@ -357,11 +393,13 @@ default_20.gib_variations = {
 	"var_03"
 }
 default_20.slots.slot_variation_gear = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/melee_a_var_03"
 	}
 }
 default_20.slots.slot_face = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_03",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_03_tattoo_01",
@@ -373,6 +411,7 @@ default_21.gib_variations = {
 	"face_03_b"
 }
 default_21.slots.slot_face = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_03_b",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_03_b_tattoo_01",
@@ -385,11 +424,13 @@ default_22.gib_variations = {
 	"var_01"
 }
 default_22.slots.slot_variation_gear = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/melee_a_var_01"
 	}
 }
 default_22.slots.slot_face = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_03_b",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_03_b_tattoo_01",
@@ -402,11 +443,13 @@ default_23.gib_variations = {
 	"var_02"
 }
 default_23.slots.slot_variation_gear = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/melee_a_var_02"
 	}
 }
 default_23.slots.slot_face = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_03_b",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_03_b_tattoo_01",
@@ -419,11 +462,13 @@ default_24.gib_variations = {
 	"var_03"
 }
 default_24.slots.slot_variation_gear = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/melee_a_var_03"
 	}
 }
 default_24.slots.slot_face = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_03_b",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/face_03_b_tattoo_01",

@@ -55,6 +55,8 @@ function StatsManager:init(is_client, event_delegate, rpc_settings)
 		self._event_delegate:register_connection_events(self, unpack(CLIENT_RPCS))
 	end
 
+	self._next_user = 0
+
 	self:clear()
 end
 
@@ -321,6 +323,10 @@ end
 function StatsManager:remove_user(key)
 	local user = self._users[key]
 
+	if user == self._next_user then
+		self._next_user = 0
+	end
+
 	if user.state == UserStates.tracking then
 		self:stop_tracking_user(key)
 	end
@@ -488,6 +494,13 @@ function StatsManager:_get_stashed_data(user)
 	return stashed_data
 end
 
+function StatsManager:is_tracking_user(key)
+	local user = self._users[key]
+	local is_tracking = user and user.state == UserStates.tracking
+
+	return is_tracking
+end
+
 function StatsManager:start_tracking_user(key, user_config)
 	local user = self._users[key]
 	local definitions = self._definitions
@@ -580,6 +593,30 @@ function StatsManager:start_tracking_user(key, user_config)
 	user.state = UserStates.tracking
 	user.config = parsed_user_config
 	user.trigger_queue = PriorityQueue:new()
+end
+
+function StatsManager:hot_join_sync(sender, channel)
+	local player = Managers.player:player(sender, 1)
+
+	if self:has_session() then
+		local stat_id = player.stat_id
+
+		if not self:is_tracking_user(stat_id) then
+			local joined_at = 0
+
+			if Managers.state and Managers.state.main_path then
+				joined_at = Managers.state.main_path:furthest_travel_percentage(1)
+			end
+
+			local player_stats_config = {
+				archetype_name = player:archetype_name(),
+				character_id = player:character_id(),
+				joined_at = joined_at
+			}
+
+			self:start_tracking_user(player.stat_id, player_stats_config)
+		end
+	end
 end
 
 function StatsManager:_parse_backend_value(x)
@@ -822,6 +859,8 @@ function StatsManager:_trigger(user, stat_name, ...)
 				...
 			})
 		else
+			self._next_user = next_user
+
 			self:_trigger(next_user, trigger_func(trigger_stat, next_user.data, ...))
 		end
 	end
@@ -864,7 +903,7 @@ function StatsManager:record_private(stat_name, player, ...)
 	local user = self._users[key]
 
 	if user and user.state == UserStates.tracking then
-		return self:_trigger(user, stat_name, ...)
+		self:_trigger(user, stat_name, ...)
 	end
 end
 
@@ -873,8 +912,16 @@ function StatsManager:record_team(stat_name, ...)
 	local team = self._team
 
 	if self:has_session() then
-		return self:_trigger(team, stat_name, ...)
+		self:_trigger(team, stat_name, ...)
 	end
+end
+
+function StatsManager:get_next_user()
+	return self._next_user
+end
+
+function StatsManager:get_stats_config()
+	return self._session_config
 end
 
 return StatsManager

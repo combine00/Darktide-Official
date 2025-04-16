@@ -1,6 +1,6 @@
 local WarpCharge = require("scripts/utilities/warp_charge")
 local mood_settings = {}
-local types = table.enum("corruption_taken", "corruption", "corruptor_proximity", "critical_health", "damage_taken", "knocked_down", "last_wound", "no_toughness", "sprinting_overtime", "sprinting", "suppression_high", "suppression_low", "suppression_ongoing", "toughness_absorbed_melee", "toughness_absorbed", "toughness_broken", "warped_critical", "warped_high_to_critical", "warped_low_to_high", "warped", "ogryn_combat_ability_charge", "ogryn_combat_ability_shout", "ogryn_combat_ability_stance", "psyker_combat_ability_shout", "psyker_force_field_sphere", "stealth", "veteran_stealth", "veteran_combat_ability_stance", "veteran_stealth_and_stance", "zealot_combat_ability_dash", "syringe_ability", "syringe_power", "syringe_speed")
+local types = table.enum("corruption_taken", "corruption", "corruptor_proximity", "critical_health", "damage_taken", "knocked_down", "last_wound", "no_toughness", "sprinting_overtime", "sprinting", "suppression_high", "suppression_low", "suppression_ongoing", "toughness_absorbed_melee", "toughness_absorbed", "toughness_broken", "warped_critical", "warped_high_to_critical", "warped_low_to_high", "warped", "ogryn_combat_ability_charge", "ogryn_combat_ability_shout", "ogryn_combat_ability_stance", "psyker_combat_ability_shout", "psyker_force_field_sphere", "stealth", "veteran_combat_ability_stance", "veteran_stealth_and_stance", "veteran_stealth", "zealot_combat_ability_dash", "generic_stealth", "story_echo", "syringe_ability", "syringe_power", "syringe_speed")
 local status = table.enum("active", "inactive", "removing")
 mood_settings.mood_types = types
 mood_settings.status = status
@@ -8,6 +8,7 @@ mood_settings.priority = {
 	types.stealth,
 	types.veteran_stealth,
 	types.veteran_stealth_and_stance,
+	types.generic_stealth,
 	types.last_wound,
 	types.critical_health,
 	types.knocked_down,
@@ -35,7 +36,8 @@ mood_settings.priority = {
 	types.corruptor_proximity,
 	types.syringe_ability,
 	types.syringe_power,
-	types.syringe_speed
+	types.syringe_speed,
+	types.story_echo
 }
 mood_settings.moods = {
 	[types.stealth] = {
@@ -81,6 +83,21 @@ mood_settings.moods = {
 		},
 		looping_sound_stop_events = {
 			"wwise/events/player/play_veteran_ability_stealth_and_stance_off"
+		}
+	},
+	[types.generic_stealth] = {
+		blend_in_time = 0.35,
+		blend_out_time = 0.8,
+		shading_environment = "content/shading_environments/moods/veteran_stealth_mood",
+		blend_mask = ShadingEnvironmentBlendMask.OVERRIDES,
+		particle_effects_looping = {
+			"content/fx/particles/screenspace/screen_veteran_stealth"
+		},
+		looping_sound_start_events = {
+			"wwise/events/player/play_veteran_ability_stealth_on"
+		},
+		looping_sound_stop_events = {
+			"wwise/events/player/play_veteran_ability_stealth_off"
 		}
 	},
 	[types.last_wound] = {
@@ -216,13 +233,13 @@ mood_settings.moods = {
 		blend_out_time = 0.1
 	},
 	[types.zealot_combat_ability_dash] = {
-		shading_environment = "content/shading_environments/moods/zealot_combat_ability_mood",
+		shading_environment = "content/shading_environments/moods/zealot_dash_mood",
 		blend_in_time = 0.1,
 		blend_out_time = 0.2,
 		blend_mask = ShadingEnvironmentBlendMask.OVERRIDES
 	},
 	[types.ogryn_combat_ability_charge] = {
-		shading_environment = "content/shading_environments/moods/zealot_combat_ability_mood",
+		shading_environment = "content/shading_environments/moods/ogryn_charge_mood",
 		blend_in_time = 0.1,
 		blend_out_time = 0.2,
 		blend_mask = ShadingEnvironmentBlendMask.OVERRIDES
@@ -435,6 +452,13 @@ mood_settings.moods = {
 			on_state = "syringe_speed",
 			off_state = "none"
 		}
+	},
+	[types.story_echo] = {
+		blend_in_time = 2.3,
+		blend_out_time = 1.5,
+		active_time = 60,
+		shading_environment = "content/shading_environments/moods/horde_story_echo_mood",
+		blend_mask = ShadingEnvironmentBlendMask.OVERRIDES
 	}
 }
 local num_moods = 0

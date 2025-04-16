@@ -26,6 +26,8 @@ function WwiseStateGroupObjective:on_gameplay_shutdown()
 	self._mission_objective_system = nil
 	self._player_unit = nil
 	self._music_parameter_extension = nil
+	self._old_objective_state = nil
+	self._music_reset_timer = 0
 end
 
 function WwiseStateGroupObjective:update(dt, t)

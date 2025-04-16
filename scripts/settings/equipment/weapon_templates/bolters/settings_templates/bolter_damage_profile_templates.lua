@@ -1,34 +1,36 @@
 local ArmorSettings = require("scripts/settings/damage/armor_settings")
-local PowerLevelSettings = require("scripts/settings/damage/power_level_settings")
 local DamageProfileSettings = require("scripts/settings/damage/damage_profile_settings")
 local DamageSettings = require("scripts/settings/damage/damage_settings")
 local GibbingSettings = require("scripts/settings/gibbing/gibbing_settings")
+local PowerLevelSettings = require("scripts/settings/damage/power_level_settings")
 local WoundsTemplates = require("scripts/settings/damage/wounds_templates")
-local GibbingPower = GibbingSettings.gibbing_power
-local GibbingTypes = GibbingSettings.gibbing_types
-local damage_types = DamageSettings.damage_types
 local armor_types = ArmorSettings.types
+local damage_lerp_values = DamageProfileSettings.damage_lerp_values
+local damage_types = DamageSettings.damage_types
+local gibbing_power = GibbingSettings.gibbing_power
+local gibbing_types = GibbingSettings.gibbing_types
+local double_cleave = DamageProfileSettings.double_cleave
+local no_cleave = DamageProfileSettings.no_cleave
 local damage_templates = {}
 local overrides = {}
 
 table.make_unique(damage_templates)
 table.make_unique(overrides)
 
-local crit_armor_mod = DamageProfileSettings.crit_armor_mod
-local crit_impact_armor_mod = DamageProfileSettings.crit_impact_armor_mod
-local damage_lerp_values = DamageProfileSettings.damage_lerp_values
-local no_cleave = DamageProfileSettings.no_cleave
-local single_cleave = DamageProfileSettings.single_cleave
-local double_cleave = DamageProfileSettings.double_cleave
 damage_templates.default_bolter_killshot = {
+	suppression_value = 10,
 	accumulative_stagger_strength_multiplier = 0.55,
 	shield_multiplier = 10,
 	ragdoll_only = true,
-	suppression_value = 10,
-	ignore_roamer_hitzone_multipliers = true,
 	stagger_category = "ranged",
 	ragdoll_push_force = 600,
 	cleave_distribution = double_cleave,
+	ignore_hitzone_multipliers_breed_tags = {
+		"horde",
+		"roamer",
+		"elite",
+		"special"
+	},
 	ranges = {
 		max = 40,
 		min = 10
@@ -90,8 +92,8 @@ damage_templates.default_bolter_killshot = {
 		}
 	},
 	damage_type = damage_types.boltshell,
-	gibbing_power = GibbingPower.heavy,
-	gibbing_type = GibbingTypes.boltshell,
+	gibbing_power = gibbing_power.heavy,
+	gibbing_type = gibbing_types.boltshell,
 	wounds_template = WoundsTemplates.bolter,
 	on_kill_area_suppression = {
 		distance = 8,
@@ -106,10 +108,15 @@ damage_templates.default_bolter_killshot = {
 	}
 }
 damage_templates.bolter_stop_explosion = {
-	ignore_roamer_hitzone_multipliers = true,
 	suppression_value = 0.5,
 	ragdoll_push_force = 200,
 	stagger_category = "flamer",
+	ignore_hitzone_multipliers_breed_tags = {
+		"horde",
+		"roamer",
+		"elite",
+		"special"
+	},
 	cleave_distribution = {
 		attack = 0.1,
 		impact = 0.1
@@ -169,8 +176,8 @@ damage_templates.bolter_stop_explosion = {
 		impact = 16
 	},
 	damage_type = damage_types.boltshell,
-	gibbing_power = GibbingPower.heavy,
-	gibbing_type = GibbingTypes.boltshell,
+	gibbing_power = gibbing_power.heavy,
+	gibbing_type = gibbing_types.boltshell,
 	wounds_template = WoundsTemplates.bolter,
 	targets = {
 		default_target = {
@@ -184,10 +191,15 @@ damage_templates.bolter_stop_explosion = {
 	gib_push_force = GibbingSettings.gib_push_force.ranged_heavy
 }
 damage_templates.bolter_kill_explosion = {
-	ignore_roamer_hitzone_multipliers = true,
 	suppression_value = 0.5,
 	ragdoll_push_force = 200,
 	stagger_category = "flamer",
+	ignore_hitzone_multipliers_breed_tags = {
+		"horde",
+		"roamer",
+		"elite",
+		"special"
+	},
 	cleave_distribution = {
 		attack = 0.1,
 		impact = 0.1
@@ -247,8 +259,8 @@ damage_templates.bolter_kill_explosion = {
 		impact = 16
 	},
 	damage_type = damage_types.boltshell,
-	gibbing_power = GibbingPower.heavy,
-	gibbing_type = GibbingTypes.boltshell,
+	gibbing_power = gibbing_power.heavy,
+	gibbing_type = gibbing_types.boltshell,
 	wounds_template = WoundsTemplates.bolter,
 	on_kill_area_suppression = {
 		distance = 8,
@@ -294,8 +306,8 @@ damage_templates.weapon_special_push = {
 			[armor_types.void_shield] = 0
 		}
 	},
-	gibbing_power = GibbingPower.always,
-	gibbing_type = GibbingTypes.default,
+	gibbing_power = gibbing_power.always,
+	gibbing_type = gibbing_types.default,
 	targets = {
 		default_target = {}
 	}
@@ -329,8 +341,8 @@ damage_templates.weapon_special_push_outer = {
 			[armor_types.void_shield] = 0
 		}
 	},
-	gibbing_power = GibbingPower.always,
-	gibbing_type = GibbingTypes.default,
+	gibbing_power = gibbing_power.always,
+	gibbing_type = gibbing_types.default,
 	targets = {
 		default_target = {}
 	}

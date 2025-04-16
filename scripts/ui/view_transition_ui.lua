@@ -9,6 +9,11 @@ function ViewTransitionUI:init(render_settings)
 		timer_name = "ui"
 	}
 	self._render_settings = render_settings
+	self._fade_color = {
+		z = 0,
+		x = 0,
+		y = 0
+	}
 end
 
 function ViewTransitionUI:_setup_renderer()
@@ -52,6 +57,12 @@ function ViewTransitionUI:_destroy_renderer()
 	end
 end
 
+function ViewTransitionUI:set_fade_color_rgb(r, g, b)
+	self._fade_color.x = r or 0
+	self._fade_color.y = g or 0
+	self._fade_color.z = b or 0
+end
+
 function ViewTransitionUI:progress()
 	return self._progress or 0
 end
@@ -92,7 +103,7 @@ function ViewTransitionUI:update(dt, t, should_transition, transition_progress)
 		local screen_height = RESOLUTION_LOOKUP.height
 		local position = Vector3(0, 0, 999)
 		local size = Vector2(screen_width, screen_height)
-		local color = Color(255 * anim_progress, 0, 0, 0)
+		local color = Color(255 * anim_progress, self._fade_color.x, self._fade_color.y, self._fade_color.z)
 
 		Gui.rect(gui, position, size, color)
 	end

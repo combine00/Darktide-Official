@@ -73,9 +73,15 @@ function TerrorEventManager:_load_mission_event_templates(mission)
 end
 
 function TerrorEventManager:_create_network_lookups(events)
+	local sorted_events_keys = table.keys(events)
+
+	table.sort(sorted_events_keys)
+
 	local flow_events_lookup = {}
 
-	for _, nodes in pairs(events) do
+	for _, key in ipairs(sorted_events_keys) do
+		local nodes = events[key]
+
 		for i = 1, #nodes do
 			local node = nodes[i]
 			local flow_event_name = node.flow_event_name
@@ -481,6 +487,10 @@ function TerrorEventManager:_update_event(event, dt, t)
 				end
 			end
 		end
+	end
+
+	if node.should_restart then
+		node_index = node.target_step_index and node.target_step_index > 0 and node.target_step_index - 1 or 0
 	end
 
 	node_index = node_index + 1

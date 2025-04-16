@@ -59,10 +59,10 @@ function Tracks:claim_track_tier(track_id, tier, optional_account_id)
 	end)
 end
 
-function Tracks:claim_trait_tier_reward(track_id, tier, reward_id)
+function Tracks:claim_track_tier_reward(track_id, tier, reward_id)
 	return Managers.backend:authenticate():next(function (account)
 		local account_id = account.sub
-		local builder = BackendUtilities.url_builder():path("/data/"):path(account_id):path("/tracks/"):path(track_id):path("/tiers/"):path(tier):path("/rewards/"):path(reward_id)
+		local builder = BackendUtilities.url_builder():path("/data/"):path(account_id):path("/tracks/"):path(track_id):path("/tiers/"):path(tier):path("/reward/"):path(reward_id)
 		local options = {
 			method = "POST"
 		}

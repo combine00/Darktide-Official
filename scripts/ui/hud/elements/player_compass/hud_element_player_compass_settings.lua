@@ -9,7 +9,7 @@ local hud_element_player_compass_settings = {
 	steps = 24,
 	font_size_big = 24,
 	visible_steps = 12,
-	step_color = Color.ui_hud_green_light(255, true),
+	step_color = Color.ui_hud_green_super_light(255, true),
 	direction_icon_color = {
 		255,
 		255,

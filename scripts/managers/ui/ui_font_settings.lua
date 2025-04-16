@@ -16,6 +16,7 @@ local ui_font_settings = {
 	},
 	header_2 = {
 		font_size = 36,
+		line_spacing = 1.2,
 		font_type = "proxima_nova_bold",
 		text_color = Color.terminal_text_header(255, true),
 		default_color = Color.terminal_text_header(255, true),
@@ -329,8 +330,9 @@ local ui_font_settings = {
 	},
 	mission_detail_sub_header = {
 		font_size = 20,
-		font_type = "proxima_nova_bold",
+		line_spacing = 1.2,
 		drop_shadow = true,
+		font_type = "proxima_nova_bold",
 		text_color = Color.ui_grey_light(255, true)
 	},
 	mission_board_icon_info = {
@@ -374,6 +376,7 @@ local ui_font_settings = {
 	},
 	mission_voting_body = {
 		font_size = 24,
+		line_spacing = 1.2,
 		text_vertical_alignment = "center",
 		font_type = "proxima_nova_bold",
 		text_horizontal_alignment = "left",

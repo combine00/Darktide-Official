@@ -4,12 +4,9 @@ function HostLoadersState:init(state_machine, shared_state)
 	self._shared_state = shared_state
 	local loaders = shared_state.loaders
 	self._loaders = loaders
-	local mission_name = shared_state.mission_name
-	local level_name = shared_state.level_name
-	local circumstance_name = shared_state.circumstance_name
 
 	for _, loader in ipairs(loaders) do
-		loader:start_loading(mission_name, level_name, circumstance_name)
+		loader:start_loading(shared_state)
 	end
 end
 

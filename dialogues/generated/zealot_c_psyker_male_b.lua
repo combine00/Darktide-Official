@@ -76,10 +76,6 @@ local zealot_c_psyker_male_b = {
 			[1.0] = 3.385729,
 			[2.0] = 3.671354
 		},
-		sound_event_weights = {
-			[1.0] = 0.5,
-			[2.0] = 0.5
-		},
 		randomize_indexes = {}
 	},
 	combat_pause_quirk_pilgrimage_b = {

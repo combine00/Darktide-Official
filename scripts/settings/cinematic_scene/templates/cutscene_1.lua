@@ -1,9 +1,8 @@
 local cinematic_scene_templates = {
 	cutscene_1 = {
 		is_skippable = true,
-		use_transition_ui = false,
 		local_player_only = true,
-		instant_black_screen_during_cutscene_loading = false,
+		use_transition_ui = false,
 		music = "mission_intro",
 		hide_players = true,
 		set_random_weapon_event = false,

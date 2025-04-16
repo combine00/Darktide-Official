@@ -225,6 +225,337 @@ local mutator_templates = {
 			}
 		}
 	},
+	mutator_live_abhuman_trickle = {
+		class = "scripts/managers/mutator/mutators/mutator_extra_trickle_hordes",
+		trickle_horde_templates = {
+			{
+				stinger_duration = 8,
+				num_trickle_hordes_active_for_cooldown = 20,
+				min_players_alive = 2,
+				disallow_spawning_too_close_to_other_spawn = true,
+				not_during_terror_events = true,
+				optional_num_tries = 6,
+				stinger = "wwise/events/minions/play_minion_special_sniper_spawn_circumstance",
+				ignore_disallowance = true,
+				cant_be_ramped = true,
+				horde_compositions = {
+					trickle_horde = {
+						renegade = {
+							none = {
+								HordeCompositions.mutator_live_abhuman
+							},
+							low = {
+								HordeCompositions.mutator_live_abhuman
+							},
+							high = {
+								HordeCompositions.mutator_live_abhuman
+							},
+							poxwalkers = {
+								HordeCompositions.mutator_live_abhuman
+							}
+						},
+						cultist = {
+							none = {
+								HordeCompositions.mutator_live_abhuman
+							},
+							low = {
+								HordeCompositions.mutator_live_abhuman
+							},
+							high = {
+								HordeCompositions.mutator_live_abhuman
+							},
+							poxwalkers = {
+								HordeCompositions.mutator_live_abhuman
+							}
+						}
+					}
+				},
+				trickle_horde_travel_distance_range = {
+					110,
+					230
+				},
+				trickle_horde_cooldown = {
+					40,
+					45
+				},
+				optional_main_path_offset = {
+					30,
+					70
+				},
+				pause_pacing_on_spawn = {
+					{
+						roamers = 20,
+						hordes = 40,
+						trickle_hordes = 40,
+						specials = 50
+					},
+					{
+						roamers = 20,
+						hordes = 40,
+						trickle_hordes = 40,
+						specials = 50
+					},
+					{
+						hordes = 40,
+						trickle_hordes = 40,
+						specials = 50
+					},
+					{
+						trickle_hordes = 20
+					},
+					{
+						trickle_hordes = 10
+					}
+				},
+				num_trickle_waves = {
+					{
+						1,
+						1
+					},
+					{
+						1,
+						1
+					},
+					{
+						1,
+						2
+					},
+					{
+						2,
+						3
+					},
+					{
+						3,
+						4
+					}
+				},
+				time_between_waves = {
+					15,
+					25
+				}
+			}
+		}
+	},
+	mutator_cultist_grenadier = {
+		class = "scripts/managers/mutator/mutators/mutator_extra_trickle_hordes",
+		trickle_horde_templates = {
+			{
+				stinger_duration = 8,
+				num_trickle_hordes_active_for_cooldown = 20,
+				disallow_spawning_too_close_to_other_spawn = true,
+				not_during_terror_events = true,
+				optional_num_tries = 6,
+				stinger = "wwise/events/minions/play_minion_special_sniper_spawn_circumstance",
+				ignore_disallowance = true,
+				cant_be_ramped = true,
+				horde_compositions = {
+					trickle_horde = {
+						renegade = {
+							none = {
+								HordeCompositions.mutator_cultist_grenadier
+							},
+							low = {
+								HordeCompositions.mutator_cultist_grenadier
+							},
+							high = {
+								HordeCompositions.mutator_cultist_grenadier
+							},
+							poxwalkers = {
+								HordeCompositions.mutator_cultist_grenadier
+							}
+						},
+						cultist = {
+							none = {
+								HordeCompositions.mutator_cultist_grenadier
+							},
+							low = {
+								HordeCompositions.mutator_cultist_grenadier
+							},
+							high = {
+								HordeCompositions.mutator_cultist_grenadier
+							},
+							poxwalkers = {
+								HordeCompositions.mutator_cultist_grenadier
+							}
+						}
+					}
+				},
+				trickle_horde_travel_distance_range = {
+					110,
+					230
+				},
+				trickle_horde_cooldown = {
+					40,
+					45
+				},
+				optional_main_path_offset = {
+					30,
+					70
+				},
+				pause_pacing_on_spawn = {
+					{
+						roamers = 20,
+						hordes = 40,
+						trickle_hordes = 40,
+						specials = 50
+					},
+					{
+						roamers = 20,
+						hordes = 40,
+						trickle_hordes = 40,
+						specials = 50
+					},
+					{
+						hordes = 40,
+						trickle_hordes = 40,
+						specials = 50
+					},
+					{
+						trickle_hordes = 20
+					},
+					{
+						trickle_hordes = 10
+					}
+				},
+				num_trickle_waves = {
+					{
+						4,
+						7
+					},
+					{
+						5,
+						8
+					},
+					{
+						6,
+						9
+					},
+					{
+						7,
+						10
+					},
+					{
+						9,
+						14
+					}
+				},
+				time_between_waves = {
+					2,
+					5
+				}
+			}
+		}
+	},
+	mutator_renegade_grenadier = {
+		class = "scripts/managers/mutator/mutators/mutator_extra_trickle_hordes",
+		trickle_horde_templates = {
+			{
+				stinger_duration = 8,
+				num_trickle_hordes_active_for_cooldown = 20,
+				disallow_spawning_too_close_to_other_spawn = true,
+				not_during_terror_events = true,
+				optional_num_tries = 6,
+				stinger = "wwise/events/minions/play_minion_special_sniper_spawn_circumstance",
+				ignore_disallowance = true,
+				cant_be_ramped = true,
+				horde_compositions = {
+					trickle_horde = {
+						renegade = {
+							none = {
+								HordeCompositions.mutator_renegade_grenadier
+							},
+							low = {
+								HordeCompositions.mutator_renegade_grenadier
+							},
+							high = {
+								HordeCompositions.mutator_renegade_grenadier
+							},
+							poxwalkers = {
+								HordeCompositions.mutator_renegade_grenadier
+							}
+						},
+						cultist = {
+							none = {
+								HordeCompositions.mutator_renegade_grenadier
+							},
+							low = {
+								HordeCompositions.mutator_renegade_grenadier
+							},
+							high = {
+								HordeCompositions.mutator_renegade_grenadier
+							},
+							poxwalkers = {
+								HordeCompositions.mutator_renegade_grenadier
+							}
+						}
+					}
+				},
+				trickle_horde_travel_distance_range = {
+					110,
+					230
+				},
+				trickle_horde_cooldown = {
+					40,
+					45
+				},
+				optional_main_path_offset = {
+					30,
+					70
+				},
+				pause_pacing_on_spawn = {
+					{
+						roamers = 20,
+						hordes = 40,
+						trickle_hordes = 40,
+						specials = 50
+					},
+					{
+						roamers = 20,
+						hordes = 40,
+						trickle_hordes = 40,
+						specials = 50
+					},
+					{
+						hordes = 40,
+						trickle_hordes = 40,
+						specials = 50
+					},
+					{
+						trickle_hordes = 20
+					},
+					{
+						trickle_hordes = 10
+					}
+				},
+				num_trickle_waves = {
+					{
+						4,
+						7
+					},
+					{
+						5,
+						8
+					},
+					{
+						6,
+						9
+					},
+					{
+						7,
+						10
+					},
+					{
+						9,
+						14
+					}
+				},
+				time_between_waves = {
+					2,
+					5
+				}
+			}
+		}
+	},
 	mutator_poxwalker_bombers = {
 		class = "scripts/managers/mutator/mutators/mutator_extra_trickle_hordes",
 		trickle_horde_templates = {

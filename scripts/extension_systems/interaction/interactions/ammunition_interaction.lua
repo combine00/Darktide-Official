@@ -4,10 +4,10 @@ local Ammo = require("scripts/utilities/ammo")
 local BuffSettings = require("scripts/settings/buff/buff_settings")
 local DialogueSettings = require("scripts/settings/dialogue/dialogue_settings")
 local Pickups = require("scripts/settings/pickup/pickups")
-local SpecialRulesSetting = require("scripts/settings/ability/special_rules_settings")
+local SpecialRulesSettings = require("scripts/settings/ability/special_rules_settings")
 local Vo = require("scripts/utilities/vo")
 local buff_proc_events = BuffSettings.proc_events
-local special_rules = SpecialRulesSetting.special_rules
+local special_rules = SpecialRulesSettings.special_rules
 local AmmunitionInteraction = class("AmmunitionInteraction", "PickupInteraction")
 local _can_interact, _can_refill_grenades = nil
 
@@ -50,6 +50,8 @@ function AmmunitionInteraction:_add_ammo(interactor_unit, pickup_data)
 	local unit_data_ext = ScriptUnit.extension(interactor_unit, "unit_data_system")
 	local visual_loadout_extension = ScriptUnit.extension(interactor_unit, "visual_loadout_system")
 	local weapon_slot_configuration = visual_loadout_extension:slot_configuration_by_type("weapon")
+	local ammo_modifier = Managers.state.difficulty:get_ammo_modifier()
+	pickup_data.modifier = ammo_modifier
 
 	for slot_name, config in pairs(weapon_slot_configuration) do
 		local inventory_slot_component = unit_data_ext:write_component(slot_name)

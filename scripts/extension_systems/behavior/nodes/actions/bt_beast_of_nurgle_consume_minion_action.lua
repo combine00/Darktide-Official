@@ -214,7 +214,7 @@ function BtBeastOfNurgleConsumeMinionAction:_start_consuming(scratchpad)
 	local reset_scene_graph = true
 
 	World.unlink_unit(scratchpad.world, target_unit, reset_scene_graph)
-	Managers.state.minion_spawn:despawn(target_unit)
+	Managers.state.minion_spawn:despawn_minion(target_unit)
 
 	scratchpad.state = "consuming"
 end

@@ -5,11 +5,13 @@ local SessionStatEvents = {}
 local collectible_missions = {
 	side_mission_tome = "tome",
 	side_mission_consumable = "relic",
-	side_mission_grimoire = "grimoire"
+	side_mission_grimoire = "grimoire",
+	side_mission_hack_communications = "communications_hack_device"
 }
 
 function SessionStatEvents.create_mission_events(mission_data, mission_result, account_id, character_id)
-	local difficulty = Managers.state.difficulty:get_difficulty()
+	local danger_settings = Managers.state.difficulty:get_danger_settings()
+	local difficulty = danger_settings and danger_settings.difficulty or 1
 	local win = mission_result.win
 	local mission_type = Managers.state.mission:mission_type_index()
 	local mission_name = Managers.state.mission:mission_name()

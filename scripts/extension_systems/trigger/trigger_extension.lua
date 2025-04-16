@@ -5,6 +5,7 @@ local TriggerConditionAllAlivePlayersInside = require("scripts/extension_systems
 local TriggerConditionAllPlayersInside = require("scripts/extension_systems/trigger/trigger_conditions/trigger_condition_all_players_inside")
 local TriggerConditionAllPlayersInsideNoEnemies = require("scripts/extension_systems/trigger/trigger_conditions/trigger_condition_all_players_inside_no_enemies")
 local TriggerConditionAllRequiredPlayersInEndZone = require("scripts/extension_systems/trigger/trigger_conditions/trigger_condition_all_required_players_in_end_zone")
+local TriggerConditionAtLeastHalfPlayersInside = require("scripts/extension_systems/trigger/trigger_conditions/trigger_condition_at_least_half_players_inside")
 local TriggerConditionAtLeastOneBossInside = require("scripts/extension_systems/trigger/trigger_conditions/trigger_condition_at_least_one_boss_inside")
 local TriggerConditionAtLeastOnePlayerInside = require("scripts/extension_systems/trigger/trigger_conditions/trigger_condition_at_least_one_player_inside")
 local TriggerConditionLuggableInside = require("scripts/extension_systems/trigger/trigger_conditions/trigger_condition_luggable_inside")
@@ -18,6 +19,7 @@ local trigger_condition_classes = {
 	all_players_inside = TriggerConditionAllPlayersInside,
 	all_players_inside_no_enemies = TriggerConditionAllPlayersInsideNoEnemies,
 	all_required_players_in_end_zone = TriggerConditionAllRequiredPlayersInEndZone,
+	at_least_half_players_inside = TriggerConditionAtLeastHalfPlayersInside,
 	at_least_one_boss_inside = TriggerConditionAtLeastOneBossInside,
 	at_least_one_player_inside = TriggerConditionAtLeastOnePlayerInside,
 	luggable_inside = TriggerConditionLuggableInside,
@@ -43,15 +45,15 @@ function TriggerExtension:init(extension_init_context, unit, ...)
 end
 
 function TriggerExtension:destroy()
+	if self._is_server then
+		self:_unregister_volume()
+	end
+
 	if self._trigger_condition then
 		self._trigger_condition:destroy()
 	end
 
 	self._trigger_action:destroy()
-
-	if self._is_server then
-		self:_unregister_volume()
-	end
 end
 
 function TriggerExtension:reset()

@@ -224,6 +224,16 @@ local minion_target_selection_weights = {
 		occupied_slots = -1,
 		distance_to_target = 22
 	},
+	renegade_radio_operator = {
+		near_distance = 10,
+		line_of_sight_weight = 8,
+		disabled = -8,
+		max_distance = 50,
+		attack_not_allowed = -2,
+		near_distance_bonus = 30,
+		occupied_slots = -1,
+		distance_to_target = 22
+	},
 	renegade_melee = {
 		occupied_slots = -2,
 		disabled = -2,

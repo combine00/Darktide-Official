@@ -54,6 +54,33 @@ weapon_stamina_templates.linesman = {
 		lerp_basic = 3
 	}
 }
+weapon_stamina_templates.linesman_rangedblock = {
+	stamina_modifier = 4,
+	sprint_cost_per_second = {
+		lerp_perfect = 0.75,
+		lerp_basic = 1.25
+	},
+	block_cost_default = {
+		inner = {
+			lerp_perfect = 0.5,
+			lerp_basic = 1
+		},
+		outer = {
+			lerp_perfect = 1,
+			lerp_basic = 3
+		}
+	},
+	block_cost_ranged = {
+		inner = {
+			lerp_perfect = 0.25,
+			lerp_basic = 0.75
+		}
+	},
+	push_cost = {
+		lerp_perfect = 1,
+		lerp_basic = 3
+	}
+}
 weapon_stamina_templates.tank = {
 	stamina_modifier = 6,
 	sprint_cost_per_second = {

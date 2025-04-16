@@ -12,11 +12,14 @@ local NAV_COST_MAP_MAX_VOLUMES = 1024
 local NAV_COST_MAP_NUM_VOLUMES_GUESS = 16
 local NAV_COST_MAP_RECOMPUTATION_INTERVAL = 0.5
 
-function NavMeshManager:init(world, nav_world, is_server, network_event_delegate, level_name)
+function NavMeshManager:init(world, nav_world, is_server, network_event_delegate, level_name, dynamic_mesh_spawning)
 	self._world = world
 	self._nav_world = nav_world
 	self._is_server = is_server
+	self._dynamic_mesh_spawning = dynamic_mesh_spawning
+	self._sparse_graph_dirty = false
 	self._level_spawned = false
+	self._sparse_nav_graph_nav_data = nil
 	self._sparse_nav_graph_connected = false
 	local nav_tag_volume_data = self:_require_nav_tag_volume_data(level_name, {})
 	local nav_tag_volume_layers = self:_create_nav_tag_volumes_from_level_data(nav_tag_volume_data)
@@ -71,6 +74,14 @@ function NavMeshManager:_require_nav_tag_volume_data(level_name, nav_tag_volume_
 end
 
 function NavMeshManager:_create_nav_tag_volumes_from_level_data(nav_tag_volume_data)
+	if self._dynamic_mesh_spawning then
+		self._sparse_graph_dirty = true
+
+		if self._sparse_nav_graph_connected then
+			return
+		end
+	end
+
 	local nav_world = self._nav_world
 	local layer_id_to_name = {}
 	local layer_name_to_id = {}
@@ -100,6 +111,14 @@ function NavMeshManager:_create_nav_tag_volumes_from_level_data(nav_tag_volume_d
 end
 
 function NavMeshManager:add_nav_tag_volume(bottom_points, altitude_min, altitude_max, layer_name, allowed, optional_type)
+	if self._dynamic_mesh_spawning then
+		self._sparse_graph_dirty = true
+
+		if self._sparse_nav_graph_connected then
+			return
+		end
+	end
+
 	local nav_tag_layer_lookup = self._nav_tag_layer_lookup
 	local layer_id = nav_tag_layer_lookup[layer_name]
 
@@ -238,6 +257,9 @@ end
 function NavMeshManager:destroy()
 	self:_destroy_nav_cost_maps()
 	self:_destroy_nav_tag_volumes()
+	GwNavWorld.disconnect_sparse_graph(self._nav_world, self._sparse_nav_graph_nav_data)
+
+	self._sparse_nav_graph_connected = false
 
 	if not self._is_server then
 		self._network_event_delegate:unregister_events(unpack(CLIENT_RPCS))
@@ -407,13 +429,20 @@ function NavMeshManager:update_time_slice_volumes_integration()
 	return done
 end
 
+function NavMeshManager:nav_world()
+	return self._nav_world
+end
+
 function NavMeshManager:on_gameplay_post_init()
-	local num_nav_tag_layers = #self._nav_tag_layer_lookup
+	self:_connect_sparse_graph()
 
-	GwNavWorld.connect_sparse_graph(self._nav_world)
-
-	self._sparse_nav_graph_connected = true
 	self._level_spawned = true
+end
+
+function NavMeshManager:_connect_sparse_graph()
+	local num_nav_tag_layers = #self._nav_tag_layer_lookup
+	self._sparse_nav_graph_nav_data = GwNavWorld.connect_sparse_graph(self._nav_world)
+	self._sparse_nav_graph_connected = true
 end
 
 function NavMeshManager:_recompute_nav_cost_maps()
@@ -435,6 +464,10 @@ function NavMeshManager:_recompute_nav_cost_maps()
 end
 
 function NavMeshManager:update(dt, t)
+	if self._sparse_graph_dirty then
+		self._sparse_graph_dirty = false
+	end
+
 	if self._should_recompute_nav_cost_maps and self._next_nav_cost_map_recomputation_t < t then
 		self:_recompute_nav_cost_maps()
 
@@ -462,6 +495,10 @@ local NAV_MESH_BELOW = 0.5
 
 function NavMeshManager:set_allowed_nav_tag_layer(layer_name, allowed)
 	if not self._is_server then
+		return
+	end
+
+	if self._dynamic_mesh_spawning and self._sparse_nav_graph_connected then
 		return
 	end
 

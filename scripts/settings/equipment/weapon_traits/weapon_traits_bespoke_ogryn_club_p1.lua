@@ -5,6 +5,30 @@ local templates = {}
 table.make_unique(templates)
 
 templates.weapon_trait_bespoke_ogryn_club_p1_windup_increases_power = {
+	format_values = {
+		power_level = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_club_p1_windup_increases_power_parent",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.melee_power_level_modifier
+				}
+			}
+		},
+		stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_club_p1_windup_increases_power_child",
+				find_value_type = "buff_template",
+				path = {
+					"max_stacks"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_club_p1_windup_increases_power_parent = {
 			{
@@ -31,6 +55,19 @@ templates.weapon_trait_bespoke_ogryn_club_p1_windup_increases_power = {
 	}
 }
 templates.weapon_trait_bespoke_ogryn_club_p1_toughness_recovery_on_chained_attacks = {
+	format_values = {
+		toughness = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_club_p1_toughness_recovery_on_chained_attacks",
+				find_value_type = "trait_override",
+				path = {
+					"toughness_fixed_percentage"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_club_p1_toughness_recovery_on_chained_attacks = {
 			{
@@ -49,6 +86,51 @@ templates.weapon_trait_bespoke_ogryn_club_p1_toughness_recovery_on_chained_attac
 	}
 }
 templates.weapon_trait_bespoke_ogryn_club_p1_targets_receive_rending_debuff = {
+	format_values = {
+		stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_club_p1_targets_receive_rending_debuff",
+				find_value_type = "trait_override",
+				path = {
+					"target_buff_data",
+					"num_stacks_on_proc"
+				}
+			}
+		},
+		rending = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "rending_debuff",
+				find_value_type = "buff_template",
+				path = {
+					"stat_buffs",
+					stat_buffs.rending_multiplier
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "rending_debuff",
+				find_value_type = "buff_template",
+				path = {
+					"duration"
+				}
+			}
+		},
+		max_stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "rending_debuff",
+				find_value_type = "buff_template",
+				path = {
+					"max_stacks"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_club_p1_targets_receive_rending_debuff = {
 			{
@@ -75,6 +157,20 @@ templates.weapon_trait_bespoke_ogryn_club_p1_targets_receive_rending_debuff = {
 	}
 }
 templates.weapon_trait_bespoke_ogryn_club_p1_infinite_melee_cleave_on_weakspot_kill = {
+	format_values = {
+		weakspot_damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_club_p1_infinite_melee_cleave_on_weakspot_kill",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.melee_weakspot_damage
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_club_p1_infinite_melee_cleave_on_weakspot_kill = {
 			{
@@ -101,6 +197,41 @@ templates.weapon_trait_bespoke_ogryn_club_p1_infinite_melee_cleave_on_weakspot_k
 	}
 }
 templates.weapon_trait_bespoke_ogryn_club_p1_staggered_targets_receive_increased_damage_debuff = {
+	format_values = {
+		stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_club_p1_staggered_targets_receive_increased_damage_debuff",
+				find_value_type = "trait_override",
+				path = {
+					"target_buff_data",
+					"num_stacks_on_proc"
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "increase_damage_received_while_staggered",
+				find_value_type = "buff_template",
+				path = {
+					"conditional_stat_buffs",
+					stat_buffs.damage_vs_staggered
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "increase_damage_received_while_staggered",
+				find_value_type = "buff_template",
+				path = {
+					"duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_club_p1_staggered_targets_receive_increased_damage_debuff = {
 			{
@@ -127,6 +258,20 @@ templates.weapon_trait_bespoke_ogryn_club_p1_staggered_targets_receive_increased
 	}
 }
 templates.weapon_trait_bespoke_ogryn_club_p1_pass_past_armor_on_crit = {
+	format_values = {
+		crit_damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_club_p1_pass_past_armor_on_crit",
+				find_value_type = "trait_override",
+				path = {
+					"conditional_stat_buffs",
+					stat_buffs.melee_critical_strike_damage
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_club_p1_pass_past_armor_on_crit = {
 			{
@@ -153,6 +298,20 @@ templates.weapon_trait_bespoke_ogryn_club_p1_pass_past_armor_on_crit = {
 	}
 }
 templates.weapon_trait_bespoke_ogryn_club_p1_rending_vs_staggered = {
+	format_values = {
+		rending = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_club_p1_rending_vs_staggered",
+				find_value_type = "trait_override",
+				path = {
+					"conditional_stat_buffs",
+					stat_buffs.rending_vs_staggered_multiplier
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_club_p1_rending_vs_staggered = {
 			{
@@ -179,6 +338,30 @@ templates.weapon_trait_bespoke_ogryn_club_p1_rending_vs_staggered = {
 	}
 }
 templates.weapon_trait_bespoke_ogryn_club_p1_increased_crit_chance_on_weapon_special_hit = {
+	format_values = {
+		crit_chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_club_p1_increased_crit_chance_on_weapon_special_hit",
+				find_value_type = "trait_override",
+				path = {
+					"proc_stat_buffs",
+					stat_buffs.melee_critical_strike_chance
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_club_p1_increased_crit_chance_on_weapon_special_hit",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_club_p1_increased_crit_chance_on_weapon_special_hit = {
 			{

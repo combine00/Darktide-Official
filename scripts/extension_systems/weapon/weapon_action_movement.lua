@@ -1,4 +1,4 @@
-local Action = require("scripts/utilities/weapon/action")
+local Action = require("scripts/utilities/action/action")
 local BuffSettings = require("scripts/settings/buff/buff_settings")
 local SharedFunctions = require("scripts/extension_systems/weapon/weapon_action_movement_shared")
 local Sprint = require("scripts/extension_systems/character_state_machine/character_states/utilities/sprint")

@@ -35,6 +35,12 @@ local function _is_in_hub()
 	return is_in_hub
 end
 
+local function _has_hud()
+	local has_hud = Managers.ui:has_hud()
+
+	return has_hud
+end
+
 local function is_view_or_popup_active()
 	local ui_manager = Managers.ui
 
@@ -63,7 +69,7 @@ local function _get_player()
 	return player
 end
 
-local function _create_objective(objective_name, localization_key, marker_units, is_side_mission)
+local function _create_objective(objective_name, localization_key, marker_units, is_side_mission, localized_header)
 	local icon = is_side_mission and "content/ui/materials/icons/objectives/bonus" or "content/ui/materials/icons/objectives/main"
 	local objective_data = {
 		marker_type = "hub_objective",
@@ -71,7 +77,8 @@ local function _create_objective(objective_name, localization_key, marker_units,
 		name = objective_name,
 		header = localization_key,
 		objective_category = is_side_mission and "side_mission" or "default",
-		icon = icon
+		icon = icon,
+		localized_header = localized_header
 	}
 	local objective = MissionObjectiveGoal:new()
 
@@ -122,6 +129,12 @@ end
 
 local function _complete_current_story_chapter(story_name)
 	Managers.narrative:complete_current_chapter(story_name)
+end
+
+local function _is_havoc_cadence_active()
+	local cadence_status = Managers.narrative:get_havoc_cadence_status()
+
+	return cadence_status.active
 end
 
 local templates = {
@@ -869,6 +882,175 @@ local templates = {
 		sync_on_events = {}
 	},
 	{
+		name = "Level 30 Introduce Objective - Havoc Start Quest",
+		valid_states = {
+			"GameplayStateRun"
+		},
+		validation_func = function (self)
+			return _is_in_hub() and _has_hud() and _is_on_story_chapter("unlock_havoc", "unlock_havoc_1") and _is_havoc_cadence_active()
+		end,
+		on_activation = function (self)
+			if self.objective then
+				Log.warning("onboarding_templates", "[on_event_triggered] trying to start objective '%s' when it's already active", self.name)
+
+				return
+			end
+
+			local narrative_manager = Managers.narrative
+
+			if narrative_manager:get_havoc_unlock_status() == "unlocked" then
+				narrative_manager:skip_story("unlock_havoc")
+
+				return
+			end
+
+			local objective_name = self.name
+			local localized_header = string.format("{#color(169,191,153)}%s{#reset()}\n%s", Localize("loc_quest_havoc_interact_description"), Localize("loc_quest_havoc_interact_objective"))
+			local interaction_type = "gamemode_havoc"
+			local marker_units = _get_interaction_units_by_type(interaction_type)
+			local objective = _create_objective(objective_name, nil, marker_units, nil, localized_header)
+			self.objective = objective
+
+			Managers.event:trigger("event_add_mission_objective", objective)
+		end,
+		on_deactivation = function (self, close_condition_met)
+			if not self.objective then
+				return
+			end
+
+			local objective = self.objective
+			local objective_name = objective:name()
+
+			Managers.event:trigger("event_remove_mission_objective", objective_name)
+
+			self.objective = nil
+
+			objective:destroy()
+
+			if close_condition_met then
+				Managers.narrative:complete_current_chapter("unlock_havoc", "unlock_havoc_1")
+			end
+		end,
+		close_condition = function (self)
+			return Managers.ui:is_view_closing("havoc_background_view")
+		end,
+		sync_on_events = {}
+	},
+	{
+		name = "Level 30 Introduce Objective - Havoc Complete Maelstrom",
+		valid_states = {
+			"GameplayStateRun"
+		},
+		validation_func = function (self)
+			return _is_in_hub() and _has_hud() and _is_on_story_chapter("unlock_havoc", "unlock_havoc_2") and _is_havoc_cadence_active()
+		end,
+		on_activation = function (self)
+			if self.objective then
+				Log.warning("onboarding_templates", "[on_event_triggered] trying to start objective '%s' when it's already active", self.name)
+
+				return
+			end
+
+			local narrative_manager = Managers.narrative
+
+			if narrative_manager:get_havoc_unlock_status() == "unlocked" then
+				narrative_manager:skip_story("unlock_havoc")
+
+				return
+			end
+
+			local objective_name = self.name
+			local localized_header = string.format("{#color(169,191,153)}%s{#reset()}\n%s", Localize("loc_quest_havoc_maelstrom_description"), Localize("loc_quest_havoc_maelstrom_objective"))
+			local interaction_type = "gamemode_havoc"
+			local marker_units = _get_interaction_units_by_type(interaction_type)
+			local objective = _create_objective(objective_name, nil, marker_units, nil, localized_header)
+			self.objective = objective
+
+			Managers.event:trigger("event_add_mission_objective", objective)
+			Managers.data_service.havoc:set_havoc_unlock_status("awaiting_maelstrom_completion")
+			narrative_manager:set_havoc_unlock_status("awaiting_maelstrom_completion")
+		end,
+		on_deactivation = function (self, close_condition_met)
+			if not self.objective then
+				return
+			end
+
+			local objective = self.objective
+			local objective_name = objective:name()
+
+			Managers.event:trigger("event_remove_mission_objective", objective_name)
+
+			self.objective = nil
+
+			objective:destroy()
+
+			if close_condition_met then
+				Managers.narrative:complete_current_chapter("unlock_havoc", "unlock_havoc_2")
+			end
+		end,
+		close_condition = function (self)
+			return Managers.narrative:get_ever_received_havoc_order()
+		end,
+		sync_on_events = {}
+	},
+	{
+		name = "Level 30 Introduce Objective - Havoc Complete Quest",
+		valid_states = {
+			"GameplayStateRun"
+		},
+		validation_func = function (self)
+			return _is_in_hub() and _has_hud() and _is_on_story_chapter("unlock_havoc", "unlock_havoc_3") and _is_havoc_cadence_active()
+		end,
+		on_activation = function (self)
+			if self.objective then
+				Log.warning("onboarding_templates", "[on_event_triggered] trying to start objective '%s' when it's already active", self.name)
+
+				return
+			end
+
+			local narrative_manager = Managers.narrative
+
+			if narrative_manager:get_havoc_unlock_status() == "unlocked" then
+				narrative_manager:skip_story("unlock_havoc")
+
+				return
+			end
+
+			local objective_name = self.name
+			local localized_header = string.format("{#color(169,191,153)}%s{#reset()}\n%s", Localize("loc_quest_havoc_final_description"), Localize("loc_quest_havoc_final_objective"))
+			local interaction_type = "gamemode_havoc"
+			local marker_units = _get_interaction_units_by_type(interaction_type)
+			local objective = _create_objective(objective_name, nil, marker_units, nil, localized_header)
+			self.objective = objective
+
+			Managers.event:trigger("event_add_mission_objective", objective)
+		end,
+		on_deactivation = function (self, close_condition_met)
+			if not self.objective then
+				return
+			end
+
+			local objective = self.objective
+			local objective_name = objective:name()
+
+			Managers.event:trigger("event_remove_mission_objective", objective_name)
+
+			self.objective = nil
+
+			objective:destroy()
+
+			if close_condition_met then
+				Managers.narrative:complete_current_chapter("unlock_havoc", "unlock_havoc_3")
+				Managers.data_service.havoc:set_havoc_unlock_status("unlocked")
+				Managers.narrative:set_havoc_unlock_status("unlocked")
+			end
+		end,
+		close_condition = function (self)
+			return Managers.ui:is_view_closing("havoc_background_view")
+		end,
+		sync_on_events = {}
+	},
+	{
 		name = "Narrative main objective",
 		valid_states = {
 			"GameplayStateRun"
@@ -899,7 +1081,7 @@ local templates = {
 				local text = Localize(localization_key, true, {
 					level = level or 0
 				})
-				local objective = _create_objective(objective_name, localization_key)
+				local objective = _create_objective(objective_name, nil, nil, false, text)
 				self.objective = objective
 
 				Managers.event:trigger("event_add_mission_objective", objective)

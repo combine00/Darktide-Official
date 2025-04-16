@@ -1,9 +1,8 @@
 local cinematic_scene_templates = {
 	hub_location_intro_gun_shop = {
 		is_skippable = true,
-		use_transition_ui = false,
 		local_player_only = true,
-		instant_black_screen_during_cutscene_loading = false,
+		use_transition_ui = false,
 		music = "cinematic_pot",
 		hide_players = false,
 		set_random_weapon_event = false,

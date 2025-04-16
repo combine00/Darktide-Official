@@ -33,9 +33,9 @@ function ActionUtility.is_within_trigger_time(time_in_action, dt, first_trigger_
 		local time_since_first_trigger_fixed = time_in_action - first_trigger_time_fixed
 		local time_since_last_trigger = time_since_first_trigger_fixed % (trigger_interval_fixed + dt)
 		local trigger_diff = math.abs(time_since_last_trigger - trigger_interval_fixed)
-		local intervall_trigger_frame = trigger_diff < EPSILON
+		local interval_trigger_frame = trigger_diff < EPSILON
 
-		if intervall_trigger_frame then
+		if interval_trigger_frame then
 			return true
 		end
 	end
@@ -43,7 +43,7 @@ function ActionUtility.is_within_trigger_time(time_in_action, dt, first_trigger_
 	return false
 end
 
-function ActionUtility.get_projectile_template(action_settings, weapon_template, ability_extension)
+function ActionUtility.projectile_template(action_settings, weapon_template, ability_extension)
 	local fire_config = action_settings and action_settings.fire_configuration
 	local fire_config_projectile_template = fire_config and fire_config.projectile
 
@@ -57,7 +57,7 @@ function ActionUtility.get_projectile_template(action_settings, weapon_template,
 		return weapon_template_projectile_template
 	end
 
-	local ability_item = action_settings and ability_extension and ActionUtility.get_ability_item(action_settings, ability_extension)
+	local ability_item = action_settings and ability_extension and ActionUtility.ability_item(action_settings, ability_extension)
 	local ability_weapon_template = ability_item and WeaponTemplate.weapon_template_from_item(ability_item)
 	local ability_weapon_template_projectile_template = ability_weapon_template.projectile_template
 
@@ -68,7 +68,7 @@ function ActionUtility.get_projectile_template(action_settings, weapon_template,
 	return nil
 end
 
-function ActionUtility.get_ability_item(action_settings, ability_extension)
+function ActionUtility.ability_item(action_settings, ability_extension)
 	local ability_type = action_settings.ability_type
 	local equipped_abilities = ability_extension:equipped_abilities()
 	local grenade_ability = equipped_abilities[ability_type]

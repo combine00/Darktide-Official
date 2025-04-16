@@ -54,10 +54,6 @@ local zealot_c_zealot_male_a = {
 			[1.0] = 7.000833,
 			[2.0] = 6.145208
 		},
-		sound_event_weights = {
-			[1.0] = 0.5,
-			[2.0] = 0.5
-		},
 		randomize_indexes = {}
 	},
 	combat_pause_quirk_pilgrimage_b = {

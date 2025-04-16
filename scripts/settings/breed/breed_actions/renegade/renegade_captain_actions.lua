@@ -738,31 +738,25 @@ local action_data = {
 	},
 	power_sword_melee_combo_attack = {
 		height = 2.75,
-		ignore_blocked = true,
 		utility_weight = 10,
-		moving_attack = true,
-		range = 3.25,
+		ignore_blocked = true,
 		attack_type = "oobb",
 		collision_filter = "filter_minion_melee",
+		moving_attack = true,
 		aoe_threat_timing = 0.3,
+		range = 3.25,
 		move_speed = 4,
 		rotation_speed = 12,
 		ignore_dodge = true,
 		width = 1.75,
 		considerations = UtilityConsiderations.renegade_captain_power_sword_melee_combo_attack,
 		attack_anim_events = {
-			"attack_swing_combo_01",
 			"attack_swing_combo_02",
 			"attack_swing_combo_03",
 			"attack_swing_combo_04",
 			"attack_swing_combo_05"
 		},
 		attack_anim_damage_timings = {
-			attack_swing_combo_01 = {
-				0.6236559139784946,
-				1.075268817204301,
-				1.8709677419354838
-			},
 			attack_swing_combo_02 = {
 				0.6021505376344086,
 				1.075268817204301,
@@ -790,17 +784,9 @@ local action_data = {
 		},
 		attack_anim_durations = {
 			attack_swing_combo_02 = 3.466666666666667,
-			attack_swing_combo_01 = 2.4,
-			attack_swing_combo_05 = 2.8,
 			attack_swing_combo_04 = 2.6666666666666665,
+			attack_swing_combo_05 = 2.8,
 			attack_swing_combo_03 = 2.8533333333333335
-		},
-		attack_override_damage_data = {
-			attack_swing_combo_01 = {
-				[3] = {
-					override_damage_type = damage_types.minion_ogryn_kick
-				}
-			}
 		},
 		attack_intensities = {
 			melee = 0.25,
@@ -810,9 +796,8 @@ local action_data = {
 		},
 		move_start_timings = {
 			attack_swing_combo_02 = 0,
-			attack_swing_combo_01 = 0,
-			attack_swing_combo_05 = 0,
 			attack_swing_combo_04 = 0,
+			attack_swing_combo_05 = 0,
 			attack_swing_combo_03 = 0
 		},
 		damage_profile = DamageProfileTemplates.renegade_captain_melee_default,
@@ -828,9 +813,8 @@ local action_data = {
 		effect_template = EffectTemplates.renegade_captain_power_sword_sweep,
 		effect_template_start_timings = {
 			attack_swing_combo_02 = 0.16666666666666666,
-			attack_swing_combo_01 = 0.16666666666666666,
-			attack_swing_combo_05 = 0.16666666666666666,
 			attack_swing_combo_04 = 0.16666666666666666,
+			attack_swing_combo_05 = 0.16666666666666666,
 			attack_swing_combo_03 = 0.16666666666666666
 		}
 	},
@@ -1802,6 +1786,19 @@ local action_data = {
 	open_door = {
 		rotation_duration = 0.1,
 		stagger_immune = true
+	},
+	smash_obstacle = {
+		rotation_duration = 0.1,
+		attack_anim_events = {
+			"attack_kick_01"
+		},
+		attack_anim_damage_timings = {
+			attack_kick_01 = 0.6666666666666666
+		},
+		attack_anim_durations = {
+			attack_kick_01 = 1.7333333333333334
+		},
+		damage_profile = DamageProfileTemplates.default
 	},
 	exit_spawner = {
 		run_anim_event = "move_fwd"

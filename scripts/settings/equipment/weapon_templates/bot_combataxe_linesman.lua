@@ -1077,6 +1077,7 @@ weapon_template.weapon_box = combat_axe_sweep_box
 weapon_template.sprint_ready_up_time = 0.1
 weapon_template.hud_configuration = {
 	uses_overheat = false,
+	uses_weapon_special_charges = false,
 	uses_ammunition = false
 }
 weapon_template.max_first_person_anim_movement_speed = 5.8

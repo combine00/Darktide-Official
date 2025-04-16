@@ -7,7 +7,6 @@ local function misc_bot_profiles(all_profiles)
 		selected_voice = "veteran_male_a",
 		gender = "male",
 		archetype = "veteran",
-		specialization = "none",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/empty_hair",
 			slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_black_01",
@@ -38,7 +37,6 @@ local function misc_bot_profiles(all_profiles)
 		selected_voice = "ogryn_a",
 		gender = "male",
 		archetype = "ogryn",
-		specialization = "none",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/empty_hair",
 			slot_body_face_hair = "content/items/characters/player/ogryn/face_hair/ogryn_facial_hair_a_eyebrows",
@@ -65,7 +63,6 @@ local function misc_bot_profiles(all_profiles)
 		selected_voice = "zealot_female_c",
 		gender = "female",
 		archetype = "zealot",
-		specialization = "none",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/hair_short_bobcut_a",
 			slot_body_face_hair = "content/items/characters/player/human/face_hair/female_facial_hair_base",
@@ -92,7 +89,6 @@ local function misc_bot_profiles(all_profiles)
 		selected_voice = "psyker_male_a",
 		gender = "male",
 		archetype = "psyker",
-		specialization = "none",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/empty_hair",
 			slot_body_face_hair = "content/items/characters/player/human/face_hair/empty_face_hair",
@@ -119,7 +115,6 @@ local function misc_bot_profiles(all_profiles)
 		selected_voice = "veteran_female_b",
 		gender = "female",
 		archetype = "veteran",
-		specialization = "none",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/hair_short_e",
 			slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_brown_02",
@@ -146,7 +141,6 @@ local function misc_bot_profiles(all_profiles)
 		selected_voice = "zealot_male_b",
 		gender = "male",
 		archetype = "zealot",
-		specialization = "none",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/empty_hair",
 			slot_gear_head = "content/items/characters/player/human/gear_head/d7_zealot_m_headgear",
@@ -174,7 +168,6 @@ local function misc_bot_profiles(all_profiles)
 		selected_voice = "psyker_female_a",
 		gender = "female",
 		archetype = "psyker",
-		specialization = "none",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/empty_hair",
 			slot_body_face_hair = "content/items/characters/player/human/face_hair/empty_face_hair",

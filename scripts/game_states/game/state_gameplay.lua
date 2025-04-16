@@ -31,6 +31,7 @@ function StateGameplay:on_enter(parent, params, creation_context)
 	shared_state.is_dedicated_mission_server = Managers.connection:is_dedicated_mission_server()
 	shared_state.spawn_group_id = params.spawn_group_id
 	shared_state.pacing_control = mechanism_data.pacing_control
+	shared_state.havoc_data = mechanism_data.havoc_data
 	shared_state.nav_world = nil
 	shared_state.nav_data = nil
 	shared_state.hard_cap_out_of_bounds_units = nil
@@ -56,7 +57,7 @@ function StateGameplay:on_enter(parent, params, creation_context)
 		sub_state_change_callbacks.UIManager = callback(Managers.ui, "cb_on_game_sub_state_change")
 	end
 
-	local state_machine = GameStateMachine:new(self, GameplayStateInit, start_params, nil, sub_state_change_callbacks, "GamePlay")
+	local state_machine = GameStateMachine:new(self, GameplayStateInit, start_params, nil, sub_state_change_callbacks, "Game", "GamePlay")
 	self._state_machine = state_machine
 	self._shared_state = shared_state
 	self._testify_performance_reporter = nil
@@ -69,7 +70,7 @@ function StateGameplay:on_enter(parent, params, creation_context)
 	self._game_world_fullscreen_blur_amount = 0
 end
 
-function StateGameplay:on_exit(on_shutdown)
+function StateGameplay:on_exit(exit_params)
 	self._next_state = nil
 	self._next_state_context = nil
 
@@ -77,7 +78,7 @@ function StateGameplay:on_exit(on_shutdown)
 		self._state_machine:unregister_on_state_change_callback("UIManager")
 	end
 
-	self._state_machine:delete(on_shutdown)
+	self._state_machine:delete(exit_params)
 end
 
 function StateGameplay:update(main_dt, main_t)

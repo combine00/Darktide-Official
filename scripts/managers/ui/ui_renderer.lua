@@ -163,6 +163,7 @@ local Vector2 = Vector2
 local Vector3 = Vector3
 local Gui2_slug_text = Gui2.slug_text
 local Gui2_update_slug_text = Gui2.update_slug_text
+local Gui2_slug_text_max_extents = Gui2.slug_text_max_extents
 local Gui2_slug_text_extents = Gui2.slug_text_extents
 local Gui_slug_text_3d = Gui.slug_text_3d
 local Gui_update_slug_text_3d = Gui.update_slug_text_3d
@@ -1100,7 +1101,7 @@ function UIRenderer:text_height(text, font_type, font_size, optional_size, optio
 
 	additional_settings.flags = flags
 	additional_settings.optional_size = optional_size
-	local min, max, _ = Gui2.slug_text_max_extents(self.gui, text, font, font_size, additional_settings)
+	local min, max, _ = Gui2_slug_text_max_extents(self.gui, text, font, font_size, additional_settings)
 	local min_x, min_y = Vector3.to_elements(min)
 	local max_x, max_y = Vector3.to_elements(max)
 	local height = max_y - min_y
@@ -1125,7 +1126,7 @@ function UIRenderer:text_size(text, font_type, font_size, optional_size, options
 
 	additional_settings.flags = flags
 	additional_settings.optional_size = optional_size
-	local min, max, caret = use_max_extents and Gui2.slug_text_max_extents or Gui2_slug_text_extents(self.gui, text, font, font_size, additional_settings)
+	local min, max, caret = use_max_extents and Gui2_slug_text_max_extents or Gui2_slug_text_extents(self.gui, text, font, font_size, additional_settings)
 	local min_x, min_y = Vector3.to_elements(min)
 	local max_x, max_y = Vector3.to_elements(max)
 	local width = max_x - min_x

@@ -115,6 +115,8 @@ function MasterData:_get_items_from_backend(version, url)
 	local promise = nil
 
 	if version ~= nil and url ~= nil then
+		Log.info("MasterData", "Fetching master items at %s", url)
+
 		promise = Managers.backend:url_request(url, {
 			require_auth = true
 		})

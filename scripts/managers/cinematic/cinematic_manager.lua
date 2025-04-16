@@ -29,7 +29,7 @@ function CinematicManager:init(world, is_server, network_event_delegate)
 	self._world = world
 	self._storyteller = World.storyteller(world)
 	self._network_event_delegate = network_event_delegate
-	self._level_loader = CinematicLevelLoader:new()
+	self._cinematic_level_loader = CinematicLevelLoader:new()
 	self._cinematic_levels = {}
 	self._on_levels_spawned_callback = {}
 	self._aligned_levels = {}
@@ -65,7 +65,7 @@ function CinematicManager:_is_valid_origin_level(origin_level, destination_level
 	if has_origin_level then
 		origin_level_name = Level.name(origin_level)
 		origin_level_name = origin_level_name:match("(.+)%..+$")
-		local is_external_level = self._level_loader:has_level(origin_level_name)
+		local is_external_level = self._cinematic_level_loader:has_level(origin_level_name)
 
 		if not is_external_level then
 			has_origin_level = false
@@ -106,10 +106,10 @@ function CinematicManager:_send_hot_join_story(sender, channel, story_definition
 	if story_definition.use_alignment_units then
 		local origin_level = story_definition.origin_level
 		local scene_unit_origin = story_definition.scene_unit_origin
-		scene_unit_origin_level_id = Level._unit_index(origin_level, scene_unit_origin)
+		scene_unit_origin_level_id = Managers.state.unit_spawner:level_index(scene_unit_origin)
 		local destination_level = story_definition.destination_level
 		local scene_unit_destination = story_definition.scene_unit_destination
-		scene_unit_destination_level_id = Level._unit_index(destination_level, scene_unit_destination)
+		scene_unit_destination_level_id = Managers.state.unit_spawner:level_index(scene_unit_destination)
 		has_origin_level, origin_level_name = self:_is_valid_origin_level(origin_level, destination_level)
 	end
 
@@ -363,11 +363,15 @@ function CinematicManager:is_playing()
 end
 
 function CinematicManager:is_using_cinematic_levels()
-	return self._level_loader:has_levels()
+	return self._cinematic_level_loader:has_levels()
 end
 
 function CinematicManager:is_loading_cinematic_levels()
-	return self._level_loader:is_loading()
+	return self._cinematic_level_loader:currently_loading_cinematic_name() ~= nil
+end
+
+function CinematicManager:currently_loading_cinematic_name()
+	return self._cinematic_level_loader:currently_loading_cinematic_name()
 end
 
 function CinematicManager:alignment_inverse_pose()
@@ -380,7 +384,7 @@ function CinematicManager:alignment_inverse_pose()
 	return nil
 end
 
-function CinematicManager:active()
+function CinematicManager:cinematic_active()
 	return self:active_camera() ~= nil
 end
 
@@ -452,8 +456,8 @@ function CinematicManager:queue_story(cinematic_scene_name, category, optional_s
 			story_definition.origin_level = origin_level
 			story_definition.destination_level = destination_level
 			local has_origin_level, origin_level_name = self:_is_valid_origin_level(origin_level, destination_level)
-			local scene_unit_origin_level_id = Level._unit_index(origin_level, optional_scene_unit_origin)
-			local scene_unit_destination_level_id = Level._unit_index(destination_level, optional_scene_unit_destination)
+			local scene_unit_origin_level_id = Managers.state.unit_spawner:level_index(optional_scene_unit_origin)
+			local scene_unit_destination_level_id = Managers.state.unit_spawner:level_index(optional_scene_unit_destination)
 			local story_name = story_definition.name
 			local cinematic_scene_name_id = NetworkLookup.cinematic_scene_names[cinematic_scene_name]
 
@@ -493,6 +497,10 @@ end
 
 function CinematicManager:play_story(story_definition)
 	if GameParameters.skip_cinematics then
+		if not self._is_server then
+			self:_check_last_played_on_client(story_definition.cinematic_scene_name)
+		end
+
 		return false
 	end
 
@@ -603,8 +611,13 @@ function CinematicManager:load_levels(cinematic_name, level_names, on_levels_spa
 	Managers.state.game_mode:set_wants_single_threaded_physics(true, "CinematicManager")
 
 	local on_levels_loaded = callback(self, "_on_levels_loaded", request_id, load_only)
+	local loader_context = {
+		cinematic_name = cinematic_name,
+		level_names = level_names,
+		callback = on_levels_loaded
+	}
 
-	self._level_loader:start_loading(cinematic_name, level_names, on_levels_loaded)
+	self._cinematic_level_loader:start_loading(loader_context)
 
 	if self._is_server then
 		if not client_channel_id and not hotjoin_only then
@@ -662,7 +675,7 @@ function CinematicManager:_unload_all_levels()
 	table.clear(cinematic_levels)
 	table.clear(self._stories)
 	table.clear(self._queued_stories)
-	self._level_loader:cleanup()
+	self._cinematic_level_loader:cleanup()
 end
 
 function CinematicManager:unload_levels(cinematic_name)
@@ -686,7 +699,7 @@ function CinematicManager:unload_levels(cinematic_name)
 	end
 
 	table.clear(self._stories)
-	self._level_loader:cleanup()
+	self._cinematic_level_loader:cleanup()
 end
 
 function CinematicManager:_spawn_cinematic_level(level_name)
@@ -713,10 +726,6 @@ end
 function CinematicManager:_unspawn_level(level)
 	Level.trigger_level_shutdown(level)
 
-	local unit_spawner_manager = Managers.state.unit_spawner
-
-	unit_spawner_manager:unregister_runtime_loaded_level(level)
-
 	local level_units = Level.units(level, true)
 	local extension_manager = Managers.state.extension
 
@@ -725,7 +734,9 @@ function CinematicManager:_unspawn_level(level)
 	local world = self._world
 	local level_name = Level.name(level)
 	level_name = level_name:match("(.+)%..+$")
+	local unit_spawner_manager = Managers.state.unit_spawner
 
+	unit_spawner_manager:unregister_runtime_loaded_level(level)
 	ScriptWorld.destroy_level(world, level_name)
 end
 
@@ -736,7 +747,7 @@ end
 function CinematicManager:rpc_cinematic_story_sync(channel_id, cinematic_scene_name_id, category, story_name, scene_unit_origin_level_id, scene_unit_destination_level_id, has_origin_level, origin_level_name)
 	local cinematic_scene_name = NetworkLookup.cinematic_scene_names[cinematic_scene_name_id]
 
-	if not has_origin_level or self._level_loader:check_loading(cinematic_scene_name) then
+	if not has_origin_level or self._cinematic_level_loader:check_loading(cinematic_scene_name) then
 		self:_client_cinematic_story_sync(cinematic_scene_name, category, story_name, scene_unit_origin_level_id, scene_unit_destination_level_id, origin_level_name)
 	else
 		local story_definition = {

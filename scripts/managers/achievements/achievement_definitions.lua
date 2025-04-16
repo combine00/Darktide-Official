@@ -5,6 +5,8 @@ local AchievementWeaponGroups = require("scripts/settings/achievements/achieveme
 local AchievementFlags = require("scripts/settings/achievements/achievement_flags")
 local AchievementTypes = require("scripts/managers/achievements/achievement_types")
 local MissionTypes = require("scripts/settings/mission/mission_types")
+local MissionBuffsAllowed = require("scripts/managers/mission_buffs/mission_buffs_allowed_buffs")
+local PSNPlatformAchievements = require("scripts/settings/achievements/psn_platform_achievements")
 local SteamPlatformAchievements = require("scripts/settings/achievements/steam_platform_achievements")
 local XboxLivePlatformAchievements = require("scripts/settings/achievements/xbox_live_platform_achievements")
 local AchievementTypesLookup = table.enum(unpack(table.keys(AchievementTypes)))
@@ -1259,7 +1261,7 @@ AchievementDefinitions.ogryn_grenade_frag_group_of_enemies = {
 	}
 }
 AchievementDefinitions.ogryn_kills_during_max_stacks_heavy_hitter = {
-	description = "loc_achievement_ogryn_kills_during_max_stacks_heavy_hitter_description",
+	description = "loc_achievement_ogryn_kills_during_max_stacks_heavy_hitter_new_description",
 	icon = "content/ui/textures/icons/achievements/class_achievements/class_ogryn_achievement_20",
 	title = "loc_achievement_ogryn_kills_during_max_stacks_heavy_hitter_name",
 	target = 5000,
@@ -2569,10 +2571,15 @@ AchievementDefinitions.team_chaos_beast_of_nurgle_slain_no_corruption = {
 }
 local missions = AchievementMissionGroups.missions
 local category_name = "missions_general"
-local excluded_maps = {}
-local excluded_zones = {}
+local excluded_maps = {
+	psykhanium = true
+}
+local excluded_zones = {
+	horde = true
+}
 local excluded_zones_for_destructible = {
-	operations = true
+	operations = true,
+	horde = true
 }
 
 local function _add_mission_objective_family(id, icon)
@@ -2743,8 +2750,9 @@ for _, zone in ipairs(AchievementMissionGroups.zones) do
 	end
 end
 
-old_numeric_target_family("missions_{index:%d}", {
+tiered_target_family("missions_{index:%d}", {
 	description = "loc_achievement_missions_x_description",
+	title = "loc_achievement_missions_x_name",
 	icon = "content/ui/textures/icons/achievements/achievement_icon_0068",
 	stat_name = "missions",
 	type = AchievementTypesLookup.increasing_stat,
@@ -2755,7 +2763,9 @@ old_numeric_target_family("missions_{index:%d}", {
 	50,
 	150,
 	250,
-	500
+	500,
+	750,
+	1000
 })
 old_numeric_target_family("scan_{index:%d}", {
 	description = "loc_achievement_scan_x_description",
@@ -3014,7 +3024,300 @@ tiered_target_family("mission_darkness_{index:%d}", {
 	10,
 	50
 })
+tiered_target_family("mission_havoc_{index:%d}", {
+	description = "loc_achievement_havoc_veteran_desc",
+	title = "loc_achievement_havoc_veteran_name",
+	category = "mission_havoc",
+	stat_name = "havoc_missions",
+	type = AchievementTypesLookup.increasing_stat,
+	icon = path .. "havoc_achievements/havoc_missions_havoc_veteran",
+	flags = {}
+}, {
+	10,
+	25,
+	50,
+	75,
+	100
+})
+tiered_target_family("havoc_win_assisted_{index:%d}", {
+	description = "loc_achievement_havoc_clutch_description",
+	title = "loc_achievement_havoc_clutch_name",
+	category = "mission_havoc",
+	stat_name = "havoc_win_assisted",
+	type = AchievementTypesLookup.increasing_stat,
+	icon = path .. "havoc_achievements/havoc_missions_expedited_backup",
+	flags = {}
+}, {
+	10,
+	25,
+	50,
+	75,
+	100
+})
 
+local function _generate_havoc_rank_name()
+	local havoc_rank_name = nil
+
+	return function (index, config, definition, key)
+		local loc_variables = definition[key]
+		loc_variables = loc_variables or {}
+		havoc_rank_name = "loc_havoc_militarium_rank_" .. string.format("%02d", index)
+		loc_variables.rank = Localize(havoc_rank_name)
+
+		return loc_variables
+	end
+end
+
+local function _generate_havoc_rank()
+	local havoc_rank_thresholds = {
+		5,
+		10,
+		15,
+		20,
+		25,
+		30,
+		35,
+		40
+	}
+	local havoc_rank = nil
+
+	return function (index, config, definition, key)
+		local loc_variables = definition[key]
+		loc_variables = loc_variables or {}
+		havoc_rank = havoc_rank_thresholds[index]
+		loc_variables.rank = tostring(havoc_rank)
+
+		return loc_variables
+	end
+end
+
+family({
+	description = "loc_achievement_havoc_tier_description",
+	title = "loc_achievement_havoc_tier_reached",
+	target = 1,
+	category = "mission_havoc",
+	type = AchievementTypesLookup.increasing_stat,
+	icon = path .. "havoc_achievements/havoc_missions_adept_of_the_53rd",
+	flags = {},
+	loc_title_variables = {
+		rank = Localize("loc_havoc_militarium_rank_01")
+	},
+	loc_variables = {
+		rank = Localize(40)
+	}
+}, {
+	id = "mission_havoc_rank_reached_0{index:%d}",
+	stat_name = "havoc_rank_reached_0{index:%d}",
+	loc_title_variables = _generate_havoc_rank_name(),
+	loc_variables = _generate_havoc_rank()
+}, {
+	{},
+	{},
+	{},
+	{},
+	{},
+	{},
+	{},
+	{}
+})
+tiered_target_family("mission_havoc_caches_earned_{index:%d}", {
+	description = "loc_achievement_havoc_weekly_cache_description",
+	category = "mission_havoc",
+	title = "loc_achievement_havoc_weekly_cache_name",
+	stat_name = "havoc_weekly_rewards_received",
+	type = AchievementTypesLookup.increasing_stat,
+	icon = path .. "havoc_achievements/havoc_missions_the_militarium_giveth",
+	flags = {}
+}, {
+	1,
+	5,
+	10,
+	15,
+	20
+})
+
+AchievementDefinitions.flawless_havoc_won = {
+	description = "loc_achievement_havoc_flawless_win_description",
+	title = "loc_havoc_plus_flawless_win_name",
+	target = 1,
+	stat_name = "flawless_havoc_won",
+	category = "mission_havoc",
+	type = AchievementTypesLookup.increasing_stat,
+	icon = path .. "havoc_achievements/havoc_missions_the_insane",
+	flags = {},
+	loc_variables = {
+		rank = 35
+	}
+}
+
+tiered_target_family("horde_complete_{index:%d}_island", {
+	description = "loc_achievement_horde_complete_islands_description",
+	icon = "content/ui/textures/icons/achievements/horde_achievements/horde_island_complete",
+	category = "mission_survival",
+	title = "loc_achievement_horde_complete_islands_name",
+	stat_name = "game_mode_survival_islands_completed",
+	type = AchievementTypesLookup.increasing_stat,
+	flags = {}
+}, {
+	1,
+	10,
+	20,
+	50
+})
+
+AchievementDefinitions.horde_mortis_collect_one = {
+	description = "loc_achievement_horde_mortis_collect_one_description",
+	category = "mission_survival",
+	title = "loc_achievement_horde_mortis_collect_one_name",
+	target = 1,
+	stat_name = "game_mode_survival_mcguffin_returned",
+	type = AchievementTypesLookup.increasing_stat,
+	icon = path .. "horde_achievements/horde_memory_shard_one",
+	flags = {}
+}
+AchievementDefinitions.horde_win_in_less_than_X = {
+	description = "loc_achievement_horde_win_in_less_than_X_description",
+	title = "loc_achievement_horde_win_in_less_than_X_name",
+	target = 1,
+	stat_name = "game_mode_survival_game_end_flawless",
+	category = "mission_survival",
+	type = AchievementTypesLookup.increasing_stat,
+	icon = path .. "horde_achievements/horde_archetype_time",
+	flags = {},
+	loc_variables = {
+		target = 25
+	}
+}
+AchievementDefinitions.horde_complete_all_maps = {
+	description = "loc_achievement_horde_complete_all_maps_description",
+	title = "loc_achievement_horde_complete_all_maps_name",
+	target = 2,
+	category = "mission_survival",
+	type = AchievementTypesLookup.multi_stat,
+	icon = path .. "horde_achievements/horde_island_complete_two_maps",
+	stats = {
+		horde_win_island_void = {
+			target = 1,
+			increasing = true
+		},
+		horde_win_island_rooftops = {
+			target = 1,
+			increasing = true
+		}
+	},
+	flags = {},
+	loc_variables = {}
+}
+local survival_classes = MissionBuffsAllowed.available_family_builds
+local icon_prefix = "content/ui/textures/icons/achievements/horde_achievements/horde_archetype_"
+
+for i = 1, #survival_classes do
+	local class_name = survival_classes[i]
+	local horde_win_all_archetype = "horde_win_" .. class_name .. "_archetype"
+	local icon_name = icon_prefix .. class_name
+	local title = "loc_achievement_horde_win_" .. class_name .. "_archetype_name"
+	local description = "loc_achievement_horde_win_" .. class_name .. "_archetype_description"
+	AchievementDefinitions[horde_win_all_archetype] = {
+		target = 1,
+		category = "mission_survival",
+		type = AchievementTypesLookup.increasing_stat,
+		stat_name = horde_win_all_archetype,
+		title = title,
+		description = description,
+		loc_variables = {
+			class = class_name
+		},
+		icon = icon_name,
+		flags = {}
+	}
+end
+
+AchievementDefinitions.horde_win_all_archetype = {
+	description = "loc_achievement_horde_win_all_archetype_description",
+	title = "loc_achievement_horde_win_all_archetype_name",
+	icon = "content/ui/textures/icons/achievements/horde_achievements/horde_archetype_all",
+	target = 5,
+	category = "mission_survival",
+	type = AchievementTypesLookup.meta,
+	achievements = table.set({
+		"horde_win_fire_archetype",
+		"horde_win_electric_archetype",
+		"horde_win_cowboy_archetype",
+		"horde_win_elementalist_archetype",
+		"horde_win_unkillable_archetype"
+	}),
+	flags = {}
+}
+
+local function generate_vo_stats(name, num_vo, target)
+	local stats = {}
+
+	for i = 1, num_vo do
+		local stat_name = string.format("backstory_%s_part_%s", name, i)
+		stats[stat_name] = {
+			increasing = true,
+			target = target
+		}
+	end
+
+	return stats
+end
+
+local function generate_vo_stats_sorting(name, num_vo)
+	local stats_sorting = {}
+
+	for i = 1, num_vo do
+		local stat_name = string.format("backstory_%s_part_%s", name, i)
+		stats_sorting[#stats_sorting + 1] = stat_name
+	end
+
+	return stats_sorting
+end
+
+local vo_target = 1
+local morrow_num_vo = 9
+local zola_num_vo = 7
+AchievementDefinitions.horde_morrow_story = {
+	description = "loc_horde_morrow_story_desc",
+	title = "loc_horde_morrow_story_title",
+	category = "mission_survival",
+	icon = "content/ui/textures/icons/achievements/horde_achievements/horde_memo_morrow",
+	type = AchievementTypesLookup.multi_stat,
+	target = morrow_num_vo,
+	stats = generate_vo_stats("morrow", morrow_num_vo, vo_target),
+	stats_sorting = generate_vo_stats_sorting("morrow", morrow_num_vo),
+	flags = {},
+	loc_variables = {
+		target = vo_target
+	}
+}
+AchievementDefinitions.horde_zola_story = {
+	description = "loc_horde_zola_story_desc",
+	title = "loc_horde_zola_story_title",
+	category = "mission_survival",
+	icon = "content/ui/textures/icons/achievements/horde_achievements/horde_memo_zola",
+	type = AchievementTypesLookup.multi_stat,
+	target = zola_num_vo,
+	stats = generate_vo_stats("zola", zola_num_vo, vo_target),
+	stats_sorting = generate_vo_stats_sorting("zola", zola_num_vo),
+	flags = {},
+	loc_variables = {
+		target = vo_target
+	}
+}
+AchievementDefinitions.horde_mortis_collect_all = {
+	description = "loc_achievement_horde_mortis_collect_all_description",
+	title = "loc_achievement_horde_mortis_collect_all_name",
+	icon = "content/ui/textures/icons/achievements/horde_achievements/horde_memory_shard_collect_all",
+	target = 2,
+	category = "mission_survival",
+	type = AchievementTypesLookup.meta,
+	achievements = table.set({
+		"horde_morrow_story",
+		"horde_zola_story"
+	}),
+	flags = {}
+}
 AchievementDefinitions.mission_scavenge_samples = {
 	description = "loc_achievement_mission_scavenge_samples_description",
 	title = "loc_achievement_mission_scavenge_samples_name",
@@ -3082,6 +3385,7 @@ tiered_target_family("scripture_recovered_{index:%d}", {
 })
 
 local excluded_maps_for_puzzles = {
+	psykhanium = true,
 	op_train = true,
 	core_research = true
 }
@@ -3112,7 +3416,8 @@ for _, mission in ipairs(missions) do
 end
 
 local excluded_zones = {
-	operations = true
+	operations = true,
+	horde = true
 }
 
 for _, zone in ipairs(AchievementMissionGroups.zone_meta) do
@@ -3431,6 +3736,56 @@ AchievementDefinitions.group_cooperation = {
 	category = category_name,
 	flags = {}
 }
+AchievementDefinitions.total_syringes_used = {
+	description = "loc_achievement_total_syringes_used_description",
+	title = "loc_achievement_total_syringes_used_name",
+	target = 20,
+	stat_name = "total_syringes_used",
+	type = AchievementTypesLookup.increasing_stat,
+	icon = path .. "havoc_achievements/havoc_mission_total_syringes",
+	category = category_name,
+	flags = {}
+}
+AchievementDefinitions.elites_and_specials_killed_using_red_stimm = {
+	description = "loc_achievement_elites_and_specials_killed_using_red_stimm_description",
+	title = "loc_achievement_elites_and_specials_killed_using_red_stimm_name",
+	target = 50,
+	stat_name = "total_kills_gained_while_using_red_stimm",
+	type = AchievementTypesLookup.increasing_stat,
+	icon = path .. "havoc_achievements/havoc_mission_total_syringes",
+	category = category_name,
+	flags = {}
+}
+AchievementDefinitions.corruption_healed_using_green_stimm = {
+	description = "loc_achievement_corruption_healed_using_green_stimm_description",
+	title = "loc_achievement_corruption_healed_using_green_stimm_stimm_name",
+	target = 1000,
+	stat_name = "corruption_healed_with_green_stimm",
+	type = AchievementTypesLookup.increasing_stat,
+	icon = path .. "havoc_achievements/havoc_mission_use_green_stim",
+	category = category_name,
+	flags = {}
+}
+AchievementDefinitions.ability_time_saved_using_yellow_stimm = {
+	description = "loc_achievement_ability_time_saved_using_yellow_stimm_description",
+	title = "loc_achievement_ability_time_saved_using_yellow_stimm_name",
+	target = 1000,
+	stat_name = "ability_time_saved_by_yellow_stimm",
+	type = AchievementTypesLookup.increasing_stat,
+	icon = path .. "havoc_achievements/havoc_mission_use_red_stim",
+	category = category_name,
+	flags = {}
+}
+AchievementDefinitions.horde_kills_during_blue_stimm = {
+	description = "loc_achievement_horde_kills_during_blue_stimm_description",
+	title = "loc_achievement_horde_kills_during_blue_stimm_name",
+	target = 1000,
+	stat_name = "total_kills_gained_while_using_blue_stimm",
+	type = AchievementTypesLookup.increasing_stat,
+	icon = path .. "havoc_achievements/havoc_mission_use_yellow_stim",
+	category = category_name,
+	flags = {}
+}
 local category_name = "offensive"
 
 tiered_target_family("enemies_killed_by_barrels_{index:%d}", {
@@ -3476,8 +3831,33 @@ AchievementDefinitions.team_win_without_ally_downed_longer_then_x = {
 	}
 }
 
-old_numeric_target_family("enemies_{index:%d}", {
+for _, breed in pairs(AchievementBreedGroups.special_and_elite_breed_lookup) do
+	tiered_target_family("amount_of_" .. breed.name .. "_killed_{index:%d}", {
+		description = "loc_achievement_amount_of_x_description",
+		title = "loc_achievement_amount_of_x_name",
+		type = AchievementTypesLookup.increasing_stat,
+		icon = breed.icon,
+		stat_name = string.format("x_amount_of_%s_killed", breed.name),
+		category = category_name,
+		flags = {},
+		loc_variables = {
+			breed = Localize(breed.local_variable)
+		},
+		loc_title_variables = {
+			breed = Localize(breed.title_local_variable)
+		}
+	}, {
+		breed.targets[1],
+		breed.targets[2],
+		breed.targets[3],
+		breed.targets[4],
+		breed.targets[5]
+	})
+end
+
+tiered_target_family("enemies_{index:%d}", {
 	description = "loc_achievement_enemies_x_description",
+	title = "loc_achievement_enemies_x_name",
 	icon = "content/ui/textures/icons/achievements/achievement_icon_0089",
 	stat_name = "total_kills",
 	type = AchievementTypesLookup.increasing_stat,
@@ -3488,7 +3868,9 @@ old_numeric_target_family("enemies_{index:%d}", {
 	40000,
 	100000,
 	250000,
-	500000
+	500000,
+	750000,
+	1000000
 })
 
 AchievementDefinitions.consecutive_headshots = {
@@ -3708,6 +4090,17 @@ for id, definition in pairs(AchievementDefinitions) do
 		definition.steam = {
 			id = platform_id,
 			stat_id = SteamPlatformAchievements.platform_to_stat[platform_id]
+		}
+	end
+end
+
+for id, definition in pairs(AchievementDefinitions) do
+	local platform_id = PSNPlatformAchievements.backend_to_platform[id]
+
+	if platform_id ~= nil then
+		definition.psn = {
+			id = platform_id,
+			show_progress = not not PSNPlatformAchievements.show_progress[platform_id]
 		}
 	end
 end

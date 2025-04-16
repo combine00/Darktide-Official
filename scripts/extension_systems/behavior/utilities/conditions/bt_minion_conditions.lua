@@ -1,31 +1,30 @@
 local AttackIntensity = require("scripts/utilities/attack_intensity")
-local conditions = {}
+local NavQueries = require("scripts/utilities/nav_queries")
+local conditions = {
+	has_target_unit = function (unit, blackboard, scratchpad, condition_args, action_data, is_running)
+		local perception_component = blackboard.perception
 
-function conditions.has_target_unit(unit, blackboard, scratchpad, condition_args, action_data, is_running)
-	local perception_component = blackboard.perception
+		if not is_running and perception_component.lock_target then
+			return false
+		end
 
-	if not is_running and perception_component.lock_target then
-		return false
+		local target_unit = perception_component.target_unit
+
+		return HEALTH_ALIVE[target_unit]
+	end,
+	is_dead = function (unit, blackboard, scratchpad, condition_args, action_data, is_running)
+		local death_component = blackboard.death
+		local is_dead = death_component.is_dead
+
+		return is_dead
+	end,
+	is_in_cover = function (unit, blackboard, scratchpad, condition_args, action_data, is_running)
+		local cover_component = blackboard.cover
+		local is_in_cover = cover_component.is_in_cover
+
+		return is_in_cover
 	end
-
-	local target_unit = perception_component.target_unit
-
-	return HEALTH_ALIVE[target_unit]
-end
-
-function conditions.is_dead(unit, blackboard, scratchpad, condition_args, action_data, is_running)
-	local death_component = blackboard.death
-	local is_dead = death_component.is_dead
-
-	return is_dead
-end
-
-function conditions.is_in_cover(unit, blackboard, scratchpad, condition_args, action_data, is_running)
-	local cover_component = blackboard.cover
-	local is_in_cover = cover_component.is_in_cover
-
-	return is_in_cover
-end
+}
 
 function conditions.is_alerted(unit, blackboard, scratchpad, condition_args, action_data, is_running)
 	local has_target_unit = conditions.has_target_unit(unit, blackboard, scratchpad, condition_args, action_data, is_running)
@@ -610,6 +609,30 @@ function conditions.daemonhost_wants_to_leave(unit, blackboard, scratchpad, cond
 	return wants_to_leave
 end
 
+local MUTATOR_DAEMONHOST_NUM_FOR_DESPAWN = {
+	1,
+	1,
+	1,
+	2,
+	3
+}
+
+function conditions.mutator_daemonhost_wants_to_leave(unit, blackboard, scratchpad, condition_args, action_data, is_running)
+	local is_aggroed = conditions.is_aggroed(unit, blackboard, scratchpad, condition_args, action_data, is_running)
+
+	if not is_aggroed then
+		return false
+	end
+
+	local statistics_component = blackboard.statistics
+	local player_deaths = statistics_component.player_deaths
+	local ChaosDaemonhostSettings = require("scripts/settings/monster/chaos_daemonhost_settings")
+	local num_player_kills_for_despawn = Managers.state.difficulty:get_table_entry_by_challenge(ChaosDaemonhostSettings.mutator_num_player_kills_for_despawn)
+	local wants_to_leave = num_player_kills_for_despawn <= player_deaths
+
+	return wants_to_leave
+end
+
 function conditions.daemonhost_is_passive(unit, blackboard, scratchpad, condition_args, action_data, is_running)
 	local perception_component = blackboard.perception
 	local aggro_state = perception_component.aggro_state
@@ -685,6 +708,43 @@ function conditions.should_patrol(unit, blackboard, scratchpad, condition_args, 
 	local is_passive = aggro_state == "passive"
 
 	return is_passive and should_patrol
+end
+
+function conditions.is_passive(unit, blackboard, scratchpad, condition_args, action_data, is_running)
+	local perception_component = blackboard.perception
+	local aggro_state = perception_component.aggro_state
+	local is_passive = aggro_state == "passive"
+
+	return is_passive
+end
+
+function conditions.can_summon_minions(unit, blackboard, scratchpad, condition_args, action_data, is_running)
+	local summon_component = blackboard.summon
+	local next_summon_t = summon_component.next_summon_t
+	local t = Managers.time:time("gameplay")
+	local minion_amount = summon_component.amount
+
+	if minion_amount ~= 0 then
+		return false
+	end
+
+	if next_summon_t < t then
+		return true
+	else
+		return false
+	end
+end
+
+function conditions.can_summon_timer_only(unit, blackboard, scratchpad, condition_args, action_data, is_running)
+	local summon_component = blackboard.summon
+	local next_summon_t = summon_component.next_summon_t
+	local t = Managers.time:time("gameplay")
+
+	if next_summon_t < t then
+		return true
+	else
+		return false
+	end
 end
 
 function conditions.captain_can_use_special_actions(unit, blackboard, scratchpad, condition_args, action_data, is_running)
@@ -1425,6 +1485,12 @@ function conditions.berzerker_leap_attack_allowed(unit, blackboard, scratchpad, 
 	local attack_allowed = AttackIntensity.minion_can_attack(unit, condition_args.attack_type, target_unit)
 
 	return attack_allowed
+end
+
+function conditions.is_minion_disabled(unit, blackboard, scratchpad, condition_args, action_data, is_running)
+	local disable_component = blackboard.disable
+
+	return disable_component.is_disabled
 end
 
 return conditions

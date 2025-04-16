@@ -74,6 +74,18 @@ function PartyImmateriumMemberMyself:psn_session_id()
 	return self._presence_entry:psn_session_id()
 end
 
+function PartyImmateriumMemberMyself:havoc_status()
+	return self._presence_entry:havoc_status()
+end
+
+function PartyImmateriumMemberMyself:havoc_rank_cadence_high()
+	return self._presence_entry:havoc_rank_cadence_high()
+end
+
+function PartyImmateriumMemberMyself:havoc_rank_all_time_high()
+	return self._presence_entry:havoc_rank_all_time_high()
+end
+
 function PartyImmateriumMemberMyself:destroy()
 	return
 end

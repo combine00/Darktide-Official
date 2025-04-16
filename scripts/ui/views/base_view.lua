@@ -43,6 +43,14 @@ function BaseView:dialogue_system()
 	return nil
 end
 
+function BaseView:_is_event_registered(event_name)
+	if self._event_list[event_name] then
+		return true
+	end
+
+	return false
+end
+
 function BaseView:_register_event(event_name, function_name)
 	function_name = function_name or event_name
 
@@ -116,10 +124,12 @@ function BaseView:_create_widgets(definitions, widgets, widgets_by_name)
 	local widget_definitions = definitions.widget_definitions
 	widgets = widgets or {}
 	widgets_by_name = widgets_by_name or {}
+	local widget_count = #widgets
 
 	for name, definition in pairs(widget_definitions) do
 		local widget = self:_create_widget(name, definition)
-		widgets[#widgets + 1] = widget
+		widget_count = widget_count + 1
+		widgets[widget_count] = widget
 	end
 
 	return widgets, widgets_by_name

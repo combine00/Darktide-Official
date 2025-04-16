@@ -2,32 +2,21 @@ local MinigameSettings = require("scripts/settings/minigame/minigame_settings")
 local NetworkLookup = require("scripts/network_lookup/network_lookup")
 local MinigameBase = class("MinigameBase")
 
-function MinigameBase:init(unit, is_server, seed)
+function MinigameBase:init(unit, is_server, seed, wwise_world)
 	self._minigame_unit = unit
 	self._is_server = is_server
 	self._current_state = MinigameSettings.game_states.none
 	self._seed = seed
 	self._player_session_id = nil
+	self._wwise_world = wwise_world
 	self._current_stage = nil
 	self._state_started = nil
 
 	if is_server then
+		self._fx_extension = nil
+		self._fx_source_name = nil
 		local unit_spawner_manager = Managers.state.unit_spawner
-		self._is_leve_unit = false
-		self._minigame_unit_id = nil
-		local game_object_id = unit_spawner_manager:game_object_id(unit)
-
-		if game_object_id then
-			self._is_leve_unit = false
-			self._minigame_unit_id = game_object_id
-		else
-			local unit_index, _ = unit_spawner_manager:level_index(unit)
-
-			if unit_index then
-				self._is_leve_unit = true
-				self._minigame_unit_id = unit_index
-			end
-		end
+		self._is_level_unit, self._minigame_unit_id = unit_spawner_manager:game_object_id_or_level_index(unit)
 	end
 end
 
@@ -47,6 +36,10 @@ function MinigameBase:hot_join_sync(sender, channel)
 	if current_decode_stage then
 		self:send_rpc_to_channel(channel, "rpc_minigame_sync_set_stage", current_decode_stage)
 	end
+end
+
+function MinigameBase:decode_interrupt()
+	return
 end
 
 function MinigameBase:start(player_or_nil)
@@ -85,6 +78,10 @@ end
 
 function MinigameBase:complete()
 	return
+end
+
+function MinigameBase:player_session_id()
+	return self._player_session_id
 end
 
 function MinigameBase:is_completed()
@@ -127,20 +124,40 @@ function MinigameBase:on_axis_set(t, x, y)
 end
 
 function MinigameBase:send_rpc(rpc_name, ...)
-	Managers.state.game_session:send_rpc_clients(rpc_name, self._minigame_unit_id, self._is_leve_unit, ...)
+	Managers.state.game_session:send_rpc_clients(rpc_name, self._minigame_unit_id, self._is_level_unit, ...)
 end
 
 function MinigameBase:send_rpc_to_channel(channel, rpc_name, ...)
 	local rpc = RPC[rpc_name]
 
-	rpc(channel, self._minigame_unit_id, self._is_leve_unit, ...)
+	rpc(channel, self._minigame_unit_id, self._is_level_unit, ...)
+end
+
+function MinigameBase:_setup_sound(player, fx_source_name)
+	local player_unit = player.player_unit
+	local visual_loadout_extension = ScriptUnit.extension(player_unit, "visual_loadout_system")
+	local unit_data_extension = ScriptUnit.extension(player_unit, "unit_data_system")
+	local inventory_component = unit_data_extension:read_component("inventory")
+	local fx_sources = visual_loadout_extension:source_fx_for_slot(inventory_component.wielded_slot)
+	self._fx_extension = ScriptUnit.extension(player_unit, "fx_system")
+	self._fx_source_name = fx_sources[fx_source_name]
 end
 
 function MinigameBase:play_sound(alias, sync_with_clients, include_client)
-	sync_with_clients = sync_with_clients == nil and true
-	include_client = include_client == nil and true
+	if self._fx_extension then
+		sync_with_clients = sync_with_clients == nil and true
+		include_client = include_client == nil and true
 
-	return self._fx_extension:trigger_gear_wwise_event_with_source(alias, nil, self._fx_source_name, sync_with_clients, include_client)
+		if self._fx_extension:sound_source(self._fx_source_name) then
+			self._fx_extension:trigger_gear_wwise_event_with_source(alias, nil, self._fx_source_name, sync_with_clients, include_client)
+		end
+	end
+end
+
+function MinigameBase:set_parameter_sound(parameter_name, parameter_value)
+	if self._fx_extension and self._fx_extension:sound_source(self._fx_source_name) then
+		self._fx_extension:set_source_parameter(parameter_name, parameter_value, self._fx_source_name)
+	end
 end
 
 function MinigameBase:current_stage()

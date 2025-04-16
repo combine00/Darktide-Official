@@ -67,7 +67,6 @@ local mission_templates = {
 		testify_flags = {
 			performance = false,
 			screenshot = false,
-			cutscenes = false,
 			validate_minion_pathing_on_mission = false,
 			run_through_mission = false,
 			fly_through = false,
@@ -109,7 +108,8 @@ local mission_templates = {
 			vo_profile = "training_ground_psyker_a",
 			mission_giver_packs = {
 				training_ground_psyker_a = {
-					"training_ground_psyker"
+					"training_ground_psyker",
+					"past"
 				}
 			}
 		}

@@ -24,8 +24,8 @@ function AccountManagerBase:do_re_signin()
 	return false
 end
 
-function AccountManagerBase:signin_profile()
-	return
+function AccountManagerBase:signin_profile(signin_callback, optional_input_device)
+	signin_callback()
 end
 
 function AccountManagerBase:user_detached()

@@ -15,8 +15,8 @@ local player_character_options_view_settings = {
 	image_size = image_size,
 	content_size = content_size,
 	animation_event_by_archetype = {
-		veteran = "human_veteran_inspect_pose",
 		psyker = "human_psyker_inspect_pose",
+		veteran = "human_veteran_inspect_pose",
 		zealot = "human_zealot_inspect_pose",
 		ogryn = "ogryn_inspect_pose"
 	},

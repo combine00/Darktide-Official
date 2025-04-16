@@ -1,5 +1,6 @@
 local CircumstanceTemplates = require("scripts/settings/circumstance/circumstance_templates")
 local DangerSettings = require("scripts/settings/difficulty/danger_settings")
+local Danger = require("scripts/utilities/danger")
 local Definitions = require("scripts/ui/views/mission_voting_view/mission_voting_view_definitions")
 local InputDevice = require("scripts/managers/input/input_device")
 local InputUtils = require("scripts/managers/input/input_utils")
@@ -25,19 +26,78 @@ local function get_input_text(action_name, input_service_name)
 	return input_text
 end
 
+local function determine_havoc_promotion_rate(played_order_rank, own_order_rank)
+	if played_order_rank == nil or own_order_rank == nil then
+		return 0
+	end
+
+	local settings = Managers.data_service.havoc:get_settings()
+	local rank_diff = played_order_rank - own_order_rank
+
+	for _, element in ipairs(settings.gap_based_promotion_rate_multiplier) do
+		if element.min_gap <= rank_diff and rank_diff <= element.max_gap then
+			return element.rate_multiplier
+		end
+	end
+
+	return 0
+end
+
+local function get_max_havoc_promotion_rate()
+	local settings = Managers.data_service.havoc:get_settings()
+	local max = 0
+
+	for _, element in ipairs(settings.gap_based_promotion_rate_multiplier) do
+		if max < element.rate_multiplier then
+			max = element.rate_multiplier
+		end
+	end
+
+	return max
+end
+
 local MissionVotingView = class("MissionVotingView", "BaseView")
 
 function MissionVotingView:init(settings, context)
-	if context then
-		if context.qp then
-			self._voting_id = context.voting_id
-			self._backend_mission_id = context.backend_mission_id
-			self._is_quickplay = true
-		else
-			self._voting_id = context.voting_id
-			self._mission_data = context.mission_data
-			self._is_quickplay = false
+	self._voting_id = context.voting_id
+	self._voting_started_by_account_id = context.started_by_account_id
+	local is_quickplay = context.qp
+	self._is_quickplay = is_quickplay
+
+	if is_quickplay then
+		self._backend_mission_id = context.backend_mission_id
+	else
+		if not context.mission_data then
+			Log.error("MissionVotingView", string.format("Context of non-quickplay mission did not contain mission_data, context contained only:\n%s", table.tostring(context)))
 		end
+
+		self._mission_data = context.mission_data
+	end
+
+	self._load_complete_callback = callback(function ()
+		self._loading = nil
+
+		if self:is_view_requirements_complete() then
+			self:_on_view_requirements_complete()
+
+			self._load_complete_callback = nil
+		end
+	end)
+
+	if self._mission_data and self._mission_data.category and self._mission_data.category == "havoc" then
+		self._havoc_promise = Managers.data_service.havoc:summary():next(function (data)
+			self._havoc_promise = nil
+
+			if not data.current_order then
+				Log.error("MissionVotingView", "Unable to retrieve joiner's current order")
+			end
+
+			self._own_order = data.current_order
+
+			if self._view_load_complete then
+				self._load_complete_callback()
+			end
+		end)
 	end
 
 	self._mission_icons_widgets = {}
@@ -47,10 +107,35 @@ function MissionVotingView:init(settings, context)
 	MissionVotingView.super.init(self, Definitions, settings, context)
 end
 
+function MissionVotingView:_on_view_load_complete(loaded)
+	if self._destroyed then
+		return
+	end
+
+	self._view_load_complete = true
+
+	if not self._havoc_promise then
+		self._load_complete_callback()
+	end
+end
+
 function MissionVotingView:on_enter()
 	MissionVotingView.super.on_enter(self)
 
 	self._allow_close_hotkey = false
+
+	self:_try_get_voting_initiator_presence()
+
+	if not self._is_quickplay and not self._mission_data then
+		Log.error("MissionVotingView", "Missing mission_data")
+		Managers.voting:cast_vote(self._voting_id, "no")
+
+		if Managers.ui:view_active(self.view_name or "mission_voting_view") then
+			Managers.ui:close_view(self.view_name or "mission_voting_view")
+		end
+
+		return
+	end
 
 	self:_setup_main_page_widgets()
 	self:_setup_button_widgets()
@@ -75,7 +160,28 @@ end
 
 function MissionVotingView:on_exit()
 	MissionVotingView.super.on_exit(self)
+
+	local havoc_promise = self._havoc_promise
+
+	if havoc_promise then
+		if havoc_promise:is_pending() then
+			havoc_promise:cancel()
+		end
+
+		self._havoc_promise = nil
+	end
+
 	self:_destroy_renderer()
+
+	local presence_promise = self._presence_promise
+
+	if presence_promise then
+		if presence_promise:is_pending() then
+			presence_promise:cancel()
+		end
+
+		self._presence_promise = nil
+	end
 end
 
 function MissionVotingView:update(dt, t, input_service)
@@ -97,7 +203,7 @@ function MissionVotingView:update(dt, t, input_service)
 		self:cb_on_toggle_details_pressed()
 	end
 
-	self:_handle_gamepad_input(input_service)
+	self:_handle_gamepad_input(input_service, dt)
 
 	if self._gamepad_active ~= InputDevice.gamepad_active then
 		self:toggle_details(self._is_showing_details)
@@ -152,18 +258,14 @@ function MissionVotingView:cb_on_accept_mission_pressed()
 
 	local success, fail_reason = Managers.voting:cast_vote(self._voting_id, "yes")
 
-	if not success then
-		-- Nothing
-	end
-
-	self:_show_confirmed_message()
-
-	self._has_voted = true
-
-	if true then
+	if success then
+		self:_show_confirmed_message()
+	else
 		Log.info("MissionVotingView", "Failed casting vote in voting %s, reason: %s", self._voting_id, fail_reason)
 		self:_close_view()
 	end
+
+	self._has_voted = self._has_voted or success
 end
 
 function MissionVotingView:cb_on_decline_mission_pressed()
@@ -176,25 +278,21 @@ function MissionVotingView:cb_on_decline_mission_pressed()
 		self:_close_view()
 	end
 
-	self._has_voted = true
+	self._has_voted = self._has_voted or success
 end
 
 function MissionVotingView:cb_on_toggle_details_pressed()
-	if not self:_is_animation_active(self._toggle_details_page_animation_id) then
-		local show_details_flag = not self._is_showing_details
-		local params = {
-			show_details_flag = show_details_flag,
-			source_heights = show_details_flag and self._main_page_heights or self._details_page_heights,
-			target_heights = show_details_flag and self._details_page_heights or self._main_page_heights
-		}
-		self._toggle_details_page_animation_id = self:_start_animation("switch_page", self._widgets_by_name, params)
+	if self:_is_animation_active(self._toggle_details_page_animation_id) then
+		return
 	end
-end
 
-function MissionVotingView:set_player_name()
-	local title_text = Localize("loc_mission_voting_view_title_format", true, self.view_data)
-	local title_widget = self._widgets_by_name.title_text
-	title_widget.content.text = title_text
+	local show_details_flag = not self._is_showing_details
+	local params = {
+		show_details_flag = show_details_flag,
+		source_heights = show_details_flag and self._main_page_heights or self._details_page_heights,
+		target_heights = show_details_flag and self._details_page_heights or self._main_page_heights
+	}
+	self._toggle_details_page_animation_id = self:_start_animation("switch_page", self._widgets_by_name, params)
 end
 
 function MissionVotingView:toggle_details(show_details_flag)
@@ -209,7 +307,7 @@ function MissionVotingView:toggle_details(show_details_flag)
 	else
 		self._additional_widgets = self._mission_info_widgets
 		self._additional_text_styles = {
-			[#self._additional_text_styles + 1] = self._widgets_by_name.title_bar_bottom.style.text
+			self._widgets_by_name.title_bar_bottom.style.text
 		}
 		text = Localize(MissionDetailsBlueprints.button_strings.show_details)
 	end
@@ -299,6 +397,34 @@ function MissionVotingView:_destroy_renderer()
 	end
 end
 
+function MissionVotingView:_try_get_voting_initiator_presence()
+	self._voting_started_by_character_name = nil
+
+	if not math.is_uuid(self._voting_started_by_account_id) then
+		return
+	end
+
+	local _, presence_promise = Managers.presence:get_presence(self._voting_started_by_account_id)
+	self._presence_promise = presence_promise
+
+	presence_promise:next(function (presence)
+		self._presence_promise = nil
+
+		if presence then
+			self._voting_started_by_character_name = presence:character_name()
+			local initiator_widget = self._widgets_by_name.initiator
+
+			if initiator_widget then
+				initiator_widget.content.initiator_text = self._voting_started_by_character_name or ""
+			end
+		end
+	end):catch(function (err)
+		self._presence_promise = nil
+
+		Log.error("MissionVotingView", "Failed getting presence for voting initiator: %s", table.tostring(err, 5))
+	end)
+end
+
 function MissionVotingView:_setup_main_page_widgets()
 	local definitions = {
 		widget_definitions = self._definitions.mission_info_widget_definitions
@@ -366,13 +492,8 @@ function MissionVotingView:_set_button_selected(index)
 
 	for i = 1, #button_widgets do
 		local button = button_widgets[i]
-
-		if not button then
-			return
-		end
-
 		local hotspot = button.content.hotspot
-		local is_selected = index and i == index and true or false
+		local is_selected = index and i == index
 		hotspot.is_selected = is_selected
 		local content = button.content
 		local text = MissionDetailsBlueprints.button_strings.selectable_buttons[content.name]
@@ -383,7 +504,7 @@ function MissionVotingView:_set_button_selected(index)
 	end
 end
 
-function MissionVotingView:_handle_gamepad_input(input_service)
+function MissionVotingView:_handle_gamepad_input(input_service, dt)
 	if not self._gamepad_active then
 		return
 	end
@@ -393,13 +514,13 @@ function MissionVotingView:_handle_gamepad_input(input_service)
 
 		if right_stick_value[2] > 0.01 then
 			local scroll_progress = self._details_list_grid:scrollbar_progress()
-			local progress = scroll_progress - 0.1
+			local progress = scroll_progress - 6 * dt
 			local new_progress = progress >= 0 and progress or 0
 
 			self._details_list_grid:set_scrollbar_progress(new_progress)
 		elseif right_stick_value[2] < -0.01 then
 			local scroll_progress = self._details_list_grid:scrollbar_progress()
-			local progress = scroll_progress + 0.1
+			local progress = scroll_progress + 6 * dt
 			local new_progress = progress <= 1 and progress or 1
 
 			self._details_list_grid:set_scrollbar_progress(new_progress)
@@ -421,35 +542,23 @@ function MissionVotingView:_handle_gamepad_input(input_service)
 	end
 end
 
-function MissionVotingView:_set_requester_portrait(portrait)
-	local portrait_widget = self._widgets_by_name.player_portrait
-	portrait_widget.content.portrait = portrait
-end
-
 local function calculate_danger_level(mission_data)
-	local danger = mission_data.challenge
-	local dangel_level_text = DangerSettings.by_index[danger].display_name
+	local danger_setting = Danger.danger_by_mission(mission_data)
 
-	return danger, dangel_level_text
+	return danger_setting.index, danger_setting.display_name
 end
 
-local function calculate_quickplay_danger_level(backend_mission_id)
-	local lookup_position = string.find(backend_mission_id, "=") + 1
-	local challenge = tonumber(string.sub(backend_mission_id, lookup_position, lookup_position))
-	local dangel_level_text = DangerSettings.by_index[challenge].display_name
+local function calculate_quickplay_danger_level(qp_string)
+	local danger_setting = Danger.danger_by_qp_code(qp_string)
 
-	return challenge, dangel_level_text
+	return danger_setting.index, danger_setting.display_name
 end
 
 function MissionVotingView:_populate_quickplay_data()
+	local widgets_by_name = self._widgets_by_name
 	local quickplay_settings = MissionDetailsBlueprints.quickplay_data
-	local zone_image_widget = self._widgets_by_name.zone_image
+	local zone_image_widget = widgets_by_name.zone_image
 	zone_image_widget.content.texture = "content/ui/materials/missions/quickplay"
-	local details_button = self._widgets_by_name.toggle_details_button
-	details_button.content.hotspot.disabled = true
-	local mission_info_widget = self._widgets_by_name.mission_info
-	local mission_info_widget_content = mission_info_widget.content
-	mission_info_widget_content.mission_title = Utf8.upper(Localize(quickplay_settings.mission_title))
 	zone_image_widget.style.texture.uvs = {
 		{
 			0,
@@ -460,22 +569,43 @@ function MissionVotingView:_populate_quickplay_data()
 			1
 		}
 	}
-	local mission_type_widget = self._widgets_by_name.mission_type
-	local mission_type_widget_content = mission_type_widget.content
-	mission_type_widget_content.mission_type = Localize(quickplay_settings.mission_type)
-	local mission_rewards_text = self._widgets_by_name.rewards_text
+	local details_button = widgets_by_name.toggle_details_button
+	details_button.content.hotspot.disabled = true
+	local mission_info_widget = widgets_by_name.mission_info
+	mission_info_widget.content.mission_title = Utf8.upper(Localize(quickplay_settings.mission_title))
+	local mission_type_widget = widgets_by_name.mission_type
+	mission_type_widget.content.mission_type = Localize(quickplay_settings.mission_type)
+	local mission_rewards_text = widgets_by_name.rewards_text
 	mission_rewards_text.content.visible = false
-	local danger_level_widget = self._widgets_by_name.mission_danger_info
+	local danger_level_widget = widgets_by_name.mission_danger_info
 	local danger_level, danger_level_text = calculate_quickplay_danger_level(self._backend_mission_id)
 
 	self:_set_difficulty_icons(danger_level_widget.style, danger_level)
 
 	danger_level_widget.content.danger_text = Utf8.upper(Localize(danger_level_text))
+	danger_level_widget.style.rankup_icon.amount = 0
+	danger_level_widget.style.rankup_icon_background.amount = 0
 
 	self:_set_scenegraph_position("mission_difficulty_left", 20, nil, nil, "center")
 
-	local accept_confirmation_widget = self._widgets_by_name.accept_confirmation
+	local accept_confirmation_widget = widgets_by_name.accept_confirmation
 	accept_confirmation_widget.visible = false
+end
+
+local function _get_havoc_rank(mission_data)
+	local min_havoc_rank = 1
+	local max_havoc_rank = 100
+	local havoc_rank_string = "havoc-rank-"
+
+	for i = min_havoc_rank, max_havoc_rank do
+		if mission_data.flags[havoc_rank_string .. tostring(i)] then
+			return i
+		end
+	end
+
+	Log.error("Matchmaking Notification Handler", "Unable to get havoc rank")
+
+	return nil
 end
 
 function MissionVotingView:_set_mission_data(mission_data)
@@ -500,11 +630,36 @@ function MissionVotingView:_set_mission_data(mission_data)
 	self:_set_rewards_info(mission_data)
 
 	local danger_level_widget = self._widgets_by_name.mission_danger_info
-	local danger_level, danger_level_text = calculate_danger_level(mission_data)
 
-	self:_set_difficulty_icons(danger_level_widget.style, danger_level)
+	if mission_data.category == "havoc" then
+		local havoc_rank = _get_havoc_rank(mission_data)
+		danger_level_widget.content.rank_text = Utf8.upper(tostring(havoc_rank))
+		danger_level_widget.content.danger_icon = "content/ui/materials/icons/generic/havoc"
+		danger_level_widget.content.danger_icon_drop_shadow = "content/ui/materials/icons/generic/havoc"
+		danger_level_widget.style.danger_icon.offset = {
+			0,
+			10,
+			1
+		}
+		danger_level_widget.style.danger_icon_drop_shadow.offset = {
+			2,
+			10,
+			0
+		}
+		local levels_to_be_gained = determine_havoc_promotion_rate(havoc_rank, self._own_order and self._own_order.rank)
+		danger_level_widget.style.rankup_icon.amount = levels_to_be_gained
+		danger_level_widget.style.rankup_icon_background.amount = get_max_havoc_promotion_rate()
+		danger_level_widget.content.danger_text = Utf8.upper(Localize("loc_havoc_name"))
+		danger_level_widget.style.difficulty_icon.amount = 0
+		danger_level_widget.style.diffulty_icon_background.amount = 0
+	else
+		local danger_level, danger_level_text = calculate_danger_level(mission_data)
 
-	danger_level_widget.content.danger_text = Utf8.upper(Localize(danger_level_text))
+		self:_set_difficulty_icons(danger_level_widget.style, danger_level)
+
+		danger_level_widget.content.danger_text = Utf8.upper(Localize(danger_level_text))
+	end
+
 	local accept_confirmation_widget = self._widgets_by_name.accept_confirmation
 	accept_confirmation_widget.visible = false
 	local has_flash_mission = not not mission_data.flags.flash
@@ -522,7 +677,12 @@ function MissionVotingView:_set_button_callbacks()
 	toggle_details_button_widget.content.hotspot.pressed_callback = callback(self, "cb_on_toggle_details_pressed")
 end
 
+function MissionVotingView:_mission_icon_size()
+	return 37.199999999999996
+end
+
 function MissionVotingView:_create_mission_icons_info(scenegraph_id, icon, x_offset, color)
+	local widget_size = self:_mission_icon_size()
 	local icon_color = color and color or Color.white(255, true)
 	local icon_definition = UIWidget.create_definition({
 		{
@@ -535,11 +695,11 @@ function MissionVotingView:_create_mission_icons_info(scenegraph_id, icon, x_off
 				horizontal_alignment = "center",
 				color = icon_color,
 				size = {
-					37.199999999999996,
-					37.199999999999996
+					widget_size,
+					widget_size
 				},
 				offset = {
-					10 + x_offset,
+					x_offset,
 					0,
 					25
 				}
@@ -550,10 +710,25 @@ function MissionVotingView:_create_mission_icons_info(scenegraph_id, icon, x_off
 	return icon_definition
 end
 
+function MissionVotingView:_get_havoc_mutators(mission_data)
+	local mutators = {}
+
+	for k, _ in pairs(mission_data.flags) do
+		if string.find(k, "havoc%-circ%-") then
+			mutators[#mutators + 1] = k
+		end
+	end
+
+	if #mutators > 0 then
+		return mutators
+	else
+		return nil
+	end
+end
+
 function MissionVotingView:_setup_mission_info_icons(mission_data)
 	table.clear(self._mission_icons_widgets)
 
-	local offset_x = 42.199999999999996
 	local mission_icon_settings = {}
 
 	if self._is_quickplay then
@@ -575,6 +750,7 @@ function MissionVotingView:_setup_mission_info_icons(mission_data)
 
 		local has_side_mission = not not mission_data.sideMission
 		local has_circumstance = mission_data.circumstance and mission_data.circumstance ~= "default"
+		local havoc_mutators = self:_get_havoc_mutators(mission_data)
 		local mission_type = MissionTypes[mission_template.mission_type]
 		mission_icon_settings[#mission_icon_settings + 1] = {
 			icon = mission_type.icon,
@@ -618,23 +794,39 @@ function MissionVotingView:_setup_mission_info_icons(mission_data)
 				end
 			end
 		end
+
+		if havoc_mutators then
+			for _, v in ipairs(havoc_mutators) do
+				local circumstance_template_name = string.sub(v, 12)
+				local circumstance_template = CircumstanceTemplates[circumstance_template_name]
+
+				if circumstance_template then
+					local circumstance_ui_settings = circumstance_template.ui
+
+					if circumstance_ui_settings then
+						mission_icon_settings[#mission_icon_settings + 1] = {
+							icon = circumstance_ui_settings.icon,
+							color = Color.golden_rod(225, true)
+						}
+					end
+				else
+					Log.error("MissionVotingView", "Unable to find circumstance %s", circumstance_template_name)
+				end
+			end
+		end
 	end
 
+	local buffer = 5
+	local icon_size = self:_mission_icon_size()
 	local num_icons = #mission_icon_settings
+	local total_width = num_icons > 0 and num_icons * (icon_size + buffer) - buffer or 0
 
-	if num_icons ~= 1 then
-		local half_icons = math.floor(num_icons / 2)
-		local even_offset = -(half_icons * offset_x) + 18.599999999999998
-		local odd_offset = -(half_icons * offset_x)
-		local offset = num_icons % 2 == 0 and even_offset or odd_offset
-
-		self:_set_scenegraph_position("mission_icons_pivot", math.floor(offset) - 10)
-	end
+	self:_set_scenegraph_position("mission_icons_pivot", math.floor(icon_size / 2 - total_width / 2))
 
 	for i = 1, num_icons do
 		local settings = mission_icon_settings[i]
-		local settings_color = settings.color and settings.color or nil
-		local mission_icon_def = self:_create_mission_icons_info("mission_icons_pivot", settings.icon, (i - 1) * offset_x, settings_color)
+		local settings_color = settings.color
+		local mission_icon_def = self:_create_mission_icons_info("mission_icons_pivot", settings.icon, (i - 1) * (icon_size + buffer), settings_color)
 		self._mission_icons_widgets[#self._mission_icons_widgets + 1] = UIWidget.init("mission_icon_" .. i, mission_icon_def)
 	end
 end
@@ -664,6 +856,16 @@ function MissionVotingView:_set_rewards_info(mission_data)
 	local main_mission_rewards_widget = self._widgets_by_name.reward_main_mission
 	local base_xp = math.floor(mission_data.xp)
 	local base_salary = math.floor(mission_data.credits)
+	local extra_rewards = mission_data.extraRewards and mission_data.extraRewards.circumstance
+
+	if extra_rewards and extra_rewards.xp then
+		base_xp = base_xp + extra_rewards.xp
+	end
+
+	if extra_rewards and extra_rewards.credits then
+		base_salary = base_salary + extra_rewards.credits
+	end
+
 	local rewards_string = " %d\t %d"
 	main_mission_rewards_widget.content.reward_main_mission_text = string.format(rewards_string, base_salary, base_xp)
 end
@@ -685,7 +887,7 @@ end
 function MissionVotingView:_set_difficulty_icons(style, difficulty_value)
 	local difficulty_icon_style = style.difficulty_icon
 	difficulty_icon_style.amount = difficulty_value
-	difficulty_icon_style.color = DangerSettings.by_index[difficulty_value] and DangerSettings.by_index[difficulty_value].color or DangerSettings.by_index[1].color
+	difficulty_icon_style.color = DangerSettings[difficulty_value] and DangerSettings[difficulty_value].color or DangerSettings[1].color
 end
 
 function MissionVotingView:_set_circumstance(mission_data)
@@ -877,10 +1079,6 @@ function MissionVotingView:_calc_text_size(widget, text_and_style_id)
 	end
 
 	return UIRenderer.text_size(self._ui_renderer, text, text_style.font_type, text_style.font_size, size, text_options)
-end
-
-function MissionVotingView:_add_dummy_portrait()
-	return "content/ui/materials/icons/portraits/default"
 end
 
 return MissionVotingView

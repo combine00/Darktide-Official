@@ -8,7 +8,7 @@ function RemoteDetermineSpawnGroupState:init(state_machine, shared_state)
 	self._got_request = false
 	self._time = 0
 
-	Log.info("RemoteDetermineSpawnGroupState", "[init] LoadingTimes: Server started waiting for Spawn Group request from peer", shared_state.client_peer_id)
+	Log.info("RemoteDetermineSpawnGroupState", "[init] LoadingTimes: Server started waiting for Spawn Group request from peer %s", shared_state.client_peer_id)
 	shared_state.network_delegate:register_connection_channel_events(self, shared_state.client_channel_id, unpack(RPCS))
 end
 

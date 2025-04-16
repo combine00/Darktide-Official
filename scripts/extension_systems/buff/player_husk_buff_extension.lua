@@ -117,6 +117,14 @@ function PlayerHuskBuffExtension:set_frame_unique_proc()
 	ferror("[PlayerHuskBuffExtension] set_frame_unique_proc can only be called on server!")
 end
 
+function PlayerHuskBuffExtension:add_inherited_buff_owner()
+	ferror("[PlayerHuskBuffExtension] add_inherited_buff_owner can only be called on server!")
+end
+
+function PlayerHuskBuffExtension:get_inherited_buff_owner()
+	ferror("[PlayerHuskBuffExtension] get_inherited_buff_owner can only be called on server!")
+end
+
 implements(PlayerHuskBuffExtension, BuffExtensionInterface)
 
 return PlayerHuskBuffExtension

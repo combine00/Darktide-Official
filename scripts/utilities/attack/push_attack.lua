@@ -1,6 +1,6 @@
+local Attack = require("scripts/utilities/attack/attack")
 local AttackSettings = require("scripts/settings/damage/attack_settings")
 local BuffSettings = require("scripts/settings/buff/buff_settings")
-local Attack = require("scripts/utilities/attack/attack")
 local ImpactEffect = require("scripts/utilities/attack/impact_effect")
 local attack_types = AttackSettings.attack_types
 local proc_events = BuffSettings.proc_events

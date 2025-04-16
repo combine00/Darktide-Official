@@ -241,6 +241,120 @@ local horde_compositions = {
 			}
 		}
 	},
+	mutator_cultist_grenadier = {
+		{
+			breeds = {
+				{
+					name = "cultist_grenadier",
+					amount = {
+						1,
+						1
+					}
+				}
+			}
+		},
+		{
+			breeds = {
+				{
+					name = "cultist_grenadier",
+					amount = {
+						1,
+						1
+					}
+				}
+			}
+		},
+		{
+			breeds = {
+				{
+					name = "cultist_grenadier",
+					amount = {
+						1,
+						1
+					}
+				}
+			}
+		},
+		{
+			breeds = {
+				{
+					name = "cultist_grenadier",
+					amount = {
+						1,
+						1
+					}
+				}
+			}
+		},
+		{
+			breeds = {
+				{
+					name = "cultist_grenadier",
+					amount = {
+						1,
+						1
+					}
+				}
+			}
+		}
+	},
+	mutator_renegade_grenadier = {
+		{
+			breeds = {
+				{
+					name = "renegade_grenadier",
+					amount = {
+						1,
+						1
+					}
+				}
+			}
+		},
+		{
+			breeds = {
+				{
+					name = "renegade_grenadier",
+					amount = {
+						1,
+						1
+					}
+				}
+			}
+		},
+		{
+			breeds = {
+				{
+					name = "renegade_grenadier",
+					amount = {
+						1,
+						1
+					}
+				}
+			}
+		},
+		{
+			breeds = {
+				{
+					name = "renegade_grenadier",
+					amount = {
+						1,
+						1
+					}
+				}
+			}
+		},
+		{
+			breeds = {
+				{
+					name = "renegade_grenadier",
+					amount = {
+						1,
+						1
+					}
+				}
+			}
+		}
+	},
 	mutator_riflemen = {
 		{
 			breeds = {
@@ -293,6 +407,105 @@ local horde_compositions = {
 					amount = {
 						24,
 						26
+					}
+				}
+			}
+		}
+	},
+	mutator_live_abhuman = {
+		{
+			breeds = {
+				{
+					name = "renegade_rifleman",
+					amount = {
+						10,
+						12
+					}
+				}
+			}
+		},
+		{
+			breeds = {
+				{
+					name = "renegade_rifleman",
+					amount = {
+						15,
+						17
+					}
+				}
+			}
+		},
+		{
+			breeds = {
+				{
+					name = "chaos_ogryn_executor",
+					amount = {
+						1,
+						1
+					}
+				},
+				{
+					name = "chaos_ogryn_gunner",
+					amount = {
+						1,
+						1
+					}
+				},
+				{
+					name = "chaos_ogryn_bulwark",
+					amount = {
+						1,
+						1
+					}
+				}
+			}
+		},
+		{
+			breeds = {
+				{
+					name = "chaos_ogryn_executor",
+					amount = {
+						1,
+						2
+					}
+				},
+				{
+					name = "chaos_ogryn_gunner",
+					amount = {
+						1,
+						2
+					}
+				},
+				{
+					name = "chaos_ogryn_bulwark",
+					amount = {
+						1,
+						2
+					}
+				}
+			}
+		},
+		{
+			breeds = {
+				{
+					name = "chaos_ogryn_executor",
+					amount = {
+						1,
+						3
+					}
+				},
+				{
+					name = "chaos_ogryn_gunner",
+					amount = {
+						1,
+						3
+					}
+				},
+				{
+					name = "chaos_ogryn_bulwark",
+					amount = {
+						1,
+						3
 					}
 				}
 			}

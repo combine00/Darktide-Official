@@ -1,4 +1,4 @@
-local Action = require("scripts/utilities/weapon/action")
+local Action = require("scripts/utilities/action/action")
 local AttackSettings = require("scripts/settings/damage/attack_settings")
 local Breed = require("scripts/utilities/breed")
 local BuffSettings = require("scripts/settings/buff/buff_settings")
@@ -188,6 +188,24 @@ function Dodge.sucessful_dodge(dodging_unit, attacking_unit, attack_type, dodge_
 
 		Managers.stats:record_private("hook_dodged_attack", dodging_player, breed_name, attack_type, dodge_type, attack_action, previously_dodged)
 	end
+end
+
+function Dodge.consecutive_dodges(unit)
+	local unit_data_extension = ScriptUnit.has_extension(unit, "unit_data_system")
+
+	if not unit_data_extension then
+		return 0
+	end
+
+	local breed = unit_data_extension:breed()
+
+	if not Breed.is_player(breed) then
+		return 0
+	end
+
+	local dodge_character_state_component = unit_data_extension:read_component("dodge_character_state")
+
+	return dodge_character_state_component.consecutive_dodges
 end
 
 return Dodge

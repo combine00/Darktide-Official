@@ -9,9 +9,10 @@ local circumstance_templates = {
 		},
 		ui = {
 			description = "loc_circumstance_toxic_gas_description",
-			icon = "content/ui/materials/icons/circumstances/nurgle_manifestation_01",
 			display_name = "loc_circumstance_toxic_gas_title",
-			happening_display_name = "loc_happening_ventilation_purge"
+			happening_display_name = "loc_happening_ventilation_purge",
+			background = "content/ui/materials/backgrounds/mutators/mutator_toxic_gas",
+			icon = "content/ui/materials/icons/circumstances/nurgle_manifestation_01"
 		},
 		mission_overrides = MissionOverrides.more_corruption_syringes
 	},
@@ -44,6 +45,23 @@ local circumstance_templates = {
 			icon = "content/ui/materials/icons/circumstances/nurgle_manifestation_01",
 			display_name = "loc_circumstance_toxic_gas_more_resistance_title",
 			happening_display_name = "loc_happening_ventilation_purge"
+		},
+		mission_overrides = MissionOverrides.more_corruption_syringes
+	},
+	toxic_gas_cultist_grenadier = {
+		dialogue_id = "circumstance_vo_toxic_gas",
+		wwise_state = "ventilation_purge_01",
+		theme_tag = "toxic_gas",
+		mutators = {
+			"mutator_toxic_gas_volumes",
+			"mutator_cultist_grenadier"
+		},
+		ui = {
+			description = "loc_circumstance_toxic_gas_cultist_grenadier_description",
+			display_name = "loc_circumstance_toxic_gas_cultist_grenadier_title",
+			happening_display_name = "loc_happening_ventilation_purge",
+			background = "content/ui/materials/backgrounds/mutators/mutator_toxic_gas",
+			icon = "content/ui/materials/icons/circumstances/nurgle_manifestation_01"
 		},
 		mission_overrides = MissionOverrides.more_corruption_syringes
 	},

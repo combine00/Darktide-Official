@@ -8,6 +8,8 @@ local PlayerManager = require("scripts/foundation/managers/player/player_manager
 local Promise = require("scripts/foundation/utilities/promise")
 local ServiceUnavailableError = require("scripts/managers/error/errors/service_unavailable_error")
 local SignInError = require("scripts/managers/error/errors/sign_in_error")
+local PsPlusError = require("scripts/managers/error/errors/ps_plus_error")
+local PSNRestrictions = require("scripts/managers/account/psn_restrictions")
 local AccountService = class("AccountService")
 
 function AccountService:init(backend_interface)
@@ -59,7 +61,7 @@ function AccountService:signin()
 			Managers.backend.interfaces.external_payment:update_account_store_status():next(function ()
 				return Managers.backend.interfaces.external_payment:reconcile_pending_txns()
 			end):catch(function (error)
-				Log.error("AccountService", "Failed setting up platform commerce: %s", table.tostring(error, 10))
+				Log.exception("AccountService", "Failed setting up platform commerce: %s", table.tostring(error, 10))
 			end)
 		else
 			Log.warning("AccountService", "Store account mismatch detected")
@@ -72,11 +74,22 @@ function AccountService:signin()
 		local auth_data_promise = Promise.resolved(auth_data)
 		local immaterium_connection_info = Managers.backend.interfaces.immaterium:fetch_connection_info()
 		local crafting_costs_promise = Managers.backend.interfaces.crafting:refresh_all_costs()
+		local havoc_settings_promise = Managers.backend.interfaces.havoc:refresh_settings()
 
 		return migrations_promise:next(function (data)
 			local migration_data_promise = Promise.resolved(data)
+			local promises = {
+				status_promise,
+				settings_promise,
+				items_promise,
+				auth_data_promise,
+				immaterium_connection_info,
+				crafting_costs_promise,
+				migration_data_promise,
+				havoc_settings_promise
+			}
 
-			return Promise.all(status_promise, settings_promise, items_promise, auth_data_promise, immaterium_connection_info, crafting_costs_promise, migration_data_promise)
+			return Promise.all(unpack(promises))
 		end)
 	end):next(function (results)
 		local status, _, _, auth_data, immaterium_connection_info, _, migration_data = unpack(results, 1, 8)
@@ -117,6 +130,19 @@ function AccountService:signin()
 			gear = profile_data.gear,
 			migration_data = migration_data
 		})
+	end):next(function (results)
+		local result_promise = Promise.resolved(results)
+		local premium_promise = IS_PLAYSTATION and PSNRestrictions:verify_premium() or Promise.resolved()
+
+		return Promise.all(premium_promise, result_promise)
+	end):next(function (results)
+		local _, data = unpack(results, 1, 2)
+
+		if IS_PLAYSTATION then
+			Managers.account:set_premium_verified(true)
+		end
+
+		return Promise.resolved(data)
 	end):catch(function (error_data)
 		if error_data.description == "VERSION_ERROR" then
 			Managers.error:report_error(GameVersionError:new(error_data))
@@ -130,6 +156,14 @@ function AccountService:signin()
 				Managers.error:report_error(ServiceUnavailableError:new(error_data))
 			elseif error_data.code == 403 and decoded_json_data and decoded_json_data.banned and (decoded_json_data.banned.frozen == true or decoded_json_data.banned.reason ~= nil) then
 				Managers.error:report_error(BanError:new(decoded_json_data))
+			elseif IS_PLAYSTATION then
+				local error, _ = unpack(error_data, 1, 2)
+
+				if error and error.header == PSNRestrictions:verify_premium_header() then
+					Managers.error:report_error(PsPlusError:new(error))
+				else
+					Managers.error:report_error(SignInError:new(error_data))
+				end
 			else
 				Managers.error:report_error(SignInError:new(error_data))
 			end

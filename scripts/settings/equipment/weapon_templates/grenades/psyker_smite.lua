@@ -1,3 +1,4 @@
+local ActionInputHierarchy = require("scripts/utilities/action/action_input_hierarchy")
 local BaseTemplateSettings = require("scripts/settings/equipment/weapon_templates/base_template_settings")
 local BuffSettings = require("scripts/settings/buff/buff_settings")
 local DamageProfileTemplates = require("scripts/settings/damage/damage_profile_templates")
@@ -70,16 +71,6 @@ local weapon_template = {
 				}
 			}
 		},
-		combat_ability = {
-			buffer_time = 0,
-			clear_input_queue = true,
-			input_sequence = {
-				{
-					value = true,
-					input = "combat_ability_pressed"
-				}
-			}
-		},
 		charge = {
 			buffer_time = 0,
 			input_sequence = {
@@ -141,6 +132,16 @@ local weapon_template = {
 					time_window = math.huge
 				}
 			}
+		},
+		combat_ability = {
+			buffer_time = 0,
+			clear_input_queue = true,
+			input_sequence = {
+				{
+					value = true,
+					input = "combat_ability_pressed"
+				}
+			}
 		}
 	}
 }
@@ -148,36 +149,102 @@ local weapon_template = {
 table.add_missing(weapon_template.action_inputs, BaseTemplateSettings.action_inputs)
 
 weapon_template.action_input_hierarchy = {
-	wield = "stay",
-	combat_ability = "stay",
-	charge_power = {
-		wield = "base",
-		charge_power_release = "base",
-		combat_ability = "base",
-		charge_power_lock_on = {
-			wield = "base",
-			use_power = "base",
-			combat_ability = "base",
-			charge_power_sticky_release = "base"
+	{
+		input = "charge_power",
+		transition = {
+			{
+				transition = "base",
+				input = "charge_power_release"
+			},
+			{
+				input = "charge_power_lock_on",
+				transition = {
+					{
+						transition = "base",
+						input = "charge_power_sticky_release"
+					},
+					{
+						transition = "base",
+						input = "use_power"
+					},
+					{
+						transition = "base",
+						input = "wield"
+					},
+					{
+						transition = "base",
+						input = "combat_ability"
+					}
+				}
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			}
 		}
 	},
-	charge_power_sticky = {
-		wield = "base",
-		use_power = "base",
-		combat_ability = "base",
-		charge_power_sticky_release = "base"
+	{
+		input = "charge_power_sticky",
+		transition = {
+			{
+				transition = "base",
+				input = "charge_power_sticky_release"
+			},
+			{
+				transition = "base",
+				input = "use_power"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			}
+		}
 	},
-	vent = {
-		wield = "base",
-		vent_release = "base",
-		combat_ability = "base"
+	{
+		input = "vent",
+		transition = {
+			{
+				transition = "base",
+				input = "vent_release"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			}
+		}
 	},
-	inspect_start = {
-		inspect_stop = "base"
+	{
+		transition = "stay",
+		input = "wield"
+	},
+	{
+		transition = "stay",
+		input = "combat_ability"
+	},
+	{
+		input = "inspect_start",
+		transition = {
+			{
+				transition = "base",
+				input = "inspect_stop"
+			}
+		}
 	}
 }
 
-table.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
+ActionInputHierarchy.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
 
 weapon_template.actions = {
 	action_unwield = {
@@ -255,14 +322,6 @@ weapon_template.actions = {
 				chain_time = 0.15
 			}
 		}
-	},
-	combat_ability = {
-		slot_to_wield = "slot_combat_ability",
-		start_input = "combat_ability",
-		uninterruptible = true,
-		kind = "unwield_to_specific",
-		total_time = 0,
-		allowed_chain_actions = {}
 	},
 	action_charge_target_sticky = {
 		start_input = "charge_power_sticky",
@@ -562,6 +621,14 @@ weapon_template.actions = {
 		crosshair = {
 			crosshair_type = "inspect"
 		}
+	},
+	combat_ability = {
+		slot_to_wield = "slot_combat_ability",
+		start_input = "combat_ability",
+		uninterruptible = true,
+		kind = "unwield_to_specific",
+		total_time = 0,
+		allowed_chain_actions = {}
 	}
 }
 weapon_template.keywords = {

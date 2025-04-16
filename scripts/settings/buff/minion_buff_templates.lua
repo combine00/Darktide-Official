@@ -42,6 +42,53 @@ templates.cultist_flamer_hit_by_flame = {
 	end,
 	minion_effects = minion_burning_buff_effects.chemfire
 }
+templates.hit_by_common_enemy_flame = {
+	interval = 0.5,
+	predicted = false,
+	refresh_duration_on_stack = true,
+	max_stacks = 1,
+	duration = 1,
+	class_name = "interval_buff",
+	keywords = {
+		buff_keywords.burning
+	},
+	interval_func = function (template_data, template_context)
+		local unit = template_context.unit
+
+		if HEALTH_ALIVE[unit] then
+			local damage_template = DamageProfileTemplates.horde_flame_impact
+			local power_level_table = MinionDifficultySettings.power_level.chaos_engulfed_enemy_fire_attack
+			local power_level = Managers.state.difficulty:get_table_entry_by_challenge(power_level_table)
+			local optional_owner_unit = template_context.is_server and template_context.owner_unit or nil
+
+			Attack.execute(unit, damage_template, "power_level", power_level, "damage_type", "burning", "attacking_unit", optional_owner_unit)
+		end
+	end,
+	minion_effects = minion_burning_buff_effects.chemfire
+}
+templates.hit_by_poxburster_bile = {
+	duration = 10,
+	predicted = false,
+	class_name = "buff",
+	is_negative = true,
+	stat_buffs = {
+		[buff_stat_buffs.movement_speed] = -0.3
+	},
+	keywords = {
+		buff_keywords.puked_on
+	},
+	player_effects = {
+		on_screen_effect = "content/fx/particles/screenspace/screen_bon_vomit_loop",
+		looping_wwise_stop_event = "wwise/events/player/play_player_vomit_exit",
+		looping_wwise_start_event = "wwise/events/player/play_player_vomit_enter",
+		stop_type = "stop",
+		wwise_state = {
+			group = "swamped",
+			on_state = "on",
+			off_state = "none"
+		}
+	}
+}
 templates.cultist_flamer_liquid_immunity = {
 	unique_buff_id = "cultist_flamer_liquid_immunity",
 	class_name = "buff",
@@ -384,10 +431,6 @@ templates.flamer_backpack_counter = {
 		end
 
 		if params.hit_zone_name_or_nil == "backpack" and params.attack_type ~= "melee" then
-			local statistics_component = Blackboard.write_component(template_data.blackboard, "statistics")
-			local gib_override_component = Blackboard.write_component(template_data.blackboard, "gib_override")
-			gib_override_component.should_override = true
-			statistics_component.flamer_backpack_impacts = statistics_component.flamer_backpack_impacts + 1
 			local unit = template_context.unit
 			local t = FixedFrame.get_latest_fixed_time()
 			local buff_extension = ScriptUnit.extension(unit, "buff_system")
@@ -410,6 +453,9 @@ templates.flamer_backpack_counter = {
 			local times_to_apply_stack = health_step_value - current_stacks_or_nil
 
 			for i = 1, times_to_apply_stack do
+				local statistics_component = Blackboard.write_component(template_data.blackboard, "statistics")
+				statistics_component.flamer_backpack_impacts = statistics_component.flamer_backpack_impacts + 1
+
 				buff_extension:add_internally_controlled_buff(buff_name, t)
 				buff_extension:_update_stat_buffs_and_keywords(t)
 			end
@@ -423,6 +469,7 @@ templates.renegade_flamer_backpack_damaged = {
 		template_data.is_triggered = false
 		template_data.fuse_timer = nil
 		template_data.duration = 1
+		template_data.blackboard = BLACKBOARDS[template_context.unit]
 	end,
 	update_func = function (template_data, template_context)
 		if not template_context.is_server then

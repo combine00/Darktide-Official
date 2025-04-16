@@ -14,7 +14,10 @@ local weapon_template = {
 		}
 	},
 	action_input_hierarchy = {
-		wield = "stay"
+		{
+			transition = "stay",
+			input = "wield"
+		}
 	},
 	actions = {
 		action_unwield = {

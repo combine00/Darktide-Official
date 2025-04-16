@@ -1,4 +1,3 @@
-local UISettings = require("scripts/settings/ui/ui_settings")
 local item_slot_settings = {
 	slot_body_face = {
 		slot_type = "body",

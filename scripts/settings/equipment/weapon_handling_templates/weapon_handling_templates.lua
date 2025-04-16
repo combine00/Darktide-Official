@@ -5,7 +5,6 @@ local function lerpable_timescale(value)
 	}
 end
 
-local multiplier = nil
 local ninja_crit_bump = 0.15
 local hatchet_crit_bump = {
 	lerp_perfect = 0.15,
@@ -699,11 +698,106 @@ local weapon_handling_templates = {
 			max_critical_shots = 6
 		}
 	},
+	ogryn_heavystubber_p2_m1_full_auto = {
+		fire_rate = {
+			fire_time = 0.08,
+			auto_fire_time = 0.225
+		},
+		critical_strike = {
+			chance_modifier = -0.02,
+			max_critical_shots = 1
+		}
+	},
+	ogryn_heavystubber_p2_m1_hip_fire = {
+		fire_rate = {
+			fire_time = 0.05
+		},
+		critical_strike = {
+			chance_modifier = -0.02,
+			max_critical_shots = 1
+		}
+	},
+	ogryn_heavystubber_p2_m2_full_auto = {
+		fire_rate = {
+			fire_time = 0.08,
+			auto_fire_time = 0.29
+		},
+		critical_strike = {
+			max_critical_shots = 1,
+			chance_modifier = {
+				lerp_perfect = 0.15,
+				lerp_basic = -0.02
+			}
+		}
+	},
+	ogryn_heavystubber_p2_m2_hip_fire = {
+		fire_rate = {
+			fire_time = 0.05
+		},
+		critical_strike = {
+			max_critical_shots = 1,
+			chance_modifier = {
+				lerp_perfect = 0.15,
+				lerp_basic = -0.02
+			}
+		}
+	},
+	ogryn_heavystubber_p2_m3_full_auto = {
+		fire_rate = {
+			fire_time = 0.05,
+			auto_fire_time = 0.36
+		},
+		critical_strike = {
+			max_critical_shots = 1,
+			chance_modifier = {
+				lerp_perfect = 0.15,
+				lerp_basic = -0.02
+			}
+		}
+	},
+	ogryn_heavystubber_p2_m3_aim = {
+		fire_rate = {
+			fire_time = 0.05
+		},
+		critical_strike = {
+			max_critical_shots = 1,
+			chance_modifier = {
+				lerp_perfect = 0.15,
+				lerp_basic = -0.02
+			}
+		}
+	},
 	shotgun_double_shot = {
 		fire_rate = {
 			max_shots = 2,
 			auto_fire_time = 0.0005,
 			fire_time = 0
+		}
+	},
+	heavy_stubber_p1_m1_hip = {
+		fire_rate = {
+			fire_time = 0,
+			auto_fire_time = {
+				lerp_perfect = 0.08,
+				lerp_basic = 0.09999999999999999
+			}
+		},
+		critical_strike = {
+			chance_modifier = -0.02,
+			max_critical_shots = 2
+		}
+	},
+	heavy_stubber_p1_m1_brace = {
+		fire_rate = {
+			fire_time = 0,
+			auto_fire_time = {
+				lerp_perfect = 0.08,
+				lerp_basic = 0.09999999999999999
+			}
+		},
+		critical_strike = {
+			chance_modifier = -0.02,
+			max_critical_shots = 2
 		}
 	}
 }

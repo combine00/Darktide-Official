@@ -116,7 +116,7 @@ function PartyImmateriumLocalizedErrorCodes.loc_invite_error(error_code)
 	local loc = loc_keys[error_code]
 
 	if not loc or not loc.invite then
-		Log.warning("PartyImmateriumLocalizedErrorCodes", "got error_code %s that is not localized", error_code)
+		Log.warning("PartyImmateriumLocalizedErrorCodes", "[invite] got error_code '%s' that is not localized", error_code)
 
 		loc = loc_keys[error_codes.UNKNOWN]
 	end
@@ -128,7 +128,7 @@ function PartyImmateriumLocalizedErrorCodes.loc_join_error(error_code)
 	local loc = loc_keys[error_code]
 
 	if not loc or not loc.join then
-		Log.warning("PartyImmateriumLocalizedErrorCodes", "got error_code %s that is not localized", error_code)
+		Log.warning("PartyImmateriumLocalizedErrorCodes", "[join] got error_code '%s' that is not localized", error_code)
 
 		loc = loc_keys[error_codes.UNKNOWN]
 	end

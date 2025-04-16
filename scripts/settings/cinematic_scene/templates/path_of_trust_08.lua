@@ -1,10 +1,9 @@
 local cinematic_scene_templates = {
 	path_of_trust_08 = {
 		is_skippable = true,
-		use_transition_ui = false,
-		local_player_only = true,
 		wait_for_player_input = true,
-		instant_black_screen_during_cutscene_loading = false,
+		local_player_only = true,
+		use_transition_ui = false,
 		music = "cinematic_pot",
 		hide_players = false,
 		set_random_weapon_event = false,

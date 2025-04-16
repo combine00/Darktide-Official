@@ -1,3 +1,4 @@
+local BuffSettings = require("scripts/settings/buff/buff_settings")
 local Luggable = require("scripts/utilities/luggable")
 local ProjectileIntegration = require("scripts/extension_systems/locomotion/utilities/projectile_integration")
 local ProjectileIntegrationData = require("scripts/extension_systems/locomotion/utilities/projectile_integration_data")
@@ -6,17 +7,24 @@ local ProjectileLocomotion = require("scripts/extension_systems/locomotion/utili
 local ProjectileLocomotionSettings = require("scripts/settings/projectile_locomotion/projectile_locomotion_settings")
 local ProjectileTemplates = require("scripts/settings/projectile/projectile_templates")
 local TrueFlightProjectileIntegration = require("scripts/extension_systems/locomotion/utilities/true_flight_projectile_integration")
+local buff_proc_events = BuffSettings.proc_events
 local locomotion_states = ProjectileLocomotionSettings.states
 local moving_locomotion_states = ProjectileLocomotionSettings.moving_states
-local MAX_SYNCHRONIZE_COUNTER = ProjectileLocomotionSettings.MAX_SYNCHRONIZE_COUNTER
-local MINIMUM_SPEED_TO_SLEEP = ProjectileLocomotionSettings.MINIMUM_SPEED_TO_SLEEP
-local MIN_TIME_IN_ENGINE_PHYSICS_BEFORE_SLEEP = ProjectileLocomotionSettings.MIN_TIME_IN_ENGINE_PHYSICS_BEFORE_SLEEP
 local MAX_SNAPSHOT_ID = NetworkConstants.max_projectile_locomotion_snapshot_id
+local MAX_SYNCHRONIZE_COUNTER = ProjectileLocomotionSettings.MAX_SYNCHRONIZE_COUNTER
+local MIN_TIME_IN_ENGINE_PHYSICS_BEFORE_SLEEP = ProjectileLocomotionSettings.MIN_TIME_IN_ENGINE_PHYSICS_BEFORE_SLEEP
+local MINIMUM_SPEED_TO_SLEEP = ProjectileLocomotionSettings.MINIMUM_SPEED_TO_SLEEP
 local ProjectileUnitLocomotionExtension = class("ProjectileUnitLocomotionExtension")
 
 function ProjectileUnitLocomotionExtension:init(extension_init_context, unit, extension_init_data, game_object_data)
 	self._soft_cap_out_of_bounds_units = extension_init_context.soft_cap_out_of_bounds_units
-	self._owner_unit = extension_init_data.owner_unit
+	local owner_unit = extension_init_data.owner_unit
+	self._owner_unit = owner_unit
+
+	if owner_unit then
+		self._buff_extension = ScriptUnit.extension(owner_unit, "buff_system")
+	end
+
 	self._projectile_unit = unit
 	self._world = extension_init_context.world
 	self._physics_world = extension_init_context.physics_world
@@ -29,6 +37,7 @@ function ProjectileUnitLocomotionExtension:init(extension_init_context, unit, ex
 	self._fx_extension = ScriptUnit.has_extension(unit, "fx_system")
 	local projectile_template_name = extension_init_data.projectile_template_name
 	local projectile_template = ProjectileTemplates[projectile_template_name]
+	self._projectile_template = projectile_template
 	local projectile_locomotion_template = projectile_template.locomotion_template
 	self._projectile_locomotion_template = projectile_locomotion_template
 	local dynamic_actor_id = Unit.find_actor(unit, "dynamic")
@@ -84,8 +93,9 @@ function ProjectileUnitLocomotionExtension:init(extension_init_context, unit, ex
 	local speed = extension_init_data.speed
 	local momentum_or_angular_velocity = extension_init_data.momentum_or_angular_velocity
 	self._unit_rotation_offset = projectile_template.unit_rotation_offset
+	local want_sleep = starting_state == locomotion_states.none or starting_state == locomotion_states.sleep
 
-	if starting_state == locomotion_states.none or starting_state == locomotion_states.sleep then
+	if want_sleep then
 		self:switch_to_sleep(position, rotation)
 	elseif starting_state == locomotion_states.carried then
 		self:switch_to_carried(carrier_unit)
@@ -94,13 +104,13 @@ function ProjectileUnitLocomotionExtension:init(extension_init_context, unit, ex
 	elseif starting_state == locomotion_states.socket_lock then
 		self:switch_to_socket_lock(position, rotation)
 	elseif starting_state == locomotion_states.manual_physics then
-		self:switch_to_manual(position, rotation, direction, speed, momentum_or_angular_velocity)
+		self:switch_to_manual_physics(position, rotation, direction, speed, momentum_or_angular_velocity)
 	elseif starting_state == locomotion_states.true_flight then
 		self:switch_to_true_flight(position, rotation, direction, speed, momentum_or_angular_velocity, self._target_unit, self._target_position)
 	elseif starting_state == locomotion_states.engine_physics then
 		local velocity = direction * speed
 
-		self:switch_to_engine(position, rotation, velocity, momentum_or_angular_velocity)
+		self:switch_to_engine_physics(position, rotation, velocity, momentum_or_angular_velocity)
 	end
 
 	self._handle_oob_despawning = extension_init_data.handle_oob_despawning
@@ -120,8 +130,8 @@ end
 
 function ProjectileUnitLocomotionExtension:game_object_initialized(game_session, game_object_id)
 	self._game_object_id = game_object_id
-	self._is_level_unit = false
 	self._game_session = game_session
+	self._is_level_unit = false
 end
 
 function ProjectileUnitLocomotionExtension:mark_for_deletion()
@@ -130,6 +140,10 @@ function ProjectileUnitLocomotionExtension:mark_for_deletion()
 
 		self._marked_for_deletion = true
 	end
+end
+
+function ProjectileUnitLocomotionExtension:is_marked_for_deletion()
+	return self._marked_for_deletion
 end
 
 function ProjectileUnitLocomotionExtension:pre_update(unit, dt, t)
@@ -179,11 +193,12 @@ function ProjectileUnitLocomotionExtension:_update_out_of_bounds()
 	local position = self._position:unbox()
 	local safe_extents = self._gameplay_safe_extents
 
-	for i = 1, 3 do
-		if safe_extents[i] < math.abs(position[i]) then
+	for ii = 1, 3 do
+		if safe_extents[ii] < math.abs(position[ii]) then
 			self:switch_to_sleep(Vector3.zero(), Quaternion.identity())
 
 			if self._handle_oob_despawning and not self._marked_for_deletion then
+				Log.info("ProjectileUnitLocomotionExtension", "%s is out-of-bounds, despawning (%s).", unit, tostring(POSITION_LOOKUP[unit]))
 				Managers.state.unit_spawner:mark_for_deletion(unit)
 
 				self._marked_for_deletion = true
@@ -246,7 +261,7 @@ function ProjectileUnitLocomotionExtension:post_update(unit, dt, t)
 	end
 end
 
-function ProjectileUnitLocomotionExtension:switch_to_manual(position, rotation, direction, speed, angular_velocity)
+function ProjectileUnitLocomotionExtension:switch_to_manual_physics(position, rotation, direction, speed, angular_velocity)
 	self:_set_state(locomotion_states.manual_physics)
 	self:_switch_to_manual_state_helper(position, rotation, direction, speed, angular_velocity)
 end
@@ -300,13 +315,13 @@ function ProjectileUnitLocomotionExtension:_update_manual_physics(unit, dt, t)
 	if not integrate_this_frame then
 		local angular_momentum = integration_data.angular_velocity / integration_data.inertia
 
-		self:switch_to_engine(new_position, new_rotation, new_velocity, angular_momentum)
+		self:switch_to_engine_physics(new_position, new_rotation, new_velocity, angular_momentum)
 	else
 		if hit_this_frame then
 			Unit.flow_event(unit, "lua_manual_physics_collision")
 		end
 
-		self:_apply_changes(locomotion_states.manual_physics, new_position, new_rotation, new_velocity, Vector3.zero())
+		self:_apply_changes(locomotion_states.manual_physics, new_position, new_rotation, new_velocity, Vector3.zero(), nil, nil, nil)
 	end
 end
 
@@ -356,7 +371,7 @@ function ProjectileUnitLocomotionExtension:_update_true_flight(unit, dt, t)
 	end
 end
 
-function ProjectileUnitLocomotionExtension:switch_to_engine(position, rotation, velocity, angular_momentum)
+function ProjectileUnitLocomotionExtension:switch_to_engine_physics(position, rotation, velocity, angular_momentum)
 	self:_set_state(locomotion_states.engine_physics)
 
 	local projectile_unit = self._projectile_unit
@@ -370,7 +385,7 @@ function ProjectileUnitLocomotionExtension:switch_to_engine(position, rotation, 
 	velocity = velocity or Vector3.zero()
 	angular_momentum = (angular_momentum or Vector3.zero()) * 0.01
 
-	self:_apply_changes(locomotion_states.engine_physics, position, rotation, velocity, angular_momentum)
+	self:_apply_changes(locomotion_states.engine_physics, position, rotation, velocity, angular_momentum, nil, nil, nil)
 
 	self._time_starting_in_engine = Managers.time:time("gameplay")
 
@@ -405,7 +420,7 @@ function ProjectileUnitLocomotionExtension:switch_to_sticky(sticking_to_unit, st
 
 	local zero_vector = Vector3.zero()
 
-	self:_apply_changes(locomotion_states.sticky, world_position, world_rotation, zero_vector, zero_vector)
+	self:_apply_changes(locomotion_states.sticky, world_position, world_rotation, zero_vector, zero_vector, nil, nil, nil)
 
 	local sticking_to_actor_index = Actor.node(sticking_to_actor)
 	local local_position, local_rotation = ProjectileLinking.link_position_and_rotation(sticking_to_unit, sticking_to_actor_index, world_position, world_rotation, hit_normal, hit_direction)
@@ -419,6 +434,21 @@ function ProjectileUnitLocomotionExtension:switch_to_sticky(sticking_to_unit, st
 	Unit.set_local_position(projectile_unit, 1, local_position)
 	Unit.set_local_rotation(projectile_unit, 1, local_rotation)
 	World.update_unit(world, projectile_unit)
+
+	local owner_buff_extension = self._buff_extension
+
+	if owner_buff_extension then
+		local param_table = owner_buff_extension:request_proc_event_param_table()
+
+		if param_table then
+			param_table.owner_unit = self._owner_unit
+			param_table.target_unit = sticking_to_unit
+			param_table.projectile_unit = self._projectile_unit
+			param_table.projectile_template_name = self._projectile_template.name
+
+			owner_buff_extension:add_proc_event(buff_proc_events.on_projectile_stick, param_table)
+		end
+	end
 end
 
 function ProjectileUnitLocomotionExtension:_update_sticky(unit, dt, t)
@@ -438,7 +468,7 @@ function ProjectileUnitLocomotionExtension:_update_sticky(unit, dt, t)
 	local world_position = Unit.world_position(projectile_unit, 1)
 	local world_rotation = Unit.world_rotation(projectile_unit, 1)
 
-	self:_apply_changes(locomotion_states.sticky, world_position, world_rotation, Vector3.zero(), Vector3.zero())
+	self:_apply_changes(locomotion_states.sticky, world_position, world_rotation, Vector3.zero(), Vector3.zero(), nil, nil, nil)
 end
 
 function ProjectileUnitLocomotionExtension:unstick_from_unit()
@@ -455,7 +485,7 @@ function ProjectileUnitLocomotionExtension:unstick_from_unit()
 	self._sticking_to_actor = nil
 	self._sticking_to_actor_index = nil
 
-	self:switch_to_engine()
+	self:switch_to_engine_physics()
 end
 
 function ProjectileUnitLocomotionExtension:switch_to_socket_lock(position, rotation)
@@ -465,7 +495,7 @@ function ProjectileUnitLocomotionExtension:switch_to_socket_lock(position, rotat
 
 	Unit.set_local_position(projectile_unit, 1, position)
 	Unit.set_local_rotation(projectile_unit, 1, rotation)
-	self:_apply_changes(locomotion_states.socket_lock, position, rotation, Vector3.zero(), Vector3.zero())
+	self:_apply_changes(locomotion_states.socket_lock, position, rotation, Vector3.zero(), Vector3.zero(), nil, nil, nil)
 end
 
 function ProjectileUnitLocomotionExtension:switch_to_carried(carrier_unit)
@@ -478,7 +508,7 @@ function ProjectileUnitLocomotionExtension:switch_to_carried(carrier_unit)
 	local position = Unit.local_position(projectile_unit, 1)
 	local rotation = Unit.local_rotation(projectile_unit, 1)
 
-	self:_apply_changes(locomotion_states.carried, position, rotation, Vector3.zero(), Vector3.zero())
+	self:_apply_changes(locomotion_states.carried, position, rotation, Vector3.zero(), Vector3.zero(), nil, nil, nil)
 
 	local game_session = self._game_session
 	local game_object_id = self._game_object_id
@@ -494,7 +524,7 @@ function ProjectileUnitLocomotionExtension:switch_to_sleep(position, rotation)
 
 	self:_set_state(locomotion_states.sleep)
 	ProjectileLocomotion.set_kinematic(self._projectile_unit, self._dynamic_actor_id, false)
-	self:_apply_changes(locomotion_states.sleep, position, rotation, Vector3.zero(), Vector3.zero())
+	self:_apply_changes(locomotion_states.sleep, position, rotation, Vector3.zero(), Vector3.zero(), nil, nil, nil)
 end
 
 function ProjectileUnitLocomotionExtension:_set_state(new_state)

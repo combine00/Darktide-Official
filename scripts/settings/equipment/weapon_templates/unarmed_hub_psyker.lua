@@ -23,6 +23,7 @@ local weapon_template = {
 	},
 	hud_configuration = {
 		uses_overheat = false,
+		uses_weapon_special_charges = false,
 		uses_ammunition = false
 	},
 	crosshair = {

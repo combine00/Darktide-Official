@@ -4,7 +4,7 @@ local ArchetypeStaminaTemplates = require("scripts/settings/stamina/archetype_st
 local ArchetypeTalents = require("scripts/settings/ability/archetype_talents/archetype_talents")
 local ArchetypeToughnessTemplates = require("scripts/settings/toughness/archetype_toughness_templates")
 local ArchetypeWarpChargeTemplates = require("scripts/settings/warp_charge/archetype_warp_charge_templates")
-local UISoundEvents = require("scripts/settings/ui/ui_sound_events")
+local UiSoundEvents = require("scripts/settings/ui/ui_sound_events")
 local archetype_data = {
 	archetype_description = "loc_class_psyker_description",
 	name = "psyker",
@@ -18,7 +18,6 @@ local archetype_data = {
 	archetype_background_large = "content/ui/materials/icons/classes/large/psyker",
 	archetype_badge = "content/ui/materials/icons/class_badges/psyker_01_01",
 	archetype_video = "content/videos/class_selection/psyker_2",
-	string_symbol = "",
 	ui_selection_order = 3,
 	talents_package_path = "packages/ui/views/talent_builder_view/psyker",
 	archetype_name = "loc_class_psyker_name",
@@ -32,19 +31,13 @@ local archetype_data = {
 	sprint = ArchetypeSprintTemplates.psyker,
 	stamina = ArchetypeStaminaTemplates.psyker,
 	warp_charge = ArchetypeWarpChargeTemplates.psyker,
-	specializations = {
-		psyker_2 = {
-			archetype = "psyker",
-			name = "psyker_2"
-		}
-	},
 	talents = ArchetypeTalents.psyker,
 	base_talents = {
 		psyker_grenade_smite = 1,
 		psyker_combat_ability_shout = 1,
 		psyker_aura_ability_cooldown = 1
 	},
-	selection_sound_event = UISoundEvents.character_create_archetype_psyker,
+	selection_sound_event = UiSoundEvents.character_create_archetype_psyker,
 	unique_weapons = {
 		{
 			item = "content/items/weapons/player/melee/forcesword_p1_m1",

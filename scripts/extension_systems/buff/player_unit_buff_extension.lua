@@ -182,6 +182,8 @@ function PlayerUnitBuffExtension:add_internally_controlled_buff(template_name, t
 		else
 			self:_add_rpc_synced_buff(template, t, ...)
 		end
+	elseif template.predicted then
+		self:_update_predicted_buff_start_time_component_on_refresh(template_name)
 	end
 end
 
@@ -268,6 +270,21 @@ function PlayerUnitBuffExtension:_add_predicted_buff(template, t, ...)
 	end
 
 	return index, component_index
+end
+
+function PlayerUnitBuffExtension:_update_predicted_buff_start_time_component_on_refresh(template_name)
+	local stacking_buff_instance = self._stacking_buffs[template_name]
+	local component_index = stacking_buff_instance and stacking_buff_instance:component_index()
+
+	if stacking_buff_instance and component_index and stacking_buff_instance:need_to_sync_start_time() then
+		local buff_component = self._buff_component
+		local component_keys = COMPONENT_KEY_LOOKUP[component_index]
+		local start_time_key = component_keys.start_time_key
+		local start_time = stacking_buff_instance:start_time()
+		buff_component[start_time_key] = start_time
+
+		stacking_buff_instance:set_need_to_sync_start_time(false)
+	end
 end
 
 function PlayerUnitBuffExtension:remove_externally_controlled_buff(local_index, component_index)
@@ -706,7 +723,7 @@ function PlayerUnitBuffExtension:_is_cinematic_active()
 	local cinematic_scene_system = extension_manager:system("cinematic_scene_system")
 	local cinematic_scene_system_active = cinematic_scene_system:is_active()
 	local cinematic_manager = Managers.state.cinematic
-	local cinematic_manager_active = cinematic_manager:active()
+	local cinematic_manager_active = cinematic_manager:cinematic_active()
 
 	return cinematic_scene_system_active or cinematic_manager_active
 end
@@ -745,6 +762,20 @@ function PlayerUnitBuffExtension:_update_on_screen_fx()
 			end
 		end
 	end
+end
+
+local _inherited_buff_owner = {}
+
+function PlayerUnitBuffExtension:add_inherited_buff_owner(buff_provider)
+	_inherited_buff_owner[#_inherited_buff_owner + 1] = buff_provider
+end
+
+function PlayerUnitBuffExtension:get_inherited_buff_owner()
+	local inherited_buff_owner = _inherited_buff_owner[1]
+
+	table.remove(_inherited_buff_owner, 1)
+
+	return inherited_buff_owner
 end
 
 implements(PlayerUnitBuffExtension, BuffExtensionInterface)

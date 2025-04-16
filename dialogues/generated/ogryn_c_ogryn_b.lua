@@ -75,10 +75,6 @@ local ogryn_c_ogryn_b = {
 			[1.0] = 6.44524,
 			[2.0] = 2.323573
 		},
-		sound_event_weights = {
-			[1.0] = 0.5,
-			[2.0] = 0.5
-		},
 		randomize_indexes = {}
 	},
 	combat_pause_quirk_glutton_b = {
@@ -92,9 +88,33 @@ local ogryn_c_ogryn_b = {
 			[1.0] = 2.465396,
 			[2.0] = 4.304552
 		},
-		sound_event_weights = {
-			[1.0] = 0.5,
-			[2.0] = 0.5
+		randomize_indexes = {}
+	},
+	combat_pause_quirk_hates_goo_a = {
+		randomize_indexes_n = 0,
+		sound_events_n = 3,
+		sound_events = {
+			"loc_ogryn_b__combat_pause_quirk_hates_goo_a_01",
+			"loc_ogryn_b__combat_pause_quirk_hates_goo_a_02",
+			"loc_ogryn_b__combat_pause_quirk_hates_goo_a_03"
+		},
+		sound_events_duration = {
+			3.915198,
+			5.807927,
+			4.600375
+		},
+		randomize_indexes = {}
+	},
+	combat_pause_quirk_hates_goo_b = {
+		randomize_indexes_n = 0,
+		sound_events_n = 2,
+		sound_events = {
+			[1.0] = "loc_ogryn_b__combat_pause_quirk_hates_goo_b_01",
+			[2.0] = "loc_ogryn_b__combat_pause_quirk_hates_goo_b_02"
+		},
+		sound_events_duration = {
+			[1.0] = 1.471635,
+			[2.0] = 2.901323
 		},
 		randomize_indexes = {}
 	}

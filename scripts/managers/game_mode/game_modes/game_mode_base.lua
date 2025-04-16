@@ -13,7 +13,8 @@ GameModeBase.INTERFACE = {
 	"cleanup_game_mode_units"
 }
 local CLIENT_RPCS = {
-	"rpc_change_game_mode_state"
+	"rpc_change_game_mode_state",
+	"rpc_client_set_local_player_orientation"
 }
 
 local function _log(...)
@@ -47,6 +48,14 @@ function GameModeBase:init(game_mode_context, game_mode_name, network_event_dele
 	if settings.afk_check then
 		self._afk_checker = AFKChecker:new(self._is_server, settings.afk_check, network_event_delegate)
 	end
+end
+
+function GameModeBase:on_gameplay_init()
+	return
+end
+
+function GameModeBase:can_player_enter_game()
+	return true
 end
 
 function GameModeBase:destroy()
@@ -110,6 +119,10 @@ function GameModeBase:player_time_until_spawn(player)
 	return nil
 end
 
+function GameModeBase:cleanup_game_mode_dynamic_lavels()
+	return
+end
+
 function GameModeBase:cleanup_game_mode_units()
 	local bot_backfilling_allowed = self._settings.bot_backfilling_allowed
 
@@ -143,8 +156,16 @@ function GameModeBase:rpc_change_game_mode_state(channel_id, new_state_id)
 	self:_change_state(new_state)
 end
 
+function GameModeBase:rpc_client_set_local_player_orientation(channel_id, yaw, pitch, roll)
+	local player_manager = Managers.player
+	local local_player = player_manager:local_player(1)
+
+	local_player:set_orientation(yaw, pitch, roll)
+end
+
 function GameModeBase:hot_join_sync(sender, channel)
-	local state_id = self._states_lookup[self._state]
+	local state = self._state
+	local state_id = self._states_lookup[state]
 
 	if state_id ~= 1 then
 		RPC.rpc_change_game_mode_state(channel, state_id)
@@ -152,7 +173,7 @@ function GameModeBase:hot_join_sync(sender, channel)
 end
 
 function GameModeBase:_cinematic_active()
-	if Managers.state.cinematic:active() then
+	if Managers.state.cinematic:cinematic_active() then
 		return true
 	end
 
@@ -163,6 +184,10 @@ end
 
 function GameModeBase:should_spawn_dead(player)
 	return false
+end
+
+function GameModeBase:get_additional_pickups()
+	return nil
 end
 
 return GameModeBase

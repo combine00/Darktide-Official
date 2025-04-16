@@ -5,6 +5,23 @@ table.make_unique(templates)
 
 local stat_buffs = BuffSettings.stat_buffs
 templates.weapon_trait_bespoke_chainaxe_p1_guaranteed_melee_crit_on_activated_kill = {
+	format_values = {
+		crit_chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_chainaxe_p1_guaranteed_melee_crit_on_activated_kill",
+				find_value_type = "trait_override",
+				path = {
+					"buff_data",
+					"num_stacks_on_proc"
+				}
+			},
+			value_manipulation = function (value)
+				return math.abs(value) * 10
+			end
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_chainaxe_p1_guaranteed_melee_crit_on_activated_kill = {
 			{
@@ -31,6 +48,19 @@ templates.weapon_trait_bespoke_chainaxe_p1_guaranteed_melee_crit_on_activated_ki
 	}
 }
 templates.weapon_trait_bespoke_chainaxe_p1_bleed_on_activated_hit = {
+	format_values = {
+		stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_chainaxe_p1_bleed_on_activated_hit",
+				find_value_type = "trait_override",
+				path = {
+					"target_buff_data",
+					"num_stacks_on_proc"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_chainaxe_p1_bleed_on_activated_hit = {
 			{
@@ -57,6 +87,30 @@ templates.weapon_trait_bespoke_chainaxe_p1_bleed_on_activated_hit = {
 	}
 }
 templates.weapon_trait_bespoke_chainaxe_p1_movement_speed_on_activation = {
+	format_values = {
+		movement_speed = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_chainaxe_p1_movement_speed_on_activation",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.movement_speed
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_chainaxe_p1_movement_speed_on_activation",
+				find_value_type = "buff_template",
+				path = {
+					"active_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_chainaxe_p1_movement_speed_on_activation = {
 			{
@@ -87,6 +141,40 @@ templates.weapon_trait_bespoke_chainaxe_p1_movement_speed_on_activation = {
 	}
 }
 templates.weapon_trait_bespoke_chainaxe_p1_increase_power_on_hit = {
+	format_values = {
+		power_level = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_chainaxe_p1_increase_power_on_hit_parent",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.melee_power_level_modifier
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_chainaxe_p1_increase_power_on_hit_parent",
+				find_value_type = "buff_template",
+				path = {
+					"child_duration"
+				}
+			}
+		},
+		stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_chainaxe_p1_increase_power_on_hit_child",
+				find_value_type = "buff_template",
+				path = {
+					"max_stacks"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_chainaxe_p1_increase_power_on_hit_parent = {
 			{
@@ -113,6 +201,40 @@ templates.weapon_trait_bespoke_chainaxe_p1_increase_power_on_hit = {
 	}
 }
 templates.weapon_trait_bespoke_chainaxe_p1_increase_power_on_kill = {
+	format_values = {
+		power_level = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_chainaxe_p1_increase_power_on_kill_parent",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.power_level_modifier
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_chainaxe_p1_increase_power_on_kill_parent",
+				find_value_type = "buff_template",
+				path = {
+					"child_duration"
+				}
+			}
+		},
+		stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_chainaxe_p1_increase_power_on_kill_child",
+				find_value_type = "buff_template",
+				path = {
+					"max_stacks"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_chainaxe_p1_increase_power_on_kill_parent = {
 			{
@@ -139,6 +261,30 @@ templates.weapon_trait_bespoke_chainaxe_p1_increase_power_on_kill = {
 	}
 }
 templates.weapon_trait_bespoke_chainaxe_p1_windup_increases_power = {
+	format_values = {
+		power_level = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_chainaxe_p1_windup_increases_power_parent",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.melee_power_level_modifier
+				}
+			}
+		},
+		stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_chainaxe_p1_windup_increases_power_child",
+				find_value_type = "buff_template",
+				path = {
+					"max_stacks"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_chainaxe_p1_windup_increases_power_parent = {
 			{
@@ -165,6 +311,50 @@ templates.weapon_trait_bespoke_chainaxe_p1_windup_increases_power = {
 	}
 }
 templates.weapon_trait_bespoke_chainaxe_p1_targets_receive_rending_debuff = {
+	format_values = {
+		stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_chainaxe_p1_targets_receive_rending_debuff",
+				find_value_type = "trait_override",
+				path = {
+					"target_buff_data",
+					"num_stacks_on_proc"
+				}
+			}
+		},
+		rending = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "rending_debuff",
+				find_value_type = "buff_template",
+				path = {
+					"stat_buffs",
+					stat_buffs.rending_multiplier
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "rending_debuff",
+				find_value_type = "buff_template",
+				path = {
+					"duration"
+				}
+			}
+		},
+		max_stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "rending_debuff",
+				find_value_type = "buff_template",
+				path = {
+					"max_stacks"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_chainaxe_p1_targets_receive_rending_debuff = {
 			{
@@ -191,6 +381,20 @@ templates.weapon_trait_bespoke_chainaxe_p1_targets_receive_rending_debuff = {
 	}
 }
 templates.weapon_trait_bespoke_chainaxe_p1_rending_vs_staggered = {
+	format_values = {
+		rending = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_chainaxe_p1_rending_vs_staggered",
+				find_value_type = "trait_override",
+				path = {
+					"conditional_stat_buffs",
+					stat_buffs.rending_vs_staggered_multiplier
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_chainaxe_p1_rending_vs_staggered = {
 			{

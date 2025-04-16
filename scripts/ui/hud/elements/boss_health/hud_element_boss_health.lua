@@ -5,13 +5,15 @@ local HudHealthBarLogic = require("scripts/ui/hud/elements/hud_health_bar_logic"
 local UIHudSettings = require("scripts/settings/ui/ui_hud_settings")
 local UIWidget = require("scripts/managers/ui/ui_widget")
 local HudElementBossHealth = class("HudElementBossHealth", "HudElementBase")
+local _check_havoc_monster_health = nil
 
 function HudElementBossHealth:init(parent, draw_layer, start_scale)
 	HudElementBossHealth.super.init(self, parent, draw_layer, start_scale, Definitions)
 
 	self._active_targets_array = {}
 	self._active_targets_by_unit = {}
-	self._max_target_units = 2
+	self._queued_targets = {}
+	self._max_health_bars = 2
 
 	self:_setup_widget_groups()
 
@@ -70,7 +72,7 @@ function HudElementBossHealth:event_boss_encounter_start(unit, boss_extension)
 	local active_targets_by_unit = self._active_targets_by_unit
 	local active_targets_array = self._active_targets_array
 
-	if active_targets_by_unit[unit] or self._max_target_units <= #active_targets_array then
+	if active_targets_by_unit[unit] then
 		return
 	end
 
@@ -88,6 +90,8 @@ function HudElementBossHealth:event_boss_encounter_start(unit, boss_extension)
 			localized_display_name = Localize("loc_weakened_monster_prefix", true, {
 				breed = localized_display_name
 			})
+		else
+			localized_display_name = _check_havoc_monster_health(initial_max_health, max_health, breed, localized_display_name)
 		end
 	end
 
@@ -147,8 +151,9 @@ function HudElementBossHealth:update(dt, t, ui_renderer, render_settings, input_
 	local widget_groups = self._widget_groups
 	local active_targets_array = self._active_targets_array
 	local num_active_targets = #active_targets_array
+	local num_health_bars_to_update = math.min(num_active_targets, self._max_health_bars)
 
-	for i = 1, num_active_targets do
+	for i = 1, num_health_bars_to_update do
 		local widget_group_index = num_active_targets > 1 and i + 1 or i
 		local widget_group = widget_groups[widget_group_index]
 		local target = active_targets_array[i]
@@ -242,8 +247,9 @@ function HudElementBossHealth:_draw_widgets(dt, t, input_service, ui_renderer, r
 	local widget_groups = self._widget_groups
 	local active_targets_array = self._active_targets_array
 	local num_active_targets = #active_targets_array
+	local num_health_bars_to_update = math.min(num_active_targets, self._max_health_bars)
 
-	for i = 1, num_active_targets do
+	for i = 1, num_health_bars_to_update do
 		local widget_group_index = num_active_targets > 1 and i + 1 or i
 		local widget_group = widget_groups[widget_group_index]
 		local target = active_targets_array[i]
@@ -278,6 +284,33 @@ function HudElementBossHealth:_apply_widget_bar_fractions(widget, bar_width_tota
 	local max_width = bar_width_total - math.max(bar_width_total * max_fraction, 0)
 	max_width = math.max(max_width, 0)
 	widget.style.max.size[1] = max_width
+end
+
+function _check_havoc_monster_health(initial_max_health, max_health, breed, localized_display_name)
+	local havoc_mananger = Managers.state.havoc
+
+	if not havoc_mananger:is_havoc() then
+		return localized_display_name
+	end
+
+	local multiplied_max_health = nil
+	local havoc_health_override_value = Managers.state.havoc:get_modifier_value("modify_monster_health")
+
+	if havoc_health_override_value then
+		multiplied_max_health = initial_max_health + initial_max_health * havoc_health_override_value
+
+		if max_health < multiplied_max_health then
+			localized_display_name = Localize("loc_weakened_monster_prefix", true, {
+				breed = localized_display_name
+			})
+
+			return localized_display_name
+		end
+
+		return localized_display_name
+	end
+
+	return localized_display_name
 end
 
 return HudElementBossHealth

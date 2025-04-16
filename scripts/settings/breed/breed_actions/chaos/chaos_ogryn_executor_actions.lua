@@ -173,6 +173,9 @@ local action_data = {
 			jump_up_1m = 0.1
 		}
 	},
+	disable = {
+		disable_anims = {}
+	},
 	jump_across = {
 		stagger_immune = true,
 		rotation_duration = 0.1,
@@ -248,7 +251,7 @@ local action_data = {
 		aoe_threat_timing = 0.4,
 		utility_weight = 5,
 		max_z_diff = 3,
-		ignore_blocked = true,
+		ignore_blocked = false,
 		considerations = UtilityConsiderations.chaos_ogryn_executor_melee_attack,
 		attack_anim_events = {
 			normal = {
@@ -341,7 +344,7 @@ local action_data = {
 	melee_attack_pommel = {
 		weapon_reach = 3.5,
 		utility_weight = 0.4,
-		ignore_blocked = true,
+		ignore_blocked = false,
 		considerations = UtilityConsiderations.melee_attack,
 		attack_anim_events = {
 			"attack_pommel_01"
@@ -362,7 +365,7 @@ local action_data = {
 	melee_attack_kick = {
 		weapon_reach = 3.5,
 		utility_weight = 3,
-		ignore_blocked = true,
+		ignore_blocked = false,
 		considerations = UtilityConsiderations.melee_attack,
 		attack_anim_events = {
 			"attack_push_kick_01"
@@ -387,7 +390,7 @@ local action_data = {
 	melee_attack_punch = {
 		weapon_reach = 3.5,
 		utility_weight = 0.4,
-		ignore_blocked = true,
+		ignore_blocked = false,
 		considerations = UtilityConsiderations.melee_attack,
 		attack_anim_events = {
 			"attack_push_punch_01",
@@ -426,7 +429,7 @@ local action_data = {
 	},
 	moving_melee_attack = {
 		aoe_threat_timing = 0.4,
-		ignore_blocked = true,
+		ignore_blocked = false,
 		vo_event = "assault",
 		move_speed_variable_name = "moving_attack_fwd_speed",
 		utility_weight = 1,
@@ -523,7 +526,7 @@ local action_data = {
 		move_speed_variable_lerp_speed = 4,
 		dodge_width = 1.1,
 		range = 4,
-		ignore_blocked = true,
+		ignore_blocked = false,
 		move_speed = 4,
 		dodge_range = 2.75,
 		assault_vo_interval_t = 3,

@@ -442,10 +442,6 @@ local zealot_a_zealot_female_a = {
 			[1.0] = 3.121542,
 			[2.0] = 2.026813
 		},
-		sound_event_weights = {
-			[1.0] = 0.5,
-			[2.0] = 0.5
-		},
 		randomize_indexes = {}
 	},
 	combat_pause_quirk_stench_a = {

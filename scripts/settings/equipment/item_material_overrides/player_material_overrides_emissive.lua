@@ -19,6 +19,16 @@ local material_overrides = {
 			}
 		}
 	},
+	emissive_red_03 = {
+		property_overrides = {
+			emissive_color_intensity = {
+				0.09,
+				0,
+				0,
+				8
+			}
+		}
+	},
 	emissive_green_01 = {
 		property_overrides = {
 			emissive_color_intensity = {
@@ -36,6 +46,16 @@ local material_overrides = {
 				0,
 				0,
 				1
+			}
+		}
+	},
+	emissive_blue_02 = {
+		property_overrides = {
+			emissive_color_intensity = {
+				0.006,
+				0.044,
+				0.06,
+				7
 			}
 		}
 	},
@@ -66,6 +86,16 @@ local material_overrides = {
 				0.02,
 				0.003,
 				5
+			}
+		}
+	},
+	emissive_orange_04 = {
+		property_overrides = {
+			emissive_color_intensity = {
+				1,
+				0.178,
+				0,
+				0.5
 			}
 		}
 	}

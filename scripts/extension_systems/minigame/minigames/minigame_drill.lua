@@ -43,17 +43,12 @@ function MinigameDrill:start(player)
 	MinigameDrill.super.start(self, player)
 	Unit.flow_event(self._minigame_unit, "lua_minigame_start")
 
-	local is_server = self._is_server
+	if player then
+		self:_setup_sound(player, FX_SOURCE_NAME)
 
-	if is_server then
 		local player_unit = player.player_unit
-		local visual_loadout_extension = ScriptUnit.extension(player_unit, "visual_loadout_system")
-		local fx_sources = visual_loadout_extension:source_fx_for_slot("slot_device")
 
 		Unit.set_flow_variable(self._minigame_unit, "player_unit", player_unit)
-
-		self._fx_extension = ScriptUnit.extension(player_unit, "fx_system")
-		self._fx_source_name = fx_sources[FX_SOURCE_NAME]
 	end
 end
 
@@ -109,6 +104,23 @@ local function _target_overlap(x, y, targets)
 	return false
 end
 
+local function _target_has_axis_aligned_neighbor(x, y, targets)
+	local min_delta_for_alignment = 0.1
+
+	for i = 1, #targets do
+		local target = targets[i]
+		local position_delta_x = math.abs(target.x - x)
+		local position_delta_y = math.abs(target.y - y)
+		local is_aligned_with_target = position_delta_x < min_delta_for_alignment or position_delta_y < min_delta_for_alignment
+
+		if is_aligned_with_target then
+			return true
+		end
+	end
+
+	return false
+end
+
 function MinigameDrill:generate_targets(seed)
 	self._start_seed = seed
 	local targets = self._targets
@@ -123,13 +135,21 @@ function MinigameDrill:generate_targets(seed)
 
 		for target = 1, MinigameSettings.drill_stage_targets do
 			local x, y = nil
+			local tries = 100
+			local is_valid_position = false
 
 			repeat
+				tries = tries - 1
 				seed, x = math.next_random(seed, 1, 100)
 				x = -0.8 + x / 100 * 1.6
 				seed, y = math.next_random(seed, 1, 100)
 				y = -0.5 + y / 100 * 1
-			until not _target_overlap(x, y, stage_targets)
+				is_valid_position = not _target_overlap(x, y, stage_targets) and not _target_has_axis_aligned_neighbor(x, y, stage_targets)
+			until is_valid_position or tries <= 0
+
+			if tries <= 0 then
+				-- Nothing
+			end
 
 			stage_targets[target] = {
 				x = x,

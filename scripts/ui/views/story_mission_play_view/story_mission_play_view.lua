@@ -3,6 +3,7 @@ local ViewElementTabMenu = require("scripts/ui/view_elements/view_element_tab_me
 local UISoundEvents = require("scripts/settings/ui/ui_sound_events")
 local ColorUtilities = require("scripts/utilities/ui/colors")
 local DangerSettings = require("scripts/settings/difficulty/danger_settings")
+local Danger = require("scripts/utilities/danger")
 local UIFonts = require("scripts/managers/ui/ui_fonts")
 local UIRenderer = require("scripts/managers/ui/ui_renderer")
 local TextUtilities = require("scripts/utilities/ui/text")
@@ -19,6 +20,7 @@ local TextUtils = require("scripts/utilities/ui/text")
 local ItemUtils = require("scripts/utilities/items")
 local MissionUtilities = require("scripts/utilities/ui/mission")
 local RegionLocalizationMappings = require("scripts/settings/backend/region_localization")
+local PromiseContainer = require("scripts/utilities/ui/promise_container")
 local PLAY_BUTTON_ANIM_DELAY = 5
 local StoryMissionPlayView = class("StoryMissionPlayView", "BaseView")
 
@@ -26,7 +28,7 @@ function StoryMissionPlayView:init(settings, context)
 	local parent = context and context.parent
 	self._parent = parent
 	self._backend_data_expiry_time = -1
-	self._promises = {}
+	self._promise_container = PromiseContainer:new()
 	self._cb_fetch_success = callback(self, "_fetch_success")
 	self._cb_fetch_failure = callback(self, "_fetch_failure")
 	self._play_button_anim_delay = 1
@@ -96,7 +98,7 @@ function StoryMissionPlayView:_update_fetch_missions(t)
 	end
 
 	self._is_fetching_missions = true
-	local missions_promise = self:_cancel_promise_on_exit(Managers.data_service.mission_board:fetch(nil, 1))
+	local missions_promise = self._promise_container:cancel_on_destroy(Managers.data_service.mission_board:fetch(nil, 1))
 	self._mission_promise = missions_promise
 
 	missions_promise:next(function (mission_data)
@@ -111,8 +113,8 @@ function StoryMissionPlayView:_fetch_success(data)
 	local story_missions = MissionUtilities.filter_latest_narrative_missions(missions)
 
 	local function sort_func(a, b)
-		local a_danger_level = DangerSettings.calculate_danger(a.challenge, a.resistance)
-		local b_danger_level = DangerSettings.calculate_danger(b.challenge, b.resistance)
+		local a_danger_level = Danger.calculate_danger(a.challenge, a.resistance)
+		local b_danger_level = Danger.calculate_danger(b.challenge, b.resistance)
 
 		return a_danger_level < b_danger_level
 	end
@@ -166,22 +168,6 @@ function StoryMissionPlayView:_fetch_failure(error_message)
 	local fetch_retry_cooldown = 5
 	self._backend_data_expiry_time = Managers.time:time("main") + fetch_retry_cooldown
 	self._is_fetching_missions = false
-end
-
-function StoryMissionPlayView:_cancel_promise_on_exit(promise)
-	local promises = self._promises
-
-	if promise:is_pending() and not promises[promise] then
-		promises[promise] = true
-
-		promise:next(function ()
-			self._promises[promise] = nil
-		end, function ()
-			self._promises[promise] = nil
-		end)
-	end
-
-	return promise
 end
 
 function StoryMissionPlayView:_populate_achievement_rewards(achievements)
@@ -315,15 +301,14 @@ function StoryMissionPlayView:_assign_option_data(option_index, data)
 	local content = widget.content
 	local style = widget.style
 	content.hotspot.pressed_callback = callback(self, "_cb_on_options_button_pressed", option_index, data)
-	local danger_level = DangerSettings.calculate_danger(data.challenge, data.resistance)
-	local danger_settings = DangerSettings.by_index[danger_level]
+	local danger_settings = Danger.danger_by_difficulty(data.challenge, data.resistance)
 	local danger_color = danger_settings.color
 
 	for i = 1, 5 do
 		local difficulty_style_id = "difficulty_box_" .. i
 		local color = style[difficulty_style_id].color
 
-		if i <= danger_level then
+		if i <= danger_settings.index then
 			local ignore_alpha = true
 
 			ColorUtilities.color_copy(danger_color, color, ignore_alpha)
@@ -592,6 +577,8 @@ function StoryMissionPlayView:_handle_input(input_service, dt, t)
 end
 
 function StoryMissionPlayView:on_exit()
+	self._promise_container:delete()
+
 	if self._mission_promise then
 		self._mission_promise:cancel()
 
@@ -726,11 +713,11 @@ function StoryMissionPlayView:fetch_regions()
 	local region_promise = Managers.backend.interfaces.region_latency:get_region_latencies()
 	self._region_promise = region_promise
 
-	self:_cancel_promise_on_exit(region_promise):next(function (regions_data)
+	self._promise_container:cancel_on_destroy(region_promise):next(function (regions_data)
 		local prefered_region_promise = nil
 
 		if BackendUtilities.prefered_mission_region == "" then
-			prefered_region_promise = self:_cancel_promise_on_exit(Managers.backend.interfaces.region_latency:get_preferred_reef())
+			prefered_region_promise = self._promise_container:cancel_on_destroy(Managers.backend.interfaces.region_latency:get_preferred_reef())
 		else
 			prefered_region_promise = Promise.resolved()
 		end

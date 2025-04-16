@@ -64,6 +64,14 @@ function MissionObjectiveZoneBaseExtension:zone_type()
 	return self._zone_type
 end
 
+function MissionObjectiveZoneBaseExtension:is_scanning_zone()
+	return self._zone_type == "scan"
+end
+
+function MissionObjectiveZoneBaseExtension:is_capture_zone()
+	return self._zone_type == "capture"
+end
+
 function MissionObjectiveZoneBaseExtension:set_seed(seed)
 	self._seed = seed
 end

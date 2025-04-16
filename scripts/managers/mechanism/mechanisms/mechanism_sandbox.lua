@@ -8,7 +8,6 @@ function MechanismSandbox:init(...)
 	MechanismSandbox.super.init(self, ...)
 
 	local mission_name = GameParameters.mission
-	self._mission_name = mission_name
 	local level_name = nil
 
 	if LEVEL_EDITOR_TEST then
@@ -18,7 +17,6 @@ function MechanismSandbox:init(...)
 			for listed_mission_name, data in pairs(Missions) do
 				if data.level == level_name then
 					mission_name = listed_mission_name
-					self._mission_name = listed_mission_name
 
 					break
 				end
@@ -26,14 +24,19 @@ function MechanismSandbox:init(...)
 
 			if not mission_name then
 				mission_name = "editor_simulation_without_mission"
-				self._mission_name = mission_name
 			end
 		end
 	else
 		level_name = Missions[mission_name].level
 	end
 
-	self._level_name = level_name
+	local mechanism_data = self._mechanism_data
+	mechanism_data.level_name = level_name
+	mechanism_data.mission_name = mission_name
+	mechanism_data.challenge = DevParameters.challenge
+	mechanism_data.resistance = DevParameters.resistance
+	mechanism_data.circumstance_name = GameParameters.circumstance
+	mechanism_data.side_mission = GameParameters.side_mission
 end
 
 function MechanismSandbox:sync_data()
@@ -48,23 +51,19 @@ function MechanismSandbox:wanted_transition()
 	if self._state == "init" or self._state == "game_mode_ended" then
 		self:_set_state("gameplay")
 
-		local challenge = DevParameters.challenge
-		local resistance = DevParameters.resistance
-		local circumstance = GameParameters.circumstance
-		local side_mission = GameParameters.side_mission
+		local mechanism_data = self._mechanism_data
+		local mission_name = mechanism_data.mission_name
+		local level_name = mechanism_data.level_name
+		local circumstance = mechanism_data.circumstance_name
+		local side_mission = mechanism_data.side_mission
+		local challenge = mechanism_data.challenge
+		local resistance = mechanism_data.resistance
 
 		Log.info("MechanismSandbox", "Using dev parameters for challenge and resistance (%s/%s)", challenge, resistance)
 
-		local mechanism_data = {
-			challenge = challenge,
-			resistance = resistance,
-			circumstance_name = circumstance,
-			side_mission = side_mission
-		}
-
 		return false, StateLoading, {
-			level = self._level_name,
-			mission_name = self._mission_name,
+			level = level_name,
+			mission_name = mission_name,
 			circumstance_name = circumstance,
 			side_mission = side_mission,
 			next_state = StateGameplay,

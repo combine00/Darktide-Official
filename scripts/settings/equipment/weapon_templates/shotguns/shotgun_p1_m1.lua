@@ -1,9 +1,11 @@
+local ActionInputHierarchy = require("scripts/utilities/action/action_input_hierarchy")
 local AimAssistTemplates = require("scripts/settings/equipment/aim_assist_templates")
 local ArmorSettings = require("scripts/settings/damage/armor_settings")
 local BaseTemplateSettings = require("scripts/settings/equipment/weapon_templates/base_template_settings")
 local BuffSettings = require("scripts/settings/buff/buff_settings")
 local DamageSettings = require("scripts/settings/damage/damage_settings")
 local FootstepIntervalsTemplates = require("scripts/settings/equipment/footstep/footstep_intervals_templates")
+local HapticTriggerTemplates = require("scripts/settings/equipment/haptic_trigger_templates")
 local LineEffects = require("scripts/settings/effects/line_effects")
 local PlayerCharacterConstants = require("scripts/settings/player_character/player_character_constants")
 local ShotshellTemplates = require("scripts/settings/projectile/shotshell_templates")
@@ -137,22 +139,58 @@ local weapon_template = {
 table.add_missing(weapon_template.action_inputs, BaseTemplateSettings.action_inputs)
 
 weapon_template.action_input_hierarchy = {
-	wield = "stay",
-	shoot_pressed = "stay",
-	special_action = "stay",
-	reload = "stay",
-	zoom = {
-		special_action = "base",
-		wield = "base",
-		zoom_shoot = "stay",
-		grenade_ability = "base",
-		zoom_release = "base",
-		reload = "base",
-		combat_ability = "base"
+	{
+		transition = "stay",
+		input = "shoot_pressed"
+	},
+	{
+		input = "zoom",
+		transition = {
+			{
+				transition = "base",
+				input = "zoom_release"
+			},
+			{
+				transition = "stay",
+				input = "zoom_shoot"
+			},
+			{
+				transition = "base",
+				input = "reload"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "grenade_ability"
+			},
+			{
+				transition = "base",
+				input = "special_action"
+			}
+		}
+	},
+	{
+		transition = "stay",
+		input = "wield"
+	},
+	{
+		transition = "stay",
+		input = "reload"
+	},
+	{
+		transition = "stay",
+		input = "special_action"
 	}
 }
 
-table.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
+ActionInputHierarchy.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
 
 weapon_template.actions = {
 	action_unwield = {
@@ -241,7 +279,7 @@ weapon_template.actions = {
 				modifier = 1,
 				t = 0.5
 			},
-			start_modifier = 0.3
+			start_modifier = 0.4
 		},
 		fx = {
 			shoot_sfx_special_extra_alias = "ranged_single_shot_special_extra",
@@ -330,7 +368,7 @@ weapon_template.actions = {
 				modifier = 1,
 				t = 0.5
 			},
-			start_modifier = 0.3
+			start_modifier = 0.4
 		},
 		fx = {
 			shoot_sfx_special_extra_alias = "ranged_single_shot_special_extra",
@@ -804,16 +842,17 @@ weapon_template.actions = {
 		}
 	},
 	action_inspect = {
-		anim_event = "inspect_start",
 		lock_view = true,
 		start_input = "inspect_start",
 		anim_end_event = "inspect_end",
 		kind = "inspect",
+		anim_event = "inspect_start",
 		stop_input = "inspect_stop",
 		total_time = math.huge,
 		crosshair = {
 			crosshair_type = "inspect"
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	}
 }
 
@@ -850,8 +889,16 @@ weapon_template.fx_sources = {
 	_eject = "fx_eject"
 }
 weapon_template.crosshair = {
-	crosshair_type_special_active = "shotgun_wide",
-	crosshair_type = "shotgun"
+	crosshair_type_func = function (condition_func_params)
+		local inventory_slot_component = condition_func_params.inventory_slot_component
+		local special_active = inventory_slot_component.special_active
+
+		if special_active then
+			return "shotgun_wide"
+		end
+
+		return "shotgun"
+	end
 }
 weapon_template.alternate_fire_settings = {
 	peeking_mechanics = true,
@@ -911,9 +958,10 @@ weapon_template.dodge_template = "shotgun"
 weapon_template.sprint_template = "killshot"
 weapon_template.stamina_template = "lasrifle"
 weapon_template.toughness_template = "default"
+weapon_template.footstep_intervals = FootstepIntervalsTemplates.default
 weapon_template.movement_curve_modifier_template = "default"
 weapon_template.smart_targeting_template = SmartTargetingTemplates.killshot
-weapon_template.footstep_intervals = FootstepIntervalsTemplates.default
+weapon_template.haptic_trigger_template = HapticTriggerTemplates.ranged.assault
 weapon_template.overclocks = {
 	stability_up_ammo_down = {
 		shotgun_p1_m1_ammo_stat = -0.1,

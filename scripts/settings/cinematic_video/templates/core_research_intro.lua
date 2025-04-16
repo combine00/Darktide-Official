@@ -1,7 +1,7 @@
 local cinematic_video_template = {
 	core_research_intro = {
 		loop_video = false,
-		music = "cinematic_pot",
+		music = "cinematic",
 		video_name = "content/videos/core_research_intro",
 		stop_only_player_skip = true,
 		start_sound_name = "wwise/events/cinematics/play_dt_cin_core_research_surround",

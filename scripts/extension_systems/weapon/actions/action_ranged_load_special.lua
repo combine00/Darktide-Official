@@ -3,10 +3,10 @@ require("scripts/extension_systems/weapon/actions/action_weapon_base")
 local Ammo = require("scripts/utilities/ammo")
 local BuffSettings = require("scripts/settings/buff/buff_settings")
 local buff_proc_events = BuffSettings.proc_events
-local ActionReloadShotgunSpecial = class("ActionReloadShotgunSpecial", "ActionWeaponBase")
+local ActionRangedLoadSpecial = class("ActionRangedLoadSpecial", "ActionWeaponBase")
 
-function ActionReloadShotgunSpecial:init(action_context, ...)
-	ActionReloadShotgunSpecial.super.init(self, action_context, ...)
+function ActionRangedLoadSpecial:init(action_context, ...)
+	ActionRangedLoadSpecial.super.init(self, action_context, ...)
 
 	local unit_data_extension = action_context.unit_data_extension
 	self._action_reload_component = unit_data_extension:write_component("action_reload")
@@ -16,8 +16,8 @@ function ActionReloadShotgunSpecial:init(action_context, ...)
 	self._buff_extension = ScriptUnit.extension(self._player_unit, "buff_system")
 end
 
-function ActionReloadShotgunSpecial:start(action_settings, t, time_scale, ...)
-	ActionReloadShotgunSpecial.super.start(self, action_settings, t, time_scale, ...)
+function ActionRangedLoadSpecial:start(action_settings, t, time_scale, ...)
+	ActionRangedLoadSpecial.super.start(self, action_settings, t, time_scale, ...)
 
 	local action_reload_component = self._action_reload_component
 	action_reload_component.has_refilled_ammunition = false
@@ -33,16 +33,16 @@ function ActionReloadShotgunSpecial:start(action_settings, t, time_scale, ...)
 	end
 end
 
-function ActionReloadShotgunSpecial:fixed_update(dt, t, time_in_action)
+function ActionRangedLoadSpecial:fixed_update(dt, t, time_in_action)
 	self:_reload(t, time_in_action)
 end
 
-function ActionReloadShotgunSpecial:finish(reason, data, t, time_in_action)
-	ActionReloadShotgunSpecial.super.finish(self, reason, data, t)
+function ActionRangedLoadSpecial:finish(reason, data, t, time_in_action)
+	ActionRangedLoadSpecial.super.finish(self, reason, data, t)
 	self:_reload(t, time_in_action)
 end
 
-function ActionReloadShotgunSpecial:_reload(t, time_in_action)
+function ActionRangedLoadSpecial:_reload(t, time_in_action)
 	local action_reload_component = self._action_reload_component
 	local inventory_slot_component = self._inventory_slot_component
 	local weapon_action_component = self._weapon_action_component
@@ -90,7 +90,7 @@ function ActionReloadShotgunSpecial:_reload(t, time_in_action)
 	end
 end
 
-function ActionReloadShotgunSpecial:running_action_state(t, time_in_action)
+function ActionRangedLoadSpecial:running_action_state(t, time_in_action)
 	local inventory_slot_component = self._inventory_slot_component
 	local action_reload_component = self._action_reload_component
 	local max_ammo_in_clip = inventory_slot_component.max_ammunition_clip
@@ -104,4 +104,4 @@ function ActionReloadShotgunSpecial:running_action_state(t, time_in_action)
 	return nil
 end
 
-return ActionReloadShotgunSpecial
+return ActionRangedLoadSpecial

@@ -2,6 +2,7 @@ local MinigameBalanceView = require("scripts/ui/views/scanner_display_view/minig
 local MinigameDecodeSymbolsView = require("scripts/ui/views/scanner_display_view/minigame_decode_symbols_view")
 local MinigameDefuseView = require("scripts/ui/views/scanner_display_view/minigame_defuse_view")
 local MinigameDrillView = require("scripts/ui/views/scanner_display_view/minigame_drill_view")
+local MinigameFrequencyView = require("scripts/ui/views/scanner_display_view/minigame_frequency_view")
 local MinigameNoneView = require("scripts/ui/views/scanner_display_view/minigame_none_view")
 local MinigameScanView = require("scripts/ui/views/scanner_display_view/minigame_scan_view")
 local MinigameSettings = require("scripts/settings/minigame/minigame_settings")
@@ -16,7 +17,8 @@ ScannerDisplayView.MINIGAMES = {
 	[MinigameSettings.types.balance] = MinigameBalanceView,
 	[MinigameSettings.types.decode_symbols] = MinigameDecodeSymbolsView,
 	[MinigameSettings.types.defuse] = MinigameDefuseView,
-	[MinigameSettings.types.drill] = MinigameDrillView
+	[MinigameSettings.types.drill] = MinigameDrillView,
+	[MinigameSettings.types.frequency] = MinigameFrequencyView
 }
 
 function ScannerDisplayView:init(settings, context)
@@ -24,7 +26,6 @@ function ScannerDisplayView:init(settings, context)
 	self._viewport_name = class_name .. "_ui_offscreen_world_viewport"
 	self._render_name = class_name .. "_offscreen_ui_renderer"
 	self._no_cursor = true
-	self._material_linked = false
 	self._auspex_unit = context.auspex_unit
 	self._minigame = ScannerDisplayView.MINIGAMES[context.minigame_type]:new(context)
 	local definitions = ScannerDisplayViewDefinitions[context.minigame_type]
@@ -63,6 +64,8 @@ function ScannerDisplayView:on_exit()
 	local offscreen_ui_renderer = self._offscreen_ui_renderer
 
 	if offscreen_ui_renderer then
+		self:_unlink_material()
+
 		local ui_manager = Managers.ui
 		local world = self._offscreen_world
 		local renderer_name = self._render_name
@@ -112,22 +115,39 @@ function ScannerDisplayView:_link_material()
 		local plane_unit = self._auspex_unit
 
 		if plane_unit then
-			local plane_mesh = Unit.mesh(plane_unit, "auspex_scanner_display")
+			local material_linked = Unit.get_data(plane_unit, "auspex_scanner_display_material_linked")
+
+			if not material_linked then
+				Unit.set_data(plane_unit, "auspex_scanner_display_material_linked", true)
+
+				local plane_mesh = Unit.mesh(plane_unit, "auspex_scanner_display")
+				local material_instance = plane_mesh and Mesh.material(plane_mesh, "auspex_scanner_display")
+
+				Material.set_resource(material_instance, "source", render_target)
+			end
+		end
+	end
+end
+
+function ScannerDisplayView:_unlink_material()
+	local plane_unit = self._auspex_unit
+
+	if plane_unit then
+		local material_linked = Unit.get_data(plane_unit, "auspex_scanner_display_material_linked")
+
+		if material_linked then
+			local plane_mesh = plane_unit and Unit.mesh(plane_unit, "auspex_scanner_display")
 			local material_instance = plane_mesh and Mesh.material(plane_mesh, "auspex_scanner_display")
 
-			Material.set_resource(material_instance, "source", render_target)
-
-			self._material_linked = true
+			Material.set_texture(material_instance, "source", nil)
+			Unit.set_data(plane_unit, "auspex_scanner_display_material_linked", false)
 		end
 	end
 end
 
 function ScannerDisplayView:update(dt, t)
 	self._minigame:update(dt, t, self._widgets_by_name)
-
-	if not self._material_linked then
-		self:_link_material()
-	end
+	self:_link_material()
 
 	return ScannerDisplayView.super.update(self, dt, t)
 end

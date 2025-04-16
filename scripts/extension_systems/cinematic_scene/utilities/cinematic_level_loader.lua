@@ -15,7 +15,10 @@ function CinematicLevelLoader:destroy()
 	self:cleanup()
 end
 
-function CinematicLevelLoader:start_loading(cinematic_name, level_names, callback)
+function CinematicLevelLoader:start_loading(context)
+	local cinematic_name = context.cinematic_name
+	local level_names = context.level_names
+	local callback = context.callback
 	local ready_callbacks = self._level_ready_callbacks
 	ready_callbacks[#ready_callbacks + 1] = callback
 
@@ -133,7 +136,7 @@ function CinematicLevelLoader:_is_loading_done()
 	return result
 end
 
-function CinematicLevelLoader:is_loading()
+function CinematicLevelLoader:currently_loading_cinematic_name()
 	if not self:_is_loading_done() then
 		return self._cinematic_name
 	end

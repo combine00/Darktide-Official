@@ -1,3 +1,4 @@
+local ActionInputHierarchy = require("scripts/utilities/action/action_input_hierarchy")
 local PlayerCharacterConstants = require("scripts/settings/player_character/player_character_constants")
 local Sprint = require("scripts/extension_systems/character_state_machine/character_states/utilities/sprint")
 local wield_inputs = PlayerCharacterConstants.wield_inputs
@@ -264,12 +265,12 @@ function ActionInputParser:action_transitioned_with_automatic_input(action_input
 	end
 
 	local hierarchy = _get_current_hierarchy(hierarchy_position, base_hierarchy, self._MAX_HIERARCHY_DEPTH, NO_ACTION_INPUT)
-	local transition = hierarchy[action_input]
+	local transition = ActionInputHierarchy.find_hierarchy_transition(hierarchy, action_input)
 	local hierarchy_s = nil
 	local children_to_prepare = self:_handle_hierarchy_transition(transition, hierarchy_position, action_input, base_hierarchy, hierarchy)
 
 	if children_to_prepare then
-		self:_prepare_child_sequences(children_to_prepare, sequences, t, network_lookup)
+		self:_prepare_child_sequences(children_to_prepare, sequences, t, network_lookup, transition)
 	end
 end
 
@@ -422,7 +423,7 @@ function ActionInputParser:_fill_table_with_authoritative_hierarchy_position(tab
 
 			local prev_action_input = prev_entry[ACTION_INPUT]
 			local current_hierarchy = _get_current_hierarchy(table, base_hierarchy, max_hierarchy_depth, no_action_input)
-			local transition = current_hierarchy[prev_action_input]
+			local transition = ActionInputHierarchy.find_hierarchy_transition(current_hierarchy, prev_action_input)
 			local _ = self:_handle_hierarchy_transition(transition, table, prev_action_input, base_hierarchy, current_hierarchy)
 		end
 	else
@@ -633,11 +634,10 @@ function ActionInputParser:_update_sequences(dt, t, template_name, hierarchy_pos
 	local base_hierarchy = self._ACTION_INPUT_HIERARCHY[template_name]
 	local hierarchy = _get_current_hierarchy(hierarchy_position, base_hierarchy, MAX_HIERARCHY_DEPTH, NO_ACTION_INPUT)
 	local action_input_sequence_completed, action_input_sequence_config, action_input_raw_input = nil
-	local sorted_action_inputs = table.keys(hierarchy)
 
-	table.sort(sorted_action_inputs)
-
-	for _, action_input in ipairs(sorted_action_inputs) do
+	for _, entry in ipairs(hierarchy) do
+		local action_input = entry.input
+		local children = entry.transition
 		local sequence_config = sequence_configs[action_input]
 		local sequence_i = network_lookup[action_input]
 		local sequence = sequences[sequence_i]
@@ -682,11 +682,11 @@ function ActionInputParser:_update_sequences(dt, t, template_name, hierarchy_pos
 			hierarchy = _get_current_hierarchy(hierarchy_position, base_hierarchy, MAX_HIERARCHY_DEPTH, NO_ACTION_INPUT)
 		end
 
-		local hierarchy_transition = hierarchy[action_input_sequence_completed]
+		local hierarchy_transition = ActionInputHierarchy.find_hierarchy_transition(hierarchy, action_input_sequence_completed)
 		local children_to_prepare = self:_handle_hierarchy_transition(hierarchy_transition, hierarchy_position, action_input_sequence_completed, base_hierarchy, hierarchy)
 
 		if children_to_prepare then
-			self:_prepare_child_sequences(children_to_prepare, sequences, t, network_lookup)
+			self:_prepare_child_sequences(children_to_prepare, sequences, t, network_lookup, hierarchy_transition)
 		end
 	end
 end
@@ -705,12 +705,12 @@ function ActionInputParser:_handle_hierarchy_transition(transition, hierarchy_po
 	elseif transition == "base" then
 		self:_reset_hierarchy_position(hierarchy_position)
 
-		local base_hierarchy_transition = base_hierarchy[action_input]
+		local base_entry = ActionInputHierarchy.find_hierarchy_transition(base_hierarchy, action_input)
 
-		if type(base_hierarchy_transition) == "table" then
+		if base_entry and type(base_entry) == "table" then
 			self:_progress_hierarchy_position(hierarchy_position, action_input)
 
-			child_sequences_to_prepare = base_hierarchy_transition
+			child_sequences_to_prepare = base_entry
 		end
 	elseif transition == "stay" then
 		child_sequences_to_prepare = current_hierarchy
@@ -767,12 +767,9 @@ function ActionInputParser:_jump_hierarchy(t, hierarchy_position, wanted_hierarc
 	self:_prepare_child_sequences(hierarchy, sequences, prepare_child_t, network_lookup)
 end
 
-function ActionInputParser:_prepare_child_sequences(children, sequences, t, network_lookup)
-	local sorted_action_inputs = table.keys(children)
-
-	table.sort(sorted_action_inputs)
-
-	for _, action_input in ipairs(sorted_action_inputs) do
+function ActionInputParser:_prepare_child_sequences(children, sequences, t, network_lookup, transition)
+	for _, child in ipairs(children) do
+		local action_input = child.input
 		local sequence_i = network_lookup[action_input]
 		local sequence = sequences[sequence_i]
 
@@ -1137,8 +1134,9 @@ function ActionInputParser:_clear_action_input_queue_from_matching_hierarchy_pos
 		end
 
 		local entry_hierarchy = _get_current_hierarchy(entry_hierarchy_position, base_hierarchy, MAX_HIERARCHY_DEPTH, NO_ACTION_INPUT)
+		local transition = ActionInputHierarchy.find_hierarchy_transition(entry_hierarchy, action_input)
 
-		if entry_hierarchy[action_input] ~= nil then
+		if transition ~= nil then
 			clear_from_index = i
 
 			for ii = 1, MAX_HIERARCHY_DEPTH do
@@ -1175,7 +1173,8 @@ function ActionInputParser:_hierarchy_position_is_base(hierarchy_position)
 end
 
 function ActionInputParser:_stop_running_sequences_from_hierarchy(hierarchy, sequences, network_lookup)
-	for action_input, _ in pairs(hierarchy) do
+	for _, entry in ipairs(hierarchy) do
+		local action_input = entry.input
 		local sequence_i = network_lookup[action_input]
 		local sequence = sequences[sequence_i]
 
@@ -1186,6 +1185,8 @@ function ActionInputParser:_stop_running_sequences_from_hierarchy(hierarchy, seq
 end
 
 function _get_current_hierarchy(hierarchy_position, hierarchy, max_hierarchy_depth, no_action_input)
+	local current_hierarchy = hierarchy
+
 	for i = 1, max_hierarchy_depth do
 		local position = hierarchy_position[i]
 
@@ -1193,10 +1194,20 @@ function _get_current_hierarchy(hierarchy_position, hierarchy, max_hierarchy_dep
 			break
 		end
 
-		hierarchy = hierarchy[position]
+		local found_entry = ActionInputHierarchy.find_hierarchy_entry(current_hierarchy, position)
+
+		if not found_entry then
+			-- Nothing
+		end
+
+		current_hierarchy = found_entry.transition
+
+		if type(current_hierarchy) ~= "table" then
+			break
+		end
 	end
 
-	return hierarchy
+	return current_hierarchy
 end
 
 function _hierarchy_string(hierarchy_position, max_hierarchy_depth, no_action_input)

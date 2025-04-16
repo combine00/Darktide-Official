@@ -7,14 +7,19 @@ local explosion_templates = {
 		radius = 10,
 		min_radius = 10,
 		scalable_radius = true,
-		close_radius = 2,
 		collision_filter = "filter_player_character_explosion",
-		static_power_level = 500,
 		min_close_radius = 2,
+		static_power_level = 500,
+		close_radius = 2,
 		close_damage_profile = DamageProfileTemplates.close_frag_grenade,
 		close_damage_type = damage_types.grenade_frag,
 		damage_profile = DamageProfileTemplates.frag_grenade,
 		damage_type = damage_types.grenade_frag,
+		broadphase_explosion_filter = {
+			"heroes",
+			"villains",
+			"destructibles"
+		},
 		explosion_area_suppression = {
 			suppression_falloff = true,
 			instant_aggro = true,
@@ -41,17 +46,22 @@ local explosion_templates = {
 	shock_grenade = {
 		damage_falloff = true,
 		radius = 8,
-		scalable_radius = true,
 		min_radius = 4,
-		close_radius = 2,
+		scalable_radius = true,
 		on_hit_buff_template_name = "shock_grenade_interval",
 		collision_filter = "filter_player_character_explosion",
 		min_close_radius = 2,
 		static_power_level = 100,
+		close_radius = 2,
 		close_damage_profile = DamageProfileTemplates.shock_grenade,
 		close_damage_type = damage_types.electrocution,
 		damage_profile = DamageProfileTemplates.shock_grenade,
 		damage_type = damage_types.electrocution,
+		broadphase_explosion_filter = {
+			"heroes",
+			"villains",
+			"destructibles"
+		},
 		explosion_area_suppression = {
 			suppression_falloff = true,
 			instant_aggro = true,
@@ -77,6 +87,11 @@ local explosion_templates = {
 		collision_filter = "filter_player_character_explosion",
 		damage_profile = DamageProfileTemplates.default_grenade,
 		damage_type = damage_types.laser,
+		broadphase_explosion_filter = {
+			"heroes",
+			"villains",
+			"destructibles"
+		},
 		explosion_area_suppression = {
 			suppression_falloff = true,
 			instant_aggro = true,
@@ -95,16 +110,21 @@ local explosion_templates = {
 		damage_falloff = true,
 		radius = 5,
 		min_radius = 1.5,
-		scalable_radius = true,
 		close_radius = 1.5,
+		scalable_radius = true,
 		collision_filter = "filter_player_character_explosion",
-		boss_power_level_modifier = 0.8,
-		static_power_level = 500,
 		min_close_radius = 1.5,
+		static_power_level = 500,
+		boss_power_level_modifier = 0.8,
 		close_damage_profile = DamageProfileTemplates.close_krak_grenade,
 		close_damage_type = damage_types.plasma,
 		damage_profile = DamageProfileTemplates.krak_grenade,
 		damage_type = damage_types.plasma,
+		broadphase_explosion_filter = {
+			"heroes",
+			"villains",
+			"destructibles"
+		},
 		explosion_area_suppression = {
 			suppression_falloff = true,
 			instant_aggro = true,
@@ -123,16 +143,21 @@ local explosion_templates = {
 		damage_falloff = true,
 		radius = 10,
 		min_radius = 5,
-		scalable_radius = true,
 		close_radius = 2,
+		scalable_radius = true,
 		collision_filter = "filter_player_character_explosion",
-		override_friendly_fire = false,
-		static_power_level = 100,
 		min_close_radius = 2,
+		static_power_level = 100,
+		override_friendly_fire = false,
 		close_damage_profile = DamageProfileTemplates.smoke_grenade,
 		close_damage_type = damage_types.physical,
 		damage_profile = DamageProfileTemplates.smoke_grenade,
 		damage_type = damage_types.physical,
+		broadphase_explosion_filter = {
+			"heroes",
+			"villains",
+			"destructibles"
+		},
 		explosion_area_suppression = {
 			suppression_falloff = true,
 			instant_aggro = true,
@@ -151,8 +176,8 @@ local explosion_templates = {
 		damage_falloff = true,
 		radius = 16,
 		min_radius = 16,
-		scalable_radius = true,
 		close_radius = 2,
+		scalable_radius = true,
 		collision_filter = "filter_player_character_explosion",
 		static_power_level = 500,
 		min_close_radius = 2,
@@ -160,6 +185,11 @@ local explosion_templates = {
 		close_damage_type = damage_types.grenade_frag,
 		damage_profile = DamageProfileTemplates.ogryn_grenade,
 		damage_type = damage_types.grenade_frag,
+		broadphase_explosion_filter = {
+			"heroes",
+			"villains",
+			"destructibles"
+		},
 		explosion_area_suppression = {
 			suppression_falloff = true,
 			instant_aggro = true,
@@ -173,6 +203,13 @@ local explosion_templates = {
 				effects = {
 					"content/fx/particles/explosions/frag_grenade_ogryn"
 				}
+			},
+			{
+				radius_variable_name = "radius",
+				min_radius = 31,
+				effects = {
+					"content/fx/particles/player_buffs/buff_ogryn_biggest_boom_grenade"
+				}
 			}
 		},
 		sfx = {
@@ -185,14 +222,19 @@ local explosion_templates = {
 		radius = 8,
 		min_radius = 5,
 		scalable_radius = true,
-		close_radius = 2,
 		collision_filter = "filter_player_character_explosion",
-		static_power_level = 500,
 		min_close_radius = 2,
+		static_power_level = 500,
+		close_radius = 2,
 		close_damage_profile = DamageProfileTemplates.ogryn_box_cluster_close_frag_grenade,
 		close_damage_type = damage_types.grenade_frag,
 		damage_profile = DamageProfileTemplates.ogryn_box_cluster_frag_grenade,
 		damage_type = damage_types.grenade_frag,
+		broadphase_explosion_filter = {
+			"heroes",
+			"villains",
+			"destructibles"
+		},
 		explosion_area_suppression = {
 			suppression_falloff = true,
 			instant_aggro = true,

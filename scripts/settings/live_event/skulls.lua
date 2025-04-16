@@ -1,4 +1,4 @@
-local Skulls = {
+local skulls = {
 	description = "loc_skulls_description",
 	name = "loc_skulls_name",
 	stat = "session_weakspot_kills",
@@ -7,4 +7,4 @@ local Skulls = {
 	condition = "loc_skulls_condition"
 }
 
-return Skulls
+return skulls

@@ -1,42 +1,40 @@
 local ArmorSettings = require("scripts/settings/damage/armor_settings")
-local PowerLevelSettings = require("scripts/settings/damage/power_level_settings")
+local AttackSettings = require("scripts/settings/damage/attack_settings")
 local DamageProfileSettings = require("scripts/settings/damage/damage_profile_settings")
 local DamageSettings = require("scripts/settings/damage/damage_settings")
 local GibbingSettings = require("scripts/settings/gibbing/gibbing_settings")
-local AttackSettings = require("scripts/settings/damage/attack_settings")
+local PowerLevelSettings = require("scripts/settings/damage/power_level_settings")
 local WoundsTemplates = require("scripts/settings/damage/wounds_templates")
-local GibbingPower = GibbingSettings.gibbing_power
-local GibbingTypes = GibbingSettings.gibbing_types
-local damage_types = DamageSettings.damage_types
 local armor_types = ArmorSettings.types
+local damage_lerp_values = DamageProfileSettings.damage_lerp_values
+local damage_types = DamageSettings.damage_types
+local gibbing_power = GibbingSettings.gibbing_power
+local gibbing_types = GibbingSettings.gibbing_types
+local melee_attack_strengths = AttackSettings.melee_attack_strength
+local big_cleave = DamageProfileSettings.big_cleave
+local double_cleave = DamageProfileSettings.double_cleave
+local light_cleave = DamageProfileSettings.light_cleave
+local medium_cleave = DamageProfileSettings.medium_cleave
+local single_cleave = DamageProfileSettings.single_cleave
 local damage_templates = {}
 local overrides = {}
 
 table.make_unique(damage_templates)
 table.make_unique(overrides)
 
-local melee_attack_strengths = AttackSettings.melee_attack_strength
-local crit_armor_mod = DamageProfileSettings.crit_armor_mod
-local crit_impact_armor_mod = DamageProfileSettings.crit_impact_armor_mod
-local damage_lerp_values = DamageProfileSettings.damage_lerp_values
-local single_cleave = DamageProfileSettings.single_cleave
-local double_cleave = DamageProfileSettings.double_cleave
-local light_cleave = DamageProfileSettings.light_cleave
-local medium_cleave = DamageProfileSettings.medium_cleave
-local big_cleave = DamageProfileSettings.big_cleave
-local default_shield_override_stagger_strength = 4
+local DEFAULT_SHIELD_OVERRIDE_STAGGER_STRENGTH = 4
 damage_templates.heavy_force_sword = {
 	sticky_attack = false,
 	force_weapon_damage = true,
 	ragdoll_push_force = 50,
 	stagger_category = "melee",
 	cleave_distribution = medium_cleave,
-	gibbing_power = GibbingPower.light,
-	gibbing_type = GibbingTypes.sawing,
+	gibbing_power = gibbing_power.light,
+	gibbing_type = gibbing_types.sawing,
 	melee_attack_strength = melee_attack_strengths.heavy,
 	wounds_template = WoundsTemplates.force_sword,
 	gib_push_force = GibbingSettings.gib_push_force.force_sword,
-	shield_override_stagger_strength = default_shield_override_stagger_strength,
+	shield_override_stagger_strength = DEFAULT_SHIELD_OVERRIDE_STAGGER_STRENGTH,
 	armor_damage_modifier = {
 		attack = {
 			[armor_types.unarmored] = damage_lerp_values.lerp_1,
@@ -270,12 +268,12 @@ damage_templates.heavy_force_sword_active = {
 	ragdoll_push_force = 0,
 	ignore_stagger_reduction = true,
 	cleave_distribution = medium_cleave,
-	gibbing_power = GibbingPower.medium,
-	gibbing_type = GibbingTypes.warp,
+	gibbing_power = gibbing_power.medium,
+	gibbing_type = gibbing_types.warp,
 	wounds_template = WoundsTemplates.force_sword_active,
 	melee_attack_strength = melee_attack_strengths.heavy,
 	gib_push_force = GibbingSettings.gib_push_force.force_sword,
-	shield_override_stagger_strength = default_shield_override_stagger_strength,
+	shield_override_stagger_strength = DEFAULT_SHIELD_OVERRIDE_STAGGER_STRENGTH,
 	armor_damage_modifier = {
 		attack = {
 			[armor_types.unarmored] = damage_lerp_values.lerp_1_5,
@@ -401,8 +399,28 @@ overrides.heavy_force_sword_flat = {
 			"power_distribution",
 			"attack",
 			{
-				0,
-				0
+				2.5,
+				2.5
+			}
+		},
+		{
+			"targets",
+			2,
+			"power_distribution",
+			"attack",
+			{
+				2.5,
+				2.5
+			}
+		},
+		{
+			"targets",
+			"default_target",
+			"power_distribution",
+			"attack",
+			{
+				2.5,
+				2.5
 			}
 		},
 		{
@@ -513,12 +531,12 @@ damage_templates.light_force_sword = {
 	ragdoll_push_force = 50,
 	stagger_category = "melee",
 	cleave_distribution = light_cleave,
-	gibbing_power = GibbingPower.light,
-	gibbing_type = GibbingTypes.sawing,
+	gibbing_power = gibbing_power.light,
+	gibbing_type = gibbing_types.sawing,
 	melee_attack_strength = melee_attack_strengths.light,
 	gib_push_force = GibbingSettings.gib_push_force.force_sword,
 	wounds_template = WoundsTemplates.force_sword,
-	shield_override_stagger_strength = default_shield_override_stagger_strength,
+	shield_override_stagger_strength = DEFAULT_SHIELD_OVERRIDE_STAGGER_STRENGTH,
 	armor_damage_modifier = {
 		attack = {
 			[armor_types.unarmored] = damage_lerp_values.lerp_1,
@@ -622,12 +640,12 @@ damage_templates.light_force_sword_active = {
 	ragdoll_push_force = 0,
 	ignore_stagger_reduction = true,
 	cleave_distribution = single_cleave,
-	gibbing_power = GibbingPower.light,
-	gibbing_type = GibbingTypes.warp,
+	gibbing_power = gibbing_power.light,
+	gibbing_type = gibbing_types.warp,
 	melee_attack_strength = melee_attack_strengths.light,
 	gib_push_force = GibbingSettings.gib_push_force.force_sword,
 	wounds_template = WoundsTemplates.force_sword_active,
-	shield_override_stagger_strength = default_shield_override_stagger_strength,
+	shield_override_stagger_strength = DEFAULT_SHIELD_OVERRIDE_STAGGER_STRENGTH,
 	armor_damage_modifier = {
 		attack = {
 			[armor_types.unarmored] = damage_lerp_values.lerp_1_5,
@@ -824,8 +842,8 @@ damage_templates.light_force_sword_linesman = {
 	ragdoll_push_force = 50,
 	stagger_category = "melee",
 	cleave_distribution = double_cleave,
-	gibbing_power = GibbingPower.medium,
-	gibbing_type = GibbingTypes.warp,
+	gibbing_power = gibbing_power.medium,
+	gibbing_type = gibbing_types.warp,
 	wounds_template = WoundsTemplates.force_sword,
 	melee_attack_strength = melee_attack_strengths.light,
 	gib_push_force = GibbingSettings.gib_push_force.force_sword,
@@ -928,11 +946,11 @@ damage_templates.light_force_sword_stab = {
 	gibbing_power = 0,
 	stagger_category = "melee",
 	cleave_distribution = single_cleave,
-	gibbing_type = GibbingTypes.sawing,
+	gibbing_type = gibbing_types.sawing,
 	wounds_template = WoundsTemplates.force_sword,
 	melee_attack_strength = melee_attack_strengths.light,
 	gib_push_force = GibbingSettings.gib_push_force.force_sword,
-	shield_override_stagger_strength = default_shield_override_stagger_strength,
+	shield_override_stagger_strength = DEFAULT_SHIELD_OVERRIDE_STAGGER_STRENGTH,
 	armor_damage_modifier = {
 		attack = {
 			[armor_types.unarmored] = damage_lerp_values.lerp_1,
@@ -1060,6 +1078,145 @@ overrides.light_force_sword_stab_sticky = {
 		}
 	}
 }
+damage_templates.light_force_sword_uppercut = {
+	sticky_attack = false,
+	force_weapon_damage = true,
+	ragdoll_push_force = 50,
+	gibbing_power = 0,
+	stagger_category = "melee",
+	cleave_distribution = light_cleave,
+	gibbing_type = gibbing_types.sawing,
+	wounds_template = WoundsTemplates.force_sword,
+	melee_attack_strength = melee_attack_strengths.light,
+	gib_push_force = GibbingSettings.gib_push_force.force_sword,
+	shield_override_stagger_strength = DEFAULT_SHIELD_OVERRIDE_STAGGER_STRENGTH,
+	armor_damage_modifier = {
+		attack = {
+			[armor_types.unarmored] = damage_lerp_values.lerp_1,
+			[armor_types.armored] = damage_lerp_values.lerp_0_5,
+			[armor_types.resistant] = damage_lerp_values.lerp_1,
+			[armor_types.player] = damage_lerp_values.lerp_1,
+			[armor_types.berserker] = damage_lerp_values.lerp_0_8,
+			[armor_types.super_armor] = damage_lerp_values.no_damage,
+			[armor_types.disgustingly_resilient] = damage_lerp_values.lerp_0_9,
+			[armor_types.void_shield] = damage_lerp_values.lerp_0_75
+		},
+		impact = {
+			[armor_types.unarmored] = damage_lerp_values.lerp_1,
+			[armor_types.armored] = damage_lerp_values.lerp_0_5,
+			[armor_types.resistant] = damage_lerp_values.lerp_1,
+			[armor_types.player] = damage_lerp_values.lerp_1,
+			[armor_types.berserker] = damage_lerp_values.lerp_0_5,
+			[armor_types.super_armor] = damage_lerp_values.no_damage,
+			[armor_types.disgustingly_resilient] = damage_lerp_values.lerp_0_75,
+			[armor_types.void_shield] = damage_lerp_values.lerp_0_75
+		}
+	},
+	targets = {
+		{
+			armor_damage_modifier = {
+				attack = {
+					[armor_types.unarmored] = damage_lerp_values.lerp_1,
+					[armor_types.armored] = damage_lerp_values.lerp_1,
+					[armor_types.resistant] = damage_lerp_values.lerp_1,
+					[armor_types.player] = damage_lerp_values.lerp_1,
+					[armor_types.berserker] = damage_lerp_values.lerp_0_8,
+					[armor_types.super_armor] = damage_lerp_values.lerp_0_25,
+					[armor_types.disgustingly_resilient] = damage_lerp_values.lerp_0_9,
+					[armor_types.void_shield] = damage_lerp_values.lerp_1
+				},
+				impact = {
+					[armor_types.unarmored] = damage_lerp_values.lerp_1,
+					[armor_types.armored] = damage_lerp_values.lerp_1,
+					[armor_types.resistant] = damage_lerp_values.lerp_1,
+					[armor_types.player] = damage_lerp_values.lerp_1,
+					[armor_types.berserker] = damage_lerp_values.lerp_0_5,
+					[armor_types.super_armor] = damage_lerp_values.lerp_1,
+					[armor_types.disgustingly_resilient] = damage_lerp_values.lerp_1,
+					[armor_types.void_shield] = damage_lerp_values.lerp_1
+				}
+			},
+			power_distribution = {
+				attack = {
+					100,
+					200
+				},
+				impact = {
+					5,
+					10
+				}
+			},
+			boost_curve_multiplier_finesse = {
+				1.25,
+				3.5
+			},
+			power_level_multiplier = {
+				0.8,
+				1.6
+			}
+		},
+		{
+			power_distribution = {
+				attack = {
+					35,
+					65
+				},
+				impact = {
+					5,
+					10
+				}
+			}
+		},
+		default_target = {
+			power_distribution = {
+				attack = {
+					15,
+					45
+				},
+				impact = {
+					4,
+					8
+				}
+			},
+			boost_curve = PowerLevelSettings.boost_curves.default
+		}
+	}
+}
+overrides.light_force_sword_uppercut_sticky = {
+	parent_template_name = "light_force_sword_uppercut",
+	overrides = {
+		{
+			"stagger_category",
+			"sticky"
+		},
+		{
+			"stagger_override",
+			"sticky"
+		},
+		{
+			"shield_stagger_category",
+			"melee"
+		},
+		{
+			"sticky_attack",
+			true
+		},
+		{
+			"wounds_template",
+			WoundsTemplates.force_sword
+		},
+		{
+			"targets",
+			1,
+			"power_distribution",
+			"attack",
+			{
+				200,
+				300
+			}
+		}
+	}
+}
 damage_templates.force_sword_push_followup_fling = {
 	is_push = true,
 	stagger_category = "melee",
@@ -1125,8 +1282,8 @@ damage_templates.forcesword_active_cleave_light = {
 	stagger_category = "melee",
 	cleave_distribution = big_cleave,
 	damage_type = damage_types.power_sword,
-	gibbing_power = GibbingPower.heavy,
-	gibbing_type = GibbingTypes.sawing,
+	gibbing_power = gibbing_power.heavy,
+	gibbing_type = gibbing_types.sawing,
 	gib_push_force = GibbingSettings.gib_push_force.sawing_medium,
 	melee_attack_strength = melee_attack_strengths.light,
 	wounds_template = WoundsTemplates.force_sword_active,
@@ -1262,7 +1419,7 @@ damage_templates.forcesword_active_cleave_heavy = {
 	stagger_category = "melee",
 	cleave_distribution = big_cleave,
 	damage_type = damage_types.power_sword,
-	gibbing_type = GibbingTypes.default,
+	gibbing_type = gibbing_types.default,
 	melee_attack_strength = melee_attack_strengths.heavy,
 	gib_push_force = GibbingSettings.gib_push_force.sawing_heavy,
 	wounds_template = WoundsTemplates.force_sword_active,

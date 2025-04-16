@@ -33,19 +33,19 @@ local function highlight_color_change_function(content, style)
 	style.hdr = progress == 1
 end
 
-function SliderPassTemplates.settings_percent_slider(width, height, settings_area_width, use_is_focused)
-	return SliderPassTemplates._settings_slider(width, height, settings_area_width, use_is_focused, true)
+function SliderPassTemplates.settings_percent_slider(width, height, settings_area_width, use_is_focused, is_sub_setting)
+	return SliderPassTemplates._settings_slider(width, height, settings_area_width, use_is_focused, true, is_sub_setting)
 end
 
-function SliderPassTemplates.settings_value_slider(width, height, settings_area_width, use_is_focused)
-	return SliderPassTemplates._settings_slider(width, height, settings_area_width, use_is_focused, false)
+function SliderPassTemplates.settings_value_slider(width, height, settings_area_width, use_is_focused, is_sub_setting)
+	return SliderPassTemplates._settings_slider(width, height, settings_area_width, use_is_focused, false, is_sub_setting)
 end
 
-function SliderPassTemplates.value_slider(width, height, value_width, use_is_focused)
-	return SliderPassTemplates._slider(width, height, value_width, use_is_focused, false)
+function SliderPassTemplates.value_slider(width, height, value_width, use_is_focused, is_sub_setting)
+	return SliderPassTemplates._slider(width, height, value_width, use_is_focused, false, is_sub_setting)
 end
 
-function SliderPassTemplates._settings_slider(width, height, settings_area_width, use_is_focused, is_percent_slider)
+function SliderPassTemplates._settings_slider(width, height, settings_area_width, use_is_focused, is_percent_slider, is_sub_setting)
 	local track_thickness = is_percent_slider and 10 or SLIDER_ENDPLATE_WIDTH
 	local slider_area_width = settings_area_width - (SLIDER_ENDPLATE_WIDTH * 2 + SLIDER_THUMB_SIZE)
 	local header_width = width - settings_area_width
@@ -62,7 +62,7 @@ function SliderPassTemplates._settings_slider(width, height, settings_area_width
 		8
 	}
 	value_font_style.text_horizontal_alignment = "right"
-	local passes = ListHeaderPassTemplates.list_header(header_width - LABEL_WIDTH, height, use_is_focused)
+	local passes = ListHeaderPassTemplates.list_header(header_width - LABEL_WIDTH, height, use_is_focused, is_sub_setting)
 	local slider_passes = {
 		{
 			value_id = "value_text",

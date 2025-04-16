@@ -1,6 +1,7 @@
 local HordePacingTemplates = require("scripts/managers/pacing/horde_pacing/horde_pacing_templates")
 local SpecialsPacingTemplates = require("scripts/managers/pacing/specials_pacing/specials_pacing_templates")
 local MonsterPacingTemplates = require("scripts/managers/pacing/monster_pacing/monster_pacing_templates")
+local RoamerPacingTemplates = require("scripts/managers/pacing/roamer_pacing/roamer_pacing_templates")
 
 local function _multiplier_step(value)
 	local multiplier_step = {
@@ -174,11 +175,12 @@ local DEFAULT_RAMP_UP_FREQUENCY_MODIFIERS = {
 	}
 }
 local pacing_template = {
-	starting_state = "build_up_tension_low",
 	name = "default",
+	starting_state = "build_up_tension_low",
 	horde_pacing_template = HordePacingTemplates.default_horde,
 	specials_pacing_template = SpecialsPacingTemplates.default_specials,
 	monster_pacing_template = MonsterPacingTemplates.default_monsters,
+	roamer_pacing_template = RoamerPacingTemplates.default_roamers,
 	max_tension = _multiplier_step(100),
 	challenge_rating_thresholds = {
 		specials = _challenge_rating_multiplier_steps(40),

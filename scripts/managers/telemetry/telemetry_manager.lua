@@ -9,6 +9,7 @@ local TelemetryManager = class("TelemetryManager")
 
 function TelemetryManager:init()
 	self._events = {}
+	self._events_in_flight = {}
 	self._batch_post_time = 0
 	self._t = 0
 	self._enable_update = true
@@ -87,9 +88,15 @@ function TelemetryManager:_ready_to_post_batch(t)
 	end
 end
 
-function TelemetryManager:post_batch()
+function TelemetryManager:post_batch(shutdown)
 	if not ENABLED or table.is_empty(self._events) then
 		return
+	end
+
+	if not shutdown then
+		local batch_size, time_since_last_post, events = self:batch_info()
+
+		Managers.telemetry_events:post_batch(batch_size, time_since_last_post, events, false)
 	end
 
 	Log.debug("TelemetryManager", "Posting batch of %d events", #self._events)
@@ -104,14 +111,18 @@ function TelemetryManager:post_batch()
 		["x-reference-time"] = tostring(self._t)
 	}
 	local compress = true
+	self._events_in_flight = self._events
+	self._events = self._events_in_flight
 
-	Managers.backend:send_telemetry_events(self._events, headers, compress):next(function ()
+	Managers.backend:send_telemetry_events(self._events_in_flight, headers, compress, shutdown):next(function ()
+		table.clear(self._events_in_flight)
 		Log.debug("TelemetryManager", "Batch successfully posted")
-		table.clear(self._events)
 
 		self._batch_in_flight = nil
 	end):catch(function (error)
-		Log.warning("TelemetryManager", "Error posting batch: %s", error)
+		Log.exception("TelemetryManager", "Error posting batch: %s", error)
+		table.merge_array(self._events, self._events_in_flight)
+		table.clear(self._events_in_flight)
 
 		self._batch_in_flight = nil
 	end)
@@ -129,11 +140,32 @@ function TelemetryManager:destroy()
 		event_manager:unregister(self, "event_telemetry_change", "_event_telemetry_change")
 	end
 
-	self:post_batch()
+	local shutdown = true
+
+	self:post_batch(shutdown)
 end
 
 function TelemetryManager:_event_telemetry_change(value)
 	self._enable_update = value
+end
+
+function TelemetryManager:batch_info()
+	local batch_size = #self._events
+	local time_since_last_post = self._t - self._batch_post_time
+	local event_types = {}
+
+	for _, event in pairs(self._events) do
+		local event_type = event.type
+		local current = event_types[event_type]
+
+		if current then
+			event_types[event_type] = current + 1
+		else
+			event_types[event_type] = 1
+		end
+	end
+
+	return batch_size, time_since_last_post, event_types
 end
 
 function TelemetryManager:_event_player_authenticated()

@@ -8,7 +8,7 @@ local ViewStyles = require("scripts/ui/views/end_player_view/end_player_view_sty
 local Items = require("scripts/utilities/items")
 local MasteryUtils = require("scripts/utilities/mastery")
 local CARD_CAROUSEL_SCENEGRAPH_ID = "card_carousel"
-local CARD_TYPES = table.enum("xp", "levelUp", "salary", "weaponDrop", "weapon_unlock", "weapon")
+local CARD_TYPES = table.enum("xp", "levelUp", "salary", "weaponDrop", "weapon_unlock", "weapon", "havocOrder")
 local item_type_group_lookup = UISettings.item_type_group_lookup
 local EndPlayerView = class("EndPlayerView", "BaseView")
 local animation_speed = 1
@@ -378,6 +378,8 @@ function EndPlayerView:_create_cards()
 					card_widgets[card_index] = widget
 				end
 			end
+		elseif card_type == CARD_TYPES.havocOrder then
+			-- Nothing
 		else
 			local widget = self:_create_card_widget(card_index + 1, card_type, card_data)
 
@@ -386,6 +388,18 @@ function EndPlayerView:_create_cards()
 				card_widgets[card_index] = widget
 			end
 		end
+	end
+
+	local has_havoc_data = session_report.havoc_order_reward or session_report.havoc_highest_rank or session_report.havoc_week_rank
+
+	if has_havoc_data then
+		card_index = card_index + 1
+		local card_data = {
+			order_reward = session_report.havoc_order_reward,
+			highest_rank = session_report.havoc_highest_rank,
+			week_rank = session_report.havoc_week_rank
+		}
+		card_widgets[card_index] = self:_create_card_widget(card_index, "havocOrder", card_data)
 	end
 
 	if session_report.mastery_rewards then
@@ -463,6 +477,8 @@ function EndPlayerView:_create_card_widget(index, card_type, card_data)
 		}
 	elseif card_type == CARD_TYPES.weapon then
 		blueprint_name = "weapon"
+	elseif card_type == CARD_TYPES.havocOrder then
+		blueprint_name = "havoc"
 	else
 		return
 	end
@@ -560,7 +576,7 @@ function EndPlayerView:_get_item(card_reward)
 		item_type = item.item_type,
 		baseItemLevel = item_overrides and item_overrides.baseItemLevel
 	}
-	local item_level_text, has_level = Items.expertise_level(dummy_item, true)
+	local item_level_text, has_level = Items.expertise_level(dummy_item, true, true)
 	local item_level = has_level and tonumber(item_level_text)
 
 	return item, item_group, rarity, item_level
@@ -779,7 +795,9 @@ function EndPlayerView:update_weapon_values(added_exp, slot, widget)
 			current_mastery_level = current_mastery_level + 1
 
 			if self["_levelup_mastery_animation_id_" .. slot] then
-				self:_complete_animation(self["_levelup_mastery_animation_id_" .. slot])
+				if not self:is_animation_done(self["_levelup_mastery_animation_id_" .. slot]) then
+					self:_complete_animation(self["_levelup_mastery_animation_id_" .. slot])
+				end
 
 				self["_levelup_mastery_animation_id_" .. slot] = nil
 			end

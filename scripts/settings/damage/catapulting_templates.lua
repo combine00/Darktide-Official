@@ -16,7 +16,7 @@ local catapulting_templates = {
 	},
 	renegade_captain_void_shield_explosion_catapult = {
 		force = 14,
-		z_force = 4,
+		z_force = 0,
 		direction_from_node = "j_spine"
 	},
 	renegade_captain_frag_grenade_close_catapult = {
@@ -39,6 +39,12 @@ local catapulting_templates = {
 	flamer_explosion = {
 		force = 7,
 		z_force = 5,
+		direction_from_node = "j_spine",
+		use_hit_position = true
+	},
+	interrupted_flamer_explosion = {
+		force = 3,
+		z_force = 2,
 		direction_from_node = "j_spine",
 		use_hit_position = true
 	},

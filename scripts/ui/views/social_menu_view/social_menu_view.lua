@@ -24,4 +24,8 @@ function SocialMenuView:cb_find_player_pressed()
 	end
 end
 
+function SocialMenuView:_handle_input()
+	return
+end
+
 return SocialMenuView

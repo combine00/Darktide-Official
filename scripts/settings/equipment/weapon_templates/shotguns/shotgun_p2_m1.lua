@@ -1,3 +1,4 @@
+local ActionInputHierarchy = require("scripts/utilities/action/action_input_hierarchy")
 local AimAssistTemplates = require("scripts/settings/equipment/aim_assist_templates")
 local ArmorSettings = require("scripts/settings/damage/armor_settings")
 local BaseTemplateSettings = require("scripts/settings/equipment/weapon_templates/base_template_settings")
@@ -5,6 +6,7 @@ local BuffSettings = require("scripts/settings/buff/buff_settings")
 local DamageProfileTemplates = require("scripts/settings/damage/damage_profile_templates")
 local DamageSettings = require("scripts/settings/damage/damage_settings")
 local FootstepIntervalsTemplates = require("scripts/settings/equipment/footstep/footstep_intervals_templates")
+local HapticTriggerTemplates = require("scripts/settings/equipment/haptic_trigger_templates")
 local HerdingTemplates = require("scripts/settings/damage/herding_templates")
 local LineEffects = require("scripts/settings/effects/line_effects")
 local PlayerCharacterConstants = require("scripts/settings/player_character/player_character_constants")
@@ -32,6 +34,7 @@ local sway_trait_templates = WeaponTraitTemplates[template_types.sway]
 local toughness_trait_templates = WeaponTraitTemplates[template_types.toughness]
 local weapon_handling_trait_templates = WeaponTraitTemplates[template_types.weapon_handling]
 local movement_curve_modifier_trait_templates = WeaponTraitTemplates[template_types.movement_curve_modifier]
+local DOUBLE_SHOT_AMMO_USAGE = 2
 local weapon_template = {
 	action_inputs = {
 		shoot_pressed = {
@@ -188,30 +191,87 @@ local weapon_template = {
 table.add_missing(weapon_template.action_inputs, BaseTemplateSettings.action_inputs)
 
 weapon_template.action_input_hierarchy = {
-	wield = "stay",
-	shoot_pressed = "stay",
-	reload = "stay",
-	zoom = {
-		special_action_hold = "base",
-		wield = "base",
-		zoom_shoot = "stay",
-		grenade_ability = "base",
-		zoom_release = "base",
-		reload = "base",
-		combat_ability = "base",
-		zoom_shoot_special_pressed = "base"
+	{
+		transition = "stay",
+		input = "shoot_pressed"
 	},
-	special_action_hold = {
-		special_action_light = "base",
-		wield = "base",
-		special_action_heavy = "base",
-		grenade_ability = "base",
-		reload = "base",
-		combat_ability = "base"
+	{
+		input = "zoom",
+		transition = {
+			{
+				transition = "base",
+				input = "zoom_release"
+			},
+			{
+				transition = "stay",
+				input = "zoom_shoot"
+			},
+			{
+				transition = "base",
+				input = "reload"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "grenade_ability"
+			},
+			{
+				transition = "base",
+				input = "zoom_shoot_special_pressed"
+			},
+			{
+				transition = "base",
+				input = "special_action_hold"
+			}
+		}
+	},
+	{
+		transition = "stay",
+		input = "wield"
+	},
+	{
+		transition = "stay",
+		input = "reload"
+	},
+	{
+		input = "special_action_hold",
+		transition = {
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "special_action_light"
+			},
+			{
+				transition = "base",
+				input = "special_action_heavy"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "grenade_ability"
+			},
+			{
+				transition = "base",
+				input = "reload"
+			}
+		}
 	}
 }
 
-table.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
+ActionInputHierarchy.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
 
 local function _can_shoot_due_to_reload(action_settings, condition_func_params, used_input)
 	local inventory_slot_component = condition_func_params.inventory_slot_component
@@ -393,7 +453,6 @@ weapon_template.actions = {
 		uninterruptible = true,
 		activate_special_on_required_ammo = true,
 		start_input = "zoom_shoot",
-		ammunition_usage = 2,
 		kind = "shoot_pellets",
 		sprint_requires_press_to_interrupt = true,
 		allow_shots_with_less_than_required_ammo = true,
@@ -403,6 +462,7 @@ weapon_template.actions = {
 		crosshair = {
 			crosshair_type = "shotgun"
 		},
+		ammunition_usage = DOUBLE_SHOT_AMMO_USAGE,
 		action_movement_curve = {
 			{
 				modifier = 0.6,
@@ -497,7 +557,16 @@ weapon_template.actions = {
 			buff_stat_buffs.attack_speed,
 			buff_stat_buffs.ranged_attack_speed
 		},
-		action_condition_func = _can_shoot_due_to_reload
+		action_condition_func = _can_shoot_due_to_reload,
+		haptic_trigger_template_condition_func = function (condition_func_params)
+			local current_ammo_in_clip = condition_func_params.inventory_slot_component.current_ammunition_clip
+
+			if DOUBLE_SHOT_AMMO_USAGE <= current_ammo_in_clip then
+				return HapticTriggerTemplates.ranged.shotgun_p2_double_shot
+			end
+
+			return HapticTriggerTemplates.ranged.shotgun_p2_single_shot
+		end
 	},
 	action_zoom = {
 		start_input = "zoom",
@@ -529,7 +598,16 @@ weapon_template.actions = {
 				action_name = "action_reload"
 			}
 		},
-		smart_targeting_template = SmartTargetingTemplates.alternate_fire_assault
+		smart_targeting_template = SmartTargetingTemplates.alternate_fire_assault,
+		haptic_trigger_template_condition_func = function (condition_func_params)
+			local current_ammo_in_clip = condition_func_params.inventory_slot_component.current_ammunition_clip
+
+			if DOUBLE_SHOT_AMMO_USAGE <= current_ammo_in_clip then
+				return HapticTriggerTemplates.ranged.shotgun_p2_double_shot
+			end
+
+			return HapticTriggerTemplates.ranged.shotgun_p2_single_shot
+		end
 	},
 	action_unzoom = {
 		start_input = "zoom_release",
@@ -733,7 +811,8 @@ weapon_template.actions = {
 		},
 		anim_end_event_condition_func = function (unit, data, end_reason)
 			return end_reason ~= "new_interrupting_action" and end_reason ~= "action_complete"
-		end
+		end,
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_bash = {
 		damage_window_start = 0.13333333333333333,
@@ -746,8 +825,8 @@ weapon_template.actions = {
 		stop_alternate_fire = true,
 		range_mod = 1.15,
 		damage_window_end = 0.3,
-		kind = "sweep",
 		attack_direction_override = "left",
+		kind = "sweep",
 		abort_sprint = true,
 		uninterruptible = true,
 		anim_event = "attack_left_diagonal_up",
@@ -828,7 +907,12 @@ weapon_template.actions = {
 		},
 		damage_type = damage_types.weapon_butt,
 		damage_profile = DamageProfileTemplates.shotgun_weapon_special_bash_light,
-		herding_template = HerdingTemplates.linesman_left_heavy
+		herding_template = HerdingTemplates.linesman_left_heavy,
+		time_scale_stat_buffs = {
+			buff_stat_buffs.attack_speed,
+			buff_stat_buffs.melee_attack_speed
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_bash_heavy = {
 		damage_window_start = 0.2,
@@ -927,19 +1011,25 @@ weapon_template.actions = {
 		},
 		damage_type = damage_types.weapon_butt,
 		damage_profile = DamageProfileTemplates.autogun_weapon_special_bash_heavy,
-		herding_template = HerdingTemplates.stab
+		herding_template = HerdingTemplates.stab,
+		time_scale_stat_buffs = {
+			buff_stat_buffs.attack_speed,
+			buff_stat_buffs.melee_attack_speed
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_inspect = {
-		anim_event = "inspect_start",
 		lock_view = true,
 		start_input = "inspect_start",
 		anim_end_event = "inspect_end",
 		kind = "inspect",
+		anim_event = "inspect_start",
 		stop_input = "inspect_stop",
 		total_time = math.huge,
 		crosshair = {
 			crosshair_type = "inspect"
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	}
 }
 
@@ -1026,9 +1116,20 @@ weapon_template.dodge_template = "shotgun"
 weapon_template.sprint_template = "assault"
 weapon_template.stamina_template = "default"
 weapon_template.toughness_template = "assault"
+weapon_template.footstep_intervals = FootstepIntervalsTemplates.default
 weapon_template.movement_curve_modifier_template = "shotgun_p2"
 weapon_template.smart_targeting_template = SmartTargetingTemplates.killshot
-weapon_template.footstep_intervals = FootstepIntervalsTemplates.default
+
+function weapon_template.haptic_trigger_template_condition_func(condition_func_params)
+	local special_active = condition_func_params.inventory_slot_component.special_active
+
+	if special_active then
+		return HapticTriggerTemplates.ranged.shotgun_p2_double_shot
+	end
+
+	return HapticTriggerTemplates.ranged.shotgun_p2_single_shot
+end
+
 weapon_template.overclocks = {
 	stability_up_ammo_down = {
 		shotgun_p2_m1_ammo_stat = -0.1,

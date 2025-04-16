@@ -47,6 +47,12 @@ function Matchmaker:_get_common_queue_ticket_data(matchmaker_type, alias_type, d
 		function avoid_list_id_formatter(id)
 			return XboxLive.xuid_hex_to_dec(id)
 		end
+	elseif authenticate_method == Managers.backend.AUTH_METHOD_PSN then
+		platform_alias_promise = Promise.resolved(alias_type .. ":psn")
+
+		function avoid_list_id_formatter(id)
+			return Application.hex64_to_dec(id)
+		end
 	else
 		Log.warning("Matchmaker", "Could not resolve a platform alias for authenticate_method: " .. authenticate_method)
 

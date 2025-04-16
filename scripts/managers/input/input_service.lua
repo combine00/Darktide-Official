@@ -419,6 +419,34 @@ function InputService:_get(action_name)
 	end
 end
 
+function InputService:get_with_filters(action_name, locked_inputs)
+	local action_rule = self._actions[action_name]
+	local is_locked = false
+	local aliases = self._aliases[action_rule.key_alias]
+
+	if aliases then
+		for locked_input, _ in pairs(locked_inputs) do
+			for _, name in ipairs(aliases) do
+				if locked_input == name then
+					is_locked = true
+
+					break
+				end
+			end
+
+			if is_locked then
+				break
+			end
+		end
+	end
+
+	if is_locked then
+		return self:get_default(action_name)
+	else
+		return self:_get(action_name)
+	end
+end
+
 function InputService:_get_simulate(action_name)
 	local value = self._simulated_actions[action_name]
 
@@ -465,6 +493,19 @@ function InputService:get_action_type(action_name)
 	local action_type = action.type
 
 	return action_type
+end
+
+function InputService:get_keys_from_alias(action_name)
+	local extract_keys = {}
+	local affected_keys = self._aliases[action_name]
+
+	if affected_keys then
+		for index, key_name in ipairs(affected_keys) do
+			extract_keys[#extract_keys + 1] = key_name
+		end
+	end
+
+	return extract_keys
 end
 
 return InputService

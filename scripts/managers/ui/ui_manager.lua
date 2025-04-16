@@ -5,8 +5,9 @@ local ItemIconLoaderUI = require("scripts/ui/item_icon_loader_ui")
 local ItemPackage = require("scripts/foundation/managers/package/utilities/item_package")
 local ItemUtils = require("scripts/utilities/items")
 local LoadingIcon = require("scripts/ui/loading_icon")
+local LoadingReason = require("scripts/ui/loading_reason")
+local LoadingStateData = require("scripts/ui/loading_state_data")
 local MasterItems = require("scripts/backend/master_items")
-local MissionObjectiveTemplates = require("scripts/settings/mission_objective/mission_objective_templates")
 local PortraitUI = require("scripts/ui/portrait_ui")
 local RenderTargetAtlasGenerator = require("scripts/ui/render_target_atlas_generator")
 local ScriptWorld = require("scripts/foundation/utilities/script_world")
@@ -36,6 +37,7 @@ function UIManager:init()
 	self._active_popups = {}
 	self._visible_widgets = {}
 	self._prev_visible_widgets = {}
+	self._ui_inputs_in_use = {}
 	local timer_name = "ui"
 	local parent_timer_name = "main"
 
@@ -64,6 +66,8 @@ function UIManager:init()
 	self._input_service_name = input_service_name
 	self._view_handler = UIViewHandler:new(Views, timer_name)
 	self._close_view_input_action = "back"
+	self._loading_state_data = LoadingStateData:new()
+	self._loading_reason = LoadingReason:new()
 	local constant_elements = require("scripts/ui/constant_elements/constant_elements")
 	self._ui_constant_elements = UIConstantElements:new(self, constant_elements)
 
@@ -549,7 +553,17 @@ function UIManager:open_view(view_name, transition_time, close_previous, close_a
 		return false
 	end
 
-	self._view_handler:open_view(view_name, transition_time, close_previous, close_all, close_transition_time, context, settings_override)
+	local view_handler = self._view_handler
+	local view_is_active = view_handler:view_active(view_name)
+	local view_is_closing = view_is_active and view_handler:is_view_closing(view_name)
+
+	if view_is_closing then
+		view_handler:close_view(view_name, true)
+
+		view_is_active = false
+	end
+
+	view_handler:open_view(view_name, transition_time, close_previous, close_all, close_transition_time, context, settings_override)
 
 	return true
 end
@@ -732,6 +746,34 @@ function UIManager:using_input(ignore_hud, ignore_views, ignore_constant_element
 	return false
 end
 
+function UIManager:inputs_in_use()
+	return self._ui_inputs_in_use
+end
+
+function UIManager:add_inputs_in_use_by_ui(input_name, optional_service_name)
+	local input_service_name = optional_service_name or self._input_service_name
+	local input_manager = Managers.input
+	local input_service = input_manager:get_input_service(input_service_name)
+	local input_keys = input_service:get_keys_from_alias(input_name)
+
+	for i = 1, #input_keys do
+		local input_key = input_keys[i]
+		self._ui_inputs_in_use[input_key] = true
+	end
+end
+
+function UIManager:remove_inputs_in_use_by_ui(input_name, optional_service_name)
+	local input_service_name = optional_service_name or self._input_service_name
+	local input_manager = Managers.input
+	local input_service = input_manager:get_input_service(input_service_name)
+	local input_keys = input_service:get_keys_from_alias(input_name)
+
+	for i = 1, #input_keys do
+		local input_key = input_keys[i]
+		self._ui_inputs_in_use[input_key] = nil
+	end
+end
+
 function UIManager:chat_using_input()
 	return self._ui_constant_elements and self._ui_constant_elements:chat_using_input()
 end
@@ -788,6 +830,9 @@ function UIManager:destroy()
 	end
 
 	self:_unload_ui_element_packages("constant_elements")
+	self._loading_state_data:delete()
+
+	self._loading_state_data = nil
 
 	if self._ui_loading_icon_renderer then
 		self:destroy_renderer("ui_loading_icon_renderer")
@@ -1000,440 +1045,39 @@ function UIManager:post_update(dt, t)
 	self._visible_widgets = prev_visible_widgets
 
 	table.clear(prev_visible_widgets)
+
+	local ui_constant_elements = self._ui_constant_elements
+
+	if ui_constant_elements then
+		ui_constant_elements:post_update(dt, t)
+	end
+
+	self._loading_state_data:post_update()
 end
 
 function UIManager:frame_capture()
 	GuiDebug.start_frame_caputure = true
 end
 
-local temp_text_options = {}
-
-function UIManager:_debug_draw_version_info(dt, t)
-	local ui_renderer = self._ui_debug_renderer
-
-	if not ui_renderer then
-		return
-	end
-
-	if self:view_active("talent_builder_view") then
-		return
-	end
-
-	local gui = ui_renderer.gui
-	local w = RESOLUTION_LOOKUP.width
-	local h = RESOLUTION_LOOKUP.height
-	local scale = RESOLUTION_LOOKUP.scale
-	local inverse_scale = RESOLUTION_LOOKUP.inverse_scale
-	ui_renderer.scale = scale
-	ui_renderer.inverse_scale = inverse_scale
-	local font_size = 24
-	local font_type = "arial"
-	local font_height, font_min_y, font_max_y = UIFonts.font_height(gui, font_type, font_size)
-	local box_size = {
-		1000,
-		math.abs(font_max_y)
-	}
-	local text_color_table = {
-		255,
-		255,
-		255,
-		255
-	}
-	local text_options = {
-		shadow = true,
-		horizontal_alignment = Gui.HorizontalAlignRight,
-		vertical_alignment = Gui.VerticalAlignBottom
-	}
-	local draw_layer = 999
-	font_size = math.floor(16 * scale)
-	local camera_position_string, camera_rotation_string, player_1p_position_string, player_3p_position_string = nil
-	local camera_manager = Managers.state.camera
-	local free_flight_manager = Managers.free_flight
-	local player = nil
-
-	if Managers.connection:is_initialized() then
-		local peer_id = Network.peer_id()
-		local local_player_id = 1
-		player = Managers.player:player(peer_id, local_player_id)
-	end
-
-	local camera_pos, camera_rot = nil
-
-	if free_flight_manager and free_flight_manager:is_in_free_flight() then
-		camera_pos, camera_rot = free_flight_manager:camera_position_rotation("global")
-	elseif camera_manager and player then
-		local viewport_name = player.viewport_name
-		local camera = camera_manager:has_camera(viewport_name)
-
-		if camera then
-			camera_pos = camera_manager:camera_position(viewport_name)
-			camera_rot = camera_manager:camera_rotation(viewport_name)
-		end
-	end
-
-	if camera_pos and camera_rot then
-		camera_position_string = string.format("Camera Position(%.2f, %.2f, %.2f)", camera_pos.x, camera_pos.y, camera_pos.z)
-		camera_rotation_string = string.format("Camera Rotation(%.4f, %.4f, %.4f, %.4f)", Quaternion.to_elements(camera_rot))
-	end
-
-	if player and player:unit_is_alive() then
-		local player_unit = player.player_unit
-		local unit_data_extension = ScriptUnit.has_extension(player_unit, "unit_data_system")
-
-		if unit_data_extension then
-			local first_person_read_component = unit_data_extension:read_component("first_person")
-			local player_1p_position = first_person_read_component.position
-			player_1p_position_string = string.format("Player 1p Position(%.2f, %.2f, %.2f)", player_1p_position.x, player_1p_position.y, player_1p_position.z)
-			local locomotion_read_component = unit_data_extension:read_component("locomotion")
-			local player_position = locomotion_read_component.position
-			player_3p_position_string = string.format("Player 3p Position(%.2f, %.2f, %.2f)", player_position.x, player_position.y, player_position.z)
-		end
-	end
-
-	local mission_name = "n/a"
-	local side_mission_name = "n/a"
-	local level_name = "n/a"
-	local game_mode_name = "n/a"
-	local mission_manager = Managers.state.mission
-	local mission = mission_manager and mission_manager:mission()
-	local chunk_name_string = nil
-
-	if Managers.state and Managers.state.chunk_lod then
-		local chunk_name = Managers.state.chunk_lod:current_chunk_name() or "n/a"
-		chunk_name_string = string.format("Chunk: %s", chunk_name)
-	end
-
-	if mission and mission.name then
-		local side_mission = mission_manager:side_mission()
-
-		if side_mission and side_mission.name then
-			side_mission_name = side_mission.name
-		end
-
-		mission_name = mission.name
-		level_name = mission.level
-		game_mode_name = mission.game_mode_name
-	end
-
-	local num_hub_players = nil
-	local connection_manager = Managers.connection
-	local host_type = connection_manager:host_type()
-
-	if host_type and host_type == "hub_server" then
-		local members = connection_manager:num_members()
-		num_hub_players = string.format("Hub Players: %d", members)
-	end
-
-	local _unique_instance_id = Managers.connection:unique_instance_id()
-	local unique_instance_id_with_prefix = nil
-
-	if _unique_instance_id then
-		unique_instance_id_with_prefix = string.format("Instance Id: %s", _unique_instance_id)
-	end
-
-	local _region = Managers.connection:region()
-	local region_with_prefix = nil
-
-	if _region then
-		region_with_prefix = string.format("Region: %s", _region)
-	end
-
-	local _deployment_id = Managers.connection:deployment_id()
-	local deployment_id_with_prefix = nil
-
-	if _deployment_id then
-		deployment_id_with_prefix = string.format("Deployment Id: %s", _deployment_id)
-	end
-
-	local mechanism_name = Managers.mechanism:mechanism_name()
-
-	if mechanism_name then
-		mechanism_name = string.format("Mechanism: %s", mechanism_name)
-		local mechanism_state = Managers.mechanism:mechanism_state()
-
-		if mechanism_state then
-			mechanism_name = string.format("%s [%s]", mechanism_name, mechanism_state)
-		end
-	end
-
-	local network_info = "Network: " .. connection_manager.platform
-
-	if Managers.multiplayer_session:aws_matchmaking() then
-		network_info = network_info .. "|AWS"
-	end
-
-	if host_type then
-		network_info = network_info .. "|" .. host_type
-	end
-
-	if Managers.connection:accelerated_endpoint() then
-		network_info = network_info .. "|accelerated"
-	end
-
-	local progression_info = nil
-
-	if player then
-		local profile = player:profile()
-		local current_level = profile and profile.current_level or "n/a"
-		progression_info = string.format("Level: %s", current_level)
-	end
-
-	local presence = Managers.presence:presence()
-	local num_mission_members = "n/a"
-
-	if GameParameters.prod_like_backend then
-		local myself = Managers.presence:presence_entry_myself()
-		num_mission_members = myself:num_mission_members()
-	end
-
-	local presence_info = string.format("Presence: %s, num_mission_members: %s", presence, num_mission_members)
-	local difficulty_info = nil
-	local difficulty_manager = Managers.state.difficulty
-
-	if difficulty_manager then
-		local challenge = difficulty_manager:get_challenge()
-		local resistance = difficulty_manager:get_resistance()
-		difficulty_info = string.format("Difficulty: %s-%s", challenge, resistance)
-	end
-
-	local circumstance_info = nil
-	local circumstance_manager = Managers.state.circumstance
-
-	if circumstance_manager then
-		local name = circumstance_manager:circumstance_name() or "n/a"
-		circumstance_info = string.format("Circumstance: %s", name)
-	end
-
-	local selected_unit_info = nil
-
-	if Debug:exists() then
-		local selected_unit = Debug.selected_unit and tostring(Debug.selected_unit) or "n/a"
-		selected_unit_info = string.format("Selected Unit: %s", selected_unit)
-	end
-
-	local vo_story_stage_info = nil
-
-	if player and player:unit_is_alive() then
-		local player_unit = player.player_unit
-		local dialogue_extension = ScriptUnit.has_extension(player_unit, "dialogue_system")
-
-		if dialogue_extension then
-			local context = dialogue_extension:get_context()
-			local vo_story_stage = context.story_stage
-			vo_story_stage_info = string.format("VO Story Stage: %s", vo_story_stage)
-		end
-	end
-
-	local cinematic_active = Managers.state and Managers.state.cinematic and Managers.state.cinematic:active() and "active" or "inactive"
-	local cutscene_view_active = Managers.ui and Managers.ui:view_active("cutscene_view") and "active" or "inactive"
-	local cinematic_loading = Managers.state and Managers.state.cinematic and Managers.state.cinematic:is_loading_cinematic_levels() and "active" or "inactive"
-	local text_order = {
-		"show_build_info",
-		"show_backend_url",
-		"show_master_data_version",
-		"show_engine_revision_info",
-		"show_content_revision_info",
-		"show_team_city_build_info",
-		"show_backend_account_info",
-		"show_lan_port_info",
-		"show_network_hash_info",
-		"show_screen_resolution_info",
-		"show_mission_name",
-		"show_level_name",
-		"show_game_mode_name",
-		"show_mechanism_name",
-		"show_chunk_name",
-		"show_camera_position_info",
-		"show_camera_rotation_info",
-		"show_player_1p_position_info",
-		"show_player_3p_position_info",
-		"show_num_hub_players",
-		"show_unique_instance_id",
-		"show_region",
-		"show_deployment_id",
-		"show_network_info",
-		"show_progression_info",
-		"show_presence_info",
-		"show_difficulty",
-		"show_circumstances",
-		"show_selected_unit_info",
-		"show_vo_story_stage_info",
-		"show_cinematic_active"
-	}
-	local texts = {
-		show_build_info = "Build: " .. (BUILD or "n/a"),
-		show_backend_url = "Backend: " .. (Backend.get_title_url and Backend.get_title_url() or "n/a"):gsub(".fatsharkgames.se", ""):gsub("https://bsp.td.", ""),
-		show_master_data_version = "Master data: " .. (MasterItems.get_cached_version() and MasterItems.get_cached_version() or "<not ready>"),
-		show_engine_revision_info = "Engine Revision: " .. (BUILD_IDENTIFIER or "n/a"),
-		show_content_revision_info = "Content Revision: " .. (APPLICATION_SETTINGS.content_revision or LOCAL_CONTENT_REVISION),
-		show_team_city_build_info = "Teamcity Build ID: " .. (APPLICATION_SETTINGS.teamcity_build_id or "n/a"),
-		show_backend_account_info = string.format("Authenticated: %s", Managers.backend:authenticated()),
-		show_lan_port_info = "LAN port: " .. (GameParameters.lan_port or "n/a"),
-		show_network_hash_info = "Network Hash: " .. (DevParameters.network_hash or "n/a"),
-		show_screen_resolution_info = string.format("Resolution W:%i H:%i", w, h),
-		show_mission_name = string.format("Mission: %s / %s", mission_name, side_mission_name),
-		show_level_name = string.format("Level: %s", level_name),
-		show_chunk_name = chunk_name_string,
-		show_game_mode_name = string.format("Game Mode: %s", game_mode_name),
-		show_mechanism_name = mechanism_name,
-		show_camera_position_info = camera_position_string,
-		show_camera_rotation_info = camera_rotation_string,
-		show_player_1p_position_info = player_1p_position_string,
-		show_player_3p_position_info = player_3p_position_string,
-		show_num_hub_players = num_hub_players,
-		show_unique_instance_id = unique_instance_id_with_prefix,
-		show_region = region_with_prefix,
-		show_deployment_id = deployment_id_with_prefix,
-		show_network_info = network_info,
-		show_progression_info = progression_info,
-		show_presence_info = presence_info,
-		show_difficulty = difficulty_info,
-		show_circumstances = circumstance_info,
-		show_selected_unit_info = selected_unit_info,
-		show_vo_story_stage_info = vo_story_stage_info,
-		show_cinematic_active = "Cinematic: " .. cinematic_active .. " | Cutscene View: " .. cutscene_view_active .. " | Loading: " .. cinematic_loading
-	}
-	local position = Vector3(w * inverse_scale - box_size[1] - 10, h * inverse_scale - box_size[2] - 300, draw_layer)
-
-	for i = #text_order, 1, -1 do
-		local text_dev_flag = text_order[i]
-
-		if DevParameters[text_dev_flag] then
-			local text = texts[text_dev_flag]
-
-			if text then
-				UIRenderer.draw_text(ui_renderer, text, font_size, font_type, position, box_size, text_color_table, text_options)
-
-				position[2] = position[2] - box_size[2]
-			end
-		end
-	end
-
-	ui_renderer.scale = nil
-	ui_renderer.inverse_scale = nil
-end
-
-function UIManager:_debug_draw_feature_info(dt, t)
-	local ui_renderer = self._ui_debug_renderer
-
-	if not ui_renderer then
-		return
-	end
-
-	local gui = ui_renderer.gui
-	local w = RESOLUTION_LOOKUP.width
-	local h = RESOLUTION_LOOKUP.height
-	local scale = RESOLUTION_LOOKUP.scale
-	local inverse_scale = RESOLUTION_LOOKUP.inverse_scale
-	local draw_layer = 999
-	ui_renderer.scale = scale
-	ui_renderer.inverse_scale = inverse_scale
-	local feature_font_size = 18
-	local feature_font_type = "arial"
-	feature_font_size = math.floor(16 * scale)
-
-	UIFonts.data_by_type(feature_font_type)
-
-	local feature_font_height, feature_font_min_y, feature_font_max_y = UIFonts.font_height(gui, feature_font_type, feature_font_size)
-	local feature_box_size = {
-		1000,
-		math.abs(feature_font_max_y)
-	}
-	local feature_text_options = {
-		shadow = true,
-		horizontal_alignment = Gui.HorizontalAlignLeft,
-		vertical_alignment = Gui.VerticalAlignBottom
-	}
-	local features = {
-		{
-			"clustered",
-			Application.render_config("settings", "clustered_shading_enabled", false)
-		},
-		{
-			"conservative",
-			Application.render_config("render_caps", "conservative_raster", false)
-		},
-		{
-			"cluster_v2",
-			Application.render_config("settings", "cluster_v2", false)
-		},
-		{
-			"dxr",
-			Application.render_config("render_caps", "dxr", false) and Application.render_config("settings", "dxr", false)
-		},
-		{
-			"reflections",
-			Application.render_config("settings", "rt_reflections_enabled", false)
-		},
-		{
-			"rtxgi",
-			Application.render_config("settings", "rtxgi_enabled", false)
-		},
-		{
-			"dlss",
-			Application.render_config("render_caps", "dlss_supported", false) and Application.render_config("settings", "upscaling_enabled", false) and Application.render_config("settings", "upscaling_mode", false) == "dlss"
-		},
-		{
-			"fsr2",
-			Application.render_config("settings", "upscaling_enabled", false) and Application.render_config("settings", "upscaling_mode", false) == "fsr2"
-		},
-		{
-			"xess",
-			Application.render_config("settings", "upscaling_enabled", false) and Application.render_config("settings", "upscaling_mode", false) == "xess"
-		},
-		{
-			"d3d_debug",
-			Renderer.settings("d3d_debug")
-		},
-		{
-			"gpu_validation",
-			Renderer.settings("d3d_gpu_validation")
-		},
-		{
-			"gpu_crashdump",
-			Renderer.settings("gpu_crash_dumps")
-		}
-	}
-	local feature_active_color = {
-		180,
-		0,
-		255,
-		0
-	}
-	local feature_notactive_color = {
-		128,
-		0,
-		128,
-		0
-	}
-	local feature_pos = Vector3(10, h * inverse_scale - feature_box_size[2], draw_layer)
-	local space_width = UIRenderer.text_size(ui_renderer, " ", feature_font_type, feature_font_size)
-
-	for i = 1, #features do
-		local tuple = features[i]
-		local text = tuple[1]
-		local val = tuple[2]
-
-		UIRenderer.draw_text(ui_renderer, text, feature_font_size, feature_font_type, feature_pos, feature_box_size, val and feature_active_color or feature_notactive_color, feature_text_options)
-
-		local text_width, text_height, plupp, caret = UIRenderer.text_size(ui_renderer, text, feature_font_type, feature_font_size)
-		feature_pos[1] = feature_pos[1] + text_width * inverse_scale + 10 * inverse_scale
-	end
-
-	ui_renderer.scale = nil
-	ui_renderer.inverse_scale = nil
-end
-
-function UIManager:load_view(view_name, reference_name, loaded_callback, dynamic_package_name)
+function UIManager:load_view(view_name, reference_name, loaded_callback, dynamic_package)
 	local settings = Views[view_name]
 	local packages_to_load_data = {}
 
-	if dynamic_package_name then
-		local package_reference_name = reference_name .. #packages_to_load_data
-		packages_to_load_data[#packages_to_load_data + 1] = {
-			package_name = dynamic_package_name,
-			reference_name = package_reference_name
-		}
+	if dynamic_package then
+		if type(dynamic_package) == "table" then
+			local package_reference_name = reference_name .. #packages_to_load_data
+			packages_to_load_data[#packages_to_load_data + 1] = {
+				package_name = dynamic_package.name,
+				reference_name = package_reference_name,
+				is_level_package = dynamic_package.is_level_package or nil
+			}
+		else
+			local package_reference_name = reference_name .. #packages_to_load_data
+			packages_to_load_data[#packages_to_load_data + 1] = {
+				package_name = dynamic_package,
+				reference_name = package_reference_name
+			}
+		end
 	end
 
 	local package_name = settings.package
@@ -1626,7 +1270,18 @@ end
 function UIManager:render_loading_icon()
 	local gui = self._ui_loading_icon_renderer.gui
 
-	LoadingIcon.render(gui)
+	self._loading_reason:render(gui, false)
+end
+
+function UIManager:render_loading_info()
+	local gui = self._ui_loading_icon_renderer.gui
+	local wait_reason, wait_time, text_opacity = self._loading_state_data:current_wait_info()
+
+	self._loading_reason:render(gui, wait_reason, wait_time, text_opacity)
+end
+
+function UIManager:current_wait_info()
+	return self._loading_state_data:current_wait_info()
 end
 
 function UIManager:handling_popups()

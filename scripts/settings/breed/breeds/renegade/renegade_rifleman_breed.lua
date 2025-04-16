@@ -14,6 +14,7 @@ local StaggerSettings = require("scripts/settings/damage/stagger_settings")
 local TargetSelectionTemplates = require("scripts/extension_systems/perception/target_selection_templates")
 local TargetSelectionWeights = require("scripts/settings/minion_target_selection/minion_target_selection_weights")
 local WeakspotSettings = require("scripts/settings/damage/weakspot_settings")
+local DamageProfileTemplates = require("scripts/settings/damage/damage_profile_templates")
 local armor_types = ArmorSettings.types
 local breed_types = BreedSettings.types
 local hit_zone_names = HitZone.hit_zone_names
@@ -24,7 +25,6 @@ local breed_data = {
 	walk_speed = 2.3,
 	use_bone_lod = true,
 	detection_radius = 15,
-	aggro_inventory_slot = "slot_ranged_weapon",
 	fx_proximity_culling_weight = 1,
 	target_stickiness_distance = 10,
 	unit_template_name = "minion",
@@ -35,6 +35,7 @@ local breed_data = {
 	spawn_inventory_slot = "slot_ranged_weapon",
 	stagger_resistance = 1,
 	good_last_los_distance = 2,
+	aggro_inventory_slot = "slot_ranged_weapon",
 	use_avoidance = true,
 	game_object_type = "minion_ranged",
 	challenge_rating = 1,
@@ -450,6 +451,7 @@ local breed_data = {
 			[hit_zone_names.lower_right_leg] = 0.5
 		}
 	},
+	outline_config = {},
 	blackboard_component_config = BreedBlackboardComponentTemplates.riflemen
 }
 

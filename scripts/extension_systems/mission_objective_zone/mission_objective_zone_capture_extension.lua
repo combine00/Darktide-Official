@@ -15,6 +15,8 @@ function MissionObjectiveZoneCaptureExtension:init(extension_init_context, unit,
 	local side_system = Managers.state.extension:system("side_system")
 	self._player_side = side_system:get_default_player_side_name()
 	self._side_system = side_system
+	self._is_local_objective_marker_enabled = true
+	self._mission_objective_target_extension = nil
 end
 
 function MissionObjectiveZoneCaptureExtension:setup_from_component(num_player_in_zone, time_in_zone, zone_type)
@@ -22,7 +24,16 @@ function MissionObjectiveZoneCaptureExtension:setup_from_component(num_player_in
 	self._time_in_zone = time_in_zone
 	self._zone_type = zone_type
 
-	self._networked_timer_extension:setup_from_component(time_in_zone)
+	self._networked_timer_extension:setup_from_component(time_in_zone, nil, 1, false)
+end
+
+function MissionObjectiveZoneCaptureExtension:extensions_ready(world, unit)
+	self._mission_objective_target_extension = ScriptUnit.extension(unit, "mission_objective_target_system")
+end
+
+function MissionObjectiveZoneCaptureExtension:activate_zone()
+	MissionObjectiveZoneCaptureExtension.super.activate_zone(self)
+	self._networked_timer_extension:start_paused()
 end
 
 function MissionObjectiveZoneCaptureExtension:update(dt, t)
@@ -33,10 +44,14 @@ function MissionObjectiveZoneCaptureExtension:update(dt, t)
 	if self._is_server then
 		self:_update_server()
 	end
+
+	if not DEDICATED_SERVER then
+		self:_update_client()
+	end
 end
 
 function MissionObjectiveZoneCaptureExtension:_update_server()
-	local fulfill_in_zone_check, _ = self:_players_fulfill_in_zone_check()
+	local fulfill_in_zone_check, _, percentage_players_in_zone = self:_players_fulfill_in_zone_check()
 	local new_state = nil
 
 	if self._current_server_state == SERVER_STATES.progress_inactive then
@@ -49,7 +64,7 @@ function MissionObjectiveZoneCaptureExtension:_update_server()
 		if not fulfill_in_zone_check then
 			new_state = SERVER_STATES.progress_inactive
 		else
-			self:_progress_active()
+			self:_progress_active(percentage_players_in_zone)
 		end
 	elseif self._current_server_state == SERVER_STATES.progress_finished then
 		self:zone_finished()
@@ -60,9 +75,34 @@ function MissionObjectiveZoneCaptureExtension:_update_server()
 	end
 end
 
-function MissionObjectiveZoneCaptureExtension:_progress_active()
+function MissionObjectiveZoneCaptureExtension:_update_client()
+	if not self._mission_objective_target_extension then
+		return
+	end
+
+	local is_local_player_in_zone = self:_is_local_player_in_zone()
+	local is_local_objective_marker_enabled = self._is_local_objective_marker_enabled
+
+	if is_local_player_in_zone and is_local_objective_marker_enabled then
+		self._mission_objective_target_extension:remove_unit_marker()
+
+		self._is_local_objective_marker_enabled = false
+	elseif not is_local_player_in_zone and not is_local_objective_marker_enabled then
+		self._mission_objective_target_extension:add_unit_marker()
+
+		self._is_local_objective_marker_enabled = true
+	end
+end
+
+function MissionObjectiveZoneCaptureExtension:_progress_active(percentage_players_in_zone)
 	if self._network_timer_state ~= NETWORK_TIMER_STATES.play then
 		self:_set_network_timer_state(NETWORK_TIMER_STATES.play)
+	end
+
+	if self._percentage_players_in_area ~= percentage_players_in_zone then
+		self._networked_timer_extension:set_speed_modifier(percentage_players_in_zone)
+
+		self._percentage_players_in_area = percentage_players_in_zone
 	end
 
 	local remaining_time = self._networked_timer_extension:get_remaining_time()
@@ -82,7 +122,7 @@ function MissionObjectiveZoneCaptureExtension:_players_fulfill_in_zone_check()
 	local side_name = self._player_side
 	local side_system = self._side_system
 	local side = side_system:get_side_from_name(side_name)
-	local valid_player_units = side.valid_player_units
+	local valid_player_units = side.valid_human_units
 	local players_in_zone = 0
 	local total_players = #valid_player_units
 
@@ -101,8 +141,23 @@ function MissionObjectiveZoneCaptureExtension:_players_fulfill_in_zone_check()
 
 	local num_players_to_trigger = self._number_of_players_in_zone
 	local all_inside = total_players > 0 and total_players == players_in_zone
+	local percentage_players_in_zone = players_in_zone / total_players
 
-	return all_inside or num_players_to_trigger <= players_in_zone, players_in_zone
+	return all_inside or num_players_to_trigger <= players_in_zone, players_in_zone, percentage_players_in_zone
+end
+
+function MissionObjectiveZoneCaptureExtension:_is_local_player_in_zone()
+	local local_player = Managers.player:local_player(1)
+	local player_unit = local_player.player_unit
+
+	if not player_unit or not ALIVE[player_unit] then
+		return false
+	end
+
+	local player_position = POSITION_LOOKUP[player_unit]
+	local in_zone = self:point_in_zone(player_position)
+
+	return in_zone
 end
 
 function MissionObjectiveZoneCaptureExtension:_set_server_state(state)

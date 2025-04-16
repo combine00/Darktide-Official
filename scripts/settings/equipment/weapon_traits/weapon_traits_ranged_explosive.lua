@@ -6,6 +6,23 @@ table.make_unique(weapon_traits_ranged_explosive)
 local stat_buffs = BuffSettings.stat_buffs
 local proc_events = BuffSettings.proc_events
 weapon_traits_ranged_explosive.weapon_traits_ranged_explosive_wield_explosion_restore_toughness = {
+	format_values = {
+		toughness = {
+			value = "20",
+			prefix = "+",
+			format_type = "string"
+		},
+		cooldown = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_restore_toughness_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_traits_ranged_explosive_wield_explosion_restore_toughness_buff = {
 			{
@@ -36,6 +53,23 @@ weapon_traits_ranged_explosive.weapon_traits_ranged_explosive_wield_explosion_re
 	}
 }
 weapon_traits_ranged_explosive.weapon_traits_ranged_explosive_wield_explosion_heal_corruption = {
+	format_values = {
+		corruption = {
+			value = "20",
+			prefix = "+",
+			format_type = "string"
+		},
+		cooldown = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_heal_corruption_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_traits_ranged_explosive_wield_explosion_heal_corruption_buff = {
 			{
@@ -66,6 +100,42 @@ weapon_traits_ranged_explosive.weapon_traits_ranged_explosive_wield_explosion_he
 	}
 }
 weapon_traits_ranged_explosive.weapon_traits_ranged_explosive_wield_explosion_increase_damage = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_increase_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_explosion_hit
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_increase_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.damage
+				}
+			}
+		},
+		duration = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_increase_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_traits_ranged_explosive_wield_explosion_increase_damage_buff = {
 			{
@@ -108,6 +178,42 @@ weapon_traits_ranged_explosive.weapon_traits_ranged_explosive_wield_explosion_in
 	}
 }
 weapon_traits_ranged_explosive.weapon_traits_ranged_explosive_wield_explosion_increase_impact = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_increase_impact_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_explosion_hit
+				}
+			}
+		},
+		impact = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_increase_impact_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.explosion_impact_modifier
+				}
+			}
+		},
+		duration = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_increase_impact_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_traits_ranged_explosive_wield_explosion_increase_impact_buff = {
 			{
@@ -150,6 +256,42 @@ weapon_traits_ranged_explosive.weapon_traits_ranged_explosive_wield_explosion_in
 	}
 }
 weapon_traits_ranged_explosive.weapon_traits_ranged_explosive_wield_explosion_increased_crit_chance = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_increased_crit_chance_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_explosion_hit
+				}
+			}
+		},
+		crit_chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_increased_crit_chance_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.critical_strike_chance
+				}
+			}
+		},
+		duration = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_increased_crit_chance_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_traits_ranged_explosive_wield_explosion_increased_crit_chance_buff = {
 			{
@@ -192,6 +334,42 @@ weapon_traits_ranged_explosive.weapon_traits_ranged_explosive_wield_explosion_in
 	}
 }
 weapon_traits_ranged_explosive.weapon_traits_ranged_explosive_wield_explosion_increased_unarmored_damage = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_increased_unarmored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_explosion_hit
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_increased_unarmored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.unarmored_damage
+				}
+			}
+		},
+		duration = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_increased_unarmored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_traits_ranged_explosive_wield_explosion_increased_unarmored_damage_buff = {
 			{
@@ -234,6 +412,42 @@ weapon_traits_ranged_explosive.weapon_traits_ranged_explosive_wield_explosion_in
 	}
 }
 weapon_traits_ranged_explosive.weapon_traits_ranged_explosive_wield_explosion_increased_armored_damage = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_increased_armored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_explosion_hit
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_increased_armored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.armored_damage
+				}
+			}
+		},
+		duration = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_increased_armored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_traits_ranged_explosive_wield_explosion_increased_armored_damage_buff = {
 			{
@@ -276,6 +490,42 @@ weapon_traits_ranged_explosive.weapon_traits_ranged_explosive_wield_explosion_in
 	}
 }
 weapon_traits_ranged_explosive.weapon_traits_ranged_explosive_wield_explosion_increased_resistant_damage = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_increased_resistant_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_explosion_hit
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_increased_resistant_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.resistant_damage
+				}
+			}
+		},
+		duration = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_increased_resistant_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_traits_ranged_explosive_wield_explosion_increased_resistant_damage_buff = {
 			{
@@ -318,6 +568,42 @@ weapon_traits_ranged_explosive.weapon_traits_ranged_explosive_wield_explosion_in
 	}
 }
 weapon_traits_ranged_explosive.weapon_traits_ranged_explosive_wield_explosion_increased_berserker_damage = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_increased_berserker_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_explosion_hit
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_increased_berserker_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.berserker_damage
+				}
+			}
+		},
+		duration = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_increased_berserker_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_traits_ranged_explosive_wield_explosion_increased_berserker_damage_buff = {
 			{
@@ -360,6 +646,42 @@ weapon_traits_ranged_explosive.weapon_traits_ranged_explosive_wield_explosion_in
 	}
 }
 weapon_traits_ranged_explosive.weapon_traits_ranged_explosive_wield_explosion_increased_super_armor_damage = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_increased_super_armor_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_explosion_hit
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_increased_super_armor_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.super_armor_damage
+				}
+			}
+		},
+		duration = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_increased_super_armor_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_traits_ranged_explosive_wield_explosion_increased_super_armor_damage_buff = {
 			{
@@ -402,6 +724,42 @@ weapon_traits_ranged_explosive.weapon_traits_ranged_explosive_wield_explosion_in
 	}
 }
 weapon_traits_ranged_explosive.weapon_traits_ranged_explosive_wield_explosion_increased_disgustingly_resilient_damage = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_increased_disgustingly_resilient_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_explosion_hit
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_increased_disgustingly_resilient_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.disgustingly_resilient_damage
+				}
+			}
+		},
+		duration = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_traits_ranged_explosive_wield_explosion_increased_disgustingly_resilient_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_traits_ranged_explosive_wield_explosion_increased_disgustingly_resilient_damage_buff = {
 			{

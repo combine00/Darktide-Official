@@ -109,10 +109,14 @@ function PlayerCharacterStateConsumed:on_enter(unit, dt, t, previous_state, para
 	self._consumed_timing = t + SET_CONSUMED_TIMING[self._breed.name]
 end
 
-local THROW_TELEPORT_UP_OFFSET_HUMAN = 1.5
-local THROW_TELEPORT_UP_OFFSET_OGRYN = 1.5
-local THROW_TELEPORT_FWD_OFFSET_HUMAN = 3.2
-local THROW_TELEPORT_FWD_OFFSET_OGRYN = 3.2
+local THROW_TELEPORT_UP_OFFSET = {
+	human = 1.5,
+	ogryn = 1.5
+}
+local THROW_TELEPORT_FWD_OFFSET = {
+	human = 3.2,
+	ogryn = 3.2
+}
 
 function PlayerCharacterStateConsumed:on_exit(unit, t, next_state)
 	PlayerCharacterStateConsumed.super.on_exit(self, unit, t, next_state)
@@ -132,8 +136,8 @@ function PlayerCharacterStateConsumed:on_exit(unit, t, next_state)
 		local is_human = breed_name == "human"
 		local disabling_unit_position = Unit.world_position(disabling_unit, 1)
 		local unit_rotation = Unit.local_rotation(disabling_unit, 1)
-		local up = Vector3.up() * (is_human and THROW_TELEPORT_UP_OFFSET_HUMAN or THROW_TELEPORT_UP_OFFSET_OGRYN)
-		local disabling_unit_forward = Quaternion.forward(unit_rotation) * (is_human and THROW_TELEPORT_FWD_OFFSET_HUMAN or THROW_TELEPORT_FWD_OFFSET_OGRYN)
+		local up = Vector3.up() * (THROW_TELEPORT_UP_OFFSET[breed_name] or THROW_TELEPORT_UP_OFFSET.human)
+		local disabling_unit_forward = Quaternion.forward(unit_rotation) * (THROW_TELEPORT_FWD_OFFSET[breed_name] or THROW_TELEPORT_FWD_OFFSET.human)
 		local teleport_position = disabling_unit_position + disabling_unit_forward + up
 		local direction = is_human and disabling_unit_forward or -disabling_unit_forward
 		local teleport_rotation = Quaternion.look(direction)

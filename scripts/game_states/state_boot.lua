@@ -26,7 +26,7 @@ function StateBoot:on_enter(parent, params)
 
 	self:_create_startup_world()
 
-	self._sm = GameStateMachine:new(self, params.states[1][1], sub_state_params, nil, nil, "Boot", true)
+	self._sm = GameStateMachine:new(self, params.states[1][1], sub_state_params, nil, nil, "Main", "Boot", true)
 	self._next_state = params.next_state
 	self._package_manager = params.package_manager
 	self._localization_manager = params.localization_manager

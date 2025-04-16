@@ -60,6 +60,11 @@ local base_template = {
 		exit_is_at_the_end_of_path = "boolean",
 		unit = "Unit",
 		entrance_position = "Vector3Box"
+	},
+	disable = {
+		attacker_unit = "Unit",
+		is_disabled = "boolean",
+		type = "string"
 	}
 }
 

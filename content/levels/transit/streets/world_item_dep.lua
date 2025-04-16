@@ -8,6 +8,7 @@ local item_dependencies = {
 		["content/items/characters/minions/chaos_traitor_guard/attachments_gear/longrange_a"] = 1,
 		["content/items/characters/minions/chaos_traitor_guard/attachments_base/lowerbody_a"] = 2,
 		["content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_fullbody_a"] = 1,
+		["content/items/characters/minions/environment_overrides/blood_covered_01"] = 1,
 		["content/items/characters/minions/chaos_traitor_guard/attachments_base/newly_infected_body_a"] = 1,
 		["content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_b"] = 1
 	},

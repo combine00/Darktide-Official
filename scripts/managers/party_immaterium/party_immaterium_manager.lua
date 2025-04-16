@@ -9,11 +9,11 @@ local PartyImmateriumManagerTestify = GameParameters.testify and require("script
 local PartyImmateriumMember = require("scripts/managers/party_immaterium/party_immaterium_member")
 local PartyImmateriumMemberMyself = require("scripts/managers/party_immaterium/party_immaterium_member_myself")
 local PlayerCompositions = require("scripts/utilities/players/player_compositions")
+local PlaystationJoinPermission = require("scripts/managers/party_immaterium/join_permission/playstation_join_permission")
 local Promise = require("scripts/foundation/utilities/promise")
 local SteamJoinPermission = require("scripts/managers/party_immaterium/join_permission/steam_join_permission")
 local UISoundEvents = require("scripts/settings/ui/ui_sound_events")
 local XboxJoinPermission = require("scripts/managers/party_immaterium/join_permission/xbox_join_permission")
-local PlaystationJoinPermission = require("scripts/managers/party_immaterium/join_permission/playstation_join_permission")
 local PartyImmateriumManager = class("PartyImmateriumManager")
 local ADVERTISEMENT_STATE = table.enum("SEARCHING", "CANCELED")
 local JOIN_REQUESTS_STATE = table.enum("PENDING", "ACCEPTED", "DECLINED")
@@ -636,6 +636,8 @@ function PartyImmateriumManager:_handle_party_event(event)
 		self:_handle_advertisement_state_update_event_trigger(event)
 	elseif event.event_type == "advertisement_request_to_join_list_update" then
 		self:_handle_advertisement_request_to_join_list_update_event_trigger(event)
+	elseif event.event_type == "party_vote_update" then
+		self:_handle_party_vote_update_event(event)
 	end
 end
 
@@ -789,6 +791,18 @@ function PartyImmateriumManager:_handle_party_update_event(event)
 
 	if #members >= 4 then
 		self:cancel_party_finder_advertise()
+	end
+end
+
+function PartyImmateriumManager:_handle_party_vote_update_event(event)
+	if (event.state == "COMPLETED_REJECTED" or event.state == "FAILED_TIMEOUT") and event.started_by_account_id == self:get_myself():unique_id() then
+		local params = event.params
+
+		if params.mission_data and string.find(params.mission_data, "havoc-rank", nil, true) then
+			Managers.data_service.havoc:delete_personal_mission(params.backend_mission_id):next(function ()
+				Managers.event:trigger("event_auto_cancel_havoc_mission")
+			end)
+		end
 	end
 end
 
@@ -1177,7 +1191,9 @@ function PartyImmateriumManager:current_game_session_mission_data()
 	local game_state = self:party_game_state()
 
 	if game_state.status == "GAME_SESSION_IN_PROGRESS" then
-		return cjson.decode(game_state.params.mission_data)
+		local mission_data = game_state.params and game_state.params.mission_data
+
+		return mission_data and cjson.decode(mission_data) or nil
 	else
 		return nil
 	end
@@ -1442,6 +1458,7 @@ function PartyImmateriumManager:_handle_member_left(member_account_id)
 
 		Managers.event:trigger("event_add_notification_message", "default", message, nil, UISoundEvents.notification_player_leave_party)
 	end)
+	self:_validate_advertisement_on_member_left(member_account_id)
 end
 
 function PartyImmateriumManager:_handle_member_kicked(member_account_id, reason)
@@ -1463,6 +1480,7 @@ function PartyImmateriumManager:_handle_member_disconnected(member_account_id)
 
 		Managers.event:trigger("event_add_notification_message", "default", message, nil, UISoundEvents.notification_player_leave_party)
 	end)
+	self:_validate_advertisement_on_member_left(member_account_id)
 end
 
 function PartyImmateriumManager:_handle_invite_created(invite_token, platform, platform_user_id, inviter_account_id)
@@ -1617,8 +1635,25 @@ function PartyImmateriumManager:_handle_immaterium_invite(party_id, invite_token
 			self._party_join_request_parties_by_id[party_id] = nil
 			local context = nil
 			local is_group_finder_invite = account_id == "00000000-0000-0000-0000-000000000000"
+			local character_name = inviter_presence:character_name()
+			local character_profile = inviter_presence:character_profile()
+			local character_level = character_profile and character_profile.current_level
+			local player_name_and_level = nil
 
-			if is_group_finder_invite then
+			if character_level then
+				player_name_and_level = Localize("loc_social_menu_character_name_format", true, {
+					character_level = character_level,
+					character_name = character_name
+				})
+			end
+
+			if self:current_state() == PartyConstants.State.in_mission then
+				local inviter_name = player_name_and_level or character_name
+
+				self._invite_notification_handler:add_invite(party_id, invite_token, inviter_name)
+
+				return
+			elseif is_group_finder_invite then
 				local GroupFinderBlueprintsGenerateFunction = require("scripts/ui/views/group_finder_view/group_finder_blueprints")
 				local ConstantElementPopupHandlerSettings = require("scripts/ui/constant_elements/elements/popup_handler/constant_element_popup_handler_settings")
 				local grid_width = ConstantElementPopupHandlerSettings.text_max_width
@@ -1690,6 +1725,7 @@ function PartyImmateriumManager:_handle_immaterium_invite(party_id, invite_token
 						required_level = party_data.required_level,
 						restrictions = party_data.restrictions,
 						tags = party_data.tags,
+						metadata = party_data.metadata,
 						version = party_data.version
 					}
 				end
@@ -1749,26 +1785,6 @@ function PartyImmateriumManager:_handle_immaterium_invite(party_id, invite_token
 					}
 				}
 			else
-				local character_name = inviter_presence:character_name()
-				local character_profile = inviter_presence:character_profile()
-				local character_level = character_profile and character_profile.current_level
-				local player_name_and_level = nil
-
-				if character_level then
-					player_name_and_level = Localize("loc_social_menu_character_name_format", true, {
-						character_level = character_level,
-						character_name = character_name
-					})
-				end
-
-				if self:current_state() == PartyConstants.State.in_mission then
-					local inviter_name = player_name_and_level or character_name
-
-					self._invite_notification_handler:add_invite(party_id, invite_token, inviter_name)
-
-					return
-				end
-
 				context = {
 					title_text = "loc_social_party_invite_received_header",
 					description_text = "loc_social_party_invite_received_description",
@@ -1801,8 +1817,10 @@ function PartyImmateriumManager:_handle_immaterium_invite(party_id, invite_token
 						},
 						{
 							text = "loc_social_party_invite_received_decline_and_block_button",
+							template_type = "terminal_button_hold_small",
+							stop_exit_sound = true,
 							close_on_pressed = true,
-							on_pressed_sound = UISoundEvents.social_menu_block_player,
+							on_complete_sound = UISoundEvents.social_menu_block_player,
 							callback = function ()
 								self:_decline_party_invite(party_id, invite_token)
 								Managers.data_service.social:block_account(inviter_account_id)
@@ -1903,8 +1921,10 @@ function PartyImmateriumManager:_request_to_join_popup(joiner_account_id)
 				},
 				{
 					text = "loc_social_party_request_to_join_decline_and_block_button",
+					template_type = "terminal_button_hold_small",
+					stop_exit_sound = true,
 					close_on_pressed = true,
-					on_pressed_sound = UISoundEvents.social_menu_block_player,
+					on_complete_sound = UISoundEvents.social_menu_block_player,
 					callback = function ()
 						Managers.grpc:answer_request_to_join(self:party_id(), joiner_account_id, "MEMBER_DECLINED_REQUEST_TO_JOIN")
 						Managers.data_service.social:block_account(joiner_account_id)
@@ -2015,6 +2035,25 @@ function PartyImmateriumManager:send_request_to_join_party(data, account_id)
 	self._party_join_request_parties_by_id[id] = data
 
 	return Managers.grpc:party_finder_request_to_join(id, account_id)
+end
+
+function PartyImmateriumManager:_validate_advertisement_on_member_left(member_account_id)
+	local advertising_state = self._advertising_state
+
+	if not advertising_state then
+		return
+	end
+
+	local havoc_order_owner = advertising_state.config.havoc_order_owner
+
+	if not havoc_order_owner then
+		return
+	end
+
+	if havoc_order_owner == member_account_id then
+		Log.info("PartyImmateriumManager", "Havoc order owner no longer in the party, cancelling advertisement")
+		self:cancel_party_finder_advertise()
+	end
 end
 
 return PartyImmateriumManager

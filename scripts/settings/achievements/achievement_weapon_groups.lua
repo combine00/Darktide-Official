@@ -70,6 +70,9 @@ local AchievementWeaponGroups = {
 			pattern = "ogryn_heavystubber_p1"
 		},
 		{
+			pattern = "ogryn_heavystubber_p2"
+		},
+		{
 			pattern = "ogryn_rippergun_p1"
 		},
 		{
@@ -113,10 +116,16 @@ local AchievementWeaponGroups = {
 			pattern = "forcesword_p1"
 		},
 		{
+			pattern = "forcesword_2h_p1"
+		},
+		{
 			pattern = "powermaul_2h_p1"
 		},
 		{
 			pattern = "powermaul_p1"
+		},
+		{
+			pattern = "powersword_2h_p1"
 		},
 		{
 			pattern = "powersword_p1"

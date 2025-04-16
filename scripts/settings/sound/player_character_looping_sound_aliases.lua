@@ -160,6 +160,16 @@ local PlayerCharacterLoopingSoundAliases = {
 			event_alias = "stop_force_weapon_block_loop"
 		}
 	},
+	wind_slash_stage_loop = {
+		exclude_from_unit_data_components = true,
+		has_husk_events = true,
+		start = {
+			event_alias = "play_wind_slash_stage_loop"
+		},
+		stop = {
+			event_alias = "stop_wind_slash_stage_loop"
+		}
+	},
 	interact_loop = {
 		is_2d = true,
 		is_exclusive = true,
@@ -183,6 +193,30 @@ local PlayerCharacterLoopingSoundAliases = {
 	sfx_minigame_loop = {
 		start = {
 			event_alias = "play_sfx_minigame_loop"
+		},
+		stop = {
+			event_alias = "stop_sfx_minigame_loop"
+		}
+	},
+	sfx_minigame_sinus_loop = {
+		start = {
+			event_alias = "play_sfx_minigame_sinus_loop"
+		},
+		stop = {
+			event_alias = "stop_sfx_minigame_loop"
+		}
+	},
+	sfx_minigame_sinus_loop_a = {
+		start = {
+			event_alias = "play_sfx_minigame_sinus_loop_a"
+		},
+		stop = {
+			event_alias = "stop_sfx_minigame_loop"
+		}
+	},
+	sfx_minigame_sinus_loop_b = {
+		start = {
+			event_alias = "play_sfx_minigame_sinus_loop_b"
 		},
 		stop = {
 			event_alias = "stop_sfx_minigame_loop"

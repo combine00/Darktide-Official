@@ -41,7 +41,17 @@ function BtRenegadeNetgunnerSelectorNode:evaluate(unit, blackboard, scratchpad, 
 		return node_death
 	end
 
-	local node_exit_spawner = children[2]
+	local node_disable = children[2]
+	local disable_component = blackboard.disable
+	local condition_result = disable_component.is_disabled
+
+	if condition_result then
+		new_running_child_nodes[node_identifier] = node_disable
+
+		return node_disable
+	end
+
+	local node_exit_spawner = children[3]
 	local spawn_component = blackboard.spawn
 	local condition_result = spawn_component.is_exiting_spawner
 
@@ -51,7 +61,7 @@ function BtRenegadeNetgunnerSelectorNode:evaluate(unit, blackboard, scratchpad, 
 		return node_exit_spawner
 	end
 
-	local node_smart_object = children[3]
+	local node_smart_object = children[4]
 	local condition_result = nil
 
 	repeat
@@ -99,7 +109,7 @@ function BtRenegadeNetgunnerSelectorNode:evaluate(unit, blackboard, scratchpad, 
 		end
 	end
 
-	local node_stagger = children[4]
+	local node_stagger = children[5]
 	local stagger_component = blackboard.stagger
 	local is_staggered = stagger_component.num_triggered_staggers > 0
 	local condition_result = is_staggered
@@ -110,7 +120,7 @@ function BtRenegadeNetgunnerSelectorNode:evaluate(unit, blackboard, scratchpad, 
 		return node_stagger
 	end
 
-	local node_attack_target = children[5]
+	local node_attack_target = children[6]
 	local is_running = last_leaf_node_running and last_running_node == node_attack_target
 	local condition_result = nil
 
@@ -150,7 +160,7 @@ function BtRenegadeNetgunnerSelectorNode:evaluate(unit, blackboard, scratchpad, 
 		end
 	end
 
-	local node_idle = children[6]
+	local node_idle = children[7]
 	new_running_child_nodes[node_identifier] = node_idle
 
 	return node_idle

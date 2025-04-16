@@ -60,6 +60,16 @@ local interaction_templates = {
 		duration = 3.8,
 		interaction_class_name = "setup_decoding"
 	},
+	gamemode_havoc = {
+		action_text = "loc_action_interaction_view",
+		ui_interaction_type = "point_of_interest",
+		interaction_icon = "content/ui/materials/hud/interactions/icons/havoc",
+		description = "loc_havoc_view",
+		interaction_priority = 1,
+		duration = 0,
+		interaction_class_name = "gamemode_havoc",
+		ui_view_name = "havoc_background_view"
+	},
 	grenade = {
 		action_text = "loc_action_interaction_pickup",
 		ui_interaction_type = "pickup",
@@ -401,6 +411,14 @@ local interaction_templates = {
 		interaction_class_name = "pickup"
 	},
 	forge_material = {
+		action_text = "loc_action_interaction_pickup",
+		interaction_icon = "content/ui/materials/hud/interactions/icons/environment_generic",
+		ui_interaction_type = "pickup",
+		interaction_priority = 1,
+		duration = 0,
+		interaction_class_name = "pickup"
+	},
+	objective_pickup = {
 		action_text = "loc_action_interaction_pickup",
 		interaction_icon = "content/ui/materials/hud/interactions/icons/environment_generic",
 		ui_interaction_type = "pickup",

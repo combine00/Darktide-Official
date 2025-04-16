@@ -1,26 +1,21 @@
 local CraftingMechanicusBarterItemsViewDefinitions = require("scripts/ui/views/crafting_mechanicus_barter_items_view/crafting_mechanicus_barter_items_view_definitions")
 local CraftingMechanicusBarterItemsViewSettings = require("scripts/ui/views/crafting_mechanicus_barter_items_view/crafting_mechanicus_barter_items_view_settings")
-local CraftingSettings = require("scripts/settings/item/crafting_mechanicus_settings")
-local ItemSlotSettings = require("scripts/settings/item/item_slot_settings")
 local ButtonPassTemplates = require("scripts/ui/pass_templates/button_pass_templates")
 local ContentBlueprints = require("scripts/ui/views/masteries_overview_view/masteries_overview_view_blueprints")
 local Items = require("scripts/utilities/items")
 local MasterItems = require("scripts/backend/master_items")
 local Mastery = require("scripts/utilities/mastery")
-local Promise = require("scripts/foundation/utilities/promise")
+local RaritySettings = require("scripts/settings/item/rarity_settings")
+local UIFonts = require("scripts/managers/ui/ui_fonts")
+local UIRenderer = require("scripts/managers/ui/ui_renderer")
 local UISettings = require("scripts/settings/ui/ui_settings")
 local UISoundEvents = require("scripts/settings/ui/ui_sound_events")
-local ViewElementCraftingRecipe = require("scripts/ui/view_elements/view_element_crafting_recipe/view_element_crafting_recipe")
+local UIWorldSpawner = require("scripts/managers/ui/ui_world_spawner")
 local ViewElementDiscardItems = require("scripts/ui/view_elements/view_element_discard_items/view_element_discard_items")
 local ViewElementGrid = require("scripts/ui/view_elements/view_element_grid/view_element_grid")
 local ViewElementTabMenu = require("scripts/ui/view_elements/view_element_tab_menu/view_element_tab_menu")
 local ViewElementWeaponStats = require("scripts/ui/view_elements/view_element_weapon_stats/view_element_weapon_stats")
-local WeaponTemplate = require("scripts/utilities/weapon/weapon_template")
 local WeaponUnlockSettings = require("scripts/settings/weapon_unlock_settings_new")
-local UIWorldSpawner = require("scripts/managers/ui/ui_world_spawner")
-local RaritySettings = require("scripts/settings/item/rarity_settings")
-local UIFonts = require("scripts/managers/ui/ui_fonts")
-local UIRenderer = require("scripts/managers/ui/ui_renderer")
 local CraftingMechanicusBarterItemsView = class("CraftingMechanicusBarterItemsView", "BaseView")
 
 function CraftingMechanicusBarterItemsView:init(settings, context)
@@ -38,11 +33,15 @@ function CraftingMechanicusBarterItemsView:on_enter()
 	self._parent:set_active_view_instance(self)
 
 	local character_id = self:_player():character_id()
+	local slot_filter_list = {
+		"slot_primary",
+		"slot_secondary"
+	}
 	local item_type_filter_list = {
 		"WEAPON_MELEE",
 		"WEAPON_RANGED"
 	}
-	self._inventory_promise = Managers.data_service.gear:fetch_inventory(character_id, nil, item_type_filter_list)
+	self._inventory_promise = Managers.data_service.gear:fetch_inventory(character_id, slot_filter_list, item_type_filter_list)
 
 	self._inventory_promise:next(callback(self, "_cb_fetch_inventory_items"))
 	self:_setup_button_callbacks()
@@ -370,7 +369,7 @@ function CraftingMechanicusBarterItemsView:_cb_fetch_inventory_items(items)
 
 			if item.parent_pattern and not is_invalid_item_for_operation then
 				filtered_items[item.gear_id] = item
-				layout[item.gear_id] = {
+				layout[#layout + 1] = {
 					widget_type = "item",
 					item = item,
 					slot = {
@@ -423,9 +422,6 @@ function CraftingMechanicusBarterItemsView:_cb_fetch_inventory_items(items)
 	self._item_grid:set_loading_state(false)
 	self._item_grid:set_color_intensity_multiplier(0.7)
 	self._item_grid:set_visibility(false)
-
-	self._filtered_offer_items_layout = {}
-
 	self._item_grid:present_grid_layout({})
 	self:_setup_sort_options()
 
@@ -651,14 +647,41 @@ function CraftingMechanicusBarterItemsView:cb_on_sort_button_pressed(option)
 end
 
 function CraftingMechanicusBarterItemsView:_sort_grid_layout(sort_function)
-	local layout = table.append({}, self._filtered_offer_items_layout)
+	local layout = self._item_grid_layout or {}
+	local item_layout = {}
 
-	if sort_function and #layout > 1 then
-		table.sort(layout, sort_function)
+	for gear_id, layout in pairs(layout) do
+		item_layout[#item_layout + 1] = layout
+	end
+
+	local filtered_layout = {}
+	local external_layouts = {}
+
+	for i = 1, #layout do
+		local layout = layout[i]
+
+		if not layout.is_external then
+			filtered_layout[#filtered_layout + 1] = layout
+		else
+			external_layouts[#external_layouts + 1] = {
+				index = i,
+				layout = layout
+			}
+		end
+	end
+
+	if sort_function and #filtered_layout > 1 then
+		table.sort(filtered_layout, sort_function)
+	end
+
+	for i = 1, #external_layouts do
+		local external_layout = external_layouts[i]
+
+		table.insert(filtered_layout, external_layout.index, external_layout.layout)
 	end
 
 	if self._current_present_grid_layout_callback then
-		self:_current_present_grid_layout_callback(layout)
+		self:_current_present_grid_layout_callback(filtered_layout)
 	end
 end
 
@@ -819,20 +842,24 @@ function CraftingMechanicusBarterItemsView:_present_pattern_layout(slot_filter)
 	end
 end
 
+local ITEMS_LAYOUT_GRID_SIZE = {
+	640,
+	800
+}
+
 function CraftingMechanicusBarterItemsView:_present_items_layout(layout, present_callback)
 	local left_click_callback = callback(self, "cb_on_grid_entry_left_pressed")
 	local generate_blueprints_function = require("scripts/ui/view_content_blueprints/item_blueprints")
-	local grid_size = {
-		640,
-		800
-	}
-	local ItemContentBlueprints = generate_blueprints_function(grid_size)
-	local spacing_entry = {
-		widget_type = "spacing_vertical"
-	}
+	local ItemContentBlueprints = generate_blueprints_function(ITEMS_LAYOUT_GRID_SIZE)
+	local item_layout = {}
 
-	table.insert(layout, 1, spacing_entry)
-	table.insert(layout, #layout + 1, spacing_entry)
+	for gear_id, layout in pairs(layout) do
+		item_layout[#item_layout + 1] = layout
+	end
+
+	if item_layout[1] and not item_layout[1].is_external then
+		self:_add_external_layout(item_layout)
+	end
 
 	local grow_direction = self._grow_direction or "down"
 
@@ -842,9 +869,10 @@ function CraftingMechanicusBarterItemsView:_present_items_layout(layout, present
 	local sort_index = self._selected_sort_option_index or 1
 	local selected_sort_option = sort_options[sort_index]
 	local selected_sort_function = selected_sort_option.sort_function
+	self._item_grid_layout = item_layout
 
-	function self:_current_present_grid_layout_callback(new_layout)
-		self._item_grid:present_grid_layout(new_layout, ItemContentBlueprints, left_click_callback, nil, nil, grow_direction, function ()
+	function self:_current_present_grid_layout_callback(callback_layout)
+		self._item_grid:present_grid_layout(callback_layout, ItemContentBlueprints, left_click_callback, nil, nil, grow_direction, function ()
 			local mastery_id = self._selected_pattern
 
 			self:_present_mastery(mastery_id)
@@ -860,28 +888,39 @@ function CraftingMechanicusBarterItemsView:_present_items_layout(layout, present
 	self:_sort_grid_layout(selected_sort_function)
 end
 
-function CraftingMechanicusBarterItemsView:_present_sacrifice_layout(layout)
-	local generate_blueprints_function = require("scripts/ui/view_content_blueprints/item_blueprints")
-	local grid_size = {
-		640,
-		900
-	}
-	local ItemContentBlueprints = generate_blueprints_function(grid_size)
+function CraftingMechanicusBarterItemsView:_add_external_layout(layout)
 	local spacing_entry = {
+		is_external = true,
 		widget_type = "spacing_vertical"
 	}
 
 	table.insert(layout, 1, spacing_entry)
 	table.insert(layout, #layout + 1, spacing_entry)
+end
+
+local SACRIFICE_LAYOUT_GRID_SIZE = {
+	640,
+	900
+}
+
+function CraftingMechanicusBarterItemsView:_present_sacrifice_layout(layout)
+	local generate_blueprints_function = require("scripts/ui/view_content_blueprints/item_blueprints")
+	local ItemContentBlueprints = generate_blueprints_function(SACRIFICE_LAYOUT_GRID_SIZE)
+	local item_layout = table.append({}, layout)
+
+	if item_layout[1] and not item_layout[1].is_external then
+		self:_add_external_layout(item_layout)
+	end
 
 	local grow_direction = self._grow_direction or "down"
 	local sort_options = self._sort_options
 	local sort_index = self._selected_sort_option_index or 1
 	local selected_sort_option = sort_options[sort_index]
 	local selected_sort_function = selected_sort_option.sort_function
+	self._item_grid_layout = item_layout
 
-	function self:_current_present_grid_layout_callback(new_layout)
-		self._item_grid:present_grid_layout(new_layout, ItemContentBlueprints, nil, nil, nil, nil, function ()
+	function self:_current_present_grid_layout_callback(callback_layout)
+		self._item_grid:present_grid_layout(callback_layout, ItemContentBlueprints, nil, nil, nil, nil, function ()
 			if not self._using_cursor_navigation then
 				self._item_grid:select_first_index()
 
@@ -937,6 +976,11 @@ end
 function CraftingMechanicusBarterItemsView:_reset_master_xp_increase()
 	local mastery_id = self._selected_pattern
 	local mastery_data = self._masteries[mastery_id]
+
+	if mastery_data == nil then
+		return
+	end
+
 	local mastery_max_level = mastery_data.mastery_max_level
 	local exp_per_level = Mastery.get_weapon_xp_per_level(mastery_data)
 	local mastery_current_xp = mastery_data.current_xp
@@ -1255,6 +1299,20 @@ function CraftingMechanicusBarterItemsView:_item_hover_update()
 	end
 end
 
+function CraftingMechanicusBarterItemsView:_get_offer_item_layout_by_gear_id(gear_id)
+	local offer_items_layout = self._offer_items_layout
+
+	if offer_items_layout then
+		for i = 1, #offer_items_layout do
+			local offer = offer_items_layout[i]
+
+			if offer.item and offer.item.gear_id and offer.item.gear_id == gear_id then
+				return offer, i
+			end
+		end
+	end
+end
+
 function CraftingMechanicusBarterItemsView:_change_state(state_name)
 	self._widgets_by_name.sacrifice_intro.content.visible = false
 	self._widgets_by_name.patterns_grid_panels.content.visible = false
@@ -1351,11 +1409,10 @@ function CraftingMechanicusBarterItemsView:_change_state(state_name)
 		self._widgets_by_name.confirm_button.content.gamepad_action = "secondary_action_pressed"
 		local item_layout = {}
 
-		for gear_id, layout in pairs(self._offer_items_layout) do
+		for i = 1, #self._offer_items_layout do
+			local layout = self._offer_items_layout[i]
 			item_layout[#item_layout + 1] = layout
 		end
-
-		self._filtered_offer_items_layout = item_layout
 
 		self:_present_items_layout(item_layout, function ()
 			local widgets = self._item_grid:widgets()
@@ -1384,13 +1441,13 @@ function CraftingMechanicusBarterItemsView:_change_state(state_name)
 		local mastery_id = self._selected_pattern
 		local item_layout = {}
 
-		for gear_id, layout in pairs(self._offer_items_layout) do
-			if self._selected_items[gear_id] then
+		for gear_id, _ in pairs(self._selected_items) do
+			local layout = self:_get_offer_item_layout_by_gear_id(gear_id)
+
+			if layout then
 				item_layout[#item_layout + 1] = layout
 			end
 		end
-
-		self._filtered_offer_items_layout = item_layout
 
 		self:_present_sacrifice_layout(item_layout)
 		self:_present_mastery(mastery_id)
@@ -1438,7 +1495,11 @@ function CraftingMechanicusBarterItemsView:_complete_purchase()
 	Managers.data_service.crafting:extract_weapon_mastery(mastery_id, gear_ids):next(function (data)
 		for i = 1, #data.gear_ids do
 			local gear_id = data.gear_ids[i]
-			self._offer_items_layout[gear_id] = nil
+			local layout, index = self:_get_offer_item_layout_by_gear_id(gear_id)
+
+			if index then
+				table.remove(self._offer_items_layout, index)
+			end
 		end
 
 		self._selected_items = {}
@@ -1487,8 +1548,12 @@ function CraftingMechanicusBarterItemsView:_complete_purchase()
 		local slot_types = tab_content.slot_types
 		local filtered_items = {}
 
-		for id, layout in pairs(self._offer_items_layout) do
-			filtered_items[#filtered_items + 1] = layout.item
+		for i = 1, #self._offer_items_layout do
+			local item = self._offer_items_layout[i] and self._offer_items_layout[i].item
+
+			if item then
+				filtered_items[#filtered_items + 1] = item
+			end
 		end
 
 		self:_present_pattern_layout(slot_types)

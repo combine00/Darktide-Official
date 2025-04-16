@@ -6,6 +6,10 @@ local function unique_name(name, table)
 end
 
 function StateMachine:init(name, parent, ...)
+	local parent_name = parent and unique_name(parent._name, parent)
+
+	GameStateDebugInfo:on_state_machine_created(parent_name, unique_name(name, self))
+
 	self._name = name
 	self._global_args = {
 		...
@@ -35,6 +39,8 @@ function StateMachine:init(name, parent, ...)
 end
 
 function StateMachine:destroy()
+	GameStateDebugInfo:on_destroy_state_machine(unique_name(self._name, self))
+
 	local state = self._current_state
 	self._current_state = nil
 
@@ -296,6 +302,8 @@ end
 function StateMachine:_enter_state(state_class, args)
 	local state = state_class:new(self, unpack(self._global_args))
 	self._current_state = state
+
+	GameStateDebugInfo:on_change_state(unique_name(self._name, self), state.__class_name)
 
 	if state.enter then
 		state:enter(unpack(args))

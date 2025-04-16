@@ -588,7 +588,7 @@ function ProfileUtils.replace_profile_for_prologue(profile)
 	local item_definitions = MasterItems.get_cached()
 	local override_profiles = PrologueCharacterProfileOverride(item_definitions)
 	local archetype = profile.archetype
-	local override_table = override_profiles[archetype]
+	local override_table = override_profiles[archetype.name]
 
 	if not override_table then
 		return profile
@@ -701,11 +701,17 @@ function ProfileUtils.generate_random_name(profile)
 	return name
 end
 
-function ProfileUtils.character_archetype_title(profile, exlude_symbol)
+function ProfileUtils.character_archetype_title(profile, exclude_symbol)
+	if not profile or table.is_empty(profile) then
+		Log.error("ProfileUtils", "Empty argument profile in function character_archetype_title")
+
+		return "???"
+	end
+
 	local archetype = profile.archetype
 	local text = nil
 
-	if UISettings.archetype_font_icon[archetype.name] and not exlude_symbol then
+	if UISettings.archetype_font_icon[archetype.name] and not exclude_symbol then
 		text = string.format("%s %s", UISettings.archetype_font_icon[archetype.name], Localize(archetype.archetype_name))
 	else
 		text = Localize(archetype.archetype_name)

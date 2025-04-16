@@ -4,6 +4,7 @@ local DebugSingleton = require("scripts/foundation/utilities/debug/debug_singlet
 local DialogueSpeakerVoiceSettings = require("scripts/settings/dialogue/dialogue_speaker_voice_settings")
 local FixedFrame = require("scripts/utilities/fixed_frame")
 local GameModeSettings = require("scripts/settings/game_mode/game_mode_settings")
+local HordesModeSettings = require("scripts/settings/hordes_mode_settings")
 local MasterItems = require("scripts/backend/master_items")
 local PlayerCharacterConstants = require("scripts/settings/player_character/player_character_constants")
 local Promise = require("scripts/foundation/utilities/promise")
@@ -31,6 +32,7 @@ local categories = {
 	"Error",
 	"Free Flight Camera",
 	"Game Mode",
+	"Horde Mode",
 	"Immaterium (Party)",
 	"Level & Mission",
 	"Marketing",
@@ -54,6 +56,7 @@ local categories = {
 	"Player Voice",
 	"Progression",
 	"Scripted Scenarios",
+	"Social Features",
 	"Stagger",
 	"Suppression",
 	"Sweep Spline",
@@ -106,6 +109,101 @@ functions.apply_ailment_to_selected_unit = {
 	options_function = ailment_options,
 	on_activated = apply_ailment_to_selected_unit
 }
+local hordes_mode_buff_options = {
+	"hordes_buff_rending_increase",
+	"hordes_buff_damage_increase",
+	"hordes_buff_suppression_immunity",
+	"hordes_buff_increased_damage_after_reload",
+	"hordes_buff_reduce_damage_taken_on_disabled_allies",
+	"hordes_buff_improved_weapon_reload_on_melee_kill",
+	"hordes_buff_burning_on_melee_hit",
+	"hordes_buff_burning_on_ranged_hit",
+	"hordes_buff_heavy_attacks_gain_damage_and_stagger",
+	"hordes_buff_toughness_on_ranged_kill",
+	"hordes_buff_toughness_regen_in_melee_range",
+	"hordes_buff_grenade_replenishment_over_time",
+	"hordes_buff_combat_ability_cooldown_on_damage_taken",
+	"hordes_buff_coherency_corruption_healing",
+	"hordes_buff_grenade_duplication_on_explosion",
+	"hordes_buff_extra_grenade_throw_chance",
+	"hordes_buff_ogryn_box_of_surprises",
+	"hordes_buff_ogryn_taunt_on_lunge",
+	"hordes_buff_ogryn_apply_fire_on_shout",
+	"hordes_buff_veteran_infinite_ammo_during_stance",
+	"hordes_buff_veteran_increased_damage_after_stealth",
+	"hordes_buff_ogryn_omega_lucky_rock",
+	"hordes_buff_combat_ability_cooldown_on_kills",
+	"hordes_buff_burning_on_melee_hit_taken",
+	"hordes_buff_auto_clip_fill_while_melee",
+	"hordes_buff_grenade_heals_on_explosion",
+	"hordes_buff_damage_vs_burning",
+	"hordes_buff_toughness_on_fire_damage_dealt",
+	"hordes_buff_burning_damage_per_burning_enemy",
+	"hordes_buff_damage_taken_by_flamers_and_grenadier_reduced",
+	"hordes_buff_coherency_burning_duration",
+	"hordes_buff_coherency_damage_vs_burning",
+	"hordes_buff_fire_pulse",
+	"hordes_buff_shock_pulse_on_toughness_broken",
+	"hordes_buff_health_regen",
+	"hordes_buff_toughness_damage_taken_above_threshold",
+	"hordes_buff_reduce_swap_time",
+	"hordes_buff_bonus_crit_chance_on_ammo",
+	"hordes_buff_no_ammo_consumption_on_crits",
+	"hordes_buff_other_slot_damage_increase_on_kill",
+	"hordes_buff_damage_vs_electrocuted",
+	"hordes_buff_two_extra_wounds",
+	"hordes_buff_instakill_melee_hit_on_electrocuted_enemy",
+	"hordes_buff_improved_dodge_speed_and_distance",
+	"hordes_buff_shock_on_hit_after_dodge",
+	"hordes_buff_coherency_damage_taken_close_to_electrocuted_enemy",
+	"hordes_buff_damage_taken_close_to_electrocuted_enemy",
+	"hordes_buff_shock_on_melee_hit",
+	"hordes_buff_shock_on_ranged_hit",
+	"hordes_buff_weakspot_ranged_hit_always_stagger",
+	"hordes_buff_spawn_dome_shield_on_grenade_explosion",
+	"hordes_buff_grenade_explosion_applies_elemental_weakness",
+	"hordes_buff_psyker_shock_on_touch_force_field",
+	"hordes_buff_psyker_smite_always_max_damage",
+	"hordes_buff_psyker_shout_always_stagger",
+	"hordes_buff_psyker_shout_boosts_allies",
+	"hordes_buff_psyker_overcharge_reduced_damage_taken",
+	"hordes_buff_psyker_brain_burst_burns_and_bleeds_on_hit",
+	"hordes_buff_psyker_brain_burst_spreads_fire_on_hit",
+	"hordes_buff_psyker_burning_on_throwing_knife_hit",
+	"hordes_buff_psyker_recover_knife_on_knife_kill",
+	"hordes_buff_explode_enemies_on_ranged_kill",
+	"hordes_buff_grenade_explosion_applies_rending_debuff",
+	"hordes_buff_grenade_explosion_kill_replenish_grenades",
+	"hordes_buff_psyker_brain_burst_hits_nearby_enemies",
+	"hordes_buff_zealot_channel_heals_corruption",
+	"hordes_buff_zealot_shock_grenade_increase_next_hit_damage",
+	"hordes_buff_zealot_fire_pulse_while_aiming_lunge",
+	"hordes_buff_zealot_lunge_hit_triggers_shout",
+	"hordes_buff_zealot_regen_toughness_inside_fire_grenade",
+	"hordes_buff_zealot_knives_bleed_and_restore_thoughness_on_kill",
+	"hordes_buff_shock_on_grenade_impact",
+	"hordes_buff_shock_closest_enemy_on_interval",
+	"hordes_buff_damage_increase_on_toughness_broken",
+	"hordes_buff_ranged_attacks_hit_mass_penetration_increased",
+	"hordes_buff_weakspot_ranged_hit_gives_infinite_ammo",
+	"hordes_buff_melee_damage_missing_ammo_in_clip",
+	"hordes_buff_veteran_shock_units_in_smoke_grenade",
+	"hordes_buff_veteran_grouped_upgraded_stealth",
+	"hordes_buff_veteran_apply_infinite_bleed_on_shout",
+	"hordes_buff_extra_ability_charge",
+	"hordes_buff_ogryn_fire_trail_on_lunge",
+	"hordes_buff_zealot_fire_trail_on_lunge",
+	"hordes_buff_aoe_shock_closest_enemy_on_interval",
+	"hordes_buff_veteran_sticky_grenade_pulls_enemies",
+	"hordes_buff_ogryn_rock_charge_while_wield",
+	"hordes_buff_ogryn_biggest_boom_grenade",
+	"hordes_buff_staggering_pulse",
+	"hordes_buff_ogryn_increase_penetration_during_stance",
+	"hordes_buff_extra_toughness_near_burning_shocked_enemies",
+	"hordes_buff_shock_on_blocking_melee_attack"
+}
+
+table.sort(hordes_mode_buff_options)
 
 local function buff_options()
 	local BuffTemplates = require("scripts/settings/buff/buff_templates")
@@ -305,6 +403,59 @@ functions.apply_buff_group_to_selected_unit = {
 	category = "Buffs",
 	options_function = buff_group_options,
 	on_activated = apply_buff_group_to_selected_unit
+}
+
+local function horde_mode_request_buff(buff_name, give_buff_to_self)
+	if not buff_name or buff_name == "" then
+		Log.error("DebugFunctions", "Invalid Buff Name to give to players.")
+
+		return
+	end
+
+	Managers.event:trigger("mission_buffs_event_request_specific_buff", buff_name, give_buff_to_self)
+end
+
+functions.horde_mode_apply_buff_to_all_players = {
+	name = "Horde Mode Request Buff",
+	debug_mission_buffs_request_buff = true,
+	category = "Buffs",
+	dropdown_width = 250,
+	filter_input_width = 100,
+	on_activated = horde_mode_request_buff,
+	buff_options = hordes_mode_buff_options
+}
+functions.horde_mode_tag_all_enemies_local = {
+	name = "Tag All Enemies (Local Client)",
+	category = "Horde Mode",
+	on_activated = function ()
+		Managers.event:trigger("event_surival_mode_tag_remaining_enemies")
+	end
+}
+local horde_mode_island_names = HordesModeSettings.island_names
+functions.horde_mode_select_island_to_play = {
+	name = "Select Island To Play",
+	category = "Horde Mode",
+	options_function = function ()
+		return horde_mode_island_names
+	end,
+	on_activated = function (selected_option)
+		if Managers.state.game_session:is_server() then
+			local level = Managers.state.mission:mission_level()
+			local game_mode_name = Managers.state.game_mode and Managers.state.game_mode:game_mode_name()
+
+			if game_mode_name and level then
+				Log.info("GameModeSurvival", "Server changes Island to play: ", selected_option)
+
+				local island_selected_level_event_name = "debug_horde_mode_" .. selected_option .. "_selected"
+
+				Level.trigger_event(level, island_selected_level_event_name)
+			end
+		else
+			local island_name_id = NetworkLookup.hordes_island_names[selected_option]
+
+			Managers.connection:send_rpc_server("rpc_server_hordes_debug_select_island", island_name_id)
+		end
+	end
 }
 
 local function _mission_name()
@@ -795,6 +946,137 @@ functions.mission_board_start_mission = {
 
 			Managers.party_immaterium:wanted_mission_selected(backend_mission_id)
 		end
+	end
+}
+
+local function _havoc_options()
+	local havoc_options = {}
+
+	for i = 1, 100 do
+		havoc_options[#havoc_options + 1] = i
+	end
+
+	return havoc_options
+end
+
+functions.start_havoc_session = {
+	name = "Start Havoc Session",
+	debug_havoc_mission_input = true,
+	category = "Level & Mission",
+	on_activated = function (debug_mission)
+		local map = debug_mission.map
+		local havoc_rank = debug_mission.havoc_rank
+
+		Log.info("Havoc", "Starting havoc level %d", havoc_rank)
+		Managers.data_service.mission_board:create_havoc_debug_mission(map, havoc_rank):next(function (mission)
+			local mission_id = mission.id
+
+			Managers.party_immaterium:wanted_mission_selected(mission_id)
+		end):catch(function (error)
+			Log.error("DebugFunctions", "Could not create debug mission " .. table.tostring(error, 5))
+		end)
+	end,
+	maps = array_concat(mission_options(), mission_options_dev()),
+	havoc_options = _havoc_options(),
+	default_value = {
+		map = "dm_forge",
+		havoc_rank = 5
+	}
+}
+functions.set_havoc_unlock_status = {
+	name = "Reset havoc_unlock_status",
+	category = "Progression",
+	on_activated = function ()
+		Managers.data_service.havoc:set_havoc_unlock_status("locked")
+		Managers.narrative:set_havoc_unlock_status("locked")
+	end
+}
+functions.start_havoc_test_session_voting = {
+	name = "Start Havoc Mission Vote",
+	category = "Level & Mission",
+	on_activated = function (debug_mission)
+		local transition_time = nil
+		local close_previous = false
+		local close_all = false
+		local close_transition_time = nil
+		local context = {
+			backend_mission_id = "eac4d0dc-5ab1-41ed-87e9-85bedac46ad6",
+			voting_id = "immaterium_party:bcd93b02-c635-4aba-89ef-ed786217f2a6",
+			mission_data = {
+				map = "cm_raid",
+				missionSize = 1,
+				displayIndex = 0,
+				missionGiver = "explicator_a",
+				resistance = 5,
+				xp = 5550,
+				minPrivateParticipants = 3,
+				credits = 24500,
+				challenge = 5,
+				start = "1730109745545",
+				expiry = "2082758399000",
+				requiredLevel = 1,
+				circumstance = "default",
+				depleted = false,
+				category = "havoc",
+				id = "eac4d0dc-5ab1-41ed-87e9-85bedac46ad6",
+				eligibleParticipants = {},
+				extraRewards = {},
+				flags = {
+					["havoc-circ-darkness_01"] = {},
+					["havoc-circ-mutator_havoc_enemies_parasite_headshot"] = {},
+					["havoc-circ-mutator_havoc_tougher_skin"] = {},
+					["havoc-circ-mutator_highest_difficulty"] = {},
+					["havoc-faction-renegade"] = {},
+					["havoc-mods-ammo_pickup_modifier-5"] = {},
+					["havoc-mods-buff_elites-4"] = {},
+					["havoc-mods-buff_horde-5"] = {},
+					["havoc-mods-buff_monsters-4"] = {},
+					["havoc-mods-buff_specials-4"] = {},
+					["havoc-mods-horde_spawn_rate_increase-6"] = {},
+					["havoc-mods-melee_minion_attack_speed-5"] = {},
+					["havoc-mods-melee_minion_permanent_damage-5"] = {},
+					["havoc-mods-melee_minion_power_level_buff-5"] = {},
+					["havoc-mods-more_alive_specials-4"] = {},
+					["havoc-mods-more_elites-5"] = {},
+					["havoc-mods-more_ogryns-5"] = {},
+					["havoc-mods-ranged_minion_attack_speed-5"] = {},
+					["havoc-mods-reduce_health_and_wounds-5"] = {},
+					["havoc-mods-reduce_toughness-5"] = {},
+					["havoc-mods-reduce_toughness_regen-5"] = {},
+					["havoc-mods-terror_event_point_increase-5"] = {},
+					["havoc-rank-35"] = {},
+					["havoc-theme-darkness"] = {},
+					["order-id-642629d7-7c88-464a-b710-d1d2d79c71bb"] = {},
+					["order-owner-aaebd154-43dc-4c9c-9d6b-7b48605a4b4a"] = {}
+				}
+			}
+		}
+		local settings_override = {
+			game_world_blur = 1,
+			name = "mission_voting_view",
+			display_name = "loc_mission_voting_view",
+			state_bound = true,
+			close_on_hotkey_gamepad = false,
+			path = "scripts/ui/views/mission_voting_view/mission_voting_view",
+			package = "packages/ui/views/mission_voting_view/mission_voting_view",
+			load_always = true,
+			class = "MissionVotingView",
+			disable_game_world = false,
+			load_in_hub = true,
+			close_on_hotkey_pressed = true,
+			enter_sound_events = {
+				"wwise/events/ui/play_ui_mission_request"
+			},
+			testify_flags = {
+				ui_views = false
+			}
+		}
+
+		if not table.is_empty(Managers.ui:active_views()) then
+			Managers.ui:close_all_views()
+		end
+
+		Managers.ui:open_view("mission_voting_view", transition_time, close_previous, close_all, close_transition_time, context, settings_override)
 	end
 }
 functions.mission_board_update_missions = {
@@ -1360,6 +1642,12 @@ local function _create_weapon_categories(item_definitions, data, slot_name)
 				break
 			end
 
+			local is_unarmed = string.find(name, "unarmed")
+
+			if is_unarmed then
+				break
+			end
+
 			local slot_valid = table.contains(slots, slot_name)
 
 			if not slot_valid then
@@ -1410,6 +1698,10 @@ local function _create_weapon_categories(item_definitions, data, slot_name)
 		until true
 	end
 
+	local breeds = {
+		"human",
+		"ogryn"
+	}
 	local workflow_states = {
 		"releasable",
 		"shippable",
@@ -1418,12 +1710,10 @@ local function _create_weapon_categories(item_definitions, data, slot_name)
 		"blockout"
 	}
 
-	for ii = 1, #workflow_states do
-		_add_weapon_category(slot_name, "human", workflow_states[ii], definitions)
-	end
-
-	for ii = 1, #workflow_states do
-		_add_weapon_category(slot_name, "ogryn", workflow_states[ii], definitions)
+	for breed_i = 1, #breeds do
+		for workflow_i = 1, #workflow_states do
+			_add_weapon_category(slot_name, breeds[breed_i], workflow_states[workflow_i], definitions)
+		end
 	end
 end
 
@@ -3013,6 +3303,14 @@ functions.premium_store_custom_time = {
 		ParameterResolver.set_dev_parameter("premium_store_custom_time", new_value)
 	end
 }
+functions.collect_cosmetics = {
+	name = "Collect playtest cosmetics",
+	button_text = "Activate",
+	category = "Micro Transaction (\"Premium\") Store",
+	on_activated = function ()
+		Managers.data_service.store:debug_empty_store("get_playtest_cosmetic_store")
+	end
+}
 
 for key, config in pairs(functions) do
 	local category = config.category
@@ -3037,6 +3335,20 @@ local function initialize()
 	player_manager = Managers.player
 	ui_manager = Managers.ui
 end
+
+local function add_account_to_block_users_states()
+	if IS_PLAYSTATION then
+		Managers.account:request_block_user_states("4030197760692964687")
+	else
+		Log.error("Debug function add_account_to_block_users_states", string.format("You cannot use this function if you are not on Playstation! "))
+	end
+end
+
+functions.add_account_to_block_users_states = {
+	name = "Request random block user states",
+	category = "Social Features",
+	on_activated = add_account_to_block_users_states
+}
 
 return {
 	parameters = functions,

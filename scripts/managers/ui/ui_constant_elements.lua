@@ -131,7 +131,7 @@ function UIConstantElements:_add_element(definition, elements, elements_array)
 	if not validation_function or validation_function(self) then
 		local filename = definition.filename
 		local class = require(filename)
-		local draw_layer = 0
+		local draw_layer = definition.draw_layer or 0
 		local element = class:new(self, draw_layer)
 		elements[class_name] = element
 		local id = #elements_array + 1
@@ -148,6 +148,19 @@ end
 
 function UIConstantElements:ui_renderer()
 	return self._ui_renderer
+end
+
+function UIConstantElements:post_update(dt, t)
+	local elements_array = self._elements_array
+
+	for i = 1, #elements_array do
+		local element = elements_array[i]
+		local element_name = element.__class_name
+
+		if element.post_update and element:should_update() then
+			element:post_update(dt, t)
+		end
+	end
 end
 
 function UIConstantElements:update(dt, t, input_service)

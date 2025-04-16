@@ -34,12 +34,12 @@ local weapon_action_data = {
 		flamer_gas = _require_weapon_action("action_flamer_gas"),
 		flamer_gas_burst = _require_weapon_action("action_flamer_gas_burst"),
 		give_pocketable = _require_weapon_action("action_give_pocketable"),
-		heal_target_over_time = _require_weapon_action("action_heal_target_over_time"),
 		inspect = _require_weapon_action("action_inspect"),
 		melee_explosive = _require_weapon_action("action_melee_explosive"),
 		overload_charge = _require_weapon_action("action_overload_charge"),
 		overload_charge_position_finder = _require_weapon_action("action_overload_charge_position_finder"),
 		overload_charge_target_finder = _require_weapon_action("action_overload_charge_target_finder"),
+		overload_charge_weapon_special = _require_weapon_action("action_overload_charge_weapon_special"),
 		overload_explosion = _require_weapon_action("action_overload_explosion"),
 		overload_target_finder = _require_weapon_action("action_overload_target_finder"),
 		place_deployable = _require_weapon_action("action_place_deployable"),
@@ -69,6 +69,7 @@ local weapon_action_data = {
 		unwield = _require_weapon_action("action_unwield"),
 		unwield_to_previous = _require_weapon_action("action_unwield_to_previous"),
 		unwield_to_specific = _require_weapon_action("action_unwield_to_specific"),
+		use_auspex = _require_weapon_action("action_use_auspex"),
 		use_syringe = _require_weapon_action("action_use_syringe"),
 		vent_overheat = _require_weapon_action("action_vent_overheat"),
 		vent_warp_charge = _require_weapon_action("action_vent_warp_charge"),
@@ -312,6 +313,9 @@ weapon_action_data.action_kind_condition_funcs = {
 		return true
 	end,
 	activate_special = function (action_settings, condition_func_params, used_input)
+		return _weapon_special_active_cooldown(action_settings, condition_func_params)
+	end,
+	overload_charge_weapon_special = function (action_settings, condition_func_params, used_input)
 		return _weapon_special_active_cooldown(action_settings, condition_func_params)
 	end,
 	ranged_load_special = function (action_settings, condition_func_params, used_input)
@@ -644,6 +648,10 @@ weapon_action_data.action_kind_to_running_action_chain_event = {
 	overload_charge_target_finder = {
 		fully_charged = true
 	},
+	overload_charge_weapon_special = {
+		fully_charged = true,
+		overheating = true
+	},
 	reload_shotgun = {
 		reload_loop = true
 	},
@@ -667,6 +675,13 @@ weapon_action_data.action_kind_to_running_action_chain_event = {
 	vent_warp_charge = {
 		fully_vented = true
 	}
+}
+weapon_action_data.action_kind_with_reversed_timescale = {
+	overload_target_finder = true,
+	overload_charge_position_finder = true,
+	overload_charge_weapon_special = true,
+	overload_charge_target_finder = true,
+	overload_charge = true
 }
 
 for name, _ in pairs(weapon_action_data.action_kind_condition_funcs) do

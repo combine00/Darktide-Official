@@ -1,8 +1,8 @@
 local SmartTargeting = require("scripts/utilities/smart_targeting")
 local EMPTY_TABLE = {}
-local PsykerSingleTargetSmartTargetingActionModule = class("PsykerSingleTargetSmartTargetingActionModule")
+local PsykerChainLightningSingleTargetingActionModule = class("PsykerChainLightningSingleTargetingActionModule")
 
-function PsykerSingleTargetSmartTargetingActionModule:init(physics_world, player_unit, component, action_settings)
+function PsykerChainLightningSingleTargetingActionModule:init(physics_world, player_unit, component, action_settings)
 	self._physics_world = physics_world
 	self._player_unit = player_unit
 	self._component = component
@@ -15,7 +15,7 @@ function PsykerSingleTargetSmartTargetingActionModule:init(physics_world, player
 	self._buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 end
 
-function PsykerSingleTargetSmartTargetingActionModule:start(action_settings, t)
+function PsykerChainLightningSingleTargetingActionModule:start(action_settings, t)
 	if self._action_settings.no_target_reset then
 		return
 	end
@@ -28,7 +28,7 @@ end
 
 local ChainLightning = require("scripts/utilities/action/chain_lightning")
 
-function PsykerSingleTargetSmartTargetingActionModule:fixed_update(dt, t)
+function PsykerChainLightningSingleTargetingActionModule:fixed_update(dt, t)
 	if self._unit_data_extension.is_resimulating then
 		return
 	end
@@ -77,7 +77,7 @@ function PsykerSingleTargetSmartTargetingActionModule:fixed_update(dt, t)
 	end
 end
 
-function PsykerSingleTargetSmartTargetingActionModule:finish(reason, data, t)
+function PsykerChainLightningSingleTargetingActionModule:finish(reason, data, t)
 	if reason == "hold_input_released" or reason == "stunned" then
 		local component = self._component
 		component.target_unit_1 = nil
@@ -86,4 +86,4 @@ function PsykerSingleTargetSmartTargetingActionModule:finish(reason, data, t)
 	end
 end
 
-return PsykerSingleTargetSmartTargetingActionModule
+return PsykerChainLightningSingleTargetingActionModule

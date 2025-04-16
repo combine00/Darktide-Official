@@ -6,13 +6,14 @@ local talent_settings = {
 	},
 	overcharge_stance = {
 		cooloff_duration = 1.5,
-		finesse_damage_per_stack = 0.01,
-		damage_per_stack = 0.01,
+		venting = 0.5,
 		base_damage = 0.1,
-		max_stacks = 30,
+		finesse_damage_per_stack = 0.01,
 		second_per_weakspot = 1,
-		crit_chance = 0.2,
-		post_stance_duration = 10
+		post_stance_duration = 10,
+		damage_per_stack = 0.01,
+		max_stacks = 30,
+		crit_chance = 0.2
 	},
 	mark_passive = {
 		weakspot_stacks = 3
@@ -34,9 +35,9 @@ local talent_settings = {
 			stacks = 1
 		},
 		melee_weaving = {
-			warp_generation = 0.8,
-			duration = 4,
-			vent_percentage = 0.05
+			warp_generation = 0.75,
+			duration = 5,
+			vent_percentage = 0.1
 		},
 		melee_attack_speed = {
 			attack_speed = 0.1
@@ -58,8 +59,8 @@ local talent_settings = {
 			proc_chance = 1
 		},
 		reload_speed_warp = {
-			reload_speed = 0.25,
-			warp_charge = 0.25,
+			reload_speed = 0.3,
+			warp_charge = 0.15,
 			threshold = 0.75
 		},
 		soulblaze_reduces_damage_taken = {
@@ -167,7 +168,7 @@ local talent_settings = {
 			on_kill_proc_chance = 0.04
 		},
 		coop_2 = {
-			percent = 0.05
+			percent = 0.04
 		},
 		coop_3 = {
 			damage_taken_multiplier = 1.25,
@@ -252,7 +253,7 @@ local talent_settings = {
 		},
 		passive_1 = {
 			max_stacks = 1,
-			empowered_chain_lightning_chance = 0.075,
+			empowered_chain_lightning_chance = 0.1,
 			chain_lightning_damage = 2,
 			psyker_smite_cost_multiplier = 0
 		},
@@ -283,7 +284,7 @@ local talent_settings = {
 			max_stacks_talent = 3
 		},
 		offensive_3 = {
-			proc_chance = 0.1,
+			proc_chance = 0.2,
 			power_level = 500,
 			special_proc_chance = 1
 		},
@@ -314,10 +315,10 @@ local talent_settings = {
 			distance = 5
 		},
 		spec_passive_1 = {
-			toughness_for_allies = 0.15
+			toughness_for_allies = 0.2
 		},
 		spec_passive_2 = {
-			empowered_chain_lightning_chance = 0.125
+			empowered_chain_lightning_chance = 0.15
 		},
 		spec_passive_3 = {
 			attack_speed = 0.15,

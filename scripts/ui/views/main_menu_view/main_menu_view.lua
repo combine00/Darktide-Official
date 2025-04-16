@@ -628,7 +628,12 @@ function MainMenuView:_on_delete_selected_character_pressed()
 					Managers.event:trigger("event_request_delete_character", character_id)
 
 					self._delete_popup_id = nil
-				end)
+				end),
+				template_options = {
+					start_delay = 2,
+					timer = 3,
+					start_input_action = "confirm_pressed"
+				}
 			},
 			{
 				text = "loc_main_menu_delete_character_popup_cancel",

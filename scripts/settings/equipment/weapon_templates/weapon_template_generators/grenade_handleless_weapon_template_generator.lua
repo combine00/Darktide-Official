@@ -143,36 +143,114 @@ local function generate_base_template()
 			}
 		},
 		action_input_hierarchy = {
-			wield = "stay",
-			unwield_to_previous = "base",
-			block_cancel = "stay",
-			combat_ability = "base",
-			aim_hold = {
-				wield = "base",
-				aim_released = "previous",
-				combat_ability = "base",
-				unwield_to_previous = "base",
-				block_cancel = {
-					wield = "base",
-					block_cancel_release = "base",
-					combat_ability = "base",
-					unwield_to_previous = "base"
+			{
+				input = "aim_hold",
+				transition = {
+					{
+						transition = "previous",
+						input = "aim_released"
+					},
+					{
+						input = "block_cancel",
+						transition = {
+							{
+								transition = "base",
+								input = "block_cancel_release"
+							},
+							{
+								transition = "base",
+								input = "wield"
+							},
+							{
+								transition = "base",
+								input = "unwield_to_previous"
+							},
+							{
+								transition = "base",
+								input = "combat_ability"
+							}
+						}
+					},
+					{
+						transition = "base",
+						input = "wield"
+					},
+					{
+						transition = "base",
+						input = "unwield_to_previous"
+					},
+					{
+						transition = "base",
+						input = "combat_ability"
+					}
 				}
 			},
-			short_hand_aim_hold = {
-				combat_ability = "base",
-				wield = "base",
-				short_hand_aim_released = "previous",
-				unwield_to_previous = "base",
-				short_hand_throw = {
-					short_hand_throw_release = "base",
-					wield = "base",
-					combat_ability = "base",
-					unwield_to_previous = "base"
+			{
+				input = "short_hand_aim_hold",
+				transition = {
+					{
+						transition = "previous",
+						input = "short_hand_aim_released"
+					},
+					{
+						input = "short_hand_throw",
+						transition = {
+							{
+								transition = "base",
+								input = "short_hand_throw_release"
+							},
+							{
+								transition = "base",
+								input = "wield"
+							},
+							{
+								transition = "base",
+								input = "unwield_to_previous"
+							},
+							{
+								transition = "base",
+								input = "combat_ability"
+							}
+						}
+					},
+					{
+						transition = "base",
+						input = "wield"
+					},
+					{
+						transition = "base",
+						input = "unwield_to_previous"
+					},
+					{
+						transition = "base",
+						input = "combat_ability"
+					}
 				}
 			},
-			inspect_start = {
-				inspect_stop = "base"
+			{
+				transition = "stay",
+				input = "block_cancel"
+			},
+			{
+				transition = "stay",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "unwield_to_previous"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				input = "inspect_start",
+				transition = {
+					{
+						transition = "base",
+						input = "inspect_stop"
+					}
+				}
 			}
 		},
 		actions = {

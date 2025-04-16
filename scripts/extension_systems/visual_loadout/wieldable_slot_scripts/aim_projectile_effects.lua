@@ -1,4 +1,4 @@
-local Action = require("scripts/utilities/weapon/action")
+local Action = require("scripts/utilities/action/action")
 local AimProjectile = require("scripts/utilities/aim_projectile")
 local PlayerUnitStatus = require("scripts/utilities/attack/player_unit_status")
 local ProjectileIntegration = require("scripts/extension_systems/locomotion/utilities/projectile_integration")

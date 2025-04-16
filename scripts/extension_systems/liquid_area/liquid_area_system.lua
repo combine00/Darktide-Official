@@ -140,6 +140,18 @@ function LiquidAreaSystem:is_position_in_liquid(position)
 	return result
 end
 
+function LiquidAreaSystem:find_liquid_areas_in_position(position, results)
+	for _, extension in pairs(self._unit_to_extension_map) do
+		local is_inside = extension:is_position_inside(position)
+
+		if is_inside then
+			table.insert(results, extension)
+		end
+	end
+
+	return results
+end
+
 function LiquidAreaSystem:traverse_logic()
 	return self._traverse_logic
 end

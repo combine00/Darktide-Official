@@ -13,7 +13,7 @@ function HudElementMissionObjectiveFeed:init(parent, draw_layer, start_scale, de
 	self._objective_widgets_by_name = {}
 	self._hud_objectives = {}
 	self._hud_objectives_names_array = {}
-	self._mission_widget_definition = Definitions.objective_definition
+	self._mission_widget_definitions = Definitions.objective_definitions
 	self._mission_objective_system = Managers.state.extension:system("mission_objective_system")
 	self._scan_delay = HudElementMissionObjectiveFeedSettings.scan_delay
 	self._scan_delay_duration = 0
@@ -135,7 +135,10 @@ function HudElementMissionObjectiveFeed:_mission_objectives_scan(ui_renderer)
 			if not locally_added and not hud_objective:is_synchronized_with_objective(active_objective) then
 				hud_objective:synchronize_objective(active_objective)
 
-				if self:has_widget(objective_name) then
+				local widget = self._widgets_by_name[objective_name]
+
+				if widget then
+					self:_update_widget_height(widget, active_objective, hud_objective, ui_renderer)
 					self:_synchronize_widget_with_hud_objective(objective_name)
 					self:_align_objective_widgets()
 				end
@@ -156,10 +159,11 @@ function HudElementMissionObjectiveFeed:_mission_objectives_scan(ui_renderer)
 	end
 end
 
-function HudElementMissionObjectiveFeed:event_add_objective(objective, locally_added)
+function HudElementMissionObjectiveFeed:event_add_objective(objective, locally_added, on_add_callback)
 	self._event_objectives_to_add[#self._event_objectives_to_add + 1] = {
 		objective = objective,
-		locally_added = locally_added
+		locally_added = locally_added,
+		on_add_callback = on_add_callback
 	}
 end
 
@@ -174,32 +178,67 @@ function HudElementMissionObjectiveFeed:_add_objective(objective, ui_renderer, l
 	end
 
 	self._objective_widgets_counter = self._objective_widgets_counter + 1
-	local widget = self:_create_widget(objective_name, self._mission_widget_definition)
+	local objective_category = objective:objective_category()
+	local mission_widget_definition = self._mission_widget_definitions[objective_category]
+	local widget = self:_create_widget(objective_name, mission_widget_definition)
 	self._objective_widgets_by_name[objective_name] = widget
 
 	self:_synchronize_widget_with_hud_objective(objective_name)
+	self:_update_widget_height(widget, objective, new_hud_objective, ui_renderer)
+	self:_align_objective_widgets()
+end
 
+function HudElementMissionObjectiveFeed:_update_widget_height(widget, objective, hud_objective, ui_renderer)
 	local content = widget.content
-	local header_text = new_hud_objective:header()
-	local header_height = 0
-	local header_size = HudElementMissionObjectiveFeedSettings.header_size
 	local style = widget.style
+	local header_text = hud_objective:header()
 	local header_text_style = style.header_text
+	local objective_category = objective:objective_category()
+	local widget_height = 0
 
 	if header_text_style then
+		local header_size = HudElementMissionObjectiveFeedSettings.header_size
 		local text_size = {
 			header_text_style.size[1],
 			1000
 		}
 		local text_options = UIFonts.get_font_options_by_style(header_text_style)
 		local _, text_height = UIRenderer.text_size(ui_renderer, header_text, header_text_style.font_type, header_text_style.font_size, text_size, text_options)
-		header_height = text_height + 5
+		local header_height = text_height + 5
+
+		if hud_objective:progress_bar() then
+			local bar_height = style.bar.size[2] + 5
+			local text_y_offset_adjustment = -(bar_height / 2)
+
+			if content.show_alert then
+				text_y_offset_adjustment = text_y_offset_adjustment + 50
+			end
+
+			header_text_style.offset[2] = header_text_style.default_offset[2] + text_y_offset_adjustment
+			local bar_y_offset_adjustment = header_height / 2
+			style.bar.offset[2] = style.bar.default_offset[2] + bar_y_offset_adjustment
+			style.bar_background.offset[2] = style.bar_background.default_offset[2] + bar_y_offset_adjustment
+			style.bar_icon.offset[2] = style.bar_icon.default_offset[2] + bar_y_offset_adjustment
+			header_height = header_height + bar_height + 10
+		end
+
+		widget_height = widget_height + math.max(header_size[2], header_height)
+	else
+		widget_height = content.size[2]
 	end
 
-	local widget_height = math.max(header_size[2], header_height)
-	content.size[2] = widget_height
+	local widget_padding_by_category = HudElementMissionObjectiveFeedSettings.widget_padding_by_category
+	widget_height = widget_height + (widget_padding_by_category[objective_category] or 0)
 
-	self:_align_objective_widgets()
+	if content.show_alert then
+		widget_height = widget_height + style.alert_background.size[2]
+	end
+
+	if content.category == "overarching" then
+		widget_height = widget_height + 20
+	end
+
+	content.size[2] = widget_height
 end
 
 function HudElementMissionObjectiveFeed:_remove_objective(objective_name)
@@ -254,9 +293,15 @@ function HudElementMissionObjectiveFeed:_synchronize_widget_with_hud_objective(o
 	end
 
 	if hud_objective:use_counter() then
+		local max_increment_hidden = hud_objective:max_increment_hidden()
 		local current_amount = hud_objective:current_counter_amount()
 		local max_amount = hud_objective:max_counter_amount()
-		content.counter_text = tostring(current_amount) .. "/" .. tostring(max_amount)
+
+		if max_increment_hidden then
+			content.counter_text = tostring(current_amount)
+		else
+			content.counter_text = tostring(current_amount) .. "/" .. tostring(max_amount)
+		end
 	else
 		content.counter_text = ""
 	end
@@ -285,10 +330,8 @@ function HudElementMissionObjectiveFeed:_synchronize_widget_with_hud_objective(o
 
 		if alert then
 			style.hazard_above.color = HudElementMissionObjectiveFeedSettings.alert_color
-			style.overarching_background.size[2] = 15 + HudElementMissionObjectiveFeedSettings.header_size[2] + 10
 		else
 			style.hazard_above.color = style.hazard_above.base_color
-			style.overarching_background.size[2] = 15 + HudElementMissionObjectiveFeedSettings.header_size[2] + 10 + 20
 		end
 	else
 		content.show_alert = false
@@ -353,15 +396,9 @@ function HudElementMissionObjectiveFeed:_update_timer_progress(hud_objective, dt
 end
 
 function HudElementMissionObjectiveFeed:_get_objectives_height(widget, ui_renderer)
-	local content = widget.content
-	local style = widget.style
 	local widget_height = widget.content.size[2]
-	local show_bar = content.show_bar
-	local bar_height = show_bar and style.bar.size[2] or 0
-	local show_alert = content.show_alert
-	local alert_height = show_alert and style.alert_background.size[2] or 0
 
-	return widget_height + bar_height * 2 + alert_height
+	return widget_height
 end
 
 function HudElementMissionObjectiveFeed:_align_objective_widgets()
@@ -378,8 +415,8 @@ function HudElementMissionObjectiveFeed:_align_objective_widgets()
 	local function mission_objective_sort_function(a, b)
 		local a_objective = hud_objectives[a]
 		local b_objective = hud_objectives[b]
-		local a_priority = entry_order_by_objective_category[a_objective:objective_category()]
-		local b_priority = entry_order_by_objective_category[b_objective:objective_category()]
+		local a_priority = a_objective:sort_order() or entry_order_by_objective_category[a_objective:objective_category()]
+		local b_priority = b_objective:sort_order() or entry_order_by_objective_category[b_objective:objective_category()]
 
 		if a_priority == b_priority then
 			return false
@@ -419,7 +456,7 @@ function HudElementMissionObjectiveFeed:_align_objective_widgets()
 
 	local background_scenegraph_id = "background"
 
-	self:_set_scenegraph_size(background_scenegraph_id, nil, total_background_height + 10)
+	self:_set_scenegraph_size(background_scenegraph_id, nil, total_background_height)
 end
 
 function HudElementMissionObjectiveFeed:_draw_widgets(dt, t, input_service, ui_renderer, render_settings)

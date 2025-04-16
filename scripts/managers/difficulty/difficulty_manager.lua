@@ -1,14 +1,35 @@
+local Havoc = require("scripts/utilities/havoc")
 local MinionDifficultySettings = require("scripts/settings/difficulty/minion_difficulty_settings")
 local PlayerDifficultySettings = require("scripts/settings/difficulty/player_difficulty_settings")
+local Danger = require("scripts/utilities/danger")
 local DifficultyManager = class("DifficultyManager")
 
-function DifficultyManager:init(is_server, resistance, challenge)
+function DifficultyManager:init(is_server, resistance, challenge, havoc_data)
 	self._is_server = is_server
-	self._resistance = resistance
 	self._challenge = challenge
+	self._resistance = resistance
 	self._initial_challenge = challenge
+	self._initial_resistance = resistance
+	self._ammo_modifier = 1
 
 	Log.info("DifficultyManager", "Difficulty initialized to challenge %s, resistance %s", challenge, resistance)
+
+	if havoc_data then
+		local parsed_havoc_data = Havoc.parse_data(havoc_data)
+		self._parsed_havoc_data = parsed_havoc_data
+	end
+end
+
+function DifficultyManager:get_parsed_havoc_data()
+	return self._parsed_havoc_data
+end
+
+function DifficultyManager:set_ammo_modifier(modifier)
+	self._ammo_modifier = modifier
+end
+
+function DifficultyManager:get_ammo_modifier()
+	return self._ammo_modifier
 end
 
 function DifficultyManager:get_minion_max_health(breed_name)
@@ -49,8 +70,16 @@ function DifficultyManager:get_resistance()
 	return self._resistance
 end
 
-function DifficultyManager:get_difficulty()
+function DifficultyManager:get_initial_challenge()
 	return self._initial_challenge
+end
+
+function DifficultyManager:get_initial_resistance()
+	return self._initial_resistance
+end
+
+function DifficultyManager:get_danger_settings()
+	return Danger.danger_by_difficulty(self._initial_challenge, self._initial_resistance)
 end
 
 function DifficultyManager:get_dummy_challenge()

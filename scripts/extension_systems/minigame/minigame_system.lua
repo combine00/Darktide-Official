@@ -18,7 +18,9 @@ local CLIENT_RPCS = {
 	"rpc_minigame_sync_defuse_set_selection",
 	"rpc_minigame_sync_drill_generate_targets",
 	"rpc_minigame_sync_drill_set_cursor",
-	"rpc_minigame_sync_drill_set_search"
+	"rpc_minigame_sync_drill_set_search",
+	"rpc_minigame_sync_frequency_set_frequency",
+	"rpc_minigame_sync_frequency_set_target_frequency"
 }
 
 function MinigameSystem:init(context, system_init_data, ...)
@@ -176,6 +178,22 @@ function MinigameSystem:rpc_minigame_sync_drill_set_search(channel_id, unit_id, 
 	local minigame = extension:minigame(MinigameSettings.types.drill)
 
 	minigame:set_searching(searching and time)
+end
+
+function MinigameSystem:rpc_minigame_sync_frequency_set_frequency(channel_id, unit_id, is_level_unit, frequency_x, frequency_y)
+	local unit = Managers.state.unit_spawner:unit(unit_id, is_level_unit)
+	local extension = self._unit_to_extension_map[unit]
+	local minigame = extension:minigame(MinigameSettings.types.frequency)
+
+	minigame:set_frequency(frequency_x, frequency_y)
+end
+
+function MinigameSystem:rpc_minigame_sync_frequency_set_target_frequency(channel_id, unit_id, is_level_unit, frequency_x, frequency_y)
+	local unit = Managers.state.unit_spawner:unit(unit_id, is_level_unit)
+	local extension = self._unit_to_extension_map[unit]
+	local minigame = extension:minigame(MinigameSettings.types.frequency)
+
+	minigame:set_target_frequency(frequency_x, frequency_y)
 end
 
 return MinigameSystem

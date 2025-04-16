@@ -1,4 +1,10 @@
 local Crashify = require("scripts/settings/crashify/crashify")
+local teamcity_build_id = nil
+
+if APPLICATION_SETTINGS.teamcity_build_id ~= "" then
+	teamcity_build_id = APPLICATION_SETTINGS.teamcity_build_id
+end
+
 local settings = {
 	enabled = true,
 	source = {
@@ -8,13 +14,14 @@ local settings = {
 		version = {
 			game = APPLICATION_SETTINGS.game_version,
 			engine_revision = string.value_or_nil(BUILD_IDENTIFIER),
-			content_revision = string.value_or_nil(APPLICATION_SETTINGS.content_revision or LOCAL_CONTENT_REVISION)
+			content_revision = string.value_or_nil(APPLICATION_SETTINGS.content_revision or LOCAL_CONTENT_REVISION),
+			teamcity_build_id = teamcity_build_id
 		},
 		data = {
 			server = string.value_or_nil(DEDICATED_SERVER),
 			testify = string.value_or_nil(GameParameters.testify),
 			testify_test_suite_id = string.value_or_nil(DevParameters.testify_test_suite_id),
-			steam_branch = string.value_or_nil(GameParameters.steam_branch),
+			steam_branch = HAS_STEAM and Steam.beta_branch(),
 			svn_branch = string.value_or_nil(GameParameters.svn_branch)
 		},
 		crashify = {

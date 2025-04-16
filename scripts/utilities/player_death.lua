@@ -27,6 +27,8 @@ local PlayerDeath = {
 
 			Managers.state.pacing:player_died(player.player_unit)
 		end
+
+		Managers.event:trigger("event_player_died", player)
 	end
 }
 

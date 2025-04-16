@@ -9,7 +9,12 @@ local renegade_gunner_default = {
 	spread = math.degrees_to_radians(1.5),
 	effect_template = EffectTemplates.renegade_gunner_hellgun,
 	damage_type = damage_types.minion_laser,
-	line_effect = LineEffects.renegade_gunner_lasbeam
+	line_effect = LineEffects.renegade_gunner_lasbeam,
+	damage_falloff = {
+		falloff_range = 35,
+		max_range = 35,
+		max_power_reduction = 0.5
+	}
 }
 local renegade_gunner_sweep = table.clone(renegade_gunner_default)
 renegade_gunner_sweep.hit_scan_template = HitScanTemplates.gunner_bullet

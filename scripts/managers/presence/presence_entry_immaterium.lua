@@ -103,7 +103,21 @@ function PresenceEntryImmaterium:update_with(new_entry)
 
 		self:_update_from_platform()
 
-		self._account_and_platform_composite_id = self:account_id() .. ":" .. self:platform() .. ":" .. self:platform_user_id()
+		local account_id = self:account_id()
+		self._account_and_platform_composite_id = account_id .. ":" .. self:platform() .. ":" .. self:platform_user_id()
+
+		if account_id ~= "" then
+			local social_service = Managers.data_service.social
+
+			if social_service then
+				local player_info = social_service:get_player_info_by_account_id(account_id)
+
+				if player_info then
+					player_info:set_platform(self:platform())
+					player_info:set_platform_user_id(self:platform_user_id())
+				end
+			end
+		end
 
 		Managers.event:trigger("event_new_immaterium_entry", new_entry)
 	end
@@ -151,8 +165,9 @@ function PresenceEntryImmaterium:platform()
 	return self._immaterium_entry.platform
 end
 
-function PresenceEntryImmaterium:platform_icon()
+function PresenceEntryImmaterium:platform_icon(in_platform)
 	local platform = self._immaterium_entry.platform
+	platform = platform ~= "" and platform or in_platform or ""
 	local is_on_my_platform = self._my_own_platform == platform
 
 	if is_on_my_platform then
@@ -176,16 +191,18 @@ function PresenceEntryImmaterium:is_online()
 	return self._immaterium_entry.status == "ONLINE"
 end
 
-function PresenceEntryImmaterium:platform_persona_name_or_account_name()
+function PresenceEntryImmaterium:platform_persona_name_or_account_name(in_platform, in_platform_id)
 	local user_has_restrictions = Managers.account:user_has_restriction()
 	local my_own_platform = self._my_own_platform
 	local platform = self:platform()
+	platform = platform ~= "" and platform or in_platform or ""
 
 	if user_has_restrictions and platform ~= my_own_platform then
 		return Localize("loc_cross_network_player")
 	end
 
 	local platform_user_id = self:platform_user_id()
+	platform_user_id = platform_user_id ~= "" and platform_user_id or in_platform_id or ""
 
 	if platform and platform_user_id then
 		local platform_username = Managers.presence:get_requested_platform_username(platform, platform_user_id)
@@ -230,6 +247,22 @@ function PresenceEntryImmaterium:psn_session_id()
 	local session_id = self:_key_value_string("psn_session_id")
 
 	return session_id ~= "none" and session_id or nil
+end
+
+function PresenceEntryImmaterium:havoc_status()
+	return self:_key_value_string("havoc_status") or "none"
+end
+
+function PresenceEntryImmaterium:havoc_rank_cadence_high()
+	local rank = self:_key_value_string("havoc_rank_cadence_high")
+
+	return rank ~= "none" and tonumber(rank) or nil
+end
+
+function PresenceEntryImmaterium:havoc_rank_all_time_high()
+	local rank = self:_key_value_string("havoc_rank_all_time_high")
+
+	return rank ~= "none" and tonumber(rank) or nil
 end
 
 function PresenceEntryImmaterium:is_alive()

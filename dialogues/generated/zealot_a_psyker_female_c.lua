@@ -126,9 +126,6 @@ local zealot_a_psyker_female_c = {
 		sound_events_duration = {
 			[1.0] = 2.575875
 		},
-		sound_event_weights = {
-			[1.0] = 1
-		},
 		randomize_indexes = {}
 	},
 	combat_pause_quirk_stench_b = {

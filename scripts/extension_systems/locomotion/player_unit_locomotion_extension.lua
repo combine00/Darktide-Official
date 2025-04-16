@@ -1,3 +1,4 @@
+local Dodge = require("scripts/extension_systems/character_state_machine/character_states/utilities/dodge")
 local ForceRotation = require("scripts/extension_systems/locomotion/utilities/force_rotation")
 local ForceTranslation = require("scripts/extension_systems/locomotion/utilities/force_translation")
 local HubMovementLocomotion = require("scripts/extension_systems/locomotion/utilities/hub_movement_locomotion")
@@ -95,6 +96,7 @@ function PlayerUnitLocomotionExtension:init(extension_init_context, unit, extens
 
 	MoverController.set_active_mover(unit, self._mover_state, "default")
 
+	self._ogryn_dodges = data_ext:archetype_name() == "ogryn"
 	self._script_minion_collision = true
 	self._old_position = Vector3Box(pos)
 	self._latest_simulated_position = Vector3Box(pos)
@@ -314,6 +316,7 @@ end
 function PlayerUnitLocomotionExtension:_update_script_driven_movement(unit, dt, t, locomotion_component, steering_component, current_position, calculate_fall_velocity, on_ground, mover)
 	local velocity_current = locomotion_component.velocity_current
 	local velocity_wanted = steering_component.velocity_wanted
+	local is_dodging, _ = Dodge.is_dodging(unit)
 
 	if calculate_fall_velocity then
 		velocity_wanted.z = velocity_current.z
@@ -365,8 +368,22 @@ function PlayerUnitLocomotionExtension:_update_script_driven_movement(unit, dt, 
 				for i = 1, num_results do
 					local minion_unit = BROADPHASE_RESULTS[i]
 					local breed = ScriptUnit.extension(minion_unit, "unit_data_system"):breed()
+					local ignore_collision = false
 
-					if HEALTH_ALIVE[minion_unit] and breed.player_locomotion_constrain_radius ~= nil then
+					if self._ogryn_dodges and is_dodging then
+						local consecutive_dodges = Dodge.consecutive_dodges(unit)
+						local first_dodge = consecutive_dodges == 1
+
+						if first_dodge then
+							local valid_breed = not breed or not breed.tags or not breed.tags.elite and not breed.tags.ogryn and not breed.tags.special and not breed.tags.monster
+							ignore_collision = valid_breed
+						end
+					end
+
+					local collide_with_minions = HEALTH_ALIVE[minion_unit] and breed.player_locomotion_constrain_radius ~= nil
+					collide_with_minions = collide_with_minions and not ignore_collision
+
+					if collide_with_minions then
 						local minion_radius = breed.player_locomotion_constrain_radius
 						local minion_min_dist_sq = minion_radius * minion_radius * 2 * 2
 						local minion_position = Vector3.flat(Unit.world_position(minion_unit, 1))

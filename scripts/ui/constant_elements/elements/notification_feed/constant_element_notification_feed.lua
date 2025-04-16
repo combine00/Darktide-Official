@@ -126,7 +126,7 @@ local function _remove_player_frame_cb_func(widget, ui_renderer)
 end
 
 local ConstantElementNotificationFeed = class("ConstantElementNotificationFeed", "ConstantElementBase")
-local MESSAGE_TYPES = table.enum("default", "alert", "mission", "item_granted", "currency", "achievement", "contract", "custom", "voting", "matchmaking", "penance_item_can_be_claimed", "player_assist", "collectible", "helped_collect_collectible", "destructible")
+local MESSAGE_TYPES = table.enum("default", "alert", "mission", "item_granted", "currency", "achievement", "contract", "custom", "voting", "matchmaking", "penance_item_can_be_claimed", "player_assist", "collectible", "helped_collect_collectible", "destructible", "havoc_status")
 
 function ConstantElementNotificationFeed:init(parent, draw_layer, start_scale)
 	ConstantElementNotificationFeed.super.init(self, parent, draw_layer, start_scale, Definitions)
@@ -238,6 +238,12 @@ function ConstantElementNotificationFeed:init(parent, draw_layer, start_scale)
 			total_time = 5,
 			priority_order = 1,
 			widget_definition = Definitions.notification_message
+		},
+		havoc_status = {
+			animation_exit = "popup_leave",
+			animation_enter = "popup_enter",
+			priority_order = 1,
+			widget_definition = Definitions.notification_message
 		}
 	}
 	self._assist_notifications_enabled = true
@@ -344,7 +350,14 @@ function ConstantElementNotificationFeed:event_remove_notification(notification_
 end
 
 function ConstantElementNotificationFeed:event_clear_notifications()
-	self:clear()
+	table.clear(self._queue_notifications)
+
+	for _, notification in pairs(self._notifications) do
+		notification.total_time = 0
+		notification.time = 0
+	end
+
+	self:_update_notification_queue_counter()
 end
 
 function ConstantElementNotificationFeed:_get_new_id()
@@ -353,11 +366,13 @@ function ConstantElementNotificationFeed:_get_new_id()
 	return self._notification_id_counter
 end
 
-function ConstantElementNotificationFeed:clear()
-	while #self._notifications > 0 do
-		local notification = self._notifications[1]
+function ConstantElementNotificationFeed:clear(ui_renderer)
+	local notifications = self._notifications
 
-		self:_remove_notification(notification)
+	while #notifications > 0 do
+		local notification = notifications[1]
+
+		self:_remove_notification(notification, ui_renderer)
 	end
 end
 
@@ -497,42 +512,46 @@ function ConstantElementNotificationFeed:_generate_notification_data(message_typ
 		elseif item_type == "CHARACTER_INSIGNIA" then
 			icon = "content/ui/materials/icons/items/containers/item_container_square"
 			icon_size = "insignia"
-		elseif item_type == "WEAPON_MELEE" or item_type == "WEAPON_RANGED" or item_type == "WEAPON_TRINKET" then
-			icon = "content/ui/materials/icons/items/containers/item_container_landscape"
-			icon_size = "large_weapon"
-		elseif item_type == "WEAPON_SKIN" then
-			icon = "content/ui/materials/icons/items/containers/item_container_landscape"
-			icon_size = "weapon_skin"
-		elseif item_type == "GADGET" then
-			icon = "content/ui/materials/icons/items/containers/item_container_landscape"
-			icon_size = "large_gadget"
-		elseif item_type == "TRAIT" then
-			icon = "content/ui/materials/icons/traits/traits_container"
-			icon_size = "medium"
-			local rarity = visual_item.rarity
-			local texture_icon, texture_frame = ItemUtils.trait_textures(visual_item, rarity)
-			icon_material_values = {
-				icon = texture_icon,
-				frame = texture_frame
-			}
-			local trait_sound_events_by_rarity = ConstantElementNotificationFeedSettings.trait_sound_events_by_rarity
-			enter_sound_event = trait_sound_events_by_rarity[rarity]
-		elseif item_type == "CHARACTER_TITLE" then
-			icon, icon_size = nil
-			texts = {
-				{
-					display_name = string.format("'%s'", ItemUtils.display_name(visual_item))
-				},
-				{
-					display_name = Localize(UISettings.item_type_localization_lookup[visual_item.item_type])
-				},
-				{
-					display_name = Localize("loc_notification_desc_added_to_inventory")
+		elseif item_type ~= "WEAPON_MELEE" then
+			if item_type == "WEAPON_RANGED" then
+				-- Nothing
+			elseif item_type == "WEAPON_TRINKET" then
+				icon = "content/ui/materials/icons/items/containers/item_container_square"
+				icon_size = "large_item"
+			elseif item_type == "WEAPON_SKIN" then
+				icon = "content/ui/materials/icons/items/containers/item_container_landscape"
+				icon_size = "weapon_skin"
+			elseif item_type == "GADGET" then
+				icon = "content/ui/materials/icons/items/containers/item_container_landscape"
+				icon_size = "large_gadget"
+			elseif item_type == "TRAIT" then
+				icon = "content/ui/materials/icons/traits/traits_container"
+				icon_size = "medium"
+				local rarity = visual_item.rarity
+				local texture_icon, texture_frame = ItemUtils.trait_textures(visual_item, rarity)
+				icon_material_values = {
+					icon = texture_icon,
+					frame = texture_frame
 				}
-			}
-		else
-			icon = "content/ui/materials/icons/items/containers/item_container_landscape"
-			icon_size = "large_cosmetic"
+				local trait_sound_events_by_rarity = ConstantElementNotificationFeedSettings.trait_sound_events_by_rarity
+				enter_sound_event = trait_sound_events_by_rarity[rarity]
+			elseif item_type == "CHARACTER_TITLE" then
+				icon, icon_size = nil
+				texts = {
+					{
+						display_name = string.format("'%s'", ItemUtils.display_name(visual_item))
+					},
+					{
+						display_name = Localize(UISettings.item_type_localization_lookup[visual_item.item_type])
+					},
+					{
+						display_name = Localize("loc_notification_desc_added_to_inventory")
+					}
+				}
+			else
+				icon = "content/ui/materials/icons/items/containers/item_container_landscape"
+				icon_size = "large_cosmetic"
+			end
 		end
 
 		if background_rarity_color then
@@ -973,9 +992,12 @@ function ConstantElementNotificationFeed:_generate_notification_data(message_typ
 		elseif item_type == "CHARACTER_INSIGNIA" then
 			icon = "content/ui/materials/icons/items/containers/item_container_square"
 			icon_size = "insignia"
-		elseif item_type == "WEAPON_MELEE" or item_type == "WEAPON_RANGED" or item_type == "WEAPON_TRINKET" then
+		elseif item_type == "WEAPON_MELEE" or item_type == "WEAPON_RANGED" then
 			icon = "content/ui/materials/icons/items/containers/item_container_landscape"
-			icon_size = "large_weapon"
+			icon_size = "large_item"
+		elseif item_type == "WEAPON_TRINKET" then
+			icon = "content/ui/materials/icons/items/containers/item_container_square"
+			icon_size = "trinket"
 		elseif item_type == "WEAPON_SKIN" then
 			icon = "content/ui/materials/icons/items/containers/item_container_landscape"
 			icon_size = "weapon_skin"
@@ -1028,6 +1050,17 @@ function ConstantElementNotificationFeed:_generate_notification_data(message_typ
 			color = background_rarity_color,
 			line_color = rarity_color,
 			enter_sound_event = enter_sound_event
+		}
+	elseif message_type == MESSAGE_TYPES.havoc_status then
+		notification_data = {
+			texts = {
+				{
+					display_name = data,
+					color = Color.terminal_text_body(255, true)
+				}
+			},
+			line_color = Color.terminal_text_body(255, true),
+			color = Color.terminal_grid_background(100, true)
 		}
 	end
 
@@ -1304,7 +1337,7 @@ function ConstantElementNotificationFeed:update(dt, t, ui_renderer, render_setti
 	if DEBUG_RELOAD then
 		DEBUG_RELOAD = false
 
-		self:clear()
+		self:clear(ui_renderer)
 	end
 
 	local notification_message_delay_queue = self._notification_message_delay_queue

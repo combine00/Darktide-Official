@@ -2,7 +2,6 @@ local BuffSettings = require("scripts/settings/buff/buff_settings")
 local MissionObjectiveCollect = require("scripts/extension_systems/mission_objective/utilities/mission_objective_collect")
 local MissionObjectiveDecode = require("scripts/extension_systems/mission_objective/utilities/mission_objective_decode")
 local MissionObjectiveDemolition = require("scripts/extension_systems/mission_objective/utilities/mission_objective_demolition")
-local MissionObjectiveDestination = require("scripts/extension_systems/mission_objective/utilities/mission_objective_destination")
 local MissionObjectiveGoal = require("scripts/extension_systems/mission_objective/utilities/mission_objective_goal")
 local MissionObjectiveKill = require("scripts/extension_systems/mission_objective/utilities/mission_objective_kill")
 local MissionObjectiveLuggable = require("scripts/extension_systems/mission_objective/utilities/mission_objective_luggable")
@@ -15,7 +14,6 @@ local WWISE_MUSIC_STATE_NONE = WwiseGameSyncSettings.state_groups.music_game_sta
 local proc_events = BuffSettings.proc_events
 local mission_objectives = {
 	collect = MissionObjectiveCollect,
-	destination = MissionObjectiveDestination,
 	goal = MissionObjectiveGoal,
 	decode = MissionObjectiveDecode,
 	kill = MissionObjectiveKill,
@@ -23,6 +21,7 @@ local mission_objectives = {
 	demolition = MissionObjectiveDemolition,
 	luggable = MissionObjectiveLuggable,
 	scanning = MissionObjectiveZone,
+	capture = MissionObjectiveZone,
 	side = MissionObjectiveSide
 }
 local MissionObjectiveSystem = class("MissionObjectiveSystem", "ExtensionSystemBase")
@@ -137,7 +136,7 @@ function MissionObjectiveSystem:update(system_context, dt, t)
 	end
 end
 
-function MissionObjectiveSystem:start_mission_objective(objective_name, progression, second_progression, increment, stage)
+function MissionObjectiveSystem:start_mission_objective(objective_name, progression, second_progression, increment, max_incremented, stage)
 	progression = progression or 0
 	second_progression = second_progression or 0
 	increment = increment or 0
@@ -155,13 +154,18 @@ function MissionObjectiveSystem:start_mission_objective(objective_name, progress
 	if self._is_server then
 		local objective_name_id = NetworkLookup.mission_objective_names[objective_name]
 
-		self:send_rpc_to_clients("rpc_start_mission_objective", objective_name_id, progression, second_progression, increment, stage)
+		self:send_rpc_to_clients("rpc_start_mission_objective", objective_name_id, progression, second_progression, increment, max_incremented or -1, stage)
 	end
 
 	local objective = self:_setup_mission_objective(objective_name)
 
 	objective:start_stage(stage)
-	objective:update_increment(increment)
+	objective:set_increment(increment)
+
+	if max_incremented then
+		objective:set_max_increment(max_incremented)
+	end
+
 	objective:set_progression(progression)
 	objective:set_second_progression(second_progression)
 	Managers.event:trigger("event_mission_objective_start", objective_name)
@@ -213,7 +217,7 @@ function MissionObjectiveSystem:evaluate_level_end_objectives()
 	local level_end_objectives = self._level_end_objectives
 
 	for objective_name, objective in pairs(level_end_objectives) do
-		local completed = objective:is_done()
+		local completed = objective:max_progression_achieved()
 
 		if completed then
 			self:end_mission_objective(objective_name)
@@ -528,16 +532,20 @@ end
 
 function MissionObjectiveSystem:objective_music_wwise_state()
 	local active_objectives = self._active_objectives
+	local highest_priority_found = -1
+	local target_music_wwise_state = nil
 
 	for _, objective in pairs(active_objectives) do
 		local music_wwise_state = objective:music_wwise_state()
+		local music_wwise_priority = objective:music_wwise_priority()
 
-		if music_wwise_state ~= WWISE_MUSIC_STATE_NONE then
-			return music_wwise_state
+		if music_wwise_state ~= WWISE_MUSIC_STATE_NONE and highest_priority_found < music_wwise_priority then
+			highest_priority_found = music_wwise_priority
+			target_music_wwise_state = music_wwise_state
 		end
 	end
 
-	return nil
+	return target_music_wwise_state
 end
 
 function MissionObjectiveSystem:objective_event_type()
@@ -755,10 +763,11 @@ function MissionObjectiveSystem:hot_join_sync(sender, channel)
 		local objective_name_id = NetworkLookup.mission_objective_names[objective_name]
 		local progression = objective:progression()
 		local increment = objective:incremented_progression()
+		local max_incremented = objective:max_incremented_progression()
 		local second_progression = objective:second_progression()
 		local stage = objective:stage()
 
-		RPC.rpc_start_mission_objective(channel, objective_name_id, progression, second_progression, increment, stage)
+		RPC.rpc_start_mission_objective(channel, objective_name_id, progression, second_progression, increment, max_incremented, stage)
 
 		local objective_units = objective:objective_units()
 
@@ -866,10 +875,14 @@ function MissionObjectiveSystem:send_rpc_to_clients(rpc_name, ...)
 	game_session:send_rpc_clients(rpc_name, ...)
 end
 
-function MissionObjectiveSystem:rpc_start_mission_objective(channel_id, objective_name_id, progression, second_progression, increment, stage)
+function MissionObjectiveSystem:rpc_start_mission_objective(channel_id, objective_name_id, progression, second_progression, increment, max_incremented, stage)
 	local objective_name = NetworkLookup.mission_objective_names[objective_name_id]
 
-	self:start_mission_objective(objective_name, progression, second_progression, increment, stage)
+	if max_incremented == -1 then
+		max_incremented = nil
+	end
+
+	self:start_mission_objective(objective_name, progression, second_progression, increment, max_incremented, stage)
 end
 
 function MissionObjectiveSystem:rpc_start_mission_objective_stage(channel_id, objective_name_id, stage)

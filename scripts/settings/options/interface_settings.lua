@@ -505,6 +505,20 @@ local settings_definitions = {
 		end
 	},
 	{
+		save_location = "interface_settings",
+		tooltip_text = "loc_settings_voice_chat_visible_all_time_mouseover",
+		display_name = "loc_interface_setting_voice_chat_visible_all_time",
+		id = "voice_chat_visible_all_time",
+		default_value = true,
+		widget_type = "boolean",
+		on_value_changed = function (value)
+			Managers.event:trigger("voice_chat_visible_setting_update", value)
+		end,
+		validation_function = function ()
+			return not IS_PLAYSTATION
+		end
+	},
+	{
 		group_name = "subtitle_settings",
 		display_name = "loc_settings_menu_group_subtitle_settings",
 		widget_type = "group_header"
@@ -671,7 +685,6 @@ local settings_definitions = {
 	},
 	{
 		save_location = "interface_settings",
-		tooltip_text = "loc_interface_setting_title_color_type_mouseover",
 		display_name = "loc_interface_setting_title_color_type",
 		id = "character_titles_color_type",
 		default_value = "rarity_colors",
@@ -693,7 +706,6 @@ local settings_definitions = {
 	},
 	{
 		save_location = "interface_settings",
-		tooltip_text = "loc_interface_setting_title_in_mission_color_type_mouseover",
 		display_name = "loc_interface_setting_title_in_mission_color_type",
 		id = "character_titles_in_mission_color_type",
 		default_value = "rarity_colors",

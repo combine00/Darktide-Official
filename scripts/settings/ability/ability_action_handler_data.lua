@@ -1,5 +1,5 @@
-local SpecialRulesSetting = require("scripts/settings/ability/special_rules_settings")
-local special_rules = SpecialRulesSetting.special_rules
+local SpecialRulesSettings = require("scripts/settings/ability/special_rules_settings")
+local special_rules = SpecialRulesSettings.special_rules
 
 local function _require_ability_action(action)
 	local base = "scripts/extension_systems/ability/actions/"
@@ -16,12 +16,12 @@ local ability_action_data = {
 		ogryn_shout = _require_ability_action("action_ogryn_shout"),
 		psyker_shout = _require_ability_action("action_psyker_shout"),
 		shout_aim = _require_ability_action("action_shout_aim"),
-		veteran_shout_aim = _require_ability_action("action_shout_aim"),
-		veteran_immediate_use = _require_ability_action("action_shout_aim"),
 		stance_change = _require_ability_action("action_stance_change"),
 		stance_change_gunlugger = _require_ability_action("action_stance_change"),
 		targeted_dash_aim = _require_ability_action("action_targeted_dash_aim"),
-		veteran_combat_ability = _require_ability_action("action_veteran_combat_ability")
+		veteran_combat_ability = _require_ability_action("action_veteran_combat_ability"),
+		veteran_immediate_use = _require_ability_action("action_shout_aim"),
+		veteran_shout_aim = _require_ability_action("action_shout_aim")
 	}
 }
 

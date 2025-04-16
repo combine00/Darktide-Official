@@ -132,7 +132,8 @@ return function ()
 					"sergeant",
 					"tech_priest",
 					"explicator",
-					"enginseer"
+					"enginseer",
+					"training_ground_psyker"
 				}
 			},
 			{
@@ -184,7 +185,8 @@ return function ()
 					"sergeant",
 					"tech_priest",
 					"explicator",
-					"enginseer"
+					"enginseer",
+					"training_ground_psyker"
 				}
 			},
 			{

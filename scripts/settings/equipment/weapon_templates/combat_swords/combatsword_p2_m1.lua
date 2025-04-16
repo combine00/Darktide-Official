@@ -1,3 +1,4 @@
+local ActionInputHierarchy = require("scripts/utilities/action/action_input_hierarchy")
 local ActionSweepSettings = require("scripts/settings/equipment/action_sweep_settings")
 local ArmorSettings = require("scripts/settings/damage/armor_settings")
 local BaseTemplateSettings = require("scripts/settings/equipment/weapon_templates/base_template_settings")
@@ -5,6 +6,7 @@ local BuffSettings = require("scripts/settings/buff/buff_settings")
 local DamageProfileTemplates = require("scripts/settings/damage/damage_profile_templates")
 local DamageSettings = require("scripts/settings/damage/damage_settings")
 local FootstepIntervalsTemplates = require("scripts/settings/equipment/footstep/footstep_intervals_templates")
+local HapticTriggerTemplates = require("scripts/settings/equipment/haptic_trigger_templates")
 local HerdingTemplates = require("scripts/settings/damage/herding_templates")
 local HitZone = require("scripts/utilities/attack/hit_zone")
 local MeleeActionInputSetupMid = require("scripts/settings/equipment/weapon_templates/melee_action_input_setup_mid")
@@ -42,23 +44,68 @@ combat_sword_action_inputs.parry = {
 	buffer_time = 0
 }
 local combat_sword_action_input_hierarchy = table.clone(MeleeActionInputSetupMid.action_input_hierarchy)
-combat_sword_action_input_hierarchy.parry = "base"
-combat_sword_action_input_hierarchy.special_action = {
-	attack_cancel = "base",
-	grenade_ability = "base",
-	wield = "base",
-	special_action = "base",
-	block = "base",
-	start_attack = {
-		attack_cancel = "base",
-		wield = "base",
-		heavy_attack = "base",
-		grenade_ability = "base",
-		block = "base",
-		special_action = "base",
-		light_attack = "base"
+combat_sword_action_input_hierarchy[#combat_sword_action_input_hierarchy + 1] = {
+	transition = "base",
+	input = "parry"
+}
+local new_special_action_transition = {
+	{
+		transition = "base",
+		input = "attack_cancel"
+	},
+	{
+		input = "start_attack",
+		transition = {
+			{
+				transition = "base",
+				input = "attack_cancel"
+			},
+			{
+				transition = "base",
+				input = "light_attack"
+			},
+			{
+				transition = "base",
+				input = "heavy_attack"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "grenade_ability"
+			},
+			{
+				transition = "base",
+				input = "special_action"
+			},
+			{
+				transition = "base",
+				input = "block"
+			}
+		}
+	},
+	{
+		transition = "base",
+		input = "wield"
+	},
+	{
+		transition = "base",
+		input = "grenade_ability"
+	},
+	{
+		transition = "base",
+		input = "block"
+	},
+	{
+		transition = "base",
+		input = "special_action"
 	}
 }
+
+ActionInputHierarchy.update_hierarchy_entry(combat_sword_action_input_hierarchy, "special_action", new_special_action_transition)
+
 weapon_template.action_inputs = combat_sword_action_inputs
 weapon_template.action_input_hierarchy = combat_sword_action_input_hierarchy
 local default_weapon_box = {
@@ -1443,7 +1490,8 @@ weapon_template.actions = {
 		inner_damage_profile = DamageProfileTemplates.default_push,
 		inner_damage_type = damage_types.physical,
 		outer_damage_profile = DamageProfileTemplates.light_push,
-		outer_damage_type = damage_types.physical
+		outer_damage_type = damage_types.physical,
+		haptic_trigger_template = HapticTriggerTemplates.melee.push
 	},
 	action_inspect = {
 		skip_3p_anims = false,
@@ -1490,13 +1538,14 @@ weapon_template.keywords = {
 	"combat_sword",
 	"p2"
 }
-weapon_template.smart_targeting_template = SmartTargetingTemplates.default_melee
 weapon_template.dodge_template = "default"
 weapon_template.sprint_template = "default"
 weapon_template.stamina_template = "default"
 weapon_template.toughness_template = "default"
 weapon_template.movement_curve_modifier_template = "chainsword_p1_m1"
 weapon_template.footstep_intervals = FootstepIntervalsTemplates.default
+weapon_template.smart_targeting_template = SmartTargetingTemplates.default_melee
+weapon_template.haptic_trigger_template = HapticTriggerTemplates.melee.heavy
 weapon_template.overclocks = {
 	cleave_damage_up_dps_down = {
 		combatsword_p1_m1_cleave_damage_stat = 0.1,

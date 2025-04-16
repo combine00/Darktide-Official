@@ -15,18 +15,27 @@ function SideRelationProximityExtension:init(extension_init_context, unit, exten
 	self._relation_data = relation_data
 	self._logic_context = {
 		unit = unit,
-		side_name = side_name
+		side_name = side_name,
+		world = extension_init_context.world,
+		physics_world = extension_init_context.physics_world
 	}
 	self._job_logic = nil
+	local owner_unit_or_nil = extension_init_data.owner_unit_or_nil
 	local relation_init_data = extension_init_data.relation_init_data
 
 	for relation_name, init_data in pairs(relation_init_data) do
-		local data = self:_initialize_relation(relation_name, init_data)
+		local data = self:_initialize_relation(relation_name, init_data, owner_unit_or_nil)
 		relation_data[relation_name] = data
 	end
 end
 
-function SideRelationProximityExtension:_initialize_relation(relation_name, relation_init_data)
+function SideRelationProximityExtension:destroy()
+	if self._job_logic then
+		Managers.state.unit_job:unregister_job(self._unit)
+	end
+end
+
+function SideRelationProximityExtension:_initialize_relation(relation_name, relation_init_data, owner_unit_or_nil)
 	local proximity_radius = relation_init_data.proximity_radius
 	local logic = {}
 	local data = {
@@ -38,22 +47,22 @@ function SideRelationProximityExtension:_initialize_relation(relation_name, rela
 		proximity_radius = relation_init_data.proximity_radius,
 		stickiness_limit = relation_init_data.stickiness_limit,
 		stickiness_time = relation_init_data.stickiness_time,
-		logic = logic
+		logic = logic,
+		owner_unit_or_nil = owner_unit_or_nil
 	}
 	local logic_context = self._logic_context
 	local logic_configuration = relation_init_data.logic
 	local num_logic = #logic_configuration
 
-	for i = 1, num_logic do
-		local config = logic_configuration[i]
-		local class_name = config.class_name
-		local init_data = config.init_data
-		local owner_unit_or_nil = config.owner_unit_or_nil
-		local class_object = CLASSES[class_name]
+	for ii = 1, num_logic do
+		local logic_config = logic_configuration[ii]
+		local logic_class_name = logic_config.class_name
+		local init_data = logic_config.init_data
+		local class_object = CLASSES[logic_class_name]
 		local class_instance = class_object:new(logic_context, init_data, owner_unit_or_nil)
-		logic[i] = class_instance
+		logic[ii] = class_instance
 
-		if config.use_as_job then
+		if logic_config.use_as_job then
 			self:_initialize_job(class_instance)
 		end
 	end
@@ -71,6 +80,10 @@ function SideRelationProximityExtension:update(unit, dt, t)
 	self:_update_unit_alive_check(unit, dt, t)
 	self:_update_proximity(unit, dt, t)
 	self:_update_logic(unit, dt, t)
+end
+
+function SideRelationProximityExtension:start_job()
+	return self._job_logic:start_job()
 end
 
 function SideRelationProximityExtension:job_completed()
@@ -102,15 +115,15 @@ function SideRelationProximityExtension:_update_unit_alive_check(unit, dt, t)
 			end
 		end
 
-		for j = 1, num_dead_units do
-			local dead_unit = dead_units[j]
+		for jj = 1, num_dead_units do
+			local dead_unit = dead_units[jj]
 			units_in_proximity[dead_unit] = nil
 			stickiness_table[dead_unit] = nil
 			local data_logic = data.logic
 			local num_logic = data.num_logic
 
-			for i = 1, num_logic do
-				local logic = data_logic[i]
+			for ii = 1, num_logic do
+				local logic = data_logic[ii]
 
 				logic:unit_in_proximity_deleted(dead_unit)
 			end
@@ -147,8 +160,8 @@ function SideRelationProximityExtension:_update_proximity(unit, dt, t)
 			local in_proximity = current_in_proximity[exit_unit]
 
 			if not in_proximity then
-				for i = 1, num_logic do
-					local logic = data_logic[i]
+				for ii = 1, num_logic do
+					local logic = data_logic[ii]
 
 					if logic.unit_left_proximity ~= nil then
 						logic:unit_left_proximity(exit_unit)
@@ -163,11 +176,11 @@ function SideRelationProximityExtension:_update_proximity(unit, dt, t)
 			local was_in_proximity = prev_in_proximity[enter_unit]
 
 			if not was_in_proximity then
-				for i = 1, num_logic do
-					local logic = data_logic[i]
+				for ii = 1, num_logic do
+					local logic = data_logic[ii]
 
 					if logic.unit_entered_proximity ~= nil then
-						logic:unit_entered_proximity(enter_unit)
+						logic:unit_entered_proximity(enter_unit, t)
 					end
 				end
 
@@ -189,8 +202,8 @@ function SideRelationProximityExtension:_update_logic(unit, dt, t)
 		local data_logic = data.logic
 		local num_logic = data.num_logic
 
-		for i = 1, num_logic do
-			local logic = data_logic[i]
+		for ii = 1, num_logic do
+			local logic = data_logic[ii]
 
 			if logic.update then
 				logic:update(dt, t)

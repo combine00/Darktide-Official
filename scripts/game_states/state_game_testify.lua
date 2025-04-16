@@ -1,5 +1,6 @@
 local BotSpawning = require("scripts/managers/bot/bot_spawning")
 local Breeds = require("scripts/settings/breed/breeds")
+local MissionBuffsAllowedBuffs = require("scripts/managers/mission_buffs/mission_buffs_allowed_buffs")
 local CircumstanceTemplates = require("scripts/settings/circumstance/circumstance_templates")
 local GameModeSettings = require("scripts/settings/game_mode/game_mode_settings")
 local MasterItems = require("scripts/backend/master_items")
@@ -9,12 +10,13 @@ local ParameterResolver = require("scripts/foundation/utilities/parameters/param
 local RenderSettings = require("scripts/settings/options/render_settings")
 local WeaponTemplate = require("scripts/utilities/weapon/weapon_template")
 local application_console_command = Application.console_command
-local flow_event = Unit.flow_event
+local application_memory_tree_to_console = Application.memory_tree_to_console
 local unit_actor = Unit.actor
 local unit_animation_event = Unit.animation_event
-local unit_by_name = World.unit_by_name
+local unit_flow_event = Unit.flow_event
 local world_create_particles = World.create_particles
 local world_set_particles_life_time = World.set_particles_life_time
+local world_unit_by_name = World.unit_by_name
 
 local function _console_command(command, ...)
 	application_console_command(command, ...)
@@ -81,6 +83,18 @@ local function retrieve_items_for_archetype(archetype, filtered_slots, workflow_
 	return items
 end
 
+local _fill_with_hordes_buff_names_recursive = nil
+
+function _fill_with_hordes_buff_names_recursive(source, destination)
+	for key, content in pairs(source) do
+		if type(content) == "table" then
+			_fill_with_hordes_buff_names_recursive(content, destination)
+		else
+			destination[content] = true
+		end
+	end
+end
+
 local StateGameTestify = {
 	action_rule = function (_, data)
 		local action_name = data.action_name
@@ -129,6 +143,34 @@ local StateGameTestify = {
 		local gears = retrieve_items_for_archetype(archetype, gears_slots, workflow_states)
 
 		return gears[slot_name]
+	end,
+	all_hordes_buffs_names = function ()
+		local used_buff_names = {}
+		local buff_families = MissionBuffsAllowedBuffs.buff_families
+
+		for buff_family, buff_family_data in pairs(buff_families) do
+			for _, buff_name in pairs(buff_family_data.priority_buffs) do
+				used_buff_names[buff_name] = true
+			end
+
+			for _, buff_name in pairs(buff_family_data.buffs) do
+				used_buff_names[buff_name] = true
+			end
+		end
+
+		local legendary_buffs = MissionBuffsAllowedBuffs.legendary_buffs
+
+		_fill_with_hordes_buff_names_recursive(legendary_buffs, used_buff_names)
+
+		local results = {}
+
+		for buff_name, _ in pairs(used_buff_names) do
+			table.insert(results, buff_name)
+		end
+
+		table.sort(results)
+
+		return results
 	end,
 	all_items = function ()
 		if not MasterItems.has_data() then
@@ -371,7 +413,7 @@ local StateGameTestify = {
 		local scale = 1
 		local save_depth = false
 		local output_dir = screenshot_settings.output_dir
-		local date_and_time = os.date("%y_%m_%d-%H%M%S")
+		local date_and_time = os.date("%y_%m_%d-%H%M")
 		local filename = screenshot_settings.filename .. "-" .. date_and_time
 		local filetype = screenshot_settings.filetype
 
@@ -391,13 +433,9 @@ local StateGameTestify = {
 
 		return actor
 	end,
-	unit_by_name = function (_, world, unit_name)
-		local unit = unit_by_name(world, unit_name)
-
-		return unit
-	end,
 	unit_flow_event = function (_, unit, flow_event_name)
-		flow_event(unit, flow_event_name)
+		Log.info("StateGameTestify", "Triggering flow event %s", flow_event_name)
+		unit_flow_event(unit, flow_event_name)
 	end,
 	unregister_timer = function (_, name)
 		Managers.time:unregister_timer(name)
@@ -427,6 +465,11 @@ local StateGameTestify = {
 		local world = Managers.world:world("level_world")
 
 		return world
+	end,
+	world_unit_by_name = function (_, world, unit_name)
+		local unit = world_unit_by_name(world, unit_name)
+
+		return unit
 	end
 }
 

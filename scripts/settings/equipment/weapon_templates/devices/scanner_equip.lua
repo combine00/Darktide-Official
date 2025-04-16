@@ -1,3 +1,4 @@
+local ActionInputHierarchy = require("scripts/utilities/action/action_input_hierarchy")
 local BaseTemplateSettings = require("scripts/settings/equipment/weapon_templates/base_template_settings")
 local DamageProfileTemplates = require("scripts/settings/damage/damage_profile_templates")
 local DamageSettings = require("scripts/settings/damage/damage_settings")
@@ -74,28 +75,76 @@ local weapon_template = {
 table.add_missing(weapon_template.action_inputs, BaseTemplateSettings.action_inputs)
 
 weapon_template.action_input_hierarchy = {
-	unwield = "stay",
-	wield = "stay",
-	push = "stay",
-	scan_start = {
-		wield = "base",
-		unwield = "base",
-		scan_cancel = "base",
-		scan_confirm = {
-			scan_confirm_cancel = "previous",
-			wield = "base",
-			unwield = "base",
-			scan_cancel = "base"
+	{
+		input = "scan_start",
+		transition = {
+			{
+				transition = "base",
+				input = "scan_cancel"
+			},
+			{
+				input = "scan_confirm",
+				transition = {
+					{
+						transition = "base",
+						input = "scan_cancel"
+					},
+					{
+						transition = "previous",
+						input = "scan_confirm_cancel"
+					},
+					{
+						transition = "base",
+						input = "wield"
+					},
+					{
+						transition = "base",
+						input = "unwield"
+					}
+				}
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "unwield"
+			}
 		}
 	},
-	inspect_start = {
-		unwield = "base",
-		wield = "base",
-		inspect_stop = "base"
+	{
+		input = "inspect_start",
+		transition = {
+			{
+				transition = "base",
+				input = "inspect_stop"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "unwield"
+			}
+		}
+	},
+	{
+		transition = "stay",
+		input = "push"
+	},
+	{
+		transition = "stay",
+		input = "wield"
+	},
+	{
+		transition = "stay",
+		input = "unwield"
 	}
 }
 
-table.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
+ActionInputHierarchy.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
 
 local scan_settings = {
 	fail_time_time = 0.6,
@@ -297,9 +346,9 @@ weapon_template.conditional_state_to_action_input = {
 	}
 }
 weapon_template.alternate_fire_settings = {
-	start_anim_event = "aim_start",
-	always_interupt = true,
+	always_interrupt = true,
 	stop_anim_event = "aim_end",
+	start_anim_event = "aim_start",
 	movement_speed_modifier = {
 		{
 			modifier = 0.4,

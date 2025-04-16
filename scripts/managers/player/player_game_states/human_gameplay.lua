@@ -190,7 +190,7 @@ function HumanGameplay:destroy()
 	if self._is_server then
 		local player_unit_spawn_manager = Managers.state.player_unit_spawn
 
-		player_unit_spawn_manager:despawn(player)
+		player_unit_spawn_manager:despawn_player(player)
 	end
 
 	local event_manager = Managers.event
@@ -211,7 +211,7 @@ function HumanGameplay:_input_active()
 		return false
 	end
 
-	if Managers.state.cinematic:active() then
+	if Managers.state.cinematic:cinematic_active() then
 		return false
 	end
 
@@ -474,18 +474,18 @@ function HumanGameplay:_handle_huds(camera_follow_unit_or_nil)
 	local spectated_player_unit_or_nil = spectated_player_or_nil and spectated_player_or_nil.player_unit
 	local spectating_ourself = spectated_player_or_nil and spectated_player_or_nil == own_player
 	local following_own_unit = own_player_unit_or_nil and camera_follow_unit_or_nil == own_player_unit_or_nil
-	local should_have_own_hud = following_own_unit and not spectating_ourself or Managers.state.cinematic:active()
+	local should_have_own_hud = following_own_unit and not spectating_ourself or Managers.state.cinematic:cinematic_active()
 	local following_spectated_player_unit = spectated_player_unit_or_nil and camera_follow_unit_or_nil == spectated_player_unit_or_nil
 
 	if self._has_own_hud and not should_have_own_hud then
 		self:_destroy_player_hud()
-	elseif self._has_spectator_hud and not following_spectated_player_unit then
+	elseif self._has_spectator_hud and (not following_spectated_player_unit or should_have_own_hud) then
 		self:_destroy_spectator_hud()
 	end
 
 	if should_have_own_hud and not self._has_own_hud then
 		self:_create_player_hud(own_player)
-	elseif following_spectated_player_unit and not self._has_spectator_hud then
+	elseif following_spectated_player_unit and not should_have_own_hud and not self._has_spectator_hud then
 		self:_create_spectator_hud(spectated_player_or_nil)
 	end
 end

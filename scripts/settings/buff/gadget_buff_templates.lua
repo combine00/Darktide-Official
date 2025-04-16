@@ -18,8 +18,8 @@ table.make_unique(templates)
 
 local DISPLAY = table.enum("number", "percentage")
 templates.gadget_coherency_aura_lingers = {
-	class_name = "stepped_range_buff",
 	predicted = false,
+	class_name = "stepped_range_buff",
 	keywords = {
 		Keywords.no_coherency_stickiness_limit
 	},
@@ -34,9 +34,6 @@ templates.gadget_coherency_aura_lingers = {
 			9,
 			10
 		}
-	},
-	localization_info = {
-		[stat_buffs.coherency_stickiness_time_value] = DISPLAY.number
 	}
 }
 templates.gadget_mission_reward_rare_loot_increase = {
@@ -46,9 +43,6 @@ templates.gadget_mission_reward_rare_loot_increase = {
 			max = 0.1,
 			min = 0.02
 		}
-	},
-	localization_info = {
-		[meta_stat_buffs.mission_reward_rare_loot_modifier] = DISPLAY.percentage
 	}
 }
 templates.gadget_side_mission_double_reward = {
@@ -56,10 +50,6 @@ templates.gadget_side_mission_double_reward = {
 	meta_stat_buffs = {
 		[meta_stat_buffs.side_mission_reward_xp_modifier] = 1,
 		[meta_stat_buffs.side_mission_reward_credit_modifier] = 1
-	},
-	localization_info = {
-		[meta_stat_buffs.side_mission_reward_xp_modifier] = DISPLAY.percentage,
-		[meta_stat_buffs.side_mission_reward_credit_modifier] = DISPLAY.percentage
 	}
 }
 templates.gadget_stamina_regeneration_in_coherency = {
@@ -84,19 +74,13 @@ templates.gadget_stamina_regeneration_in_coherency = {
 		local in_coherency = num_coherency > 1
 
 		return in_coherency
-	end,
-	localization_info = {
-		[stat_buffs.stamina_regeneration_modifier] = DISPLAY.percentage
-	}
+	end
 }
 templates.gadget_coherency_toughness_regeneration = {
 	predicted = false,
 	class_name = "buff",
 	stat_buffs = {
 		[stat_buffs.toughness_coherency_regen_rate_multiplier] = 0.2
-	},
-	localization_info = {
-		[stat_buffs.toughness_coherency_regen_rate_multiplier] = DISPLAY.percentage
 	}
 }
 templates.gadget_toughness_regen_delay = {
@@ -105,9 +89,6 @@ templates.gadget_toughness_regen_delay = {
 	stat_buffs = {
 		[stat_buffs.toughness_regen_delay_multiplier] = 0.7,
 		[stat_buffs.toughness_regen_rate_modifier] = 0.3
-	},
-	localization_info = {
-		[stat_buffs.toughness_regen_delay_multiplier] = DISPLAY.percentage
 	}
 }
 templates.gadget_innate_toughness_increase = {
@@ -143,9 +124,6 @@ templates.gadget_toughness_increase = {
 	class_name = "buff",
 	stat_buffs = {
 		[stat_buffs.toughness_bonus] = 0.05
-	},
-	localization_info = {
-		[stat_buffs.toughness_bonus] = DISPLAY.percentage
 	}
 }
 templates.gadget_innate_health_increase = {
@@ -167,9 +145,6 @@ templates.gadget_health_increase = {
 	class_name = "buff",
 	stat_buffs = {
 		[stat_buffs.max_health_modifier] = 0.05
-	},
-	localization_info = {
-		[stat_buffs.max_health_modifier] = DISPLAY.percentage
 	}
 }
 templates.gadget_toughness_damage_reduction = {
@@ -177,9 +152,6 @@ templates.gadget_toughness_damage_reduction = {
 	class_name = "buff",
 	stat_buffs = {
 		[stat_buffs.toughness_damage_taken_multiplier] = 0.7
-	},
-	localization_info = {
-		[stat_buffs.toughness_damage_taken_multiplier] = DISPLAY.percentage
 	}
 }
 templates.gadget_innate_max_wounds_increase = {
@@ -211,36 +183,24 @@ templates.gadget_corruption_resistance = {
 	class_name = "buff",
 	stat_buffs = {
 		[stat_buffs.corruption_taken_multiplier] = 0.8
-	},
-	localization_info = {
-		[stat_buffs.corruption_taken_multiplier] = DISPLAY.percentage
 	}
 }
 templates.gadget_mission_xp_increase = {
 	meta_buff = true,
 	meta_stat_buffs = {
 		[meta_stat_buffs.mission_reward_xp_modifier] = 0.15
-	},
-	localization_info = {
-		[meta_stat_buffs.mission_reward_xp_modifier] = DISPLAY.percentage
 	}
 }
 templates.gadget_mission_credits_increase = {
 	meta_buff = true,
 	meta_stat_buffs = {
 		[meta_stat_buffs.mission_reward_credit_modifier] = 0.15
-	},
-	localization_info = {
-		[meta_stat_buffs.mission_reward_credit_modifier] = DISPLAY.percentage
 	}
 }
 templates.gadget_mission_reward_gear_instead_of_weapon_increase = {
 	meta_buff = true,
 	meta_stat_buffs = {
 		[meta_stat_buffs.mission_reward_gear_instead_of_weapon_modifier] = 0.25
-	},
-	localization_info = {
-		[meta_stat_buffs.mission_reward_gear_instead_of_weapon_modifier] = DISPLAY.percentage
 	}
 }
 templates.gadget_permanent_damage_resistance = {
@@ -248,9 +208,6 @@ templates.gadget_permanent_damage_resistance = {
 	class_name = "buff",
 	stat_buffs = {
 		[stat_buffs.corruption_taken_grimoire_multiplier] = 0.8
-	},
-	localization_info = {
-		[stat_buffs.corruption_taken_grimoire_multiplier] = DISPLAY.percentage
 	}
 }
 templates.gadget_revive_speed_increase = {
@@ -258,9 +215,6 @@ templates.gadget_revive_speed_increase = {
 	class_name = "buff",
 	stat_buffs = {
 		[stat_buffs.revive_speed_modifier] = 0.2
-	},
-	localization_info = {
-		[stat_buffs.revive_speed_modifier] = DISPLAY.percentage
 	}
 }
 templates.gadget_cooldown_reduction = {
@@ -268,9 +222,6 @@ templates.gadget_cooldown_reduction = {
 	class_name = "buff",
 	stat_buffs = {
 		[stat_buffs.ability_cooldown_modifier] = -0.05
-	},
-	localization_info = {
-		[stat_buffs.ability_cooldown_modifier] = DISPLAY.percentage
 	}
 }
 templates.gadget_sprint_cost_reduction = {
@@ -278,9 +229,6 @@ templates.gadget_sprint_cost_reduction = {
 	class_name = "buff",
 	stat_buffs = {
 		[stat_buffs.sprinting_cost_multiplier] = 0.8
-	},
-	localization_info = {
-		[stat_buffs.sprinting_cost_multiplier] = DISPLAY.percentage
 	}
 }
 templates.gadget_block_cost_reduction = {
@@ -288,9 +236,6 @@ templates.gadget_block_cost_reduction = {
 	class_name = "buff",
 	stat_buffs = {
 		[stat_buffs.block_cost_multiplier] = 0.8
-	},
-	localization_info = {
-		[stat_buffs.block_cost_multiplier] = DISPLAY.percentage
 	}
 }
 templates.gadget_stamina_regeneration = {
@@ -298,9 +243,6 @@ templates.gadget_stamina_regeneration = {
 	class_name = "buff",
 	stat_buffs = {
 		[stat_buffs.stamina_regeneration_modifier] = 0.2
-	},
-	localization_info = {
-		[stat_buffs.stamina_regeneration_modifier] = DISPLAY.percentage
 	}
 }
 templates.gadget_damage_reduction_vs_flamers = {
@@ -309,9 +251,6 @@ templates.gadget_damage_reduction_vs_flamers = {
 	stat_buffs = {
 		[stat_buffs.damage_taken_by_cultist_flamer_multiplier] = 0.8,
 		[stat_buffs.damage_taken_by_renegade_flamer_multiplier] = 0.8
-	},
-	localization_info = {
-		[stat_buffs.damage_taken_by_cultist_flamer_multiplier] = DISPLAY.percentage
 	}
 }
 templates.gadget_damage_reduction_vs_snipers = {
@@ -319,9 +258,6 @@ templates.gadget_damage_reduction_vs_snipers = {
 	class_name = "buff",
 	stat_buffs = {
 		[stat_buffs.damage_taken_by_renegade_sniper_multiplier] = 0.8
-	},
-	localization_info = {
-		[stat_buffs.damage_taken_by_renegade_sniper_multiplier] = DISPLAY.percentage
 	}
 }
 templates.gadget_damage_reduction_vs_grenadiers = {
@@ -330,9 +266,6 @@ templates.gadget_damage_reduction_vs_grenadiers = {
 	stat_buffs = {
 		[stat_buffs.damage_taken_by_renegade_grenadier_multiplier] = 0.8,
 		[stat_buffs.damage_taken_by_cultist_grenadier_multiplier] = 0.8
-	},
-	localization_info = {
-		[stat_buffs.damage_taken_by_renegade_grenadier_multiplier] = DISPLAY.percentage
 	}
 }
 templates.gadget_damage_reduction_vs_hounds = {
@@ -340,9 +273,6 @@ templates.gadget_damage_reduction_vs_hounds = {
 	class_name = "buff",
 	stat_buffs = {
 		[stat_buffs.damage_taken_by_chaos_hound_multiplier] = 0.8
-	},
-	localization_info = {
-		[stat_buffs.damage_taken_by_chaos_hound_multiplier] = DISPLAY.percentage
 	}
 }
 templates.gadget_damage_reduction_vs_mutants = {
@@ -350,9 +280,6 @@ templates.gadget_damage_reduction_vs_mutants = {
 	class_name = "buff",
 	stat_buffs = {
 		[stat_buffs.damage_taken_by_cultist_mutant_multiplier] = 0.8
-	},
-	localization_info = {
-		[stat_buffs.damage_taken_by_cultist_mutant_multiplier] = DISPLAY.percentage
 	}
 }
 templates.gadget_damage_reduction_vs_gunners = {
@@ -362,9 +289,6 @@ templates.gadget_damage_reduction_vs_gunners = {
 		[stat_buffs.damage_taken_by_cultist_gunner_multiplier] = 0.8,
 		[stat_buffs.damage_taken_by_renegade_gunner_multiplier] = 0.8,
 		[stat_buffs.damage_taken_by_chaos_ogryn_gunner_multiplier] = 0.8
-	},
-	localization_info = {
-		[stat_buffs.damage_taken_by_cultist_gunner_multiplier] = DISPLAY.percentage
 	}
 }
 templates.gadget_damage_reduction_vs_bombers = {
@@ -372,9 +296,6 @@ templates.gadget_damage_reduction_vs_bombers = {
 	class_name = "buff",
 	stat_buffs = {
 		[stat_buffs.damage_taken_by_chaos_poxwalker_bomber_multiplier] = 0.8
-	},
-	localization_info = {
-		[stat_buffs.damage_taken_by_chaos_poxwalker_bomber_multiplier] = DISPLAY.percentage
 	}
 }
 templates.gadget_stamina_while_reviving = {
@@ -395,10 +316,7 @@ templates.gadget_stamina_while_reviving = {
 
 			return is_reviving
 		end
-	end,
-	localization_info = {
-		[stat_buffs.stamina_modifier] = DISPLAY.percentage
-	}
+	end
 }
 templates.gadget_push_block_angle_increase = {
 	predicted = false,
@@ -419,16 +337,11 @@ templates.gadget_push_block_angle_increase = {
 			max = 0.25,
 			lerp_value_func = value_lerp_2dp
 		}
-	},
-	localization_info = {
-		[stat_buffs.inner_push_angle_modifier] = DISPLAY.percentage,
-		[stat_buffs.outer_push_angle_modifier] = DISPLAY.percentage,
-		[stat_buffs.block_angle_modifier] = DISPLAY.percentage
 	}
 }
 templates.gadget_mission_objective_complete_buff = {
-	class_name = "proc_buff",
 	predicted = false,
+	class_name = "proc_buff",
 	proc_events = {
 		[proc_events.on_side_mission_objective_complete] = 1
 	},
@@ -438,14 +351,11 @@ templates.gadget_mission_objective_complete_buff = {
 		local buff_extension = ScriptUnit.extension(unit, "buff_system")
 
 		buff_extension:add_externally_controlled_buff("gadget_health_buff", t)
-	end,
-	localization_info = {
-		proc_buff_name = "gadget_health_buff"
-	}
+	end
 }
 templates.gadget_all_grimoires_buff = {
-	class_name = "proc_buff",
 	predicted = false,
+	class_name = "proc_buff",
 	proc_events = {
 		[proc_events.on_all_grimoires_picked_up] = 1
 	},
@@ -455,10 +365,7 @@ templates.gadget_all_grimoires_buff = {
 		local buff_extension = ScriptUnit.extension(unit, "buff_system")
 
 		buff_extension:add_externally_controlled_buff("gadget_health_buff", t)
-	end,
-	localization_info = {
-		proc_buff_name = "gadget_health_buff"
-	}
+	end
 }
 templates.gadget_play_with_only_bots_buff = {
 	predicted = false,
@@ -472,10 +379,7 @@ templates.gadget_play_with_only_bots_buff = {
 		local is_single_human_player = num_human_players == 1
 
 		return is_single_human_player
-	end,
-	localization_info = {
-		[stat_buffs.max_health_modifier] = DISPLAY.percentage
-	}
+	end
 }
 templates.gadget_medical_healing_increase = {
 	predicted = false,
@@ -486,14 +390,11 @@ templates.gadget_medical_healing_increase = {
 			max = 0.25,
 			lerp_value_func = value_lerp_2dp
 		}
-	},
-	localization_info = {
-		[stat_buffs.medical_crate_healing_modifier] = DISPLAY.percentage
 	}
 }
 templates.gadget_toughness_increase_on_revive = {
-	class_name = "proc_buff",
 	predicted = false,
+	class_name = "proc_buff",
 	proc_events = {
 		[proc_events.on_revive] = 1
 	},
@@ -508,30 +409,21 @@ templates.gadget_toughness_increase_on_revive = {
 		local target_unit_buff_extension = ScriptUnit.extension(target_unit, "buff_system")
 
 		target_unit_buff_extension:add_internally_controlled_buff("gadget_toughness_buff", t)
-	end,
-	localization_info = {
-		proc_buff_name = "gadget_toughness_buff"
-	}
+	end
 }
 templates.gadget_health_buff = {
 	predicted = false,
 	class_name = "buff",
 	stat_buffs = {
 		[stat_buffs.max_health_modifier] = 0.25
-	},
-	localization_info = {
-		[stat_buffs.max_health_modifier] = DISPLAY.percentage
 	}
 }
 templates.gadget_toughness_buff = {
-	class_name = "buff",
 	predicted = false,
 	duration = 5,
+	class_name = "buff",
 	stat_buffs = {
 		[stat_buffs.toughness_damage_taken_modifier] = 0.5
-	},
-	localization_info = {
-		[stat_buffs.toughness_damage_taken_modifier] = DISPLAY.percentage
 	}
 }
 

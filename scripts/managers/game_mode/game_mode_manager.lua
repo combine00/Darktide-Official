@@ -83,7 +83,7 @@ function GameModeManager:register_physics_safe_callback(cb)
 	self._num_physics_safe_callbacks = index
 end
 
-function GameModeManager:_async_raycast_result_cb(id, hits, num_hits)
+function GameModeManager:_async_raycast_result_cb(id, ...)
 	local queue = self._raycast_queue
 	local index = self._async_raycast_handles[id]
 	local cb = queue[index - 1]
@@ -99,7 +99,7 @@ function GameModeManager:_async_raycast_result_cb(id, hits, num_hits)
 		queue[jj] = nil
 	end
 
-	cb(id, hits, num_hits, data_buffer)
+	cb(id, data_buffer, ...)
 	table.clear(data_buffer)
 
 	self._async_raycast_handles[id] = nil
@@ -176,6 +176,10 @@ end
 
 function GameModeManager:game_mode_name()
 	return self._game_mode:name()
+end
+
+function GameModeManager:game_mode()
+	return self._game_mode
 end
 
 function GameModeManager:side_compositions()
@@ -330,12 +334,24 @@ function GameModeManager:player_time_until_spawn(player)
 	return self._game_mode:player_time_until_spawn(player)
 end
 
+function GameModeManager:cleanup_game_mode_dynamic_lavels()
+	self._game_mode:cleanup_game_mode_dynamic_lavels()
+end
+
 function GameModeManager:cleanup_game_mode_units()
 	self._game_mode:cleanup_game_mode_units()
 end
 
 function GameModeManager:should_spawn_dead(player)
 	return self._game_mode:should_spawn_dead(player)
+end
+
+function GameModeManager:on_gameplay_init()
+	self._game_mode:on_gameplay_init()
+end
+
+function GameModeManager:can_player_enter_game()
+	return self._game_mode:can_player_enter_game()
 end
 
 function GameModeManager:game_mode_ready()
@@ -436,7 +452,7 @@ function GameModeManager:mission_outro_played()
 		return true
 	end
 
-	if state == "outro_cinematic" and not Managers.state.cinematic:active() then
+	if state == "outro_cinematic" and not Managers.state.cinematic:cinematic_active() then
 		return true
 	end
 

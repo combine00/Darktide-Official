@@ -105,7 +105,7 @@ PickupSpawner.component_data = {
 	ignore_item_list = {
 		ui_type = "check_box",
 		value = true,
-		ui_name = "Accept any pool items",
+		ui_name = "Accept Any Pool Items",
 		category = "Items"
 	},
 	items = {
@@ -119,12 +119,14 @@ PickupSpawner.component_data = {
 			"ammo_cache_pocketable",
 			"battery_01_luggable",
 			"battery_02_luggable",
+			"communications_hack_device",
 			"consumable",
 			"container_01_luggable",
 			"container_02_luggable",
 			"container_03_luggable",
 			"control_rod_01_luggable",
 			"grimoire",
+			"hordes_mcguffin",
 			"large_clip",
 			"large_metal",
 			"large_platinum",
@@ -138,20 +140,21 @@ PickupSpawner.component_data = {
 			"syringe_corruption_pocketable",
 			"syringe_power_boost_pocketable",
 			"syringe_speed_boost_pocketable",
-			"tome",
-			"collectible_01_pickup"
+			"tome"
 		},
 		options_values = {
 			"none",
 			"ammo_cache_pocketable",
 			"battery_01_luggable",
 			"battery_02_luggable",
+			"communications_hack_device",
 			"consumable",
 			"container_01_luggable",
 			"container_02_luggable",
 			"container_03_luggable",
 			"control_rod_01_luggable",
 			"grimoire",
+			"hordes_mcguffin",
 			"large_clip",
 			"large_metal",
 			"large_platinum",
@@ -165,8 +168,7 @@ PickupSpawner.component_data = {
 			"syringe_corruption_pocketable",
 			"syringe_power_boost_pocketable",
 			"syringe_speed_boost_pocketable",
-			"tome",
-			"collectible_01_pickup"
+			"tome"
 		}
 	},
 	item_spawn_selection = {

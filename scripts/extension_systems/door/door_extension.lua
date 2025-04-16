@@ -187,7 +187,7 @@ function DoorExtension:update(unit, dt, t)
 	if self._is_server then
 		self:instantiate_state()
 
-		if self._self_closing_timer > 0 and not self:_is_dead(unit) then
+		if self._self_closing_timer > 0 then
 			self._self_closing_timer = self._self_closing_timer - dt
 
 			if self._self_closing_timer <= 0 then
@@ -224,24 +224,16 @@ function DoorExtension:_should_nav_block()
 end
 
 function DoorExtension:_update_nav_block(unit)
-	local is_dead = self:_is_dead(unit)
 	local nav_blocked = self:nav_blocked()
+	local should_nav_block = self:_should_nav_block()
 
-	if is_dead then
-		if not nav_blocked then
+	if should_nav_block ~= nav_blocked then
+		if should_nav_block then
+			self:_set_nav_block(true)
+			Unit.flow_event(self._unit, "lua_door_nav_blocked")
+		elseif not should_nav_block then
 			self:_set_nav_block(false)
-		end
-	else
-		local should_nav_block = self:_should_nav_block()
-
-		if should_nav_block ~= nav_blocked then
-			if should_nav_block then
-				self:_set_nav_block(true)
-				Unit.flow_event(self._unit, "lua_door_nav_blocked")
-			elseif not should_nav_block then
-				self:_set_nav_block(false)
-				Unit.flow_event(self._unit, "lua_door_nav_opened")
-			end
+			Unit.flow_event(self._unit, "lua_door_nav_opened")
 		end
 	end
 end
@@ -507,17 +499,6 @@ function DoorExtension:teleport_bots()
 			index = index + 1
 		end
 	end
-end
-
-function DoorExtension:_is_dead(unit)
-	local is_dead = false
-	local health_extension = ScriptUnit.has_extension(unit, "health_system")
-
-	if health_extension and not health_extension:is_alive() then
-		is_dead = true
-	end
-
-	return is_dead
 end
 
 function DoorExtension:_set_current_state(state)

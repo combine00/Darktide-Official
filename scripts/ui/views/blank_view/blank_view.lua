@@ -1,21 +1,22 @@
+require("scripts/ui/views/base_view")
+
 local definition_path = "scripts/ui/views/blank_view/blank_view_definitions"
-local BaseView = require("scripts/ui/views/base_view")
 local BlankView = class("BlankView", "BaseView")
 
 function BlankView:init(settings, context)
 	local definitions = require(definition_path)
 
-	BaseView.init(self, definitions, settings)
+	BlankView.super.init(self, definitions, settings)
 
 	self._pass_draw = false
 	self._loading_icon = context and context.loading_icon
 end
 
 function BlankView:draw(dt, t, input_service, layer)
-	BaseView.draw(self, dt, t, input_service, layer)
+	BlankView.super.draw(self, dt, t, input_service, layer)
 
 	if self._loading_icon then
-		Managers.ui:render_loading_icon()
+		Managers.ui:render_loading_info()
 	end
 end
 

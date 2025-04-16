@@ -1,16 +1,14 @@
 local Component = require("scripts/utilities/component")
-local VisualLoadoutLodGroup = require("scripts/extension_systems/visual_loadout/utilities/visual_loadout_lod_group")
 local VisualLoadoutCustomization = require("scripts/extension_systems/visual_loadout/utilities/visual_loadout_customization")
+local VisualLoadoutLodGroup = require("scripts/extension_systems/visual_loadout/utilities/visual_loadout_lod_group")
 local unit_alive = Unit.alive
 local unit_set_unit_visibility = Unit.set_unit_visibility
 local unit_set_visibility = Unit.set_visibility
 local unit_flow_event = Unit.flow_event
 local ATTACHMENT_SPAWN_STATUS = table.enum("waiting_for_load", "fully_spawned")
-local FACIAL_HAIR_VISIBILITY_GROUPS = table.enum("eyebrows", "beard")
-local _should_spawn_3p, _should_spawn_1p = nil
 local EquipmentComponent = class("EquipmentComponent")
 
-function EquipmentComponent:init(world, item_definitions, unit_spawner, unit_3p, optional_extension_manager, optional_item_streaming_settings, optional_force_highest_lod_step)
+function EquipmentComponent:init(world, item_definitions, unit_spawner, unit_3p, optional_extension_manager, optional_item_streaming_settings, optional_force_highest_lod_step, optional_from_ui_profile_spawner)
 	self._world = world
 	self._item_definitions = item_definitions
 	self._unit_spawner = unit_spawner
@@ -18,6 +16,7 @@ function EquipmentComponent:init(world, item_definitions, unit_spawner, unit_3p,
 	self.lod_shadow_group_3p = VisualLoadoutLodGroup.try_init_and_fetch_lod_group(unit_3p, "lod_shadow")
 	self._extension_manager = optional_extension_manager
 	self._force_highest_lod_step = optional_force_highest_lod_step
+	self._from_ui_profile_spawner = optional_from_ui_profile_spawner
 	local has_slot_package_streaming = optional_item_streaming_settings ~= nil
 	self._has_slot_package_streaming = has_slot_package_streaming
 
@@ -29,33 +28,32 @@ end
 
 local function _create_slot_from_configuration(configuration, slot_options)
 	local slot_name = configuration.name
-	local slot = {
-		name = slot_name,
-		equipped = false,
-		item = nil,
-		unit_3p = nil,
-		unit_1p = nil,
-		parent_unit_3p = nil,
-		parent_unit_1p = nil,
-		attachments_3p = nil,
-		attachments_1p = nil,
-		hidden_3p = nil,
-		hidden_1p = nil,
-		wants_hidden_by_gameplay_1p = false,
-		wants_hidden_by_gameplay_3p = false,
-		buffable = configuration.buffable,
-		wieldable = configuration.wieldable,
-		wield_inputs = configuration.wield_inputs,
-		use_existing_unit_3p = configuration.use_existing_unit_3p,
-		item_loaded = nil,
-		attachment_spawn_status = nil,
-		equipped_t = nil,
-		deform_overrides = nil,
-		breed_name = nil,
-		hide_unit_in_slot = configuration.hide_unit_in_slot,
-		skip_link_children = slot_options.skip_link_children or false,
-		cached_nodes = {}
-	}
+	local slot = Script.new_map(32)
+	slot.name = slot_name
+	slot.equipped = false
+	slot.item = nil
+	slot.unit_3p = nil
+	slot.unit_1p = nil
+	slot.parent_unit_3p = nil
+	slot.parent_unit_1p = nil
+	slot.attachments_3p = nil
+	slot.attachments_1p = nil
+	slot.hidden_3p = nil
+	slot.hidden_1p = nil
+	slot.wants_hidden_by_gameplay_1p = false
+	slot.wants_hidden_by_gameplay_3p = false
+	slot.buffable = configuration.buffable
+	slot.wieldable = configuration.wieldable
+	slot.wield_inputs = configuration.wield_inputs
+	slot.use_existing_unit_3p = configuration.use_existing_unit_3p
+	slot.item_loaded = nil
+	slot.attachment_spawn_status = nil
+	slot.equipped_t = nil
+	slot.deform_overrides = nil
+	slot.breed_name = nil
+	slot.hide_unit_in_slot = configuration.hide_unit_in_slot
+	slot.skip_link_children = not not slot_options.skip_link_children
+	slot.cached_nodes = {}
 
 	return slot
 end
@@ -75,35 +73,40 @@ function EquipmentComponent.initialize_equipment(slot_configuration, optional_sl
 	return equipment
 end
 
-local temp = {}
+local _attach_settings = {}
 
 function EquipmentComponent:_attach_settings()
-	table.clear(temp)
+	table.clear(_attach_settings)
 
 	local extension_manager = self._extension_manager
-	temp.world = self._world
-	temp.unit_spawner = self._unit_spawner
-	temp.from_script_component = false
-	temp.item_definitions = self._item_definitions
-	temp.extension_manager = extension_manager
-	temp.spawn_with_extensions = extension_manager ~= nil
-	temp.force_highest_lod_step = self._force_highest_lod_step
+	_attach_settings.world = self._world
+	_attach_settings.unit_spawner = self._unit_spawner
+	_attach_settings.from_script_component = false
+	_attach_settings.item_definitions = self._item_definitions
+	_attach_settings.extension_manager = extension_manager
+	_attach_settings.spawn_with_extensions = extension_manager ~= nil
+	_attach_settings.force_highest_lod_step = self._force_highest_lod_step
+	_attach_settings.from_ui_profile_spawner = self._from_ui_profile_spawner
 
-	return temp
+	return _attach_settings
 end
 
-function EquipmentComponent:_fill_attach_settings_3p(attach_settings, slot)
+function EquipmentComponent:_fill_attach_settings_3p(owner_unit, attach_settings, slot)
+	attach_settings.owner_unit = owner_unit
 	attach_settings.is_first_person = false
 	attach_settings.lod_group = self.lod_group_3p
 	attach_settings.lod_shadow_group = self.lod_shadow_group_3p
+	attach_settings.breed_name = nil
 	attach_settings.skip_link_children = slot.skip_link_children
 end
 
-function EquipmentComponent:_fill_attach_settings_1p(attach_settings, breed_name_or_nil)
+function EquipmentComponent:_fill_attach_settings_1p(owner_unit, attach_settings, slot)
+	attach_settings.owner_unit = owner_unit
 	attach_settings.is_first_person = true
 	attach_settings.lod_group = false
 	attach_settings.lod_shadow_group = false
-	attach_settings.breed_name = breed_name_or_nil
+	attach_settings.breed_name = slot.breed_name
+	attach_settings.skip_link_children = nil
 end
 
 function EquipmentComponent:equip_item(unit_3p, unit_1p, slot, item, optional_existing_unit_3p, deform_overrides, optional_breed_name, optional_mission_template, optional_equipment)
@@ -155,8 +158,8 @@ function EquipmentComponent:_spawn_item_units(slot, unit_3p, unit_1p, attach_set
 		slot.attachment_spawn_status = ATTACHMENT_SPAWN_STATUS.waiting_for_load
 	end
 
-	if _should_spawn_3p(slot) then
-		self:_fill_attach_settings_3p(attach_settings, slot)
+	if self:_should_spawn_3p(unit_3p, slot, item) then
+		self:_fill_attach_settings_3p(unit_3p, attach_settings, slot)
 
 		local item_unit_3p, attachment_units_3p, attachment_name_to_unit_3p, _ = nil
 		local item_data = slot.item
@@ -211,8 +214,8 @@ function EquipmentComponent:_spawn_item_units(slot, unit_3p, unit_1p, attach_set
 		end
 	end
 
-	if _should_spawn_1p(unit_1p, item, slot) then
-		self:_fill_attach_settings_1p(attach_settings, slot.breed_name)
+	if self:_should_spawn_1p(unit_1p, item, slot) then
+		self:_fill_attach_settings_1p(unit_1p, attach_settings, slot)
 
 		local item_unit_1p, attachment_units_1p, attachment_name_to_unit_1p, _ = nil
 		local item_data = slot.item
@@ -266,23 +269,23 @@ end
 
 function EquipmentComponent:_spawn_attachments(slot, optional_mission_template)
 	local item = slot.item
+	local parent_unit_3p = slot.parent_unit_3p
 
-	if _should_spawn_3p(slot) then
+	if self:_should_spawn_3p(parent_unit_3p, slot, item) then
 		local attach_settings = self:_attach_settings()
 
-		self:_fill_attach_settings_3p(attach_settings, slot)
+		self:_fill_attach_settings_3p(parent_unit_3p, attach_settings, slot)
 
 		local unit_3p = slot.unit_3p
 		local weapon_skin_item = item.slot_weapon_skin
 		local skin_data = weapon_skin_item and weapon_skin_item ~= "" and rawget(attach_settings.item_definitions, weapon_skin_item)
 		local skin_overrides = VisualLoadoutCustomization.generate_attachment_overrides_lookup(item, skin_data)
 		local attachment_units_3p, attachment_name_to_unit_3p = VisualLoadoutCustomization.spawn_item_attachments(item, skin_overrides, attach_settings, unit_3p, true, nil, optional_mission_template)
-		local parent_unit = slot.parent_unit_3p
 
-		VisualLoadoutCustomization.apply_material_overrides(item, unit_3p, parent_unit, attach_settings)
+		VisualLoadoutCustomization.apply_material_overrides(item, unit_3p, parent_unit_3p, attach_settings)
 
 		if skin_data then
-			VisualLoadoutCustomization.apply_material_overrides(skin_data, unit_3p, parent_unit, attach_settings)
+			VisualLoadoutCustomization.apply_material_overrides(skin_data, unit_3p, parent_unit_3p, attach_settings)
 		end
 
 		VisualLoadoutCustomization.add_extensions(nil, attachment_units_3p, attach_settings)
@@ -291,7 +294,7 @@ function EquipmentComponent:_spawn_attachments(slot, optional_mission_template)
 
 		if deform_overrides then
 			for _, deform_override in pairs(deform_overrides) do
-				VisualLoadoutCustomization.apply_material_override(unit_3p, parent_unit, false, deform_override, false)
+				VisualLoadoutCustomization.apply_material_override(unit_3p, parent_unit_3p, false, deform_override, false)
 			end
 		end
 
@@ -314,10 +317,10 @@ function EquipmentComponent:_spawn_attachments(slot, optional_mission_template)
 
 	local parent_unit_1p = slot.parent_unit_1p
 
-	if _should_spawn_1p(parent_unit_1p, item, slot) then
+	if self:_should_spawn_1p(parent_unit_1p, item, slot) then
 		local attach_settings = self:_attach_settings()
 
-		self:_fill_attach_settings_1p(attach_settings, slot.breed_name)
+		self:_fill_attach_settings_1p(parent_unit_1p, attach_settings, slot)
 
 		local unit_1p = slot.unit_1p
 		local weapon_skin_item = item.slot_weapon_skin
@@ -577,12 +580,6 @@ local function _set_slot_hidden(slot, hidden_3p, hidden_1p)
 		else
 			_slot_flow_event_1p(slot, "lua_visible")
 		end
-	end
-end
-
-local function _mask_base_body_slot(base_body_slot, mask_override, unit_3p)
-	if mask_override then
-		VisualLoadoutCustomization.apply_material_override(body_unit, unit_3p, false, mask_override, false)
 	end
 end
 
@@ -942,11 +939,11 @@ function EquipmentComponent.send_component_event(slot, event_name, ...)
 	end
 end
 
-function _should_spawn_3p(slot)
+function EquipmentComponent:_should_spawn_3p(unit_3p, slot, item)
 	return not slot.use_existing_unit_3p and (not DEDICATED_SERVER or slot.wieldable)
 end
 
-function _should_spawn_1p(unit_1p, item, slot)
+function EquipmentComponent:_should_spawn_1p(unit_1p, item, slot)
 	return unit_1p and item.base_unit and item.show_in_1p and (not DEDICATED_SERVER or slot.wieldable)
 end
 

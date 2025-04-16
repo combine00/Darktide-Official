@@ -801,6 +801,39 @@ local conversations_hub_sergeant_a = {
 			[1.0] = 10.23571
 		},
 		randomize_indexes = {}
+	},
+	uxbridge_hub_heresy_greeting_a = {
+		randomize_indexes_n = 0,
+		sound_events_n = 1,
+		sound_events = {
+			[1.0] = "loc_sergeant_a__uxbridge_hub_heresy_greeting_a_01"
+		},
+		sound_events_duration = {
+			[1.0] = 7.742771
+		},
+		randomize_indexes = {}
+	},
+	uxbridge_hub_heresy_greeting_b = {
+		randomize_indexes_n = 0,
+		sound_events_n = 1,
+		sound_events = {
+			[1.0] = "loc_sergeant_a__uxbridge_hub_heresy_greeting_b_01"
+		},
+		sound_events_duration = {
+			[1.0] = 4.682063
+		},
+		randomize_indexes = {}
+	},
+	uxbridge_hub_heresy_greeting_c = {
+		randomize_indexes_n = 0,
+		sound_events_n = 1,
+		sound_events = {
+			[1.0] = "loc_sergeant_a__uxbridge_hub_heresy_greeting_c_01"
+		},
+		sound_events_duration = {
+			[1.0] = 5.071729
+		},
+		randomize_indexes = {}
 	}
 }
 

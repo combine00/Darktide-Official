@@ -130,6 +130,12 @@ end
 function SaveManager:character_data(character_id)
 	local account_id = self:save_data_account_id()
 
+	if not character_id then
+		local player_manager = Managers.player
+		local player = player_manager and player_manager:local_player(1)
+		character_id = player and player:character_id()
+	end
+
 	return self._save_data:character_data(account_id, character_id)
 end
 

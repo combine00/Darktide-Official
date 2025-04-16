@@ -110,6 +110,18 @@ function PartyImmateriumMember:psn_session_id()
 	return self:_get_presence():psn_session_id()
 end
 
+function PartyImmateriumMember:havoc_status()
+	return self:_get_presence():havoc_status()
+end
+
+function PartyImmateriumMember:havoc_rank_cadence_high()
+	return self:_get_presence():havoc_rank_cadence_high()
+end
+
+function PartyImmateriumMember:havoc_rank_all_time_high()
+	return self:_get_presence():havoc_rank_all_time_high()
+end
+
 function PartyImmateriumMember:destroy()
 	return
 end

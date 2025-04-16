@@ -22,11 +22,14 @@ templates.weapon_trait_bespoke_ogryn_thumper_p1_power_bonus_on_continuous_fire =
 }, BaseWeaponTraitBuffTemplates.stacking_buff_on_continuous_fire)
 templates.weapon_trait_bespoke_ogryn_thumper_p1_crit_chance_based_on_aim_time = table.clone(BaseWeaponTraitBuffTemplates.chance_based_on_aim_time)
 templates.weapon_trait_bespoke_ogryn_thumper_p1_weapon_special_power_bonus_after_one_shots = {
-	allow_proc_while_active = true,
 	predicted = false,
+	allow_proc_while_active = true,
 	max_stacks = 1,
 	class_name = "proc_buff",
 	active_duration = 4,
+	buff_data = {
+		required_num_hits = 3
+	},
 	proc_events = {
 		[proc_events.on_shoot] = 1
 	},

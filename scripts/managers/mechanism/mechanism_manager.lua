@@ -391,6 +391,10 @@ function MechanismManager:backend_mission_id()
 	return backend_mission_id
 end
 
+function MechanismManager:mechanism_data()
+	return self._mechanism:mechanism_data()
+end
+
 function MechanismManager:profile_changes_are_allowed()
 	local mechanism = self._mechanism
 
@@ -399,6 +403,12 @@ function MechanismManager:profile_changes_are_allowed()
 	end
 
 	return mechanism:profile_changes_are_allowed()
+end
+
+function MechanismManager:current_mechanism()
+	local mechanism = self._mechanism
+
+	return mechanism
 end
 
 return MechanismManager

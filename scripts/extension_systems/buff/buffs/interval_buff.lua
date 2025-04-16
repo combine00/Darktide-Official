@@ -13,8 +13,11 @@ local function _next_interval_t(template, context)
 end
 
 function IntervalBuff:init(context, template, start_time, instance_id, ...)
+	self._duration_bonus_multiplier = 1
+
 	IntervalBuff.super.init(self, context, template, start_time, instance_id, ...)
 
+	self._duration_bonus_multiplier = self:_calculate_duration_bonus_multiplier(self._template_context, template)
 	local random_offset = template.start_with_frame_offset and context.fixed_time_step * (1 + math.floor(math.random() * 9)) or 0
 	local first_interval = template.start_interval_on_apply and 0 or _next_interval_t(template)
 	self._next_interval_t = start_time + first_interval + random_offset
@@ -40,6 +43,12 @@ function IntervalBuff:update(dt, t, portable_random)
 	end
 end
 
+function IntervalBuff:duration()
+	local base_duration = IntervalBuff.super.duration(self)
+
+	return base_duration and base_duration * self._duration_bonus_multiplier or nil
+end
+
 function IntervalBuff:finished()
 	local template = self._template
 
@@ -48,6 +57,59 @@ function IntervalBuff:finished()
 	end
 
 	return false
+end
+
+function IntervalBuff:_calculate_duration_bonus_multiplier(context, template)
+	local burning_duration_bonus_multiplier = self:_calculate_burning_duration_bonus_multiplier(context.unit, context, template)
+
+	return burning_duration_bonus_multiplier
+end
+
+function IntervalBuff:_calculate_burning_duration_bonus_multiplier(unit, context, template)
+	local attacker_unit = self:owner_unit()
+
+	if not attacker_unit then
+		return 1
+	end
+
+	local side_system = Managers.state.extension:system("side_system")
+	local unit_side = side_system.side_by_unit[unit]
+	local side_name = unit_side and unit_side:name() or nil
+
+	if side_name == nil or side_name == "heroes" then
+		return 1
+	end
+
+	local num_constant_keywords = template.keywords and #template.keywords
+	local has_burning_keyword = false
+
+	if num_constant_keywords then
+		local keywords = template.keywords
+
+		for i = 1, num_constant_keywords do
+			local keyword = keywords[i]
+
+			if keyword == "burning" then
+				has_burning_keyword = true
+
+				break
+			end
+		end
+	end
+
+	if not has_burning_keyword then
+		return 1
+	end
+
+	local total_duration_multiplier = 1
+	local buff_extension = ScriptUnit.has_extension(attacker_unit, "buff_system")
+
+	if buff_extension then
+		local attacker_stat_buffs = buff_extension:stat_buffs()
+		total_duration_multiplier = total_duration_multiplier + (attacker_stat_buffs.burning_duration or 1) - 1
+	end
+
+	return total_duration_multiplier
 end
 
 return IntervalBuff

@@ -36,6 +36,11 @@ function NetworkStoryManager:on_gameplay_post_init(level)
 	return
 end
 
+function NetworkStoryManager:unregister_level(level)
+	local levels = self._levels
+	levels[level] = nil
+end
+
 function NetworkStoryManager:destroy()
 	if not self._is_server then
 		self._network_event_delegate:unregister_events(unpack(CLIENT_RPCS))

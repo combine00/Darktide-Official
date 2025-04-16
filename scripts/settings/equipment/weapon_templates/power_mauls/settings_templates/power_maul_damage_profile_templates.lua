@@ -1,28 +1,26 @@
 local ArmorSettings = require("scripts/settings/damage/armor_settings")
-local PowerLevelSettings = require("scripts/settings/damage/power_level_settings")
+local AttackSettings = require("scripts/settings/damage/attack_settings")
 local DamageProfileSettings = require("scripts/settings/damage/damage_profile_settings")
 local DamageSettings = require("scripts/settings/damage/damage_settings")
 local GibbingSettings = require("scripts/settings/gibbing/gibbing_settings")
-local AttackSettings = require("scripts/settings/damage/attack_settings")
+local PowerLevelSettings = require("scripts/settings/damage/power_level_settings")
 local WoundsTemplates = require("scripts/settings/damage/wounds_templates")
-local GibbingPower = GibbingSettings.gibbing_power
-local GibbingTypes = GibbingSettings.gibbing_types
-local damage_types = DamageSettings.damage_types
 local armor_types = ArmorSettings.types
+local damage_lerp_values = DamageProfileSettings.damage_lerp_values
+local damage_types = DamageSettings.damage_types
+local gibbing_power = GibbingSettings.gibbing_power
+local gibbing_types = GibbingSettings.gibbing_types
+local melee_attack_strengths = AttackSettings.melee_attack_strength
+local big_cleave = DamageProfileSettings.big_cleave
+local double_cleave = DamageProfileSettings.double_cleave
+local light_cleave = DamageProfileSettings.light_cleave
+local single_cleave = DamageProfileSettings.single_cleave
 local damage_templates = {}
 local overrides = {}
 
 table.make_unique(damage_templates)
 table.make_unique(overrides)
 
-local melee_attack_strengths = AttackSettings.melee_attack_strength
-local crit_armor_mod = DamageProfileSettings.crit_armor_mod
-local crit_impact_armor_mod = DamageProfileSettings.crit_impact_armor_mod
-local damage_lerp_values = DamageProfileSettings.damage_lerp_values
-local single_cleave = DamageProfileSettings.single_cleave
-local double_cleave = DamageProfileSettings.double_cleave
-local big_cleave = DamageProfileSettings.big_cleave
-local light_cleave = DamageProfileSettings.light_cleave
 local smiter_light_default_am = {
 	attack = {
 		[armor_types.unarmored] = damage_lerp_values.lerp_1,
@@ -95,8 +93,8 @@ damage_templates.powermaul_light_smiter = {
 	stagger_category = "melee",
 	cleave_distribution = single_cleave,
 	damage_type = damage_types.spiked_blunt,
-	gibbing_power = GibbingPower.light,
-	gibbing_type = GibbingTypes.crushing,
+	gibbing_power = gibbing_power.light,
+	gibbing_type = gibbing_types.crushing,
 	melee_attack_strength = melee_attack_strengths.light,
 	wounds_template = WoundsTemplates.power_maul,
 	stagger_duration_modifier = {
@@ -155,8 +153,8 @@ damage_templates.powermaul_light_linesman = {
 	stagger_category = "melee",
 	cleave_distribution = light_cleave,
 	damage_type = damage_types.spiked_blunt,
-	gibbing_power = GibbingPower.light,
-	gibbing_type = GibbingTypes.crushing,
+	gibbing_power = gibbing_power.light,
+	gibbing_type = gibbing_types.crushing,
 	melee_attack_strength = melee_attack_strengths.light,
 	wounds_template = WoundsTemplates.power_maul,
 	stagger_duration_modifier = {
@@ -239,8 +237,8 @@ damage_templates.powermaul_heavy_tank = {
 	stagger_category = "melee",
 	cleave_distribution = big_cleave,
 	damage_type = damage_types.spiked_blunt,
-	gibbing_power = GibbingPower.medium,
-	gibbing_type = GibbingTypes.crushing,
+	gibbing_power = gibbing_power.medium,
+	gibbing_type = gibbing_types.crushing,
 	melee_attack_strength = melee_attack_strengths.heavy,
 	wounds_template = WoundsTemplates.power_maul,
 	stagger_duration_modifier = {
@@ -395,8 +393,8 @@ damage_templates.powermaul_light_tank = {
 	stagger_category = "melee",
 	cleave_distribution = big_cleave,
 	damage_type = damage_types.spiked_blunt,
-	gibbing_power = GibbingPower.light,
-	gibbing_type = GibbingTypes.crushing,
+	gibbing_power = gibbing_power.light,
+	gibbing_type = gibbing_types.crushing,
 	melee_attack_strength = melee_attack_strengths.light,
 	wounds_template = WoundsTemplates.power_maul,
 	stagger_duration_modifier = {
@@ -523,7 +521,7 @@ overrides.powermaul_weapon_special = {
 		},
 		{
 			"gibbing_power",
-			GibbingPower.always
+			gibbing_power.always
 		},
 		{
 			"sticky_attack",
@@ -531,7 +529,7 @@ overrides.powermaul_weapon_special = {
 		},
 		{
 			"gibbing_type",
-			GibbingTypes.default
+			gibbing_types.default
 		},
 		{
 			"wounds_template",

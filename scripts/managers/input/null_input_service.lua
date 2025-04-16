@@ -22,4 +22,12 @@ function NullInputService:get_default(action_name)
 	return self._parent:get_default(action_name)
 end
 
+function NullInputService:get_with_filters(action_name)
+	return self._parent:get_default(action_name)
+end
+
+function NullInputService:get_keys_from_alias(action_name)
+	return {}
+end
+
 return NullInputService

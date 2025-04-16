@@ -16,7 +16,7 @@ local HitMass = require("scripts/utilities/attack/hit_mass")
 local MinionState = require("scripts/utilities/minion_state")
 local PlayerUnitStatus = require("scripts/utilities/attack/player_unit_status")
 local PowerLevelSettings = require("scripts/settings/damage/power_level_settings")
-local SpecialRulesSetting = require("scripts/settings/ability/special_rules_settings")
+local SpecialRulesSettings = require("scripts/settings/ability/special_rules_settings")
 local TalentSettings = require("scripts/settings/talent/talent_settings")
 local ailment_effects = AilmentSettings.effects
 local buff_keywords = BuffSettings.keywords
@@ -26,7 +26,7 @@ local buff_targets = BuffSettings.targets
 local damage_efficiencies = AttackSettings.damage_efficiencies
 local damage_types = DamageSettings.damage_types
 local minion_burning_buff_effects = BurningSettings.buff_effects.minions
-local special_rules = SpecialRulesSetting.special_rules
+local special_rules = SpecialRulesSettings.special_rules
 local stagger_results = AttackSettings.stagger_results
 local attack_types = AttackSettings.attack_types
 local CHAIN_LIGHTNING_POWER_LEVEL = 500
@@ -113,7 +113,7 @@ templates.warp_fire = {
 			local owner_unit = template_context.is_server and template_context.owner_unit
 			local source_item = template_context.is_server and template_context.source_item
 
-			Attack.execute(unit, damage_template, "power_level", power_level, "damage_type", damage_types.warpfire, "attacking_unit", owner_unit, "item", source_item)
+			Attack.execute(unit, damage_template, "power_level", power_level, "damage_type", damage_types.warpfire, "attack_type", attack_types.buff, "attacking_unit", owner_unit, "item", source_item)
 		end
 	end,
 	on_remove_stack_func = function (template_data, template_context, change, new_stack_count)
@@ -244,7 +244,7 @@ templates.bleed = {
 			local source_item = template_context.is_server and template_context.source_item
 			local owner_unit = template_context.is_server and template_context.owner_unit or template_context.unit
 
-			Attack.execute(unit, damage_template, "power_level", power_level, "damage_type", damage_types.bleeding, "attacking_unit", owner_unit, "item", source_item)
+			Attack.execute(unit, damage_template, "power_level", power_level, "damage_type", damage_types.bleeding, "attack_type", attack_types.buff, "attacking_unit", owner_unit, "item", source_item)
 		end
 	end,
 	minion_effects = {
@@ -359,6 +359,13 @@ templates.shock_grenade_interval = {
 		0.3,
 		0.8
 	},
+	start_func = function (template_data, template_context)
+		local unit = template_context.unit
+		local unit_data = ScriptUnit.has_extension(unit, "unit_data_system")
+		local breed = unit_data and unit_data:breed()
+		local is_poxwalker_bomber = breed and breed.tags and breed.name == "chaos_poxwalker_bomber"
+		template_data.is_poxwalker_bomber = is_poxwalker_bomber
+	end,
 	interval_func = function (template_data, template_context, template, dt, t)
 		local is_server = template_context.is_server
 
@@ -367,8 +374,9 @@ templates.shock_grenade_interval = {
 		end
 
 		local unit = template_context.unit
+		local is_staggered_poxwalker_bomber = template_data.is_poxwalker_bomber and MinionState.is_staggered(unit)
 
-		if HEALTH_ALIVE[unit] then
+		if HEALTH_ALIVE[unit] and not is_staggered_poxwalker_bomber then
 			local damage_template = DamageProfileTemplates.shock_grenade_stun_interval
 			local owner_unit = template_context.owner_unit
 			local power_level = DEFAULT_POWER_LEVEL
@@ -376,7 +384,7 @@ templates.shock_grenade_interval = {
 			local attack_direction = Vector3(math.sin(random_radians), math.cos(random_radians), 0)
 			attack_direction = Vector3.normalize(attack_direction)
 
-			Attack.execute(unit, damage_template, "power_level", power_level, "damage_type", damage_types.electrocution, "attacking_unit", HEALTH_ALIVE[owner_unit] and owner_unit, "attack_direction", attack_direction)
+			Attack.execute(unit, damage_template, "power_level", power_level, "damage_type", damage_types.electrocution, "attack_type", attack_types.buff, "attacking_unit", HEALTH_ALIVE[owner_unit] and owner_unit, "attack_direction", attack_direction)
 		end
 	end,
 	minion_effects = {
@@ -445,7 +453,7 @@ templates.shockmaul_stun_interval = {
 			local attack_direction = Vector3(math.sin(random_radians), math.cos(random_radians), 0)
 			attack_direction = Vector3.normalize(attack_direction)
 
-			Attack.execute(unit, damage_template, "power_level", power_level, "damage_type", damage_types.electrocution, "attacking_unit", HEALTH_ALIVE[owner_unit] and owner_unit, "attack_direction", attack_direction)
+			Attack.execute(unit, damage_template, "power_level", power_level, "damage_type", damage_types.electrocution, "attack_type", attack_types.buff, "attacking_unit", HEALTH_ALIVE[owner_unit] and owner_unit, "attack_direction", attack_direction)
 		end
 	end,
 	minion_effects = {
@@ -562,7 +570,7 @@ templates.power_maul_stun = {
 			local attack_direction = Vector3(math.sin(random_radians), math.cos(random_radians), 0)
 			attack_direction = Vector3.normalize(attack_direction)
 
-			Attack.execute(unit, damage_template, "power_level", power_level, "damage_type", damage_types.electrocution, "attacking_unit", HEALTH_ALIVE[owner_unit] and owner_unit, "attack_direction", attack_direction)
+			Attack.execute(unit, damage_template, "power_level", power_level, "damage_type", damage_types.electrocution, "attack_type", attack_types.buff, "attacking_unit", HEALTH_ALIVE[owner_unit] and owner_unit, "attack_direction", attack_direction)
 
 			local buff_extension = template_context.buff_extension
 
@@ -586,7 +594,7 @@ local function _chain_lightning_start_func(template_data, template_context)
 
 	if template_context.template.use_hit_mass_based_timing then
 		local owner_unit = template_context.owner_unit
-		local target_hit_mass = HitMass.target_hit_mass(owner_unit, unit, false)
+		local target_hit_mass = HitMass.target_hit_mass(owner_unit, unit, false, false)
 		local template = template_context.template
 		local hit_mass_cost = template.hit_mass_cost or 0.2
 		local attack_start_time = math.clamp((target_hit_mass - 1) * hit_mass_cost, 0, 2)

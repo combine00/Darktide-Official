@@ -108,10 +108,6 @@ local zealot_a_veteran_male_a = {
 			[1.0] = 4.092417,
 			[2.0] = 3.925896
 		},
-		sound_event_weights = {
-			[1.0] = 0.5,
-			[2.0] = 0.5
-		},
 		randomize_indexes = {}
 	},
 	combat_pause_quirk_stench_b = {

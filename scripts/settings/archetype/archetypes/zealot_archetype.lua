@@ -4,7 +4,7 @@ local ArchetypeStaminaTemplates = require("scripts/settings/stamina/archetype_st
 local ArchetypeTalents = require("scripts/settings/ability/archetype_talents/archetype_talents")
 local ArchetypeToughnessTemplates = require("scripts/settings/toughness/archetype_toughness_templates")
 local ArchetypeWarpChargeTemplates = require("scripts/settings/warp_charge/archetype_warp_charge_templates")
-local UISoundEvents = require("scripts/settings/ui/ui_sound_events")
+local UiSoundEvents = require("scripts/settings/ui/ui_sound_events")
 local archetype_data = {
 	archetype_description = "loc_class_zealot_description",
 	name = "zealot",
@@ -18,7 +18,6 @@ local archetype_data = {
 	archetype_background_large = "content/ui/materials/icons/classes/large/zealot",
 	archetype_badge = "content/ui/materials/icons/class_badges/zealot_01_01",
 	archetype_video = "content/videos/class_selection/zealot_2",
-	string_symbol = "",
 	ui_selection_order = 2,
 	talents_package_path = "packages/ui/views/talent_builder_view/zealot",
 	archetype_name = "loc_class_zealot_name",
@@ -32,19 +31,13 @@ local archetype_data = {
 	sprint = ArchetypeSprintTemplates.default,
 	stamina = ArchetypeStaminaTemplates.zealot,
 	warp_charge = ArchetypeWarpChargeTemplates.default,
-	specializations = {
-		zealot_2 = {
-			archetype = "zealot",
-			name = "zealot_2"
-		}
-	},
 	talents = ArchetypeTalents.zealot,
 	base_talents = {
 		zealot_shock_grenade = 1,
 		zealot_dash = 1,
 		zealot_toughness_damage_coherency = 1
 	},
-	selection_sound_event = UISoundEvents.character_create_archetype_zealot,
+	selection_sound_event = UiSoundEvents.character_create_archetype_zealot,
 	unique_weapons = {
 		{
 			item = "content/items/weapons/player/melee/chainsword_2h_p1_m1",

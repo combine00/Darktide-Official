@@ -41,6 +41,10 @@ function ViewElementMenuPanel:init(parent, draw_layer, start_scale, definitions)
 	self._content = {}
 end
 
+function ViewElementMenuPanel:is_handling_navigation_input()
+	return self._is_handling_navigation_input
+end
+
 function ViewElementMenuPanel:set_is_handling_navigation_input(is_enabled)
 	self._is_handling_navigation_input = is_enabled
 

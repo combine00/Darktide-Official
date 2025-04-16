@@ -13,7 +13,22 @@ function ShadingEnvironmentExtension:init(extension_init_context, unit, extensio
 	self._slot = -1
 end
 
+function ShadingEnvironmentExtension:_clear_previous_shading_environment_resource()
+	if self._shading_environment_resource then
+		World.destroy_shading_environment_resource(self._world, self._shading_environment_resource)
+
+		self._shading_environment_resource = nil
+		self._shading_environment_resource_name = nil
+
+		Managers.state.camera:remove_environment(self)
+
+		self._enabled = false
+	end
+end
+
 function ShadingEnvironmentExtension:setup_from_component(fade_in_distance, layer, blend_mask, shading_environment_resource_name, shading_environment_slot, start_enabled)
+	self:_clear_previous_shading_environment_resource()
+
 	self._shading_environment_resource_name_default = shading_environment_resource_name
 	self._fade_in_distance = fade_in_distance
 	self._layer = layer
@@ -37,14 +52,17 @@ function ShadingEnvironmentExtension:setup_from_component(fade_in_distance, laye
 	end
 end
 
+function ShadingEnvironmentExtension:set_slot(shading_environment_slot)
+	self._slot = shading_environment_slot
+end
+
+function ShadingEnvironmentExtension:slot()
+	return self._slot
+end
+
 function ShadingEnvironmentExtension:destroy(unit)
 	self:disable()
-
-	if self._shading_environment_resource then
-		World.destroy_shading_environment_resource(self._world, self._shading_environment_resource)
-
-		self._shading_environment_resource = nil
-	end
+	self:_clear_previous_shading_environment_resource()
 end
 
 function ShadingEnvironmentExtension:enable()
@@ -67,7 +85,11 @@ function ShadingEnvironmentExtension:disable()
 	self._enabled = false
 end
 
-function ShadingEnvironmentExtension:setup_theme(shading_environment_system)
+function ShadingEnvironmentExtension:setup_theme(shading_environment_system, force_reset)
+	if force_reset then
+		self:_clear_previous_shading_environment_resource()
+	end
+
 	local slot_id = self._slot
 
 	if slot_id > -1 then

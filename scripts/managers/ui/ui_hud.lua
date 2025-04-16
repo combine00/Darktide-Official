@@ -52,6 +52,8 @@ function UIHud:init(elements, visibility_groups, params)
 	Managers.event:register(self, "event_update_hud_scale", "event_update_hud_scale")
 
 	self._refresh_retained = true
+
+	Managers.event:trigger("event_on_hud_created")
 end
 
 function UIHud:get_player_extension(player, extension_name)
@@ -199,7 +201,7 @@ function UIHud:_add_element(definition, elements, elements_array)
 		local use_hud_scale = definition.use_hud_scale
 		local class = require(filename)
 		local optional_context = definition.context
-		local draw_layer = 0
+		local draw_layer = UIHudSettings.element_draw_layers[class_name] or 0
 		local hud_scale = use_hud_scale and Hud.hud_scale() or RESOLUTION_LOOKUP.scale
 		local element = class:new(self, draw_layer, hud_scale, optional_context)
 		elements[class_name] = element

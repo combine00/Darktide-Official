@@ -24,14 +24,8 @@ local UIWorldSpawner = require("scripts/managers/ui/ui_world_spawner")
 local ViewElementInputLegend = require("scripts/ui/view_elements/view_element_input_legend/view_element_input_legend")
 local ViewElementWeaponStats = require("scripts/ui/view_elements/view_element_weapon_stats/view_element_weapon_stats")
 local Zones = require("scripts/settings/zones/zones")
-local generate_blueprints_function = require("scripts/ui/view_content_blueprints/item_blueprints")
 local INVENTORY_VIEW_NAME = "inventory_background_view"
 local SOCIAL_VIEW_NAME = "social_menu_view"
-local talents_presentation_style_id_list = {
-	"talent_1",
-	"talent_2",
-	"talent_3"
-}
 local loadout_presentation_order = {
 	"ability",
 	"blitz",
@@ -76,11 +70,23 @@ function LobbyView:init(settings, context)
 	self._mission_data = context.mission_data
 	self._spawn_slots = {}
 	self._show_weapons = false
+	local _unparsed_havoc_data = Managers.mechanism._mechanism._mechanism_data.havoc_data
+
+	if context.debug_preview and context.debug_unparsed_havoc_data then
+		_unparsed_havoc_data = context.debug_unparsed_havoc_data
+	end
+
+	if _unparsed_havoc_data then
+		self._havoc_data = self:_parsed_havoc_data(_unparsed_havoc_data)
+	end
+
 	self._slot_changes = false
 	self._use_gamepad_tooltip_navigation = false
 	local definitions = require(definition_path)
+	local level, dynamic_level_package = self:select_target_level()
+	self._level = level
 
-	LobbyView.super.init(self, definitions, settings, context)
+	LobbyView.super.init(self, definitions, settings, context, dynamic_level_package)
 
 	self._pass_draw = false
 	self._can_exit = not context or context.can_exit
@@ -94,6 +100,7 @@ function LobbyView:on_enter()
 	self:_setup_menu_list()
 	self:_setup_input_legend()
 	self:_setup_mission_descriptions()
+	self:_setup_havoc_info()
 
 	self._item_definitions = MasterItems.get_cached()
 
@@ -101,6 +108,87 @@ function LobbyView:on_enter()
 	TaskbarFlash.flash_window()
 
 	self._item_stats = self:_setup_item_stats("item_stats")
+end
+
+function LobbyView:_parsed_havoc_data(data)
+	local parsed_data = {}
+	local split1 = string.split(data, ";")
+	local mission = split1[1]
+	parsed_data.mission = mission
+	local level = tonumber(split1[2])
+	parsed_data.level = level
+	local circumstances = split1[5]
+	local split2 = string.split(circumstances, ":")
+	local circumstances_entry = {}
+
+	for i = 1, #split2 do
+		circumstances_entry[#circumstances_entry + 1] = split2[i]
+	end
+
+	parsed_data.circumstances = circumstances_entry
+
+	return parsed_data
+end
+
+function LobbyView:_setup_havoc_info()
+	local havoc_data = self._havoc_data
+	local widgets = self._widgets_by_name
+
+	if not havoc_data then
+		widgets.havoc_title.visible = false
+		widgets.havoc_circumstance_01.visible = false
+		widgets.havoc_circumstance_02.visible = false
+		widgets.havoc_circumstance_03.visible = false
+		widgets.havoc_circumstance_04.visible = false
+
+		return
+	end
+
+	local havoc_title_content = widgets.havoc_title.content
+	havoc_title_content.havoc_rank = Utf8.upper(havoc_data.level)
+	local num_displayed_mutators = 0
+
+	for i = 1, #havoc_data.circumstances do
+		num_displayed_mutators = num_displayed_mutators + 1
+		local circumstance_data = havoc_data.circumstances[i]
+		local circumstance_template = Circumstances[circumstance_data]
+		local circumstance_ui_settings = circumstance_template.ui
+		local widget_name = "havoc_circumstance_0" .. i
+		local widget = self._widgets_by_name[widget_name]
+		local widget_content = widget.content
+		widget.offset[2] = (i - 1) * 113
+		widget_content.icon = circumstance_ui_settings.icon
+		widget_content.circumstance_name = Localize(circumstance_ui_settings.display_name)
+		widget_content.circumstance_description = Localize(circumstance_ui_settings.description)
+	end
+
+	if num_displayed_mutators ~= 4 then
+		for i = num_displayed_mutators + 1, 4 do
+			local widget_name = "havoc_circumstance_0" .. i
+			local widget = self._widgets_by_name[widget_name]
+			widget.visible = false
+		end
+	end
+end
+
+function LobbyView:select_target_level()
+	local level_name = nil
+
+	if self._havoc_data then
+		level_name = "havoc"
+	elseif self._mission_data and self._mission_data.mission_name == "psykhanium" then
+		level_name = "horde"
+	else
+		level_name = "default"
+	end
+
+	local level = LobbyViewSettings.levels_by_id[level_name] or LobbyViewSettings.levels_by_id.default
+	local level_packages = {
+		is_level_package = true,
+		name = level.level_name
+	}
+
+	return level, level_packages
 end
 
 function LobbyView:_initialize_background_world()
@@ -146,7 +234,9 @@ function LobbyView:_initialize_background_world()
 	local world_layer = LobbyViewSettings.world_layer
 	local world_timer_name = LobbyViewSettings.timer_name
 	self._world_spawner = UIWorldSpawner:new(world_name, world_layer, world_timer_name, self.view_name)
-	local level_name = LobbyViewSettings.level_name
+	local level_name = nil
+	local target_level = self._level
+	level_name = self._level.level_name
 
 	self._world_spawner:spawn_level(level_name)
 
@@ -159,7 +249,7 @@ function LobbyView:event_register_lobby_camera(camera_unit)
 	local viewport_name = LobbyViewSettings.viewport_name
 	local viewport_type = LobbyViewSettings.viewport_type
 	local viewport_layer = LobbyViewSettings.viewport_layer
-	local shading_environment = LobbyViewSettings.shading_environment
+	local shading_environment = self._level.shading_environment
 
 	self._world_spawner:create_viewport(camera_unit, viewport_name, viewport_type, viewport_layer, shading_environment)
 end
@@ -835,7 +925,7 @@ function LobbyView:_assign_player_to_slot(player, slot)
 	local unique_id = player:unique_id()
 	local profile = player:profile()
 	local archetype_settings = profile.archetype
-	local breed_name = archetype_settings.breed
+	local breed_name = archetype_settings and archetype_settings.breed or profile.breed
 	local spawn_point_unit = nil
 
 	if breed_name == "ogryn" then
@@ -1268,23 +1358,6 @@ function LobbyView:_slot_by_index(index)
 	end
 end
 
-function LobbyView:_slot_by_unit(unit)
-	local spawn_slots = self._spawn_slots
-
-	for i = 1, #spawn_slots do
-		local slot = spawn_slots[i]
-		local profile_spawner = slot.profile_spawner
-
-		if profile_spawner then
-			local character_unit = profile_spawner:spawned_character_unit()
-
-			if character_unit and unit and character_unit == unit then
-				return slot
-			end
-		end
-	end
-end
-
 function LobbyView:_own_player_ready_status()
 	local player = Managers.player:local_player(1)
 	local slot_index = self:_get_slot_index_by_player(player)
@@ -1623,7 +1696,7 @@ function LobbyView:_setup_weapon_widgets(spawn_slot)
 	spawn_slot.profile_spawner:destroy()
 
 	local archetype_settings = profile.archetype
-	local breed_name = archetype_settings.breed
+	local breed_name = archetype_settings and archetype_settings.breed or profile.breed
 	local spawn_point_unit = nil
 
 	if breed_name == "ogryn" then
@@ -1655,17 +1728,17 @@ function LobbyView:_set_weapons_visibility()
 	local loadout_size = LobbyViewSettings.loadout_size
 	local panel_size = LobbyViewSettings.panel_size
 
-	for i = 1, #self._spawn_slots do
-		local slot = self._spawn_slots[i]
+	for ii = 1, #self._spawn_slots do
+		local slot = self._spawn_slots[ii]
 
 		if slot.occupied then
-			for i = 1, #slot.weapon_widgets do
-				local weapon_widgets = slot.weapon_widgets[i]
+			for jj = 1, #slot.weapon_widgets do
+				local weapon_widgets = slot.weapon_widgets[jj]
 				weapon_widgets.content.visible = is_active
 			end
 
-			for i = 1, #slot.talent_widgets do
-				local talent_widget = slot.talent_widgets[i]
+			for jj = 1, #slot.talent_widgets do
+				local talent_widget = slot.talent_widgets[jj]
 				talent_widget.content.visible = not is_active
 			end
 		end
@@ -1751,9 +1824,6 @@ function LobbyView:_start_animation_unready(spawn_slot)
 	spawn_slot.profile_spawner:assign_animation_event("unready")
 end
 
-local FALLBACK_DISPLAY_NAME = "loc_talent_display_name_fallback"
-local FALLBACK_DESCRIPTION = "loc_talent_description_fallback"
-local FALLBACK_ICON = "content/ui/textures/icons/talents/fallback"
 local dummy_tooltip_text_size = {
 	400,
 	20

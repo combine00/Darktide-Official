@@ -1,10 +1,9 @@
-local Breeds = require("scripts/settings/breed/breeds")
 local Definitions = require("scripts/ui/views/player_character_options_view/player_character_options_view_definitions")
+local Breeds = require("scripts/settings/breed/breeds")
 local PlayerCharacterOptionsViewSettings = require("scripts/ui/views/player_character_options_view/player_character_options_view_settings")
 local ProfileUtils = require("scripts/utilities/profile_utils")
+local UiSettings = require("scripts/settings/ui/ui_settings")
 local UISoundEvents = require("scripts/settings/ui/ui_sound_events")
-local SocialConstants = require("scripts/managers/data_service/services/social/social_constants")
-local OnlineStatus = SocialConstants.OnlineStatus
 local PlayerCharacterOptionsView = class("PlayerCharacterOptionsView", "BaseView")
 
 function PlayerCharacterOptionsView:init(settings, context)
@@ -43,6 +42,18 @@ function PlayerCharacterOptionsView:on_enter()
 	local player = self._inspected_player
 	local profile = player and player:profile()
 	local player_name = player and player:name()
+	local player_title = ProfileUtils.character_title(profile)
+
+	if IS_PLAYSTATION then
+		local player_info = player and Managers.data_service.social:get_player_info_by_account_id(player:account_id())
+		local console = player_info and player_info:platform()
+
+		if console == "psn" or console == "ps5" then
+			local player_online_id = player_info and player_info:user_display_name() or ""
+			player_title = player_title and player_title ~= "" and player_title .. " - " .. player_online_id or player_online_id
+		end
+	end
+
 	local current_level = profile and profile.current_level
 
 	self:_set_player_name(player_name, current_level)
@@ -50,14 +61,12 @@ function PlayerCharacterOptionsView:on_enter()
 	local profile_archetype = profile.archetype
 	local archetype_name = profile_archetype.name
 	self._widgets_by_name.class_badge.style.badge.material_values.badge = PlayerCharacterOptionsViewSettings.archetype_badge_texture_by_name[archetype_name]
-	local archetype = profile and profile.archetype
-	local string_symbol = archetype and archetype.string_symbol
+	local string_symbol = archetype_name and UiSettings.archetype_font_icon[archetype_name] or ""
 	local character_archetype_title = string_symbol .. " " .. ProfileUtils.character_archetype_title(profile, true)
 
 	self:_set_class_name(character_archetype_title)
 
 	local scenegraph_definition = self._definitions.scenegraph_definition
-	local player_title = ProfileUtils.character_title(profile)
 
 	if player_title and player_title ~= "" then
 		self._widgets_by_name.character_title.content.text = player_title

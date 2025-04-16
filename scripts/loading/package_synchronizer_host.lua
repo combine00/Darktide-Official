@@ -20,6 +20,10 @@ local function _debug_print(str, ...)
 	Log.info(PackageSynchronizerHost.DEBUG_TAG, str, ...)
 end
 
+local function _debug_warning(str, ...)
+	Log.warning(PackageSynchronizerHost.DEBUG_TAG, str, ...)
+end
+
 local SYNC_STATES = table.enum("not_synced", "synced")
 
 function PackageSynchronizerHost:init(network_delegate, hosted_synchronizer_client)
@@ -573,7 +577,7 @@ function PackageSynchronizerHost:_handle_player_unit_respawn_before_sync(player,
 		sync_data.after_sync_spawn_pose_box = Matrix4x4Box(pose)
 	end
 
-	player_unit_spawn_manager:despawn_safe(player)
+	player_unit_spawn_manager:despawn_player_safe(player)
 end
 
 function PackageSynchronizerHost:_handle_inventory_changes_before_sync(inventory_changes, player, sync_data)
@@ -751,45 +755,57 @@ function PackageSynchronizerHost:_cleanup_owned_units(player)
 	end
 end
 
-function PackageSynchronizerHost:is_peer_synced(peer_id, debug_log)
+function PackageSynchronizerHost:is_peer_synced(peer_id, peers_filter_map, debug_log)
 	local prioritization_template = self._prioritization_template
 	local required_package_aliases = prioritization_template.required_package_aliases
 	local sync_states = self._sync_states
 	local peer_states = sync_states[peer_id].peer_states
 
 	for sync_peer_id, peer_data in pairs(peer_states) do
-		local player_states = peer_data.player_states
+		repeat
+			if peers_filter_map and not peers_filter_map[sync_peer_id] then
+				break
+			end
 
-		for sync_local_player_id, player_data in pairs(player_states) do
-			local alias_states = player_data.alias_states
+			local player_states = peer_data.player_states
 
-			if not sync_states[sync_peer_id] or sync_states[sync_peer_id].enabled then
-				local synced = true
+			for sync_local_player_id, player_data in pairs(player_states) do
+				local alias_states = player_data.alias_states
 
-				for i = 1, #required_package_aliases do
-					local alias = required_package_aliases[i]
-					local alias_state = alias_states[alias]
+				if not sync_states[sync_peer_id] or sync_states[sync_peer_id].enabled then
+					local synced = true
 
-					if alias_state ~= SYNC_STATES.synced then
-						synced = false
+					for i = 1, #required_package_aliases do
+						local alias = required_package_aliases[i]
+						local alias_state = alias_states[alias]
 
-						break
+						if alias_state ~= SYNC_STATES.synced then
+							synced = false
+
+							break
+						end
 					end
-				end
 
-				if not synced then
-					if debug_log then
-						Log.info("PackageSynchronizerHost", "peer %s has not synced all other peers! has not synced: %s", peer_id, sync_peer_id)
+					if not synced then
+						if debug_log then
+							Log.info("PackageSynchronizerHost", "peer %s has not synced all other peers! has not synced: %s", peer_id, sync_peer_id)
+						end
+
+						return false
 					end
-
-					return false
 				end
 			end
-		end
+		until true
 	end
 
 	for sync_peer_id, data in pairs(sync_states) do
-		if data.enabled then
+		repeat
+			if peers_filter_map and not peers_filter_map[sync_peer_id] then
+				break
+			elseif not data.enabled then
+				break
+			end
+
 			local player_states = data.peer_states[peer_id].player_states
 			local synced = true
 
@@ -815,7 +831,7 @@ function PackageSynchronizerHost:is_peer_synced(peer_id, debug_log)
 
 				return false
 			end
-		end
+		until true
 	end
 
 	return true
@@ -851,14 +867,105 @@ function PackageSynchronizerHost:bot_synced_by_all(local_player_id)
 	return synced
 end
 
-function PackageSynchronizerHost:peers_synced(peer_ids)
+function PackageSynchronizerHost:peers_synced(peer_ids, peers_filter_map)
 	for _, peer_id in ipairs(peer_ids) do
-		if not self:is_peer_synced(peer_id) then
+		if not self:is_peer_synced(peer_id, peers_filter_map) then
 			return false
 		end
 	end
 
 	return true
+end
+
+local temp_non_synced_peers_map = {
+	peer_to_others = Script.new_array(8),
+	others_to_peer = Script.new_array(8)
+}
+
+function PackageSynchronizerHost:peers_not_synced_with(peer_id, peers_filter_map)
+	local non_synced_peers_map = temp_non_synced_peers_map
+	local peer_to_others = non_synced_peers_map.peer_to_others
+	local others_to_peer = non_synced_peers_map.others_to_peer
+
+	table.clear(peer_to_others)
+	table.clear(others_to_peer)
+
+	local prioritization_template = self._prioritization_template
+	local required_package_aliases = prioritization_template.required_package_aliases
+	local sync_states = self._sync_states
+	local peer_states = sync_states[peer_id].peer_states
+
+	for sync_peer_id, peer_data in pairs(peer_states) do
+		repeat
+			if peers_filter_map and not peers_filter_map[sync_peer_id] then
+				break
+			end
+
+			local synced = true
+			local player_states = peer_data.player_states
+
+			for sync_local_player_id, player_data in pairs(player_states) do
+				local alias_states = player_data.alias_states
+
+				if not sync_states[sync_peer_id] or sync_states[sync_peer_id].enabled then
+					for i = 1, #required_package_aliases do
+						local alias = required_package_aliases[i]
+						local alias_state = alias_states[alias]
+
+						if alias_state ~= SYNC_STATES.synced then
+							synced = false
+
+							break
+						end
+					end
+
+					if not synced then
+						break
+					end
+				end
+			end
+
+			if not synced then
+				peer_to_others[#peer_to_others + 1] = sync_peer_id
+			end
+		until true
+	end
+
+	for sync_peer_id, data in pairs(sync_states) do
+		repeat
+			if peers_filter_map and not peers_filter_map[sync_peer_id] then
+				break
+			elseif not data.enabled then
+				break
+			elseif sync_peer_id == peer_id then
+				break
+			end
+
+			local player_states = data.peer_states[peer_id].player_states
+			local synced = true
+
+			for _, player_data in pairs(player_states) do
+				local alias_states = player_data.alias_states
+
+				for i = 1, #required_package_aliases do
+					local alias = required_package_aliases[i]
+					local alias_state = alias_states[alias]
+
+					if alias_state ~= SYNC_STATES.synced then
+						synced = false
+
+						break
+					end
+				end
+			end
+
+			if not synced then
+				others_to_peer[#others_to_peer + 1] = sync_peer_id
+			end
+		until true
+	end
+
+	return peer_to_others, others_to_peer
 end
 
 function PackageSynchronizerHost:enable_peers(peer_ids)
@@ -867,11 +974,13 @@ function PackageSynchronizerHost:enable_peers(peer_ids)
 	for _, peer_id in ipairs(peer_ids) do
 		if sync_states[peer_id] then
 			sync_states[peer_id].enabled = true
+		else
+			_debug_warning("LoadingTimes: Failed to enable sync state. Peer %s is not known!", tostring(peer_id))
 		end
 	end
 
 	for peer_id, data in pairs(sync_states) do
-		if peer_id ~= self._peer_id then
+		if peer_id ~= self._peer_id and data.enabled then
 			local channel_id = data.channel_id
 
 			RPC.rpc_package_synchronizer_enable_peers(channel_id, peer_ids)

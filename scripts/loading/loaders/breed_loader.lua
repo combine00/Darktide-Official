@@ -16,7 +16,10 @@ function BreedLoader:destroy()
 	self:_cleanup()
 end
 
-function BreedLoader:start_loading(mission_name, level_editor_level, circumstance_name)
+function BreedLoader:start_loading(context)
+	local mission_name = context.mission_name
+	local level_editor_level = context.level_editor_level
+	local circumstance_name = context.circumstance_name
 	local chosen_breeds = {}
 	local mission_settings = Missions[mission_name]
 	local is_hub = mission_settings.is_hub

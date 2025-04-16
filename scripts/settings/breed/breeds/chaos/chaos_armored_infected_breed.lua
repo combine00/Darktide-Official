@@ -13,6 +13,7 @@ local StaggerSettings = require("scripts/settings/damage/stagger_settings")
 local TargetSelectionTemplates = require("scripts/extension_systems/perception/target_selection_templates")
 local TargetSelectionWeights = require("scripts/settings/minion_target_selection/minion_target_selection_weights")
 local WeakspotSettings = require("scripts/settings/damage/weakspot_settings")
+local DamageProfileTemplates = require("scripts/settings/damage/damage_profile_templates")
 local armor_types = ArmorSettings.types
 local breed_types = BreedSettings.types
 local hit_zone_names = HitZone.hit_zone_names
@@ -20,7 +21,7 @@ local stagger_types = StaggerSettings.stagger_types
 local weakspot_types = WeakspotSettings.types
 local breed_name = "chaos_armored_infected"
 local breed_data = {
-	display_name = "loc_breed_display_name_chaos_newly_infected",
+	display_name = "loc_chaos_armored_infected_breed_name",
 	run_speed = 5.159999999999999,
 	use_bone_lod = true,
 	power_level_type = "horde_default_melee",
@@ -386,10 +387,9 @@ local breed_data = {
 		[hit_zone_names.upper_left_leg] = armor_types.unarmored,
 		[hit_zone_names.lower_right_leg] = armor_types.unarmored,
 		[hit_zone_names.lower_left_leg] = armor_types.unarmored,
-		[hit_zone_names.upper_right_arm] = armor_types.unarmored,
-		[hit_zone_names.upper_left_arm] = armor_types.unarmored,
 		[hit_zone_names.lower_right_arm] = armor_types.unarmored,
-		[hit_zone_names.lower_left_arm] = armor_types.unarmored
+		[hit_zone_names.lower_left_arm] = armor_types.unarmored,
+		[hit_zone_names.head] = armor_types.unarmored
 	},
 	hitzone_damage_multiplier = {
 		ranged = {
@@ -399,6 +399,7 @@ local breed_data = {
 			[hit_zone_names.lower_right_leg] = 0.2
 		}
 	},
+	outline_config = {},
 	blackboard_component_config = BreedBlackboardComponentTemplates.melee_can_be_suppressed
 }
 

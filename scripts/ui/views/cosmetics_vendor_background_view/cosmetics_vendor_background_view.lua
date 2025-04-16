@@ -32,10 +32,14 @@ function CosmeticsVendorBackgroundView:on_enter()
 		narrative_manager:complete_event(narrative_event_name)
 	end
 
-	self:play_vo_events(ViewSettings.vo_event_vendor_greeting, "reject_npc_a", nil, 1)
-	self:play_vo_events(ViewSettings.vo_event_vendor_greeting, "reject_npc_servitor_a", nil, 0)
+	local story_name = "path_of_trust"
+	local pot_completed = narrative_manager:is_story_complete(story_name)
 
-	self._use_child_view_to_render = true
+	if pot_completed then
+		self:play_vo_events(ViewSettings.vo_event_vendor_greeting, "reject_npc_servitor_a", nil, 0)
+	else
+		self:play_vo_events(ViewSettings.vo_event_vendor_greeting, "reject_npc_a", nil, 1)
+	end
 end
 
 function CosmeticsVendorBackgroundView:on_exit()
@@ -64,6 +68,7 @@ function CosmeticsVendorBackgroundView:_set_wallet_background_width(width)
 	local widget = widgets_by_name[scenegraph_id]
 
 	if widget then
+		widget.content.visible = true
 		widget.style.texture.uvs[2][1] = math.min(uv_fractions, 1)
 	end
 
@@ -79,16 +84,14 @@ function CosmeticsVendorBackgroundView:update(dt, t, input_service)
 end
 
 function CosmeticsVendorBackgroundView:draw(dt, t, input_service, layer)
-	if not self._active_view_instance or self._active_view_instance and not self._use_child_view_to_render then
-		local render_scale = self._render_scale
-		local render_settings = self._render_settings
-		local ui_renderer = self._ui_renderer
-		render_settings.start_layer = layer
-		render_settings.scale = render_scale
-		render_settings.inverse_scale = render_scale and 1 / render_scale
+	local render_scale = self._render_scale
+	local render_settings = self._render_settings
+	local ui_renderer = self._ui_renderer
+	render_settings.start_layer = layer
+	render_settings.scale = render_scale
+	render_settings.inverse_scale = render_scale and 1 / render_scale
 
-		self:draw_passes(dt, t, ui_renderer, input_service, render_settings)
-	end
+	self:draw_passes(dt, t, ui_renderer, input_service, render_settings)
 end
 
 function CosmeticsVendorBackgroundView:draw_passes(dt, t, ui_renderer, input_service, render_settings)
@@ -99,6 +102,16 @@ function CosmeticsVendorBackgroundView:draw_passes(dt, t, ui_renderer, input_ser
 	self:_draw_widgets(dt, t, situational_input_service, ui_renderer, render_settings)
 	UIRenderer.end_pass(ui_renderer)
 	self:_draw_elements(dt, t, ui_renderer, render_settings, input_service)
+end
+
+function CosmeticsVendorBackgroundView:cb_on_camera_zoom_toggled()
+	local view_instance = self._active_view and Managers.ui:view_instance(self._active_view)
+
+	if not view_instance or not view_instance.cb_on_camera_zoom_toggled then
+		return
+	end
+
+	view_instance:cb_on_camera_zoom_toggled()
 end
 
 return CosmeticsVendorBackgroundView

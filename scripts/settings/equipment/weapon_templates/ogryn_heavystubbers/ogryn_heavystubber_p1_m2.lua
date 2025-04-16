@@ -1,9 +1,11 @@
+local ActionInputHierarchy = require("scripts/utilities/action/action_input_hierarchy")
 local ArmorSettings = require("scripts/settings/damage/armor_settings")
 local BaseTemplateSettings = require("scripts/settings/equipment/weapon_templates/base_template_settings")
 local BuffSettings = require("scripts/settings/buff/buff_settings")
 local DamageProfileTemplates = require("scripts/settings/damage/damage_profile_templates")
 local DamageSettings = require("scripts/settings/damage/damage_settings")
 local FootstepIntervalsTemplates = require("scripts/settings/equipment/footstep/footstep_intervals_templates")
+local HapticTriggerTemplates = require("scripts/settings/equipment/haptic_trigger_templates")
 local HerdingTemplates = require("scripts/settings/damage/herding_templates")
 local HitScanTemplates = require("scripts/settings/projectile/hit_scan_templates")
 local LineEffects = require("scripts/settings/effects/line_effects")
@@ -131,33 +133,96 @@ local weapon_template = {
 table.add_missing(weapon_template.action_inputs, BaseTemplateSettings.action_inputs)
 
 weapon_template.action_input_hierarchy = {
-	wield = "stay",
-	reload = "stay",
-	stab = "stay",
-	shoot = {
-		zoom = "base",
-		wield = "base",
-		grenade_ability = "base",
-		reload = "base",
-		combat_ability = "base",
-		shoot_release = "base"
-	},
-	zoom = {
-		zoom_release = "base",
-		wield = "base",
-		grenade_ability = "base",
-		reload = "base",
-		combat_ability = "base",
-		zoom_shoot = {
-			wield = "base",
-			reload = "base",
-			zoom_release = "base",
-			shoot_release = "previous"
+	{
+		input = "shoot",
+		transition = {
+			{
+				transition = "base",
+				input = "shoot_release"
+			},
+			{
+				transition = "base",
+				input = "reload"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "grenade_ability"
+			},
+			{
+				transition = "base",
+				input = "zoom"
+			}
 		}
+	},
+	{
+		input = "zoom",
+		transition = {
+			{
+				transition = "base",
+				input = "zoom_release"
+			},
+			{
+				input = "zoom_shoot",
+				transition = {
+					{
+						transition = "base",
+						input = "reload"
+					},
+					{
+						transition = "base",
+						input = "zoom_release"
+					},
+					{
+						transition = "previous",
+						input = "shoot_release"
+					},
+					{
+						transition = "base",
+						input = "wield"
+					}
+				}
+			},
+			{
+				transition = "base",
+				input = "reload"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "grenade_ability"
+			}
+		}
+	},
+	{
+		transition = "stay",
+		input = "wield"
+	},
+	{
+		transition = "stay",
+		input = "reload"
+	},
+	{
+		transition = "stay",
+		input = "stab"
 	}
 }
 
-table.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
+ActionInputHierarchy.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
 
 weapon_template.actions = {
 	action_unwield = {
@@ -608,7 +673,8 @@ weapon_template.actions = {
 		},
 		time_scale_stat_buffs = {
 			buff_stat_buffs.reload_speed
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_stab = {
 		damage_window_start = 0.26666666666666666,
@@ -704,7 +770,12 @@ weapon_template.actions = {
 		},
 		damage_type = damage_types.blunt_heavy,
 		damage_profile = DamageProfileTemplates.light_ogryn_shotgun_tank,
-		herding_template = HerdingTemplates.thunder_hammer_right_heavy
+		herding_template = HerdingTemplates.thunder_hammer_right_heavy,
+		time_scale_stat_buffs = {
+			buff_stat_buffs.attack_speed,
+			buff_stat_buffs.melee_attack_speed
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_inspect = {
 		skip_3p_anims = false,
@@ -717,7 +788,8 @@ weapon_template.actions = {
 		total_time = math.huge,
 		crosshair = {
 			crosshair_type = "inspect"
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	}
 }
 
@@ -907,6 +979,7 @@ weapon_template.stamina_template = "default"
 weapon_template.toughness_template = "default"
 weapon_template.movement_curve_modifier_template = "default"
 weapon_template.footstep_intervals = FootstepIntervalsTemplates.ogryn_heavy_stubber
+weapon_template.haptic_trigger_template = HapticTriggerTemplates.ranged.heavy_stubber
 weapon_template.traits = {}
 local ogryn_heavystubbert_p1_traits = table.ukeys(WeaponTraitsOgrynHeavystubbertP1)
 

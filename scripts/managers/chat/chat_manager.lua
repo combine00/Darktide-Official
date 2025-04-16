@@ -1,6 +1,8 @@
 local ChatManagerConstants = require("scripts/foundation/managers/chat/chat_manager_constants")
 local ChatManagerInterface = require("scripts/foundation/managers/chat/chat_manager_interface")
 local PrivilegesManager = require("scripts/managers/privileges/privileges_manager")
+local SocialConstants = require("scripts/managers/data_service/services/social/social_constants")
+local BackendUtilities = require("scripts/foundation/managers/backend/utilities/backend_utilities")
 local ChatManager = class("ChatManager")
 local SOUND_SETTING_OPTIONS_VOICE_CHAT = table.enum("muted", "voice_activated", "push_to_talk")
 
@@ -26,6 +28,7 @@ end
 
 function ChatManager:init()
 	self._initialized = false
+	self._logged_in = false
 	self._t = 0
 	self._account_handle = nil
 	self._privileges_manager = nil
@@ -36,13 +39,22 @@ function ChatManager:init()
 	self._input_service = Managers.input:get_input_service("Ingame")
 	self._party_id_session_handles = {}
 	self._capture_devices = {}
+	self._retry_login_count = 0
 	self._time_since_mute_local_mic = nil
 
 	Managers.event:register(self, "player_mute_status_changed", "player_mute_status_changed")
+
+	if IS_PLAYSTATION then
+		Managers.event:register(self, "event_new_block_user_states", "_event_new_block_user_states")
+	end
 end
 
 function ChatManager:destroy()
 	Managers.event:unregister(self, "player_mute_status_changed")
+
+	if IS_PLAYSTATION then
+		Managers.event:unregister(self, "event_new_block_user_states")
+	end
 end
 
 function ChatManager:split_displayname(input)
@@ -135,9 +147,13 @@ function ChatManager:login(peer_id, account_id, vivox_token)
 	else
 		Log.warning("ChatManager", "Already logged in.")
 	end
+
+	self._logged_in = true
 end
 
 function ChatManager:logout()
+	self._logged_in = false
+
 	if not self:is_logged_in() then
 		Log.warning("ChatManager", "Already logged out")
 
@@ -474,6 +490,7 @@ function ChatManager:_poll_party()
 					local voice = true
 					local text = true
 
+					self:_reset_party_channels()
 					self:join_chat_channel(channel, nil, voice, text, ChatManagerConstants.ChannelTag.PARTY, token)
 
 					self._party_id_session_handles[party_id] = channel
@@ -482,14 +499,18 @@ function ChatManager:_poll_party()
 				end)
 			end
 		else
-			local party_id_session_handles = self._party_id_session_handles
-
-			for key, session_handle in pairs(party_id_session_handles) do
-				self:leave_channel(session_handle)
-
-				party_id_session_handles[key] = nil
-			end
+			self:_reset_party_channels()
 		end
+	end
+end
+
+function ChatManager:_reset_party_channels()
+	local party_id_session_handles = self._party_id_session_handles
+
+	for key, session_handle in pairs(party_id_session_handles) do
+		self:leave_channel(session_handle)
+
+		party_id_session_handles[key] = nil
 	end
 end
 
@@ -520,6 +541,14 @@ function ChatManager:_handle_event(message)
 			else
 				self:mute_local_mic(true)
 			end
+
+			self._retry_login_count = 0
+		elseif state == ChatManagerConstants.LoginState.LOGGED_OUT and self._logged_in and self:is_connected() and self._retry_login_count == 0 then
+			self._retry_login_count = self._retry_login_count + 1
+
+			self:_get_vivox_token():next(function (data)
+				self:login(Network.peer_id(), data.account_id, data.vivox_token)
+			end)
 		end
 	elseif message.event == Vivox.EventType_CONNECTION_STATE_CHANGE then
 		local state = connection_state_enum(message.state)
@@ -614,6 +643,7 @@ function ChatManager:_handle_event(message)
 		local peer_id, account_id = self:split_displayname(message.displayname)
 		local participant = {
 			is_speaking = false,
+			waiting_for_block_states = false,
 			is_muted_for_me = false,
 			is_validated = false,
 			is_moderator_muted = false,
@@ -724,6 +754,10 @@ function ChatManager:_validate_participants()
 	for session_handle, channel in pairs(self._sessions) do
 		for participant_uri, participant in pairs(channel.participants) do
 			if not participant.is_validated then
+				local is_offline = false
+				local invalid_player_info = false
+				local waiting_for_ps5 = false
+
 				if not participant.player_info and participant.account_id and Managers.data_service.social then
 					local player_info = Managers.data_service.social:get_player_info_by_account_id(participant.account_id)
 					participant.player_info = player_info
@@ -732,12 +766,31 @@ function ChatManager:_validate_participants()
 				if not participant.player_info then
 					Log.warning("ChatManager", "Invalid participant %s, could not get PlayerInfo", participant_uri)
 
-					return
+					invalid_player_info = true
+				end
+
+				if not invalid_player_info and participant.player_info:online_status() == SocialConstants.OnlineStatus.offline then
+					is_offline = true
 				end
 
 				local player_info = participant.player_info
+				local is_block_states_required = false
 
-				if not participant.displayname then
+				if IS_PLAYSTATION and not is_offline and not invalid_player_info then
+					local platform = player_info:platform()
+					local is_friend = player_info:is_friend()
+					local party_status = player_info:party_status()
+					local is_same_party = party_status == SocialConstants.PartyStatus.mine or party_status == SocialConstants.PartyStatus.same_mission
+					is_block_states_required = not is_friend and not is_same_party and platform == my_platform
+
+					if is_block_states_required and participant.waiting_for_block_states then
+						waiting_for_ps5 = true
+					end
+				end
+
+				local is_invalid_participant = is_offline or invalid_player_info or waiting_for_ps5
+
+				if not is_invalid_participant and not participant.displayname then
 					local displayname = player_info:character_name()
 
 					if displayname and displayname ~= "" and displayname ~= "N/A" then
@@ -745,7 +798,7 @@ function ChatManager:_validate_participants()
 					end
 				end
 
-				if not participant.is_mute_status_set then
+				if not is_invalid_participant and not participant.is_mute_status_set then
 					local text_mute = player_info:is_text_muted()
 					local voice_mute = player_info:is_voice_muted()
 
@@ -771,6 +824,8 @@ function ChatManager:_validate_participants()
 							end
 						end
 					elseif IS_PLAYSTATION then
+						Managers.account:set_wait_to_collect_accounts(true)
+
 						local platform = player_info:platform()
 						local platform_user_id = player_info:platform_user_id()
 
@@ -781,20 +836,33 @@ function ChatManager:_validate_participants()
 						end
 
 						local is_blocked = player_info:is_blocked()
-						local communication_restricted = Managers.account:user_has_restriction()
-						text_mute = text_mute or communication_restricted or is_blocked
-						voice_mute = voice_mute or communication_restricted or is_blocked
+						local is_platform_id_already_requested = Managers.account:is_platform_id_already_requested(platform_user_id)
+
+						if is_block_states_required and not is_platform_id_already_requested then
+							Managers.account:request_block_user_states(platform_user_id)
+
+							participant.waiting_for_block_states = true
+						end
+
+						if not is_block_states_required or not participant.waiting_for_block_states then
+							local is_player_blocking_me = Managers.account:is_player_blocking_me(player_info)
+							local communication_restricted = Managers.account:user_has_restriction()
+							text_mute = text_mute or communication_restricted or is_blocked or is_player_blocking_me
+							voice_mute = voice_mute or communication_restricted or is_blocked or is_player_blocking_me
+						end
 					end
 
-					if text_mute ~= participant.is_text_muted_for_me then
-						self:channel_text_mute_participant(session_handle, participant.participant_uri, text_mute)
-					end
+					if not is_block_states_required or not participant.waiting_for_block_states then
+						if text_mute ~= participant.is_text_muted_for_me then
+							self:channel_text_mute_participant(session_handle, participant.participant_uri, text_mute)
+						end
 
-					if voice_mute ~= participant.is_muted_for_me then
-						self:channel_voip_mute_participant(session_handle, participant.participant_uri, voice_mute)
-					end
+						if voice_mute ~= participant.is_muted_for_me then
+							self:channel_voip_mute_participant(session_handle, participant.participant_uri, voice_mute)
+						end
 
-					participant.is_mute_status_set = true
+						participant.is_mute_status_set = true
+					end
 				end
 
 				if participant.displayname and participant.is_mute_status_set then
@@ -809,6 +877,10 @@ function ChatManager:_validate_participants()
 				end
 			end
 		end
+	end
+
+	if IS_PLAYSTATION then
+		Managers.account:set_wait_to_collect_accounts(false)
 	end
 end
 
@@ -838,6 +910,35 @@ function ChatManager:_update_transmitting_channel_priority()
 	if priority_channel then
 		Vivox.set_tx_session(priority_channel.session_handle)
 	end
+end
+
+function ChatManager:_event_new_block_user_states()
+	for session_handle, channel in pairs(self._sessions) do
+		for participant_uri, participant in pairs(channel.participants) do
+			participant.waiting_for_block_states = false
+		end
+	end
+end
+
+function ChatManager:_get_vivox_token()
+	return Managers.backend:authenticate():next(function (account)
+		local account_id = account.sub
+		local builder = BackendUtilities.url_builder():path("/social/"):path(account_id):path("/chat"):path("/login")
+		local options = {
+			method = "GET"
+		}
+
+		return Managers.backend:title_request(builder:to_string(), options):next(function (data)
+			if data.status ~= 200 then
+				return Promise.rejected(data)
+			end
+
+			return {
+				account_id = account_id,
+				vivox_token = data.body.VivoxToken
+			}
+		end)
+	end)
 end
 
 implements(ChatManager, ChatManagerInterface)

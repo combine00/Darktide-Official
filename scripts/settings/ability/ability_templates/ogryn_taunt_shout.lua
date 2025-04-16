@@ -1,5 +1,4 @@
-local DamageProfileTemplates = require("scripts/settings/damage/damage_profile_templates")
-local RADIUS = 8
+local RADIUS = 12
 local ability_template = {
 	action_inputs = {
 		shout_pressed = {
@@ -33,9 +32,18 @@ local ability_template = {
 		}
 	},
 	action_input_hierarchy = {
-		shout_pressed = {
-			shout_released = "base",
-			block_cancel = "base"
+		{
+			input = "shout_pressed",
+			transition = {
+				{
+					transition = "base",
+					input = "shout_released"
+				},
+				{
+					transition = "base",
+					input = "block_cancel"
+				}
+			}
 		}
 	},
 	actions = {
@@ -58,30 +66,22 @@ local ability_template = {
 			}
 		},
 		action_shout = {
-			buff_to_add = "taunted",
-			force_stagger_duration = 1,
-			target_enemies = true,
+			shout_target_template = "ogryn_shout",
+			use_charge_at_start = true,
+			toughness_replenish_percent = 1,
 			kind = "ogryn_shout",
 			sprint_ready_up_time = 0,
-			anim = "ability_shout",
+			vo_tag = "ability_bullgryn",
+			refill_toughness = false,
 			uninterruptible = true,
 			has_husk_sound = true,
+			recover_toughness_effect = "content/fx/particles/abilities/squad_leader_ability_toughness_buff",
 			allowed_during_sprint = true,
 			ability_type = "combat_ability",
-			special_rule_buff_enemy = "ogryn_taunt_increased_damage_taken_buff",
-			recover_toughness_effect = "content/fx/particles/abilities/squad_leader_ability_toughness_buff",
-			toughness_replenish_percent = 1,
-			use_charge_at_start = true,
-			vo_tag = "ability_bullgryn",
+			anim = "ability_shout",
 			use_ability_charge = true,
-			force_stagger_type = "light",
-			power_level = 500,
 			total_time = 0.75,
-			radius = RADIUS,
-			damage_profile = DamageProfileTemplates.shout_stagger_ogryn_taunt,
-			buff_ignored_breeds = {
-				chaos_daemonhost = true
-			}
+			radius = RADIUS
 		}
 	},
 	fx_sources = {},

@@ -5,6 +5,7 @@ local BuffSettings = require("scripts/settings/buff/buff_settings")
 local DamageProfileTemplates = require("scripts/settings/damage/damage_profile_templates")
 local DamageSettings = require("scripts/settings/damage/damage_settings")
 local FootstepIntervalsTemplates = require("scripts/settings/equipment/footstep/footstep_intervals_templates")
+local HapticTriggerTemplates = require("scripts/settings/equipment/haptic_trigger_templates")
 local HerdingTemplates = require("scripts/settings/damage/herding_templates")
 local HitZone = require("scripts/utilities/attack/hit_zone")
 local MeleeActionInputSetupMid = require("scripts/settings/equipment/weapon_templates/melee_action_input_setup_mid")
@@ -42,7 +43,10 @@ combat_sword_action_inputs.parry = {
 	buffer_time = 0
 }
 local combat_sword_action_input_hierarchy = table.clone(MeleeActionInputSetupMid.action_input_hierarchy)
-combat_sword_action_input_hierarchy.parry = "base"
+combat_sword_action_input_hierarchy[#combat_sword_action_input_hierarchy + 1] = {
+	transition = "base",
+	input = "parry"
+}
 weapon_template.action_inputs = combat_sword_action_inputs
 weapon_template.action_input_hierarchy = combat_sword_action_input_hierarchy
 weapon_template.action_inputs.block.buffer_time = 0.1
@@ -1087,7 +1091,7 @@ weapon_template.actions = {
 	},
 	action_push = {
 		push_radius = 2.5,
-		block_duration = 0.2,
+		block_duration = 0.5,
 		kind = "push",
 		anim_event = "attack_push",
 		total_time = 1,
@@ -1147,7 +1151,8 @@ weapon_template.actions = {
 		inner_damage_profile = DamageProfileTemplates.default_push,
 		inner_damage_type = damage_types.punch,
 		outer_damage_profile = DamageProfileTemplates.light_push,
-		outer_damage_type = damage_types.punch
+		outer_damage_type = damage_types.punch,
+		haptic_trigger_template = HapticTriggerTemplates.melee.push
 	},
 	action_parry_special = {
 		ignore_setting_blocked_on_minions = true,
@@ -1329,13 +1334,14 @@ weapon_template.keywords = {
 	"combat_sword",
 	"p1"
 }
-weapon_template.smart_targeting_template = SmartTargetingTemplates.default_melee
 weapon_template.dodge_template = "default"
 weapon_template.sprint_template = "default"
-weapon_template.stamina_template = "default"
+weapon_template.stamina_template = "linesman"
 weapon_template.toughness_template = "default"
 weapon_template.movement_curve_modifier_template = "chainsword_p1_m1"
 weapon_template.footstep_intervals = FootstepIntervalsTemplates.default
+weapon_template.smart_targeting_template = SmartTargetingTemplates.default_melee
+weapon_template.haptic_trigger_template = HapticTriggerTemplates.melee.medium
 weapon_template.overclocks = {
 	cleave_damage_up_dps_down = {
 		combatsword_p1_m1_cleave_damage_stat = 0.1,

@@ -15,12 +15,12 @@ local function _center_of_all_actors(target_unit)
 	local number_of_positions = 0
 	local number_of_nodes = Unit.num_scene_graph_items(target_unit)
 
-	for i = 1, number_of_nodes do
-		local actors = Unit_get_node_actors(target_unit, i, false, true)
+	for ii = 1, number_of_nodes do
+		local actors = Unit_get_node_actors(target_unit, ii, false, true)
 
 		if actors then
-			for j = 1, #actors do
-				local actor = Unit_actor(target_unit, actors[j])
+			for jj = 1, #actors do
+				local actor = Unit_actor(target_unit, actors[jj])
 				local center_of_mass = Actor_center_of_mass(actor)
 				position = position + center_of_mass
 				number_of_positions = number_of_positions + 1
@@ -51,8 +51,8 @@ local function _center_of_hit_zone(target_unit, target_hit_zone)
 		if target_actor_names then
 			Managers.state.extension:system("physics_unit_proximity_system"):activate_unit(target_unit)
 
-			for i = 1, #target_actor_names do
-				local target_actor = Unit_actor(target_unit, target_actor_names[i])
+			for ii = 1, #target_actor_names do
+				local target_actor = Unit_actor(target_unit, target_actor_names[ii])
 				local target_position = Actor_center_of_mass(target_actor)
 				position = position + target_position
 				number_of_positions = number_of_positions + 1
@@ -119,14 +119,14 @@ function TrueFlightDefaults.default_update_towards_position(target_position, phy
 	local new_direction = Quaternion.forward(new_rotation)
 	local acceleration = true_flight_template.on_target_acceleration or 0
 	local new_speed = speed + acceleration * dt
-	local distance = (speed + new_speed) * dt * 0.5
-	local new_position = position + new_direction * distance
+	local new_distance = (speed + new_speed) * dt * 0.5
+	local new_position = position + new_direction * new_distance
 	local new_velocity = new_direction * new_speed
 	integration_data.velocity = new_velocity
-	local new_rotation = Quaternion.look(velocity)
+	local final_rotation = Quaternion.look(velocity)
 	new_position = TrueFlightDefaults.default_check_collisions(physics_world, integration_data, position, new_position, dt, t, optional_validate_impact_func, optional_on_impact_func)
 
-	return new_position, new_rotation
+	return new_position, final_rotation
 end
 
 function TrueFlightDefaults.default_update_position_velocity(physics_world, integration_data, dt, t, optional_validate_impact_func, optional_on_impact_func)
@@ -159,8 +159,8 @@ function TrueFlightDefaults.get_closest_highest_value_target(integration_data, n
 	local closest_distance = math.huge
 
 	if number_of_results > 0 then
-		for i = 1, number_of_results do
-			local unit = results[i]
+		for ii = 1, number_of_results do
+			local unit = results[ii]
 
 			if ScriptUnit.has_extension(unit, "health_system") and is_valid_and_legitimate_target_func(integration_data, unit, position) then
 				local unit_position = POSITION_LOOKUP[unit]
@@ -179,7 +179,7 @@ function TrueFlightDefaults.get_closest_highest_value_target(integration_data, n
 	return nil, nil
 end
 
-function TrueFlightDefaults.find_closest_highest_value_target(integration_data, position, is_valid_and_legitimate_targe_func)
+function TrueFlightDefaults.find_closest_highest_value_target(integration_data, position, is_valid_and_legitimate_target_func)
 	local projectile_unit = integration_data.projectile_unit
 	local true_flight_template = integration_data.true_flight_template
 	local broadphase_radius = true_flight_template.broadphase_radius
@@ -201,12 +201,12 @@ function TrueFlightDefaults.find_closest_highest_value_target(integration_data, 
 		end
 	end
 
-	local closest_unit, hit_zone = TrueFlightDefaults.get_closest_highest_value_target(integration_data, number_of_results, results, position, is_valid_and_legitimate_targe_func, true_flight_template.target_hit_zone)
+	local closest_unit, hit_zone = TrueFlightDefaults.get_closest_highest_value_target(integration_data, number_of_results, results, position, is_valid_and_legitimate_target_func, true_flight_template.target_hit_zone)
 
 	return closest_unit, hit_zone
 end
 
-function TrueFlightDefaults.default_no_new_target(integration_data, position, is_valid_and_legitimate_targe_func)
+function TrueFlightDefaults.default_no_new_target(integration_data, position, is_valid_and_legitimate_target_func)
 	return nil, nil
 end
 
@@ -299,18 +299,12 @@ function TrueFlightDefaults.retry_if_no_target(integration_data)
 	return not target_unit and not target_pos
 end
 
-function TrueFlightDefaults.dont_retry_target(integration_data)
+function TrueFlightDefaults.never_retry_target(integration_data)
 	return false
 end
 
 function TrueFlightDefaults.always_retry_target(integration_data)
 	return true
-end
-
-function TrueFlightDefaults.retry_if_target_position(integration_data)
-	local target_unit = integration_data.target_unit
-
-	return not target_unit
 end
 
 function TrueFlightDefaults.default_check_collisions(physics_world, integration_data, previus_position, new_position, dt, t, optional_validate_impact_func, optional_on_impact_func)

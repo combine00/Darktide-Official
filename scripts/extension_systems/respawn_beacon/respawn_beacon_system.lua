@@ -33,17 +33,17 @@ function RespawnBeaconSystem:_create_respawn_beacons()
 	local main_path_manager = Managers.state.main_path
 	local sorted_beacons = {}
 	local unit_to_extension_map = self._unit_to_extension_map
+	local nav_world = self._nav_world
+	local beacon_main_path_data = self._beacon_main_path_data
+	local nav_spawn_points = main_path_manager:nav_spawn_points()
 
-	for unit, extension in pairs(unit_to_extension_map) do
-		local nav_spawn_points = main_path_manager:nav_spawn_points()
-
-		if nav_spawn_points then
-			local beacon_main_path_data = self._beacon_main_path_data
+	if nav_spawn_points then
+		for unit, extension in pairs(unit_to_extension_map) do
 			local position = Unit.world_position(unit, 1)
-			local target_navmesh_position = NavQueries.position_on_mesh_with_outside_position(self._nav_world, nil, position, 1, 1, 1)
+			local target_navmesh_position = NavQueries.position_on_mesh_with_outside_position(nav_world, nil, position, 1, 1, 1)
 
 			if target_navmesh_position then
-				local group_index = SpawnPointQueries.group_from_position(self._nav_world, nav_spawn_points, target_navmesh_position)
+				local group_index = SpawnPointQueries.group_from_position(nav_world, nav_spawn_points, target_navmesh_position)
 
 				if group_index then
 					local start_index = main_path_manager:node_index_by_nav_group_index(group_index)
@@ -82,11 +82,11 @@ function RespawnBeaconSystem:_create_respawn_beacons()
 				end
 			end
 		end
-	end
 
-	table.sort(sorted_beacons, function (t1, t2)
-		return t1.distance < t2.distance
-	end)
+		table.sort(sorted_beacons, function (t1, t2)
+			return t1.distance < t2.distance
+		end)
+	end
 
 	self._sorted_beacons = sorted_beacons
 end

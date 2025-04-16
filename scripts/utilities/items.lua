@@ -3,9 +3,11 @@ local Archetypes = require("scripts/settings/archetype/archetypes")
 local BuffTemplates = require("scripts/settings/buff/buff_templates")
 local ItemSlotSettings = require("scripts/settings/item/item_slot_settings")
 local ItemSourceSettings = require("scripts/settings/item/item_source_settings")
+local LiveEvents = require("scripts/settings/live_event/live_events")
 local MasterItems = require("scripts/backend/master_items")
 local RankSettings = require("scripts/settings/item/rank_settings")
 local RaritySettings = require("scripts/settings/item/rarity_settings")
+local TraitValueParser = require("scripts/utilities/trait_value_parser")
 local UISettings = require("scripts/settings/ui/ui_settings")
 local UISoundEvents = require("scripts/settings/ui/ui_sound_events")
 local WeaponTemplate = require("scripts/utilities/weapon/weapon_template")
@@ -420,9 +422,9 @@ function Items.character_level(item)
 	return character_level
 end
 
-local find_link_attachment_item_slot_path = nil
+local _find_link_attachment_item_slot_path = nil
 
-function find_link_attachment_item_slot_path(target_table, slot_id, item, link_item, optional_path)
+function _find_link_attachment_item_slot_path(target_table, slot_id, item, link_item, optional_path)
 	local unused_trinket_name = "content/items/weapons/player/trinkets/unused_trinket"
 	local path = optional_path or nil
 
@@ -443,7 +445,7 @@ function find_link_attachment_item_slot_path(target_table, slot_id, item, link_i
 			else
 				local previous_path = path
 				path = path and path .. "." .. k or k
-				local alternative_path, path_item = find_link_attachment_item_slot_path(t, slot_id, item, link_item, path)
+				local alternative_path, path_item = _find_link_attachment_item_slot_path(t, slot_id, item, link_item, path)
 
 				if alternative_path then
 					return alternative_path, path_item
@@ -463,7 +465,7 @@ local trinket_slot_order = {
 function Items.get_current_equipped_trinket(item)
 	for i = 1, #trinket_slot_order do
 		local slot_id = trinket_slot_order[i]
-		local trinket_path, trinket_item = find_link_attachment_item_slot_path(item, slot_id, nil, false)
+		local _, trinket_item = _find_link_attachment_item_slot_path(item, slot_id, nil, false)
 
 		if type(trinket_item) == "table" then
 			return trinket_item, slot_id
@@ -486,7 +488,7 @@ function Items.weapon_trinket_preview_item(item, optional_preview_item)
 		for i = 1, #trinket_slot_order do
 			local slot_id = trinket_slot_order[i]
 
-			if find_link_attachment_item_slot_path(visual_item, slot_id, item, true) then
+			if _find_link_attachment_item_slot_path(visual_item, slot_id, item, true) then
 				break
 			end
 		end
@@ -498,7 +500,7 @@ end
 function Items.add_weapon_trinket_on_preview_item(weapon_item, trinket_item)
 	for i = 1, #trinket_slot_order do
 		local slot_id = trinket_slot_order[i]
-		local alternative_path, path_item = find_link_attachment_item_slot_path(weapon_item.attachments, slot_id, trinket_item, true)
+		local alternative_path, _ = _find_link_attachment_item_slot_path(weapon_item.attachments, slot_id, trinket_item, true)
 
 		if alternative_path then
 			break
@@ -530,10 +532,41 @@ function Items.weapon_skin_preview_item(item, include_skin_item_info)
 	return visual_item
 end
 
-function Items.expertise_level(item, no_symbol)
+function Items.total_stats_value(item)
+	local item_type = item.item_type
+	local total_stats = nil
+
+	if item_type and Items.is_weapon(item_type) then
+		local item_base_stats = item.base_stats
+
+		if item_base_stats and not table.is_empty(item_base_stats) then
+			total_stats = 0
+
+			for i = 1, #item_base_stats do
+				local stat = item_base_stats[i]
+				local value = stat.value
+				total_stats = total_stats + value
+			end
+
+			total_stats = math.floor(total_stats * 100 + 0.5)
+		end
+	end
+
+	return total_stats
+end
+
+function Items.expertise_level(item, no_symbol, use_base_item_level)
 	if item.item_type ~= "GADGET" then
 		local base_item_level = item.baseItemLevel
-		local expertise_level = math.max(0, math.floor((base_item_level and base_item_level - 80 or 0) / 6) * expertise_multiplier)
+		local item_level = nil
+
+		if use_base_item_level then
+			item_level = base_item_level
+		else
+			item_level = Items.total_stats_value(item)
+		end
+
+		local expertise_level = math.max(0, math.floor((item_level and item_level - 80 or 0) / 6) * expertise_multiplier)
 
 		if no_symbol then
 			return tostring(expertise_level), base_item_level ~= nil
@@ -668,6 +701,13 @@ function Items.item_property_text(item, prefer_iconography)
 	return table.concat(properties, "\n")
 end
 
+local _key_value_color = Color.terminal_text_body(255, true)
+local _obtained_source_color_context = {
+	r = _key_value_color[2],
+	g = _key_value_color[3],
+	b = _key_value_color[4]
+}
+
 function Items.obtained_display_name(item)
 	local item_source = item.source
 	local source_settings = item_source and ItemSourceSettings[item_source]
@@ -676,40 +716,51 @@ function Items.obtained_display_name(item)
 	local display_name = display_name_localized
 	local optional_description = nil
 
-	if display_name and source_settings and source_settings.is_achievement then
-		local slots = item.slots
-		local first_slot_name = slots and slots[1]
+	if display_name and source_settings then
+		if source_settings.is_achievement then
+			local slots = item.slots
+			local first_slot_name = slots and slots[1]
 
-		if first_slot_name then
-			local player_manager = Managers.player
-			local player = player_manager:local_player(1)
-			local achievement = AchievementUIHelper.get_acheivement_by_reward_item(item)
-			local is_complete = achievement and Managers.achievements:achievement_completed(player, achievement.id)
+			if first_slot_name then
+				local player_manager = Managers.player
+				local player = player_manager:local_player(1)
+				local achievement = AchievementUIHelper.get_acheivement_by_reward_item(item)
+				local is_complete = achievement and Managers.achievements:achievement_completed(player, achievement.id)
 
-			if achievement then
-				if not is_complete then
-					if achievement.type == "meta" then
-						local sub_penances_count = table.size(achievement.achievements)
-						optional_description = Localize("loc_inventory_cosmetic_item_acquisition_penance_description_multiple_requirement", true, {
-							penance_amount = sub_penances_count
-						})
-					else
-						optional_description = AchievementUIHelper.localized_description(achievement)
+				if achievement then
+					if not is_complete then
+						if achievement.type == "meta" then
+							local sub_penances_count = table.size(achievement.achievements)
+							optional_description = Localize("loc_inventory_cosmetic_item_acquisition_penance_description_multiple_requirement", true, {
+								penance_amount = sub_penances_count
+							})
+						else
+							optional_description = AchievementUIHelper.localized_description(achievement)
+						end
 					end
-				end
 
-				local achievement_label = AchievementUIHelper.localized_title(achievement)
-				local key_value_color = Color.terminal_text_body(255, true)
-				local achievement_label_colored = Localize("loc_color_value_fomat_key", true, {
-					value = achievement_label,
-					r = key_value_color[2],
-					g = key_value_color[3],
-					b = key_value_color[4]
-				})
-				display_name = Localize(display_name_localization_key, true, {
-					achievement_label = achievement_label_colored
-				})
+					local achievement_label = AchievementUIHelper.localized_title(achievement)
+					_obtained_source_color_context.value = achievement_label
+					local achievement_label_colored = Localize("loc_color_value_fomat_key", true, _obtained_source_color_context)
+					display_name = Localize(display_name_localization_key, true, {
+						achievement_label = achievement_label_colored
+					})
+				end
 			end
+		elseif source_settings.is_live_event then
+			local reward_item_name = item.__master_item and item.__master_item.name or ""
+			local live_event_label_colored = nil
+
+			for _, live_event in pairs(LiveEvents) do
+				if live_event.item_rewards and table.array_contains(live_event.item_rewards, reward_item_name) then
+					_obtained_source_color_context.value = Localize(live_event.name)
+					live_event_label_colored = Localize("loc_color_value_fomat_key", true, _obtained_source_color_context)
+				end
+			end
+
+			display_name = Localize(display_name_localization_key, true, {
+				live_event_label = live_event_label_colored
+			})
 		end
 	end
 
@@ -789,7 +840,7 @@ function Items.weapon_skin_requirement_text(item)
 
 		local template_display_name_localized = item_or_nil and Items.weapon_card_display_name(item_or_nil)
 
-		if template_display_name_localized and not string.find(text, template_display_name_localized) then
+		if template_display_name_localized and not string.find(text, template_display_name_localized, nil, true) then
 			text = text .. "• " .. template_display_name_localized
 
 			if i < #weapon_template_restriction then
@@ -884,7 +935,7 @@ function Items.class_requirement_text(item, prefer_iconography)
 
 		if archetype then
 			local display_name_localized = Localize(archetype.archetype_name)
-			local string_symbol = prefer_iconography and archetype.string_symbol or "•"
+			local string_symbol = prefer_iconography and UISettings.archetype_font_icon[archetype_name] or "•"
 			entries[i] = string.format("%s %s", string_symbol, display_name_localized)
 		end
 	end
@@ -1112,47 +1163,55 @@ end
 
 function Items.is_item_compatible_with_profile(item, profile)
 	local item_gender, item_breed, item_archetype = nil
+	local item_genders = item.genders
+	local wanted_gender = profile.gender
 
-	if item.genders and not table.is_empty(item.genders) then
-		for i = 1, #item.genders do
-			local gender = item.genders[i]
+	if item_genders and not table.is_empty(item_genders) then
+		for ii = 1, #item_genders do
+			local gender = item_genders[ii]
 
-			if gender == profile.gender then
-				item_gender = profile.gender
+			if gender == wanted_gender then
+				item_gender = wanted_gender
 
 				break
 			end
 		end
 	else
-		item_gender = profile.gender
+		item_gender = wanted_gender
 	end
 
-	if item.breeds and not table.is_empty(item.breeds) then
-		for i = 1, #item.breeds do
-			local breed = item.breeds[i]
+	local item_breeds = item.breeds
+	local wanted_breed = profile.breed
 
-			if breed == profile.breed then
-				item_breed = profile.breed
+	if item_breeds and not table.is_empty(item_breeds) then
+		for ii = 1, #item_breeds do
+			local breed = item_breeds[ii]
+
+			if breed == wanted_breed then
+				item_breed = wanted_breed
 
 				break
 			end
 		end
 	else
-		item_breed = profile.breed
+		item_breed = wanted_breed
 	end
 
-	if item.archetypes and not table.is_empty(item.archetypes) then
-		for i = 1, #item.archetypes do
-			local archetype = item.archetypes[i]
+	local item_archetypes = item.archetypes
+	local wanted_archetype = profile.archetype
 
-			if archetype == profile.archetype.name then
-				item_archetype = profile.archetype
+	if item_archetypes and not table.is_empty(item_archetypes) then
+		for i = 1, #item_archetypes do
+			local archetype = item_archetypes[i]
+
+			if archetype == wanted_archetype.name then
+				item_archetype = wanted_archetype
 
 				break
 			end
 		end
 	else
-		item_archetype = profile.archetype
+		item_archetype = wanted_archetype
 	end
 
 	if not item_breed and not profile.breed then
@@ -1439,9 +1498,20 @@ function Items.compare_item_rarity(a, b)
 	return nil
 end
 
+function Items.compare_item_sort_order(a, b)
+	local a_sort_order = a.sort_order or 0
+	local b_sort_order = b.sort_order or 0
+
+	if a_sort_order < b_sort_order then
+		return true
+	elseif b_sort_order < a_sort_order then
+		return false
+	end
+
+	return nil
+end
+
 function Items.compare_item_level(a, b)
-	local a_item_type = a.item_type
-	local b_item_type = b.item_type
 	local a_expertiseLevel_text = Items.expertise_level(a, true)
 	local a_expertiseLevel = tonumber(a_expertiseLevel_text)
 	local b_expertiseLevel_text = Items.expertise_level(b, true)
@@ -1456,105 +1526,8 @@ function Items.compare_item_level(a, b)
 	return nil
 end
 
-local function _get_lerp_stepped_value(range, lerp_value)
-	local min = 1
-	local max = #range
-	local lerped_value = math.lerp(min, max, lerp_value)
-	local index = math.round(lerped_value)
-	local value = range[index]
-
-	return value
-end
-
-local description_values = {}
-
-function Items.perk_description(item, rarity, lerp_value)
-	table.clear(description_values)
-
-	local description = item.description
-	local trait = item.trait
-
-	if not trait then
-		return Localize(description)
-	end
-
-	if item.description_values and next(item.description_values) then
-		for i = 1, #item.description_values do
-			local data = item.description_values[i]
-			local description_rarity = tonumber(data.rarity)
-
-			if description_rarity == rarity then
-				local description_key = data.string_key
-				local description_value = data.string_value
-				description_values[description_key] = description_value
-			end
-		end
-
-		local no_cache = true
-
-		return Localize(description, no_cache, description_values)
-	end
-
-	local buff_id = trait
-	local buff_template = BuffTemplates[buff_id]
-
-	if not buff_template then
-		return Localize(description)
-	end
-
-	local localization_info = buff_template.localization_info
-
-	if not localization_info then
-		return Localize(description)
-	end
-
-	local class_name = buff_template.class_name
-
-	if class_name == "proc_buff" then
-		local proc_buff_name = localization_info.proc_buff_name
-
-		if proc_buff_name then
-			buff_template = BuffTemplates[proc_buff_name]
-			localization_info = buff_template.localization_info
-		end
-	end
-
-	local is_meta_buff = buff_template.meta_buff
-	local buff_template_stat_buffs = buff_template.stat_buffs or buff_template.meta_stat_buffs or buff_template.lerped_stat_buffs or buff_template.conditional_stat_buffs
-
-	if buff_template_stat_buffs then
-		for stat_buff_name, value in pairs(buff_template_stat_buffs) do
-			if buff_template.lerped_stat_buffs then
-				local min = value.min
-				local max = value.max
-				local lerp_value_func = value.lerp_value_func or math.lerp
-				value = lerp_value_func(min, max, lerp_value)
-			elseif is_meta_buff and type(value) == "table" then
-				value = buff_template.lerp_function(value, lerp_value)
-			elseif class_name == "stepped_range_buff" then
-				value = _get_lerp_stepped_value(value, lerp_value)
-			end
-
-			local show_as = localization_info[stat_buff_name]
-
-			if show_as and show_as == "percentage" then
-				value = tostring(math.round(value * 100)) .. "%"
-			end
-
-			description_values[stat_buff_name] = value
-		end
-	end
-
-	description_values.duration = buff_template.duration
-	local final_description = Localize(description, true, description_values)
-
-	Log.debug("Items", "perk_description %s", table.tostring(description_values))
-
-	return final_description
-end
-
 function Items.trait_description(item, rarity, lerp_value)
-	return Items.perk_description(item, rarity, lerp_value)
+	return TraitValueParser.trait_description(item, rarity, lerp_value)
 end
 
 function Items.perk_rating(perk_item, perk_rarity, perk_value)
@@ -1708,7 +1681,7 @@ function Items.preview_stats_change(item, expertise_increase, stats, max_stat_va
 		}
 	end
 
-	local item_current_level = item.baseItemLevel
+	local item_current_level = Items.total_stats_value(item)
 	local item_max_level = 380
 
 	if not item_current_level then
@@ -1734,8 +1707,6 @@ function Items.preview_stats_change(item, expertise_increase, stats, max_stat_va
 	end
 
 	remaining_budget = math.max(remaining_budget, 0)
-	local current_expertise_text = Items.expertise_level(item, true)
-	local current_expertise = tonumber(current_expertise_text) / Items.get_expertise_multiplier()
 	local this_round_indices = {}
 	local min_value = nil
 	local stored_expertise_stats_increase = item.gear and item.gear.masterDataInstance and item.gear.masterDataInstance.overrides and item.gear.masterDataInstance.overrides.expertise_stat_increases
@@ -1750,7 +1721,7 @@ function Items.preview_stats_change(item, expertise_increase, stats, max_stat_va
 			for ii = 1, #stored_expertise_stats_increase do
 				local stored_expertise_stat_increase = stored_expertise_stats_increase[ii]
 
-				if stored_expertise_stat_increase.name == stat.name then
+				if stored_expertise_stat_increase.name == stat.name and math.floor(stat.value + 0.5) < max_stat_value then
 					added_expertise_fraction = stored_expertise_stat_increase.value
 
 					break
@@ -1838,27 +1809,35 @@ function Items.preview_stats_change(item, expertise_increase, stats, max_stat_va
 	return result
 end
 
-function Items.create_mannequin_profile_by_item(item, prefered_gender, prefered_archetype)
+function Items.create_mannequin_profile_by_item(item, preferred_gender, preferred_archetype)
 	local item_gender, item_breed, item_archetype, item_slot_name = nil
 
 	if item.genders and not table.is_empty(item.genders) then
-		if prefered_gender and table.find(item.genders, prefered_gender) then
-			item_gender = prefered_gender
+		if preferred_gender and table.find(item.genders, preferred_gender) then
+			item_gender = preferred_gender
 		elseif table.find(item.genders, "male") then
 			item_gender = "male"
 		else
 			item_gender = item.genders[1]
 		end
-	elseif (not item.genders or item.genders and table.is_empty(item.genders)) and prefered_gender then
-		item_gender = prefered_gender
+	elseif (not item.genders or item.genders and table.is_empty(item.genders)) and preferred_gender then
+		item_gender = preferred_gender
 	end
 
 	if item.archetypes and not table.is_empty(item.archetypes) then
-		if prefered_archetype and table.find(item.archetypes, prefered_archetype) then
-			item_archetype = type(prefered_archetype) == "string" and Archetypes[prefered_archetype] or prefered_archetype
+		if preferred_archetype and table.find(item.archetypes, preferred_archetype) then
+			item_archetype = type(preferred_archetype) == "string" and Archetypes[preferred_archetype] or preferred_archetype
 		else
-			local archetype = item.archetypes[1]
-			item_archetype = type(archetype) == "string" and Archetypes[archetype] or archetype
+			local archetype = nil
+			local num_archetypes = #item.archetypes
+
+			for ii = 1, num_archetypes do
+				archetype = Archetypes[item.archetypes[ii]]
+
+				if archetype then
+					break
+				end
+			end
 		end
 	end
 
@@ -1901,6 +1880,42 @@ function Items.create_mannequin_profile_by_item(item, prefered_gender, prefered_
 		breed = breed,
 		gender = gender
 	}
+end
+
+function Items.track_reward_item_to_gear(item)
+	local gear = table.clone(item)
+	local gear_id = gear.uuid
+	gear.overrides = nil
+	gear.id = nil
+	gear.uuid = nil
+	gear.gear_id = nil
+
+	return gear_id, gear
+end
+
+function Items.register_track_reward(claimed_reward)
+	local item_id = claimed_reward.id
+	local reward_id = claimed_reward.gearId
+	local rewarded_master_item = MasterItems.get_item(item_id)
+	rewarded_master_item.uuid = reward_id
+	rewarded_master_item.masterDataInstance = {
+		id = item_id,
+		overrides = {},
+		slots = rewarded_master_item.slots
+	}
+	local gear_id, gear = Items.track_reward_item_to_gear(rewarded_master_item)
+
+	Managers.data_service.gear:on_gear_created(gear_id, gear)
+
+	local item = MasterItems.get_item_instance(gear, gear_id)
+
+	if item then
+		local skip_notification = true
+
+		Items.mark_item_id_as_new(item, skip_notification)
+	end
+
+	return item
 end
 
 function Items.set_item_id_as_favorite(item_gear_id, state)

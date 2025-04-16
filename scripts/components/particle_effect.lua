@@ -15,6 +15,8 @@ function ParticleEffect:init(unit)
 
 	local create_particle_on_spawn = self:get_data(unit, "create_particle_on_spawn")
 
+	Unit.flow_event(unit, "particle_effect_component_init")
+
 	if create_particle_on_spawn then
 		self:_create_particle()
 	end
@@ -88,6 +90,9 @@ function ParticleEffect:_create_particle()
 	local world_rotation = Unit.world_rotation(unit, 1)
 	local world_scale = Unit.world_scale(unit, 1)
 	local particle_id = World.create_particles(world, particle_name, world_position, world_rotation, world_scale)
+
+	World.link_particles(world, particle_id, unit, self._particle_node, Matrix4x4.identity(), "unlink")
+
 	self._particle_id = particle_id
 	local scalar_parameters = self:get_data(unit, "scalar_parameters")
 	local success = self:_set_non_boxed_parameters(world, particle_id, scalar_parameters, World.set_particles_material_scalar)

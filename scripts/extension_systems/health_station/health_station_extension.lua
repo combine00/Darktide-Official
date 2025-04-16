@@ -350,7 +350,7 @@ function HealthStationExtension:unspawn_battery()
 		if self._battery_unit ~= nil then
 			local battery_unit = self._battery_unit
 
-			self._pickup_spawner_extension:unspawn_item(battery_unit)
+			self._pickup_spawner_extension:despawn_item(battery_unit)
 
 			self._battery_unit = nil
 		end

@@ -18,6 +18,12 @@ end
 function HordePacing:on_gameplay_post_init(level, template)
 	local template_first_spawn_timer_modifer = math.random_range(template.first_spawn_timer_modifer[1], template.first_spawn_timer_modifer[2])
 	local first_spawn_timer_modifer = template_first_spawn_timer_modifer and self._timer_modifier * template_first_spawn_timer_modifer
+	local template_override = Managers.state.pacing:get_horde_pacing_override_tempate()
+
+	if template_override then
+		template = template_override
+	end
+
 	self._coordinated_horde_strikes = {}
 
 	self:_init_coordinated_horde_strikes(template)
@@ -56,6 +62,14 @@ local TIME_SINCE_FORWARD_TRAVEL_CHANGE_MOVE_TIMER_OVERRIDE = {
 	30
 }
 local CHALLENGE_RATING_FOR_NO_MOVE_TIMER_OVERRIDE = 0
+local TIME_SINCE_FORWARD_TRAVEL_CHANGE_MOVE_TIMER_OVERRIDE = {
+	60,
+	60,
+	60,
+	15,
+	10
+}
+local CHALLENGE_RATING_FOR_NO_MOVE_TIMER_OVERRIDE = 0
 
 function HordePacing:_update_horde_allowance(t, dt, side_id, target_side_id)
 	local main_path_manager = Managers.state.main_path
@@ -64,9 +78,9 @@ function HordePacing:_update_horde_allowance(t, dt, side_id, target_side_id)
 	local total_minions_spawned = Managers.state.minion_spawn:num_spawned_minions()
 	local minion_spawn_limit_reached = template.max_active_minions <= total_minions_spawned
 	local furthest_travel_distance = main_path_manager:furthest_travel_distance(target_side_id)
+	local time_since_forward_travel_changed = main_path_manager:time_since_forward_travel_changed(target_side_id)
 	local allowed_hordes_per_travel_distance = math.ceil(furthest_travel_distance / self._required_travel_distance) - self._triggered_hordes
 	local hordes_enabled = pacing_manager:spawn_type_enabled("hordes") and allowed_hordes_per_travel_distance > 0
-	local time_since_forward_travel_changed = main_path_manager:time_since_forward_travel_changed(target_side_id)
 	local travel_distance_allowed = time_since_forward_travel_changed < TRAVEL_DISTANCE_CHANGE_ALLOWANCE_MIN or TRAVEL_DISTANCE_CHANGE_ALLOWANCE_MAX < time_since_forward_travel_changed
 	local triggered_pre_stinger = self._triggered_pre_stinger
 	local current_wave = self._current_wave
@@ -500,6 +514,12 @@ function HordePacing:_setup_next_horde(template, optional_timer_modifier)
 	local next_horde_at = math.random_range(horde_timer_range[1], horde_timer_range[2])
 	self._next_horde_at = next_horde_at * (optional_timer_modifier or self._timer_modifier)
 	local pre_stinger_delay = template.pre_stinger_delays[horde_type]
+	local decreased_stinger = Managers.state.mutator:mutator("mutator_decreased_horde_pacing_stinger")
+
+	if decreased_stinger then
+		pre_stinger_delay = pre_stinger_delay * 0.5
+	end
+
 	self._next_horde_pre_stinger_at = self._next_horde_at - pre_stinger_delay
 	local travel_distance_required_for_horde = template.travel_distance_required_for_horde
 	self._required_travel_distance = self._override_required_travel_distance or math.random_range(travel_distance_required_for_horde[1], travel_distance_required_for_horde[2])
@@ -555,6 +575,16 @@ function HordePacing:_trigger_pre_stinger(template, side_id, optional_stinger_ev
 	self._fx_system:trigger_wwise_event(stinger_sound_event, nil, nil, nil, nil, nil, optional_ambisonics)
 end
 
+function HordePacing:force_next_horde()
+	local horde_started = self._horde_started
+
+	if horde_started then
+		return false
+	end
+
+	self._next_horde_at = 5
+end
+
 function HordePacing:_trigger_stinger(template, position, optional_stinger_override)
 	local stinger_sound_event = optional_stinger_override or template.stinger_sound_events[self._current_compositions.name]
 
@@ -571,10 +601,10 @@ local FAILED_TRAVEL_RANGE = {
 }
 
 function HordePacing:_update_trickle_horde_pacing(t, dt, side_id, target_side_id)
+	local pacing_manager = Managers.state.pacing
 	local main_path_manager = Managers.state.main_path
 	local furthest_travel_distance = main_path_manager:furthest_travel_distance(target_side_id)
 	local trickle_hordes = self._trickle_hordes
-	local pacing_manager = Managers.state.pacing
 	local ramp_up_timer_modifier = pacing_manager:get_ramp_up_frequency_modifier("trickle_hordes") or 1
 
 	for i = 1, #trickle_hordes do

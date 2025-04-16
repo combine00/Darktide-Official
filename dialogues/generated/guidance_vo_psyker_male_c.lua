@@ -662,7 +662,7 @@ local guidance_vo_psyker_male_c = {
 	},
 	guidance_stairs_sighted = {
 		randomize_indexes_n = 0,
-		sound_events_n = 8,
+		sound_events_n = 10,
 		sound_events = {
 			"loc_psyker_male_c__stairs_sighted_01",
 			"loc_psyker_male_c__stairs_sighted_02",
@@ -671,7 +671,9 @@ local guidance_vo_psyker_male_c = {
 			"loc_psyker_male_c__stairs_sighted_05",
 			"loc_psyker_male_c__stairs_sighted_06",
 			"loc_psyker_male_c__stairs_sighted_07",
-			"loc_psyker_male_c__stairs_sighted_08"
+			"loc_psyker_male_c__stairs_sighted_08",
+			"loc_psyker_male_c__stairs_sighted_09",
+			"loc_psyker_male_c__stairs_sighted_10"
 		},
 		sound_events_duration = {
 			0.529365,
@@ -681,23 +683,27 @@ local guidance_vo_psyker_male_c = {
 			1.184813,
 			0.892094,
 			0.846677,
-			0.966906
+			0.966906,
+			1.032917,
+			0.882688
 		},
 		sound_event_weights = {
-			0.125,
-			0.125,
-			0.125,
-			0.125,
-			0.125,
-			0.125,
-			0.125,
-			0.125
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1
 		},
 		randomize_indexes = {}
 	},
 	guidance_stairs_sighted_1 = {
 		randomize_indexes_n = 0,
-		sound_events_n = 8,
+		sound_events_n = 10,
 		sound_events = {
 			"loc_psyker_male_c__stairs_sighted_01",
 			"loc_psyker_male_c__stairs_sighted_02",
@@ -706,7 +712,9 @@ local guidance_vo_psyker_male_c = {
 			"loc_psyker_male_c__stairs_sighted_05",
 			"loc_psyker_male_c__stairs_sighted_06",
 			"loc_psyker_male_c__stairs_sighted_07",
-			"loc_psyker_male_c__stairs_sighted_08"
+			"loc_psyker_male_c__stairs_sighted_08",
+			"loc_psyker_male_c__stairs_sighted_09",
+			"loc_psyker_male_c__stairs_sighted_10"
 		},
 		sound_events_duration = {
 			0.529365,
@@ -716,23 +724,27 @@ local guidance_vo_psyker_male_c = {
 			1.184813,
 			0.892094,
 			0.846677,
-			0.966906
+			0.966906,
+			1.032917,
+			0.882688
 		},
 		sound_event_weights = {
-			0.125,
-			0.125,
-			0.125,
-			0.125,
-			0.125,
-			0.125,
-			0.125,
-			0.125
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1
 		},
 		randomize_indexes = {}
 	},
 	guidance_stairs_sighted_2 = {
 		randomize_indexes_n = 0,
-		sound_events_n = 8,
+		sound_events_n = 10,
 		sound_events = {
 			"loc_psyker_male_c__stairs_sighted_01",
 			"loc_psyker_male_c__stairs_sighted_02",
@@ -741,7 +753,9 @@ local guidance_vo_psyker_male_c = {
 			"loc_psyker_male_c__stairs_sighted_05",
 			"loc_psyker_male_c__stairs_sighted_06",
 			"loc_psyker_male_c__stairs_sighted_07",
-			"loc_psyker_male_c__stairs_sighted_08"
+			"loc_psyker_male_c__stairs_sighted_08",
+			"loc_psyker_male_c__stairs_sighted_09",
+			"loc_psyker_male_c__stairs_sighted_10"
 		},
 		sound_events_duration = {
 			0.529365,
@@ -751,23 +765,27 @@ local guidance_vo_psyker_male_c = {
 			1.184813,
 			0.892094,
 			0.846677,
-			0.966906
+			0.966906,
+			1.032917,
+			0.882688
 		},
 		sound_event_weights = {
-			0.125,
-			0.125,
-			0.125,
-			0.125,
-			0.125,
-			0.125,
-			0.125,
-			0.125
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1
 		},
 		randomize_indexes = {}
 	},
 	guidance_stairs_sighted_3 = {
 		randomize_indexes_n = 0,
-		sound_events_n = 8,
+		sound_events_n = 10,
 		sound_events = {
 			"loc_psyker_male_c__stairs_sighted_01",
 			"loc_psyker_male_c__stairs_sighted_02",
@@ -776,7 +794,9 @@ local guidance_vo_psyker_male_c = {
 			"loc_psyker_male_c__stairs_sighted_05",
 			"loc_psyker_male_c__stairs_sighted_06",
 			"loc_psyker_male_c__stairs_sighted_07",
-			"loc_psyker_male_c__stairs_sighted_08"
+			"loc_psyker_male_c__stairs_sighted_08",
+			"loc_psyker_male_c__stairs_sighted_09",
+			"loc_psyker_male_c__stairs_sighted_10"
 		},
 		sound_events_duration = {
 			0.529365,
@@ -786,23 +806,27 @@ local guidance_vo_psyker_male_c = {
 			1.184813,
 			0.892094,
 			0.846677,
-			0.966906
+			0.966906,
+			1.032917,
+			0.882688
 		},
 		sound_event_weights = {
-			0.125,
-			0.125,
-			0.125,
-			0.125,
-			0.125,
-			0.125,
-			0.125,
-			0.125
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1
 		},
 		randomize_indexes = {}
 	},
 	guidance_stairs_sighted_4 = {
 		randomize_indexes_n = 0,
-		sound_events_n = 8,
+		sound_events_n = 10,
 		sound_events = {
 			"loc_psyker_male_c__stairs_sighted_01",
 			"loc_psyker_male_c__stairs_sighted_02",
@@ -811,7 +835,9 @@ local guidance_vo_psyker_male_c = {
 			"loc_psyker_male_c__stairs_sighted_05",
 			"loc_psyker_male_c__stairs_sighted_06",
 			"loc_psyker_male_c__stairs_sighted_07",
-			"loc_psyker_male_c__stairs_sighted_08"
+			"loc_psyker_male_c__stairs_sighted_08",
+			"loc_psyker_male_c__stairs_sighted_09",
+			"loc_psyker_male_c__stairs_sighted_10"
 		},
 		sound_events_duration = {
 			0.529365,
@@ -821,17 +847,21 @@ local guidance_vo_psyker_male_c = {
 			1.184813,
 			0.892094,
 			0.846677,
-			0.966906
+			0.966906,
+			1.032917,
+			0.882688
 		},
 		sound_event_weights = {
-			0.125,
-			0.125,
-			0.125,
-			0.125,
-			0.125,
-			0.125,
-			0.125,
-			0.125
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1,
+			0.1
 		},
 		randomize_indexes = {}
 	},
@@ -948,18 +978,27 @@ local guidance_vo_psyker_male_c = {
 	},
 	info_asset_nurgle_growth = {
 		randomize_indexes_n = 0,
-		sound_events_n = 2,
+		sound_events_n = 5,
 		sound_events = {
-			[1.0] = "loc_psyker_male_c__asset_nurgle_growth_01",
-			[2.0] = "loc_psyker_male_c__asset_nurgle_growth_04"
+			"loc_psyker_male_c__asset_nurgle_growth_01",
+			"loc_psyker_male_c__asset_nurgle_growth_02",
+			"loc_psyker_male_c__asset_nurgle_growth_03",
+			"loc_psyker_male_c__asset_nurgle_growth_04",
+			"loc_psyker_male_c__asset_nurgle_growth_05"
 		},
 		sound_events_duration = {
-			[1.0] = 1.88174,
-			[2.0] = 1.65024
+			1.88174,
+			1.477573,
+			2.264479,
+			1.65024,
+			3.379729
 		},
 		sound_event_weights = {
-			[1.0] = 0.5,
-			[2.0] = 0.5
+			0.2,
+			0.2,
+			0.2,
+			0.2,
+			0.2
 		},
 		randomize_indexes = {}
 	}

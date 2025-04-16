@@ -8,7 +8,7 @@ function HudElementSpectateFading:init(parent, draw_layer, start_scale)
 
 	self._player = parent:player()
 	local fade_render_settings = HudElementSpectateFadingSettings.render_settings
-	self._fade_ui = ViewTransitionUI:new(fade_render_settings)
+	self._view_transition_ui = ViewTransitionUI:new(fade_render_settings)
 
 	self:_register_event("event_spectate_fade_in")
 	self:_register_event("event_spectate_fade_out")
@@ -44,7 +44,7 @@ function HudElementSpectateFading:update(dt, t, ui_renderer, render_settings, in
 		anim_progress = self._fade_easing_function(anim_progress)
 	end
 
-	self._fade_ui:update(dt, t, fade_progress ~= nil, anim_progress)
+	self._view_transition_ui:update(dt, t, fade_progress ~= nil, anim_progress)
 
 	local fade_out = self._fade_out_data
 
@@ -80,9 +80,9 @@ function HudElementSpectateFading:event_spectate_fade_out_at(player, duration, e
 end
 
 function HudElementSpectateFading:destroy(ui_renderer)
-	self._fade_ui:destroy()
+	self._view_transition_ui:destroy()
 
-	self._fade_ui = nil
+	self._view_transition_ui = nil
 
 	HudElementSpectateFading.super.destroy(self, ui_renderer)
 end

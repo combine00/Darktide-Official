@@ -7,13 +7,6 @@ local player_difficulty_settings = {
 			1,
 			1
 		},
-		veteran = {
-			4,
-			3,
-			3,
-			2,
-			2
-		},
 		ogryn = {
 			5,
 			4,
@@ -21,14 +14,21 @@ local player_difficulty_settings = {
 			3,
 			3
 		},
-		zealot = {
+		psyker = {
 			4,
 			3,
 			3,
 			2,
 			2
 		},
-		psyker = {
+		veteran = {
+			4,
+			3,
+			3,
+			2,
+			2
+		},
+		zealot = {
 			4,
 			3,
 			3,

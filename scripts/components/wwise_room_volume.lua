@@ -99,7 +99,8 @@ WwiseRoomVolume.component_data = {
 			"indoor_large_echo_3d",
 			"indoor_medium_hallway_3d",
 			"indoor_huge_cylinder_3d",
-			"indoor_small_hallway_3d"
+			"indoor_small_hallway_3d",
+			"outside_huge_canyon_3d"
 		}
 	},
 	ambient_event = {

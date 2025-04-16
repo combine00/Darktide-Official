@@ -1,4 +1,3 @@
-local DamageProfileTemplates = require("scripts/settings/damage/damage_profile_templates")
 local TalentSettings = require("scripts/settings/talent/talent_settings")
 local talent_settings = TalentSettings.veteran_3
 local RADIUS = talent_settings.combat_ability.radius
@@ -35,9 +34,18 @@ local ability_template = {
 		}
 	},
 	action_input_hierarchy = {
-		combat_ability_pressed = {
-			block_cancel = "base",
-			combat_ability_released = "base"
+		{
+			input = "combat_ability_pressed",
+			transition = {
+				{
+					transition = "base",
+					input = "combat_ability_released"
+				},
+				{
+					transition = "base",
+					input = "block_cancel"
+				}
+			}
 		}
 	},
 	actions = {
@@ -79,26 +87,18 @@ local ability_template = {
 			}
 		},
 		action_veteran_combat_ability = {
-			use_ability_charge = true,
+			shout_target_template = "veteran_shout",
 			use_charge_at_start = true,
-			allowed_during_sprint = true,
-			kind = "veteran_combat_ability",
 			uninterruptible = true,
+			kind = "veteran_combat_ability",
+			use_ability_charge = true,
+			abort_sprint = false,
+			allowed_during_sprint = true,
 			ability_type = "combat_ability",
 			has_husk_sound = true,
+			prevent_sprint = false,
 			total_time = 1,
-			shout_settings = {
-				target_enemies = true,
-				revive_allies = true,
-				force_stagger_type_if_not_staggered_duration = 2.5,
-				force_stagger_type_if_not_staggered = "heavy",
-				target_allies = true,
-				radius = RADIUS,
-				damage_profile = DamageProfileTemplates.shout_stagger_veteran,
-				power_level = talent_settings.combat_ability.power_level,
-				cone_dot = talent_settings.combat_ability.cone_dot,
-				cone_range = talent_settings.combat_ability.cone_range
-			},
+			radius = RADIUS,
 			vo_tags = {
 				shock_trooper = "ability_shock_trooper",
 				squad_leader = "ability_squad_leader",

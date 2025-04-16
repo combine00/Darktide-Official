@@ -4,6 +4,7 @@ local Breeds = require("scripts/settings/breed/breeds")
 local MinionAttackSelection = require("scripts/utilities/minion_attack_selection/minion_attack_selection")
 local MinionDifficultySettings = require("scripts/settings/difficulty/minion_difficulty_settings")
 local PerceptionSettings = require("scripts/settings/perception/perception_settings")
+local TerrorEventQueries = require("scripts/managers/terror_event/utilities/terror_event_queries")
 local aggro_states = PerceptionSettings.aggro_states
 local TerrorEventNodes = {
 	debug_print = {
@@ -58,6 +59,42 @@ local TerrorEventNodes = {
 			if node.duration then
 				return not is_completed and string.format("(%.1f sec)", is_running and scratchpad.ends_at - t or node.duration)
 			end
+		end
+	},
+	restart_when = {
+		init = function (node, event, t)
+			if node.duration then
+				event.scratchpad.ends_at = t + node.duration
+			end
+		end,
+		update = function (node, scratchpad, t, dt)
+			local early_exit_reached = node.early_exit_condition and node.early_exit_condition()
+			local ends_at = scratchpad.ends_at
+
+			if early_exit_reached or ends_at and ends_at < t then
+				node.should_restart = node.condition()
+
+				return true
+			end
+
+			return false
+		end,
+		debug_text = function (node, is_completed, is_running, scratchpad, t, dt)
+			if node.duration then
+				return not is_completed and string.format("(%.1f sec)", is_running and scratchpad.ends_at - t or node.duration)
+			end
+		end
+	},
+	lua_event = {
+		init = function (node, event, t)
+			local target_event = node.target_event
+
+			if target_event then
+				Managers.event:trigger(target_event)
+			end
+		end,
+		update = function (node, scratchpad, t, dt)
+			return true
 		end
 	},
 	start_terror_event = {

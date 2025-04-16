@@ -5,6 +5,28 @@ table.make_unique(templates)
 
 local stat_buffs = BuffSettings.stat_buffs
 templates.weapon_trait_bespoke_ogryn_gauntlet_p1_power_bonus_on_continuous_fire = {
+	format_values = {
+		power_level = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_gauntlet_p1_power_bonus_on_continuous_fire",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.power_level_modifier
+				}
+			}
+		},
+		ammo = {
+			value = "10%",
+			format_type = "string"
+		},
+		stacks = {
+			value = "5",
+			format_type = "string"
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_gauntlet_p1_power_bonus_on_continuous_fire = {
 			{
@@ -31,6 +53,19 @@ templates.weapon_trait_bespoke_ogryn_gauntlet_p1_power_bonus_on_continuous_fire 
 	}
 }
 templates.weapon_trait_bespoke_ogryn_gauntlet_p1_toughness_on_elite_kills = {
+	format_values = {
+		toughness = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_gauntlet_p1_toughness_on_elite_kills",
+				find_value_type = "trait_override",
+				path = {
+					"toughness_fixed_percentage"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_gauntlet_p1_toughness_on_elite_kills = {
 			{
@@ -49,6 +84,19 @@ templates.weapon_trait_bespoke_ogryn_gauntlet_p1_toughness_on_elite_kills = {
 	}
 }
 templates.weapon_trait_bespoke_ogryn_gauntlet_p1_toughness_on_crit_kills = {
+	format_values = {
+		toughness = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_gauntlet_p1_toughness_on_crit_kills",
+				find_value_type = "trait_override",
+				path = {
+					"toughness_fixed_percentage"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_gauntlet_p1_toughness_on_crit_kills = {
 			{
@@ -67,6 +115,50 @@ templates.weapon_trait_bespoke_ogryn_gauntlet_p1_toughness_on_crit_kills = {
 	}
 }
 templates.weapon_trait_bespoke_ogryn_gauntlet_p1_targets_receive_rending_debuff = {
+	format_values = {
+		stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_gauntlet_p1_targets_receive_rending_debuff",
+				find_value_type = "trait_override",
+				path = {
+					"target_buff_data",
+					"num_stacks_on_proc"
+				}
+			}
+		},
+		rending = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "rending_debuff",
+				find_value_type = "buff_template",
+				path = {
+					"stat_buffs",
+					stat_buffs.rending_multiplier
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "rending_debuff",
+				find_value_type = "buff_template",
+				path = {
+					"duration"
+				}
+			}
+		},
+		max_stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "rending_debuff",
+				find_value_type = "buff_template",
+				path = {
+					"max_stacks"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_gauntlet_p1_targets_receive_rending_debuff = {
 			{
@@ -93,6 +185,34 @@ templates.weapon_trait_bespoke_ogryn_gauntlet_p1_targets_receive_rending_debuff 
 	}
 }
 templates.weapon_trait_bespoke_ogryn_gauntlet_p1_windup_increases_power = {
+	format_values = {
+		power_level = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_gauntlet_p1_windup_increases_power",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.power_level_modifier
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_gauntlet_p1_windup_increases_power",
+				find_value_type = "trait_override",
+				path = {
+					"duration_per_stack"
+				}
+			}
+		},
+		stacks = {
+			value = "5",
+			format_type = "string"
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_gauntlet_p1_windup_increases_power = {
 			{
@@ -123,6 +243,30 @@ templates.weapon_trait_bespoke_ogryn_gauntlet_p1_windup_increases_power = {
 	}
 }
 templates.weapon_trait_bespoke_ogryn_gauntlet_p1_crit_chance_bonus_on_melee_kills = {
+	format_values = {
+		crit_chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_gauntlet_p1_crit_chance_bonus_on_melee_kills",
+				find_value_type = "trait_override",
+				path = {
+					"proc_stat_buffs",
+					stat_buffs.critical_strike_chance
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_gauntlet_p1_crit_chance_bonus_on_melee_kills",
+				find_value_type = "buff_template",
+				path = {
+					"active_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_gauntlet_p1_crit_chance_bonus_on_melee_kills = {
 			{
@@ -153,6 +297,40 @@ templates.weapon_trait_bespoke_ogryn_gauntlet_p1_crit_chance_bonus_on_melee_kill
 	}
 }
 templates.weapon_trait_bespoke_ogryn_gauntlet_p1_chained_melee_hits_increases_power = {
+	format_values = {
+		power = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_gauntlet_p1_chained_melee_hits_increases_power_parent",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.power_level_modifier
+				}
+			}
+		},
+		stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_gauntlet_p1_chained_melee_hits_increases_power_child",
+				find_value_type = "buff_template",
+				path = {
+					"max_stacks"
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_gauntlet_p1_chained_melee_hits_increases_power_parent",
+				find_value_type = "buff_template",
+				path = {
+					"child_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_gauntlet_p1_chained_melee_hits_increases_power_parent = {
 			{
@@ -179,6 +357,41 @@ templates.weapon_trait_bespoke_ogryn_gauntlet_p1_chained_melee_hits_increases_po
 	}
 }
 templates.weapon_trait_bespoke_ogryn_gauntlet_p1_melee_power_after_ranged_explosion = {
+	format_values = {
+		power_level = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_gauntlet_p1_melee_power_after_ranged_explosion",
+				find_value_type = "trait_override",
+				path = {
+					"proc_stat_buffs",
+					stat_buffs.melee_power_level_modifier
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_gauntlet_p1_melee_power_after_ranged_explosion",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		num_hits = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_gauntlet_p1_melee_power_after_ranged_explosion",
+				find_value_type = "buff_template",
+				path = {
+					"buff_data",
+					"required_num_hits"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_gauntlet_p1_melee_power_after_ranged_explosion = {
 			{
@@ -209,6 +422,41 @@ templates.weapon_trait_bespoke_ogryn_gauntlet_p1_melee_power_after_ranged_explos
 	}
 }
 templates.weapon_trait_bespoke_ogryn_gauntlet_p1_power_bonus_after_weapon_special_multiple = {
+	format_values = {
+		power_level = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_gauntlet_p1_power_bonus_after_weapon_special_multiple",
+				find_value_type = "trait_override",
+				path = {
+					"proc_stat_buffs",
+					stat_buffs.power_level_modifier
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_gauntlet_p1_power_bonus_after_weapon_special_multiple",
+				find_value_type = "buff_template",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		num_hits = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_gauntlet_p1_melee_power_after_ranged_explosion",
+				find_value_type = "buff_template",
+				path = {
+					"buff_data",
+					"required_num_hits"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_gauntlet_p1_power_bonus_after_weapon_special_multiple = {
 			{

@@ -1,10 +1,10 @@
 local BallisticRaycast = require("scripts/extension_systems/weapon/actions/utilities/ballistic_raycast")
 local BallisticRaycastPostionFinderActionModule = class("BallisticRaycastPostionFinderActionModule")
 
-function BallisticRaycastPostionFinderActionModule:init(physics_world, player_unit, component, action_settings)
+function BallisticRaycastPostionFinderActionModule:init(physics_world, player_unit, position_finder_component, action_settings)
 	self._physics_world = physics_world
 	self._player_unit = player_unit
-	self._component = component
+	self._position_finder_component = position_finder_component
 	self._action_settings = action_settings
 	local unit_data_extension = ScriptUnit.extension(player_unit, "unit_data_system")
 	self._first_person_component = unit_data_extension:read_component("first_person")
@@ -12,8 +12,7 @@ function BallisticRaycastPostionFinderActionModule:init(physics_world, player_un
 end
 
 function BallisticRaycastPostionFinderActionModule:start(action_settings, t)
-	local action_component = self._component
-	action_component.position = Vector3.zero()
+	self._position_finder_component.position = Vector3.zero()
 end
 
 function BallisticRaycastPostionFinderActionModule:fixed_update(dt, t)
@@ -36,14 +35,12 @@ function BallisticRaycastPostionFinderActionModule:fixed_update(dt, t)
 		end
 	end
 
-	local action_component = self._component
-	action_component.position = hit_position
+	self._position_finder_component.position = hit_position
 end
 
 function BallisticRaycastPostionFinderActionModule:finish(reason, data, t)
 	if reason == "hold_input_released" or reason == "stunned" then
-		local action_component = self._component
-		action_component.position = Vector3.zero()
+		self._position_finder_component.position = Vector3.zero()
 	end
 end
 

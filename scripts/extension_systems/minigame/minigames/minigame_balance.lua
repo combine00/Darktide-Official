@@ -21,13 +21,37 @@ function MinigameBalance:init(unit, is_server, seed)
 	self._last_axis_set = 0
 	self._disrupt_timer = 0
 	self._objective = nil
-	self._progression = 0
+	self._start_progression = 0
 	self._is_stuck_indication = false
 	self._sound_alert_time = 0
 end
 
 function MinigameBalance:hot_join_sync(sender, channel)
 	MinigameBalance.super.hot_join_sync(self, sender, channel)
+end
+
+function MinigameBalance:_player_fail(player)
+	if not player then
+		Log.error("MinigameBalance", "Trying to access user but there is none")
+
+		return
+	end
+
+	local unique_id = player:unique_id()
+	self._misses_per_player[unique_id] = (self._misses_per_player[unique_id] or 0) + 1
+end
+
+function MinigameBalance:decode_interrupt()
+	MinigameBalance.super.decode_interrupt(self)
+
+	local target_extension = ScriptUnit.has_extension(self._minigame_unit, "mission_objective_target_system")
+
+	if self._start_progression == 0 and target_extension then
+		local objective_name = target_extension:objective_name()
+		local mission_objective_system = Managers.state.extension:system("mission_objective_system")
+		local objective = mission_objective_system:active_objective(objective_name)
+		self._start_progression = objective and objective:progression() or 0
+	end
 end
 
 function MinigameBalance:start(player)
@@ -37,17 +61,12 @@ function MinigameBalance:start(player)
 
 	Unit.flow_event(self._minigame_unit, "lua_minigame_start")
 
-	local is_server = self._is_server
+	if player then
+		self:_setup_sound(player, FX_SOURCE_NAME)
 
-	if is_server then
 		local player_unit = player.player_unit
-		local visual_loadout_extension = ScriptUnit.extension(player_unit, "visual_loadout_system")
-		local fx_sources = visual_loadout_extension:source_fx_for_slot("slot_device")
 
 		Unit.set_flow_variable(self._minigame_unit, "player_unit", player_unit)
-
-		self._fx_extension = ScriptUnit.extension(player_unit, "fx_system")
-		self._fx_source_name = fx_sources[FX_SOURCE_NAME]
 	end
 
 	local target_extension = ScriptUnit.has_extension(self._minigame_unit, "mission_objective_target_system")
@@ -189,7 +208,7 @@ function MinigameBalance:progression()
 		return 0
 	end
 
-	return self._objective:progression()
+	return (self._objective:progression() - self._start_progression) / (1 - self._start_progression)
 end
 
 return MinigameBalance

@@ -325,7 +325,7 @@ function MinionPerceptionExtension:alert(enemy_unit)
 
 	if aggro_state == aggro_states.aggroed then
 		return
-	elseif aggro_state == aggro_states.alerted then
+	elseif aggro_state == aggro_states.alerted or self._breed.force_aggro then
 		self:aggro()
 	else
 		perception_component.aggro_state = aggro_states.alerted

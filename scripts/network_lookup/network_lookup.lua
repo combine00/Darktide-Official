@@ -17,6 +17,7 @@ local DialogueLookupConcepts = require("scripts/settings/dialogue/dialogue_looku
 local DialogueSettings = require("scripts/settings/dialogue/dialogue_settings")
 local EffectTemplates = require("scripts/settings/fx/effect_templates")
 local FlowEvents = require("scripts/settings/fx/flow_events")
+local HavocSettings = require("scripts/settings/havoc_settings")
 local HazardPropSettings = require("scripts/settings/hazard_prop/hazard_prop_settings")
 local HerdingTemplates = require("scripts/settings/damage/herding_templates")
 local HitZone = require("scripts/utilities/attack/hit_zone")
@@ -128,6 +129,8 @@ NetworkLookup.dialogue_names = DialogueLookup
 NetworkLookup.dialogues_all_concepts = table.clone(DialogueLookupConcepts.all_concepts)
 NetworkLookup.dynamic_smart_tags = _create_lookup({}, DialogueSettings.dynamic_smart_tags)
 NetworkLookup.manual_subtitles = _create_lookup({}, DialogueSettings.manual_subtitles)
+NetworkLookup.backend_vo_groups = _create_lookup({}, DialogueSettings.backend_vo_groups)
+NetworkLookup.horde_mode_vo = _create_lookup({}, DialogueSettings.horde_mode)
 NetworkLookup.door_control_panel_states = {
 	"active",
 	"inactive"
@@ -167,6 +170,19 @@ NetworkLookup.hazard_prop_content = _create_lookup({}, HazardPropSettings.hazard
 NetworkLookup.hazard_prop_states = _create_lookup({}, HazardPropSettings.hazard_state)
 NetworkLookup.herding_templates = _create_lookup({}, HerdingTemplates)
 NetworkLookup.hit_zones = _create_lookup({}, HitZone.hit_zone_names)
+NetworkLookup.hordes_build_families = {
+	"fire",
+	"electric",
+	"armor_piercing",
+	"elementalist",
+	"unkillable",
+	"grenade",
+	"cowboy"
+}
+NetworkLookup.hordes_island_names = {
+	"island_void",
+	"island_rooftops"
+}
 NetworkLookup.host_types = _create_lookup({}, MatchmakingConstants.HOST_TYPES)
 NetworkLookup.impact_fx_names = _create_lookup({}, ImpactEffectSettings.impact_fx_templates)
 NetworkLookup.interaction_result = {
@@ -270,36 +286,47 @@ NetworkLookup.player_character_particle_variable_names = {
 }
 NetworkLookup.player_character_particles = table.clone(PlayerCharacterParticleNames)
 local player_character_sounds = {
-	["wwise/events/player/play_backstab_indicator_melee"] = true,
-	["wwise/events/ui/play_hud_heal_2d"] = true,
+	["wwise/events/player/play_horde_mode_buff_ammo_refill"] = true,
+	["wwise/events/player/stop_foley_fall_wind_2D"] = true,
 	["wwise/events/player/play_backstab_indicator_melee_elite"] = true,
-	["wwise/events/player/play_player_get_hit_light_2d"] = true,
+	["wwise/events/player/play_psyker_ability_shout"] = true,
 	["wwise/events/player/play_syringe_healed_by_ally"] = true,
-	["wwise/events/player/play_foley_fall_wind_2D"] = true,
+	["wwise/events/player/play_player_get_hit_light_2d"] = true,
 	["wwise/events/weapon/play_indicator_weakspot"] = true,
-	["wwise/events/player/play_player_experience_fall_damage_2d"] = true,
+	["wwise/events/minions/play_enemy_daemonhost_execute_player_impact"] = true,
 	["wwise/events/player/play_player_vomit_enter"] = true,
 	["wwise/events/minions/play_minion_twins_disappear_explosion"] = true,
-	["wwise/events/player/play_player_get_hit_fire"] = true,
-	["wwise/events/weapon/play_indicator_crit"] = true,
+	["wwise/events/player/play_pick_up_ammo_01"] = true,
+	["wwise/events/player/play_horde_mode_buff_dublicate"] = true,
 	["wwise/events/player/play_player_get_hit_corruption_2d_tick"] = true,
-	["wwise/events/weapon/play_bullet_hits_gen_unarmored_death"] = true,
+	["wwise/events/player/play_foley_fall_wind_2D"] = true,
 	["wwise/events/player/play_player_get_hit_2d_corruption_tick_toughness"] = true,
 	["wwise/events/player/play_player_get_hit_sharp"] = true,
-	["wwise/events/player/stop_foley_fall_wind_2D"] = true,
-	["wwise/events/weapon/play_shared_combat_weapon_bolter_bullet_flyby"] = true,
-	["wwise/events/weapon/play_weapon_lasgun_crack_beam_nearby"] = true,
-	["wwise/events/player/play_toughness_break"] = true,
+	["wwise/events/ui/play_hud_health_station_2d"] = true,
+	["wwise/events/weapon/play_bullet_hits_gen_unarmored_death"] = true,
+	["wwise/events/weapon/play_horde_mode_heal_self_confirmation"] = true,
+	["wwise/events/ui/play_hud_heal_2d"] = true,
 	["wwise/events/player/play_backstab_indicator_ranged"] = true,
+	["wwise/events/player/play_horde_mode_buff_grenade_refill"] = true,
 	["wwise/events/weapon/play_enemy_netgunner_net_trapped"] = true,
+	["wwise/events/player/play_toughness_break"] = true,
+	["wwise/events/player/play_horde_mode_buff_rock_charge_loop"] = true,
+	["wwise/events/player/stop_horde_mode_buff_rock_charge_loop"] = true,
+	["wwise/events/player/play_horde_mode_buff_rock_charge_finish"] = true,
 	["wwise/events/player/play_vault"] = true,
 	["wwise/events/ui/play_hud_coherency_off"] = true,
-	["wwise/events/minions/play_enemy_daemonhost_execute_player_impact"] = true,
-	["wwise/events/ui/play_hud_health_station_2d"] = true,
-	["wwise/events/player/play_pick_up_ammo_01"] = true,
+	["wwise/events/weapon/play_horde_mode_buff_fire_burst"] = true,
+	["wwise/events/player/play_player_experience_fall_damage_2d"] = true,
+	["wwise/events/weapon/play_indicator_crit"] = true,
+	["wwise/events/player/play_horde_mode_buff_super_crit"] = true,
+	["wwise/events/weapon/play_shared_combat_weapon_bolter_bullet_flyby"] = true,
+	["wwise/events/weapon/play_weapon_lasgun_crack_beam_nearby"] = true,
+	["wwise/events/player/play_horde_mode_buff_electric_crit"] = true,
+	["wwise/events/player/play_player_get_hit_fire"] = true,
 	["wwise/events/ui/play_hud_coherency_on"] = true,
+	["wwise/events/weapon/play_horde_mode_buff_shield"] = true,
 	["wwise/events/weapon/play_explosion_force_med"] = true,
-	["wwise/events/player/play_psyker_ability_shout"] = true,
+	["wwise/events/player/play_backstab_indicator_melee"] = true,
 	["wwise/events/player/play_player_get_hit_corruption_2d"] = true,
 	["wwise/events/player/play_toughness_hits"] = true,
 	["wwise/events/player/play_player_dodge_ranged_success"] = true,
@@ -347,6 +374,11 @@ NetworkLookup.force_field_unit_names = {
 	"content/characters/player/human/attachments_combat/psyker_shield/psyker_shield_flat_functional",
 	"content/characters/player/human/attachments_combat/psyker_shield/shield_sphere_functional"
 }
+NetworkLookup.force_field_shape_overrides = {
+	"none",
+	"flat",
+	"sphere"
+}
 NetworkLookup.smoke_fog_unit = {
 	"content/characters/player/human/attachments_combat/smoke_fog/smoke_fog_volume",
 	"content/smoke_fog/empty_unit/empty_unit"
@@ -367,7 +399,12 @@ NetworkLookup.sound_parameters = {
 	"wpn_fire_interval",
 	"charge_level",
 	"psyker_overload_global",
-	"auspex_scanner_speed"
+	"auspex_scanner_speed",
+	"auspex_a_h",
+	"auspex_a_w",
+	"auspex_b_h",
+	"auspex_b_w",
+	"auspex_b_goal"
 }
 NetworkLookup.sound_switches = {
 	"surface_material"
@@ -436,6 +473,19 @@ NetworkLookup.weapon_modifier_override_keys = _create_lookup({}, {
 NetworkLookup.weapon_templates = _create_lookup({}, WeaponTemplates)
 NetworkLookup.wounds_templates = _create_lookup({}, WoundsTemplates)
 NetworkLookup.wounds_shapes = _create_lookup({}, WoundsSettings.shapes)
+local hash_table = {}
+
+for i = 1, #HavocSettings.modifiers do
+	local modifier = HavocSettings.modifiers[i]
+	hash_table[modifier] = true
+end
+
+for i = 1, #HavocSettings.positive_modifiers do
+	local modifier = HavocSettings.positive_modifiers[i]
+	hash_table[modifier] = true
+end
+
+NetworkLookup.havoc_modifiers = _create_lookup({}, hash_table)
 
 local function _init(name, lookup_table)
 	for index, key in ipairs(lookup_table) do

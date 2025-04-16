@@ -1,6 +1,6 @@
 require("scripts/extension_systems/weapon/actions/action_weapon_base")
 
-local Action = require("scripts/utilities/weapon/action")
+local Action = require("scripts/utilities/action/action")
 local ActionSweepSettings = require("scripts/settings/equipment/action_sweep_settings")
 local AimAssist = require("scripts/utilities/aim_assist")
 local Armor = require("scripts/utilities/attack/armor")
@@ -147,7 +147,7 @@ end
 function ActionSweep:start(action_settings, t, time_scale, action_start_params)
 	ActionSweep.super.start(self, action_settings, t, time_scale, action_start_params)
 
-	self._weapon_tweak_templates_component.charge_template_name = action_settings.charge_template or "none"
+	self._weapon_tweak_templates_component.charge_template_name = action_settings.charge_template or self._weapon_template.special_charge_template or "none"
 	self._auto_completed = action_start_params.auto_completed
 	local is_chain_action = action_start_params.is_chain_action
 	local combo_count = action_start_params.combo_count
@@ -1146,9 +1146,9 @@ function ActionSweep:_process_hit(t, hit_unit, hit_actor, hit_units, action_sett
 	num_hit_enemies = num_hit_enemies + 1
 	local use_reduced_hit_mass = buff_extension:has_keyword(buff_keywords.use_reduced_hit_mass)
 	local ignore_armor_aborts_attack = is_critical_strike and buff_extension:has_keyword(buff_keywords.ignore_armor_aborts_attack_critical_strike) or buff_extension:has_keyword(buff_keywords.ignore_armor_aborts_attack) or use_reduced_hit_mass
-	local hit_weakspot = Weakspot.hit_weakspot(target_breed_or_nil, hit_zone_name_or_nil)
-	local target_hit_mass = HitMass.target_hit_mass(player_unit, hit_unit, hit_weakspot)
 	local attack_type = AttackSettings.attack_types.melee
+	local hit_weakspot = Weakspot.hit_weakspot(target_breed_or_nil, hit_zone_name_or_nil)
+	local target_hit_mass = HitMass.target_hit_mass(player_unit, hit_unit, hit_weakspot, is_critical_strike, attack_type)
 	local target_armor = Armor.armor_type(hit_unit, target_breed_or_nil, hit_zone_name_or_nil, attack_type)
 	local action_armor_hit_mass_mod = action_settings.action_armor_hit_mass_mod and action_settings.action_armor_hit_mass_mod[target_armor]
 	local amount_of_mass_hit = nil

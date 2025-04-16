@@ -1,7 +1,9 @@
 require("scripts/extension_systems/weapon/actions/action_ability_base")
 
+local BuffSettings = require("scripts/settings/buff/buff_settings")
 local Lunge = require("scripts/utilities/player_state/lunge")
 local LungeTemplates = require("scripts/settings/lunge/lunge_templates")
+local proc_events = BuffSettings.proc_events
 local ActionTargetedDashAim = class("ActionTargetedDashAim", "ActionAbilityBase")
 
 function ActionTargetedDashAim:init(action_context, action_params, action_setting)
@@ -17,12 +19,24 @@ function ActionTargetedDashAim:start(action_settings, t, time_scale, action_star
 	ActionTargetedDashAim.super.start(self, action_settings, t, time_scale, action_start_params)
 
 	self._lunge_character_state_component.is_aiming = true
+	local buff_extension = self._buff_extension
+	local param_table = buff_extension and buff_extension:request_proc_event_param_table()
+
+	if param_table then
+		buff_extension:add_proc_event(proc_events.on_lunge_aim_start, param_table)
+	end
 end
 
 function ActionTargetedDashAim:finish(reason, data, t, time_in_action)
 	ActionTargetedDashAim.super.finish(self, reason, data, t, time_in_action)
 
 	self._lunge_character_state_component.is_aiming = false
+	local buff_extension = self._buff_extension
+	local param_table = buff_extension and buff_extension:request_proc_event_param_table()
+
+	if param_table then
+		buff_extension:add_proc_event(proc_events.on_lunge_aim_end, param_table)
+	end
 end
 
 function ActionTargetedDashAim:fixed_update(dt, t, time_in_action)

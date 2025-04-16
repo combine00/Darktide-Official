@@ -1,3 +1,4 @@
+local ActionInputHierarchy = require("scripts/utilities/action/action_input_hierarchy")
 local BaseTemplateSettings = require("scripts/settings/equipment/weapon_templates/base_template_settings")
 local FootstepIntervalsTemplates = require("scripts/settings/equipment/footstep/footstep_intervals_templates")
 local PlayerCharacterConstants = require("scripts/settings/player_character/player_character_constants")
@@ -92,25 +93,67 @@ local function generate_base_template(buff_name, validate_target_func, hud_icon,
 	table.add_missing(base_template.action_inputs, BaseTemplateSettings.action_inputs)
 
 	base_template.action_input_hierarchy = {
-		special_action = "base",
-		wield = "base",
-		use_self = "base",
-		aim = {
-			grenade_ability = "base",
-			wield = "base",
-			aim_release = "base",
-			combat_ability = "base",
-			use_ally = "base"
+		{
+			transition = "base",
+			input = "wield"
 		},
-		aim_give = {
-			wield = "base",
-			aim_give_release = "previous",
-			combat_ability = "base",
-			grenade_ability = "base"
+		{
+			transition = "base",
+			input = "use_self"
+		},
+		{
+			transition = "base",
+			input = "special_action"
+		},
+		{
+			input = "aim",
+			transition = {
+				{
+					transition = "base",
+					input = "use_ally"
+				},
+				{
+					transition = "base",
+					input = "aim_release"
+				},
+				{
+					transition = "base",
+					input = "wield"
+				},
+				{
+					transition = "base",
+					input = "combat_ability"
+				},
+				{
+					transition = "base",
+					input = "grenade_ability"
+				}
+			}
+		},
+		{
+			input = "aim_give",
+			transition = {
+				{
+					transition = "previous",
+					input = "aim_give_release"
+				},
+				{
+					transition = "base",
+					input = "wield"
+				},
+				{
+					transition = "base",
+					input = "combat_ability"
+				},
+				{
+					transition = "base",
+					input = "grenade_ability"
+				}
+			}
 		}
 	}
 
-	table.add_missing(base_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
+	ActionInputHierarchy.add_missing(base_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
 
 	base_template.actions = {
 		action_unwield = {

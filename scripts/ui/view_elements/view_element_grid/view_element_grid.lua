@@ -300,10 +300,14 @@ function ViewElementGrid:update(dt, t, input_service)
 
 		local current_scrollbar_progress = self._grid:scrollbar_progress()
 
-		if self._current_scrollbar_progress ~= current_scrollbar_progress then
+		if self._current_scrollbar_progress ~= current_scrollbar_progress or self._updated_grid_list then
 			self._current_scrollbar_progress = current_scrollbar_progress
 
 			self:update_grid_widgets_visibility()
+
+			if self._updated_grid_list then
+				self._updated_grid_list = nil
+			end
 		end
 	end
 
@@ -312,6 +316,10 @@ end
 
 function ViewElementGrid:set_color_intensity_multiplier(color_intensity_multiplier)
 	self._color_intensity_multiplier = color_intensity_multiplier or 1
+end
+
+function ViewElementGrid:set_tutorial_color_intensity_multiplier(color_intensity_multiplier)
+	self._tutorial_color_intensity_multiplier = color_intensity_multiplier
 end
 
 function ViewElementGrid:set_alpha_multiplier(alpha_multiplier)
@@ -361,6 +369,11 @@ function ViewElementGrid:draw(dt, t, ui_renderer, render_settings, input_service
 
 	local old_color_intensity_multiplier = render_settings.color_intensity_multiplier
 	local color_intensity_multiplier = self._color_intensity_multiplier or 1
+
+	if self._tutorial_color_intensity_multiplier then
+		color_intensity_multiplier = color_intensity_multiplier * self._tutorial_color_intensity_multiplier
+	end
+
 	render_settings.color_intensity_multiplier = (old_color_intensity_multiplier or 1) * color_intensity_multiplier
 	local old_alpha_multiplier = render_settings.alpha_multiplier
 	local alpha_multiplier = self._alpha_multiplier or 1
@@ -542,7 +555,7 @@ function ViewElementGrid:_destroy_grid()
 end
 
 function ViewElementGrid:_destroy_grid_widgets()
-	local widgets = self._grid_widgets
+	local widgets = self._all_grid_widgets
 	local content_blueprints = self._content_blueprints
 
 	if widgets then
@@ -571,8 +584,8 @@ function ViewElementGrid:_destroy_grid_widgets()
 		end
 	end
 
-	self:_clear_widgets(self._grid_widgets)
-	self:_clear_widgets(self._grid_alignment_widgets)
+	self:_clear_widgets(self._all_grid_widgets)
+	self:_clear_widgets(self._all_grid_alignment_widgets)
 
 	self._current_scrollbar_progress = nil
 end
@@ -724,6 +737,47 @@ function ViewElementGrid:_assign_display_name(display_name)
 	widgets_by_name.grid_divider_title.content.visible = use_title
 end
 
+function ViewElementGrid:grid_layout()
+	return self._grid_layout
+end
+
+function ViewElementGrid:update_grid_layout(new_layout)
+	local grid_alignment_reorder = {}
+	local grid_widgets_reorder = {}
+	local widget = self:selected_grid_widget()
+	local widget_id_entry = widget and widget.entry_id
+	local index = 0
+	self._visible_grid_layout = new_layout
+
+	for i = 1, #self._visible_grid_layout do
+		local layout = self._visible_grid_layout[i]
+		local entry_id = layout.entry_id
+		local widgets = self._widgets_by_entry_id[entry_id]
+
+		if widgets then
+			index = index + 1
+
+			if widgets.alignment_widget then
+				grid_alignment_reorder[#grid_alignment_reorder + 1] = widgets.alignment_widget
+			end
+
+			if widgets.widget then
+				grid_widgets_reorder[#grid_widgets_reorder + 1] = widgets.widget
+			end
+		end
+	end
+
+	self._grid._selected_grid_index = 1
+	self._grid_widgets = grid_widgets_reorder
+	self._grid_alignment_widgets = grid_alignment_reorder
+	self._grid._widgets = self._grid_widgets
+	self._grid._alignment_list = self._grid_alignment_widgets
+
+	self:force_update_list_size()
+
+	self._updated_grid_list = true
+end
+
 function ViewElementGrid:present_grid_layout(layout, content_blueprints, left_click_callback, right_click_callback, display_name, optional_grow_direction, optional_on_present_callback, optional_left_double_click_callback)
 	if self._drawn and self._grid then
 		self._present_grid_layout = callback(function ()
@@ -747,67 +801,110 @@ function ViewElementGrid:present_grid_layout(layout, content_blueprints, left_cl
 end
 
 function ViewElementGrid:_on_present_grid_layout_changed(layout, content_blueprints, left_click_callback, right_click_callback, display_name, optional_grow_direction, optional_left_double_click_callback)
-	self:_destroy_grid_widgets()
-	self:_assign_display_name(display_name)
-	self:_hide_empty_message()
+	local generate_grid = false
 
-	self._visible_grid_layout = layout
-	self._content_blueprints = content_blueprints
-	self._left_click_callback = left_click_callback
-	self._right_click_callback = right_click_callback
-	self._left_double_click_callback = optional_left_double_click_callback
-	local widgets = {}
-	local alignment_widgets = {}
-	local left_click_callback_name = "cb_on_grid_entry_left_pressed"
-	local right_click_callback_name = "cb_on_grid_entry_right_pressed"
-	local double_click_callback_name = optional_left_double_click_callback and "cb_on_grid_entry_double_click_pressed"
-	local previous_group_header_name = nil
-	local group_header_index = 0
+	if self._grid_layout and not table.is_empty(self._grid_layout) and layout then
+		for i = 1, #layout do
+			local current_layout = layout[i]
+			local entry_id = current_layout.entry_id
 
-	for index, entry in ipairs(layout) do
-		local widget_suffix = "entry_" .. tostring(index)
-		local widget, alignment_widget = self:_create_entry_widget_from_config(entry, widget_suffix, left_click_callback_name, right_click_callback_name, double_click_callback_name)
-		widgets[#widgets + 1] = widget
-		alignment_widgets[#alignment_widgets + 1] = alignment_widget
+			if not entry_id or not self._widgets_by_entry_id or not self._widgets_by_entry_id[entry_id] then
+				generate_grid = true
 
-		if widget then
-			if entry.widget_type == "group_header" then
-				group_header_index = group_header_index + 1
-				previous_group_header_name = "group_header_" .. group_header_index
+				break
 			end
-
-			widget.content.group_header = previous_group_header_name
-			widget.content.entry = entry
 		end
+	elseif not layout then
+		return
+	else
+		generate_grid = true
 	end
 
-	self._grid_widgets = widgets
-	self._grid_alignment_widgets = alignment_widgets
-	local menu_settings = self._menu_settings
-	local grid_scenegraph_id = "grid_background"
-	local grid_pivot_scenegraph_id = "grid_content_pivot"
-	local grid_spacing = menu_settings.grid_spacing
-	local grid_direction = optional_grow_direction or "down"
-	local use_select_on_focused = menu_settings.use_select_on_focused
-	local use_is_focused_for_navigation = menu_settings.use_is_focused_for_navigation
-	local bottom_chin = menu_settings.bottom_chin or 0
-	local top_padding = menu_settings.top_padding or 0
-	local scroll_start_margin = menu_settings.scroll_start_margin or 0
-	local grid = UIWidgetGrid:new(self._grid_widgets, self._grid_alignment_widgets, self._ui_scenegraph, grid_scenegraph_id, grid_direction, grid_spacing, nil, use_is_focused_for_navigation, use_select_on_focused, bottom_chin, top_padding, scroll_start_margin)
-	self._grid = grid
-	local widgets_by_name = self._widgets_by_name
-	local grid_scrollbar_widget_id = "grid_scrollbar"
-	local scrollbar_widget = widgets_by_name[grid_scrollbar_widget_id]
+	if generate_grid then
+		self:_destroy_grid_widgets()
+		self:_assign_display_name(display_name)
+		self:_hide_empty_message()
 
-	grid:assign_scrollbar(scrollbar_widget, grid_pivot_scenegraph_id, grid_scenegraph_id)
-	grid:set_enable_gamepad_scrolling(menu_settings.enable_gamepad_scrolling)
-	grid:set_scrollbar_progress(0)
-	grid:set_scroll_step_length(100)
-	self:_update_window_size()
-	self:_on_navigation_input_changed()
+		self._content_blueprints = content_blueprints
+		self._left_click_callback = left_click_callback
+		self._right_click_callback = right_click_callback
+		self._left_double_click_callback = optional_left_double_click_callback
+		self._grid_layout = layout
+		self._visible_grid_layout = layout
+		self._widgets_by_entry_id = {}
+		local widgets = {}
+		local alignment_widgets = {}
+		local widgets_by_entry_id = {}
+		local left_click_callback_name = "cb_on_grid_entry_left_pressed"
+		local right_click_callback_name = "cb_on_grid_entry_right_pressed"
+		local double_click_callback_name = optional_left_double_click_callback and "cb_on_grid_entry_double_click_pressed"
+		local previous_group_header_name = nil
+		local group_header_index = 0
+		local id = tostring(math.uuid())
 
-	if #self._grid_widgets == 0 then
-		self:_show_empty_message()
+		for index, entry in ipairs(layout) do
+			local widget_suffix = "entry_" .. tostring(index)
+			local entry_id = string.format("%s_%d", id, index)
+			local widget, alignment_widget = self:_create_entry_widget_from_config(entry, widget_suffix, left_click_callback_name, right_click_callback_name, double_click_callback_name)
+			widgets[#widgets + 1] = widget
+			alignment_widgets[#alignment_widgets + 1] = alignment_widget
+			alignment_widget.entry_id = entry_id
+			entry.entry_id = entry_id
+
+			if widget then
+				if entry.widget_type == "group_header" then
+					group_header_index = group_header_index + 1
+					previous_group_header_name = "group_header_" .. group_header_index
+				end
+
+				widget.content.group_header = previous_group_header_name
+				widget.content.entry = entry
+				widget.entry_id = entry_id
+			end
+
+			widgets_by_entry_id[entry_id] = {
+				widget = widget,
+				alignment_widget = alignment_widget
+			}
+		end
+
+		self._all_grid_widgets = widgets
+		self._all_grid_alignment_widgets = alignment_widgets
+		self._grid_widgets = widgets
+		self._grid_alignment_widgets = alignment_widgets
+		self._widgets_by_entry_id = widgets_by_entry_id
+		local menu_settings = self._menu_settings
+		local grid_scenegraph_id = "grid_background"
+		local grid_pivot_scenegraph_id = "grid_content_pivot"
+		local grid_spacing = menu_settings.grid_spacing
+		local grid_direction = optional_grow_direction or "down"
+		local use_select_on_focused = menu_settings.use_select_on_focused
+		local use_is_focused_for_navigation = menu_settings.use_is_focused_for_navigation
+		local bottom_chin = menu_settings.bottom_chin or 0
+		local top_padding = menu_settings.top_padding or 0
+		local scroll_start_margin = menu_settings.scroll_start_margin or 0
+		local grid = UIWidgetGrid:new(self._grid_widgets, self._grid_alignment_widgets, self._ui_scenegraph, grid_scenegraph_id, grid_direction, grid_spacing, nil, use_is_focused_for_navigation, use_select_on_focused, bottom_chin, top_padding, scroll_start_margin)
+		self._grid = grid
+		local widgets_by_name = self._widgets_by_name
+		local grid_scrollbar_widget_id = "grid_scrollbar"
+		local scrollbar_widget = widgets_by_name[grid_scrollbar_widget_id]
+
+		grid:assign_scrollbar(scrollbar_widget, grid_pivot_scenegraph_id, grid_scenegraph_id)
+		grid:set_enable_gamepad_scrolling(menu_settings.enable_gamepad_scrolling)
+		grid:set_scrollbar_progress(0)
+		grid:set_scroll_step_length(100)
+		self:_update_window_size()
+		self:_on_navigation_input_changed()
+
+		if #self._grid_widgets == 0 then
+			self:_show_empty_message()
+		end
+	else
+		self:update_grid_layout(layout)
+
+		if #self._grid_widgets == 0 then
+			self:_show_empty_message()
+		end
 	end
 end
 
@@ -846,6 +943,10 @@ function ViewElementGrid:set_handle_grid_navigation(allow)
 	local grid = self._grid
 
 	grid:set_handle_grid_navigation(allow)
+end
+
+function ViewElementGrid:get_loading_state()
+	return self._widgets_by_name.grid_loading.content.is_loading
 end
 
 function ViewElementGrid:set_loading_state(is_loading)
@@ -1028,7 +1129,7 @@ end
 function ViewElementGrid:scrollbar_progress()
 	local grid = self._grid
 
-	return grid:scrollbar_progress()
+	return grid and grid:scrollbar_progress()
 end
 
 function ViewElementGrid:set_scrollbar_progress(scroll_progress, instant_scroll)
@@ -1069,6 +1170,49 @@ end
 function ViewElementGrid:cb_on_grid_entry_double_click_pressed(widget, element)
 	if self._left_double_click_callback then
 		self._left_double_click_callback(widget, element)
+	end
+end
+
+function ViewElementGrid:force_update_grid_widget_icon(index)
+	local widgets = self._grid_widgets
+	local widget = widgets and widgets[index]
+
+	if widget then
+		local widget_type = widget.type
+		local content_blueprints = self._content_blueprints
+		local template = content_blueprints[widget_type]
+
+		if template then
+			local content = widget.content
+			local element = content.element
+			local ui_renderer = self._ui_resource_renderer
+			local no_resource_rendering = self._no_resource_rendering
+
+			if no_resource_rendering then
+				ui_renderer = self._parent:ui_renderer()
+			end
+
+			if template.unload_icon then
+				template.unload_icon(self, widget, element, ui_renderer)
+			end
+
+			if template.load_icon then
+				local profile = self._item_icon_profile
+				local content = widget.content
+				local element = content.element
+				local visible = content.visible
+				local visible_last_frame = content.visible_last_frame
+				local render_icon = content.render_icon or visible
+
+				template.load_icon(self, widget, element, ui_renderer, profile, true)
+
+				local icon_load_id = content.icon_load_id
+
+				if icon_load_id and self._cache_loaded_icons and not self._loaded_icon_id_cache[icon_load_id] then
+					self._loaded_icon_id_cache[icon_load_id] = Managers.ui:increment_item_icon_load_by_existing_id(icon_load_id)
+				end
+			end
+		end
 	end
 end
 
@@ -1257,12 +1401,28 @@ function ViewElementGrid:get_sort_button_world_position()
 	return self:scenegraph_world_position(scenegraph_id)
 end
 
-function ViewElementGrid:force_update_list_size_keeping_scroll()
+function ViewElementGrid:length_scrolled()
 	local grid = self._grid
-	local current_scroll = grid:length_scrolled()
+	local current_scroll = grid and grid:length_scrolled() or 0
+
+	return current_scroll
+end
+
+function ViewElementGrid:scroll_length()
+	local grid = self._grid
+	local scroll_length = grid and grid:scroll_length() or 0
+
+	return scroll_length
+end
+
+function ViewElementGrid:force_update_list_size_keeping_scroll()
+	local current_scroll = self:length_scrolled()
 
 	self:force_update_list_size()
-	self:set_scrollbar_progress(current_scroll / grid:scroll_length(), true)
+
+	local scrol_length = self:scroll_length()
+
+	self:set_scrollbar_progress(current_scroll / scrol_length, true)
 end
 
 function ViewElementGrid:hovered_grid_index()

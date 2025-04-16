@@ -5,6 +5,7 @@ local MissionObjectiveDemolition = class("MissionObjectiveDemolition", "MissionO
 function MissionObjectiveDemolition:init()
 	MissionObjectiveDemolition.super.init(self)
 
+	self._paused = false
 	self._resume_timer_active = false
 	self._resume_timer = 0
 end
@@ -47,8 +48,8 @@ function MissionObjectiveDemolition:update(dt)
 
 		if self._resume_timer <= 0 then
 			self._resume_timer = 0
+			self._paused = false
 
-			self:resume()
 			self:stage_done()
 		end
 	end
@@ -107,11 +108,20 @@ function MissionObjectiveDemolition:update_progression()
 			self._resume_timer_active = true
 
 			Unit.flow_event(self._synchronizer_unit, "lua_event_timer_started")
-			self:pause()
+
+			self._paused = true
 		else
 			self:stage_done()
 		end
 	end
+end
+
+function MissionObjectiveDemolition:max_progression_achieved()
+	if self._paused then
+		return false
+	end
+
+	return MissionObjectiveDemolition.super.max_progression_achieved(self)
 end
 
 function MissionObjectiveDemolition:marked_units()

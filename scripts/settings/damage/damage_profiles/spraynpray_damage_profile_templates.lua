@@ -1,18 +1,16 @@
 local ArmorSettings = require("scripts/settings/damage/armor_settings")
-local PowerLevelSettings = require("scripts/settings/damage/power_level_settings")
 local DamageProfileSettings = require("scripts/settings/damage/damage_profile_settings")
 local GibbingSettings = require("scripts/settings/gibbing/gibbing_settings")
-local GibbingPower = GibbingSettings.gibbing_power
+local PowerLevelSettings = require("scripts/settings/damage/power_level_settings")
 local armor_types = ArmorSettings.types
+local gibbing_power = GibbingSettings.gibbing_power
+local single_cleave = DamageProfileSettings.single_cleave
 local damage_templates = {}
 local overrides = {}
 
 table.make_unique(damage_templates)
 table.make_unique(overrides)
 
-local crit_armor_mod = DamageProfileSettings.crit_armor_mod
-local crit_impact_armor_mod = DamageProfileSettings.crit_impact_armor_mod
-local single_cleave = DamageProfileSettings.single_cleave
 damage_templates.default_spraynpray = {
 	suppression_value = 4,
 	stagger_category = "ranged",
@@ -71,7 +69,7 @@ damage_templates.default_spraynpray = {
 		attack = 0.3,
 		impact = 0.75
 	},
-	gibbing_power = GibbingPower.medium,
+	gibbing_power = gibbing_power.medium,
 	on_kill_area_suppression = {
 		distance = 2,
 		suppression_value = 4
@@ -145,7 +143,7 @@ damage_templates.autogun_snp = {
 		attack = 0.3,
 		impact = 0.4
 	},
-	gibbing_power = GibbingPower.medium,
+	gibbing_power = gibbing_power.medium,
 	on_kill_area_suppression = {
 		distance = 2,
 		suppression_value = 4
@@ -219,7 +217,7 @@ damage_templates.rippergun_spraynpray = {
 		attack = 1.5,
 		impact = 1.75
 	},
-	gibbing_power = GibbingPower.medium,
+	gibbing_power = gibbing_power.medium,
 	targets = {
 		default_target = {
 			boost_curve_multiplier_finesse = 1.2,

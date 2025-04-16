@@ -53,7 +53,7 @@ function Log.init(global_log_level)
 		Log.LOG_TYPE_ERROR
 	}
 	Log._lowest_category_level = #Log._types
-	Log._category_levels = {}
+	Log._category_levels = Log._category_levels or {}
 
 	Log.set_global_log_level(global_log_level or Log.DEFAULT_LOG_LEVEL)
 end

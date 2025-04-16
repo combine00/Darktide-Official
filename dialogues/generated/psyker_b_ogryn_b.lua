@@ -103,6 +103,19 @@ local psyker_b_ogryn_b = {
 		},
 		randomize_indexes = {}
 	},
+	combat_pause_quirk_heights_b = {
+		randomize_indexes_n = 0,
+		sound_events_n = 2,
+		sound_events = {
+			[1.0] = "loc_ogryn_b__combat_pause_quirk_heights_b_01",
+			[2.0] = "loc_ogryn_b__combat_pause_quirk_heights_b_02"
+		},
+		sound_events_duration = {
+			[1.0] = 5.391708,
+			[2.0] = 5.198167
+		},
+		randomize_indexes = {}
+	},
 	combat_pause_quirk_lonely_b = {
 		randomize_indexes_n = 0,
 		sound_events_n = 2,

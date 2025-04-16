@@ -1,7 +1,6 @@
 local Promise = require("scripts/foundation/utilities/promise")
 local UISettings = require("scripts/settings/ui/ui_settings")
 local MasteryUtils = require("scripts/utilities/mastery")
-local MasteryUtils = require("scripts/utilities/mastery")
 local MasterItems = require("scripts/backend/master_items")
 local ItemUtils = require("scripts/utilities/items")
 local MasteryService = class("MasteryService")
@@ -20,6 +19,25 @@ function MasteryService:_convert_mastery_data(mastery_data)
 		for i = 1, #milestones do
 			local milestone = milestones[i]
 			milestone.level = i
+			local claims = mastery_progress.claims and mastery_progress.claims[tostring(i - 1)]
+
+			if claims then
+				for reward_id, reward_data in pairs(milestone.rewards) do
+					local claimed_reward = nil
+
+					for f = 1, #claims do
+						local claim_id = claims[f]
+
+						if claim_id == reward_id then
+							claimed_reward = true
+
+							break
+						end
+					end
+
+					milestone.rewards[reward_id].claimed = claimed_reward
+				end
+			end
 		end
 
 		for i = 1, #milestones do
@@ -46,11 +64,11 @@ function MasteryService:_convert_mastery_data(mastery_data)
 		end
 
 		return {
-			current_xp = current_xp,
+			current_xp = math.floor(current_xp),
 			mastery_level = current_level or 0,
 			milestones = milestones,
-			start_xp = start_exp,
-			end_xp = end_exp,
+			start_xp = start_exp and math.floor(start_exp),
+			end_xp = end_exp and math.floor(end_exp),
 			mastery_id = pattern_name,
 			id = mastery_progress.id,
 			claimed_level = claimed_level
@@ -142,10 +160,6 @@ function MasteryService:get_all_masteries(optional_account_id)
 	end)
 end
 
-function MasteryService:claim_tier(track_id, tier)
-	return self._backend_interface.tracks:claim_track_tier(track_id, tier)
-end
-
 function MasteryService:get_mastery(track_id, optional_account_id)
 	return self:_get_masteries_tracks():next(function ()
 		return self._backend_interface.tracks:get_track(track_id):next(function (mastery)
@@ -194,6 +208,12 @@ end
 
 function MasteryService:purchase_traits(pattern_name, traits_data)
 	local operations = table.clone(traits_data)
+
+	for i = 1, #operations do
+		local operation = operations[i]
+		operation.operation_index = i
+	end
+
 	local failed_traits = {}
 
 	local function _recursive_purchase_trait(trait_data)
@@ -206,16 +226,38 @@ function MasteryService:purchase_traits(pattern_name, traits_data)
 		else
 			local trait_name = trait_data.trait_name
 			local rarity = trait_data.rarity
-			local index = trait_data.index
 
 			return _purchase_trait(self, pattern_name, trait_name, rarity):next(function ()
 				table.remove(operations, 1)
 
 				return _recursive_purchase_trait(operations[1])
 			end):catch(function ()
-				failed_traits[#failed_traits + 1] = operations[1]
+				local invalid_operations_indices = {}
 
-				table.remove(operations, 1)
+				for i = 1, #operations do
+					local operation = operations[i]
+
+					if operation.trait_name == trait_name then
+						failed_traits[#failed_traits + 1] = operation
+						invalid_operations_indices[#invalid_operations_indices + 1] = operation.operation_index
+					end
+				end
+
+				while #invalid_operations_indices > 0 do
+					local operation_index = invalid_operations_indices[1]
+
+					for i = 1, #operations do
+						local operation = operations[i]
+
+						if operation_index == operation.operation_index then
+							table.remove(operations, i)
+
+							break
+						end
+					end
+
+					table.remove(invalid_operations_indices, 1)
+				end
 
 				return _recursive_purchase_trait(operations[1])
 			end)
@@ -254,7 +296,15 @@ function MasteryService:claim_level(mastery_data, level_to_claim)
 
 	local track_id = self._mastery_track_ids[mastery_data.mastery_id]
 
-	return Managers.data_service.mastery:claim_tier(track_id, level_to_claim)
+	return self._backend_interface.tracks:claim_track_tier(track_id, level_to_claim):next(function ()
+		local rewards = mastery_data.milestones and mastery_data.milestones[level_to_claim] and mastery_data.milestones[level_to_claim].rewards
+
+		if rewards then
+			for reward_id, data in pairs(rewards) do
+				-- Nothing
+			end
+		end
+	end)
 end
 
 function MasteryService:claim_levels_by_new_exp(mastery_data, new_exp)
@@ -333,10 +383,12 @@ function MasteryService:check_and_claim_all_masteries_levels(masteries_data)
 		promises[#promises + 1] = self:claim_levels_by_new_exp(mastery_data)
 	end
 
+	local claim_promise = nil
+
 	if table.is_empty(promises) then
-		return Promise.resolved({})
+		claim_promise = Promise.resolved({})
 	else
-		return Promise.all(unpack(promises)):next(function (data)
+		claim_promise = Promise.all(unpack(promises)):next(function (data)
 			local result = {}
 
 			for index, mastery_data in pairs(data) do
@@ -348,6 +400,24 @@ function MasteryService:check_and_claim_all_masteries_levels(masteries_data)
 			return result
 		end)
 	end
+
+	return claim_promise:next(function ()
+		local missing_rewards_promises = {}
+
+		for index, mastery_data in pairs(masteries_data) do
+			local missing_rewards = MasteryUtils.get_unclaimed_rewards(mastery_data)
+			local track_id = self._mastery_track_ids[mastery_data.mastery_id]
+
+			for tier, reward_ids in pairs(missing_rewards) do
+				for i = 1, #reward_ids do
+					local reward_id = reward_ids[i]
+					missing_rewards_promises[#missing_rewards_promises + 1] = self._backend_interface.tracks:claim_track_tier_reward(track_id, tier, reward_id)
+				end
+			end
+		end
+
+		return Promise.all(unpack(missing_rewards_promises))
+	end)
 end
 
 function MasteryService:get_track_id(mastery_id)

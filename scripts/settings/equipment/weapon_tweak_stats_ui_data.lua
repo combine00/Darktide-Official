@@ -68,6 +68,20 @@ local impact_armor_damage_modifiers = {
 }
 local stat_descriptions = {
 	charge = {
+		overheat_decay = {
+			auto_vent_duration = {
+				display_units = "s",
+				display_type = "default",
+				display_name = "loc_weapon_stats_display_heat_decay"
+			}
+		},
+		overheat_overtime = {
+			overheat_percent = {
+				display_units = "%",
+				display_type = "percentage",
+				display_name = "loc_weapon_stats_display_heat_generation"
+			}
+		},
 		overheat_percent = {
 			display_name = "loc_weapon_stats_display_heat_resistance",
 			display_type = "default"

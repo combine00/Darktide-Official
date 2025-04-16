@@ -77,21 +77,63 @@ local function generate_base_template(functional_unit, visual_unit, allow_rotati
 			}
 		},
 		action_input_hierarchy = {
-			grenade_ability = "stay",
-			wield = "base",
-			cancel = "stay",
-			unwield_to_previous = "stay",
-			aim_force_field = {
-				place_force_field = "base",
-				wield = "base",
-				cancel = "base",
-				grenade_ability = "base"
+			{
+				input = "aim_force_field",
+				transition = {
+					{
+						transition = "base",
+						input = "place_force_field"
+					},
+					{
+						transition = "base",
+						input = "wield"
+					},
+					{
+						transition = "base",
+						input = "cancel"
+					},
+					{
+						transition = "base",
+						input = "grenade_ability"
+					}
+				}
 			},
-			instant_aim_force_field = {
-				wield = "base",
-				instant_place_force_field = "base",
-				cancel = "base",
-				grenade_ability = "base"
+			{
+				input = "instant_aim_force_field",
+				transition = {
+					{
+						transition = "base",
+						input = "instant_place_force_field"
+					},
+					{
+						transition = "base",
+						input = "wield"
+					},
+					{
+						transition = "base",
+						input = "cancel"
+					},
+					{
+						transition = "base",
+						input = "grenade_ability"
+					}
+				}
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "stay",
+				input = "cancel"
+			},
+			{
+				transition = "stay",
+				input = "unwield_to_previous"
+			},
+			{
+				transition = "stay",
+				input = "grenade_ability"
 			}
 		},
 		actions = {

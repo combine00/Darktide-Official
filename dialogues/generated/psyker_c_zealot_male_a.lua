@@ -81,10 +81,6 @@ local psyker_c_zealot_male_a = {
 			[1.0] = 6.653896,
 			[2.0] = 4.728729
 		},
-		sound_event_weights = {
-			[1.0] = 0.5,
-			[2.0] = 0.5
-		},
 		randomize_indexes = {}
 	},
 	combat_pause_quirk_messelina_b = {
@@ -97,10 +93,6 @@ local psyker_c_zealot_male_a = {
 		sound_events_duration = {
 			[1.0] = 5.780708,
 			[2.0] = 7.30825
-		},
-		sound_event_weights = {
-			[1.0] = 0.5,
-			[2.0] = 0.5
 		},
 		randomize_indexes = {}
 	},

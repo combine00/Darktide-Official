@@ -381,12 +381,12 @@ Destructible.component_data = {
 	},
 	broadphase_radius = {
 		ui_type = "number",
-		min = 10,
-		max = 100,
-		decimals = 0,
-		value = 40,
+		min = 0.1,
+		max = 40,
+		decimals = 2,
+		value = 1,
 		ui_name = "Broadphase Radius",
-		step = 1
+		step = 0.1
 	},
 	mass = {
 		ui_type = "number",
@@ -476,7 +476,8 @@ Destructible.component_data = {
 		}
 	},
 	extensions = {
-		"DestructibleExtension"
+		"DestructibleExtension",
+		"BroadphaseExtension"
 	}
 }
 

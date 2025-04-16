@@ -126,7 +126,7 @@ local weapon_dodge_templates = {
 			lerp_basic = 2
 		},
 		diminishing_return_limit = {
-			lerp_perfect = 3,
+			lerp_perfect = 4,
 			lerp_basic = 2
 		},
 		speed_modifier = {
@@ -176,6 +176,28 @@ local weapon_dodge_templates = {
 		},
 		speed_modifier = {
 			lerp_perfect = 0.9,
+			lerp_basic = 0.9
+		}
+	},
+	ogryn_fast = {
+		distance_scale = {
+			lerp_perfect = 1.1,
+			lerp_basic = 0.8
+		},
+		diminishing_return_distance_modifier = {
+			lerp_perfect = 0.2,
+			lerp_basic = 0.4
+		},
+		diminishing_return_start = {
+			lerp_perfect = 4,
+			lerp_basic = 2
+		},
+		diminishing_return_limit = {
+			lerp_perfect = 4,
+			lerp_basic = 2
+		},
+		speed_modifier = {
+			lerp_perfect = 1,
 			lerp_basic = 0.9
 		}
 	},

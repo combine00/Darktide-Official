@@ -31,6 +31,10 @@ function BroadphaseExtension:setup_from_component(broadphase_category, broadphas
 	self:_add_to_broadphase()
 end
 
+function BroadphaseExtension:broadphase_radius()
+	return self._broadphase_radius
+end
+
 function BroadphaseExtension:_add_to_broadphase()
 	local unit = self._unit
 	local broadphase = self._broadphase

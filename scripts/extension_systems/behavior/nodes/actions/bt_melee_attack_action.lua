@@ -274,14 +274,18 @@ function BtMeleeAttackAction:_start_attack_anim(unit, breed, target_unit, t, spa
 		local dodge_window = (action_data.dodge_window or DEFAULT_DODGE_WINDOW) + extra_timing
 		scratchpad.dodge_window = scratchpad.attack_timing - dodge_window
 		scratchpad.backstab_timing = scratchpad.attack_timing - backstab_timing - extra_timing
-		local target_weapon_template = nil
+		local target_weapon_template, target_buff_extension = nil
 
 		if target_player then
 			local target_weapon_action_component = target_unit_data_extension:read_component("weapon_action")
 			target_weapon_template = WeaponTemplate.current_weapon_template(target_weapon_action_component)
 		end
 
-		local is_blockable = Block.attack_is_blockable(action_data.damage_profile, target_unit, target_weapon_template)
+		if target_unit then
+			target_buff_extension = ScriptUnit.extension(target_unit, "buff_system")
+		end
+
+		local is_blockable = Block.attack_is_blockable(action_data.damage_profile, target_unit, target_weapon_template, target_buff_extension)
 
 		if not is_blockable then
 			scratchpad.attack_timing = scratchpad.attack_timing + extra_timing * 0.5

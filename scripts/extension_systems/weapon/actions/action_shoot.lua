@@ -5,15 +5,13 @@ local ActionUtility = require("scripts/extension_systems/weapon/actions/utilitie
 local AimAssist = require("scripts/utilities/aim_assist")
 local BuffSettings = require("scripts/settings/buff/buff_settings")
 local Component = require("scripts/utilities/component")
-local InputDevice = require("scripts/managers/input/input_device")
 local LagCompensation = require("scripts/utilities/lag_compensation")
 local Overheat = require("scripts/utilities/overheat")
 local PlayerUnitData = require("scripts/extension_systems/unit_data/utilities/player_unit_data")
 local PowerLevelSettings = require("scripts/settings/damage/power_level_settings")
 local Recoil = require("scripts/utilities/recoil")
-local ReloadStates = require("scripts/extension_systems/weapon/utilities/reload_states")
 local SmartTargeting = require("scripts/utilities/smart_targeting")
-local SpecialRulesSetting = require("scripts/settings/ability/special_rules_settings")
+local SpecialRulesSettings = require("scripts/settings/ability/special_rules_settings")
 local Spread = require("scripts/utilities/spread")
 local Suppression = require("scripts/utilities/attack/suppression")
 local Sway = require("scripts/utilities/sway")
@@ -22,7 +20,8 @@ local Vo = require("scripts/utilities/vo")
 local ActionShoot = class("ActionShoot", "ActionWeaponBase")
 local buff_keywords = BuffSettings.keywords
 local proc_events = BuffSettings.proc_events
-local special_rules = SpecialRulesSetting.special_rules
+local special_rules = SpecialRulesSettings.special_rules
+local talent_settings_ogryn_1 = TalentSettings.ogryn_1
 local DEFUALT_NUM_CRITICAL_SHOTS = 1
 local DEFAULT_POWER_LEVEL = PowerLevelSettings.default_power_level
 local EMPTY_TABLE = {}
@@ -105,9 +104,9 @@ function ActionShoot:start(action_settings, t, time_scale, params)
 		local leadbelcher_chance = 0
 
 		if check_leadbelcher then
-			leadbelcher_chance = TalentSettings.ogryn_1.passive_1.free_ammo_proc_chance
+			leadbelcher_chance = talent_settings_ogryn_1.passive_1.free_ammo_proc_chance
 		elseif check_leadbelcher_improved then
-			leadbelcher_chance = TalentSettings.ogryn_1.spec_passive_2.increased_passive_proc_chance
+			leadbelcher_chance = talent_settings_ogryn_1.spec_passive_2.increased_passive_proc_chance
 		end
 
 		self._leadbelcher_shot = self:_check_for_lucky_strike(false, true, leadbelcher_chance)
@@ -153,6 +152,8 @@ function ActionShoot:start(action_settings, t, time_scale, params)
 		self._weapon_extension:set_wielded_weapon_weapon_special_active(t, true)
 
 		self._weapon_action_component.special_active_at_start = true
+
+		self:_set_haptic_trigger_template(self._action_settings, self._weapon_template)
 	end
 
 	local special_active = inventory_slot_component.special_active
@@ -240,6 +241,15 @@ function ActionShoot:fixed_update(dt, t, time_in_action)
 		if not self._unit_data_extension.is_resimulating then
 			table.clear(self._shot_result)
 			self:_shoot(position, rotation, DEFAULT_POWER_LEVEL, charge_level, t)
+
+			if IS_PLAYSTATION and self._is_local_unit and self._is_human_controlled then
+				local fire_rate_settings = self:_fire_rate_settings()
+				local auto_fire_time = fire_rate_settings.auto_fire_time
+				auto_fire_time = auto_fire_time and self:_scale_auto_fire_time_with_buffs(auto_fire_time)
+				local frequency = auto_fire_time and 1 / auto_fire_time or 0
+
+				Managers.input.haptic_trigger_effects:trigger_vibration(frequency)
+			end
 		end
 
 		self._has_shot_this_frame = true
@@ -497,6 +507,22 @@ function ActionShoot:_set_fire_state(t, new_fire_state)
 	if new_fire_state == "shot" or new_fire_state == "waiting_to_shoot" then
 		self:_check_for_auto_critical_strike_end(t, new_fire_state)
 	end
+
+	if IS_PLAYSTATION and new_fire_state == "shot" and self._is_local_unit and self._is_human_controlled then
+		Managers.input.haptic_trigger_effects:stop_vibration()
+	end
+end
+
+function ActionShoot:server_correction_occurred()
+	ActionShoot.super.server_correction_occurred(self)
+
+	if IS_PLAYSTATION then
+		local fire_state = self._action_component.fire_state
+
+		if fire_state == "shot" and self._is_local_unit and self._is_human_controlled then
+			Managers.input.haptic_trigger_effects:stop_vibration()
+		end
+	end
 end
 
 function ActionShoot:finish(reason, data, t, time_in_action)
@@ -547,6 +573,10 @@ function ActionShoot:finish(reason, data, t, time_in_action)
 
 	self._leadbelcher_shot = false
 	action_component.num_shots_fired = 0
+
+	if IS_PLAYSTATION and self._is_local_unit and self._is_human_controlled then
+		Managers.input.haptic_trigger_effects:stop_vibration()
+	end
 end
 
 function ActionShoot:_rewind_ms(is_local_unit, player, position, direction, max_distance)
@@ -831,9 +861,9 @@ function ActionShoot:_check_for_auto_critical_strike()
 		local leadbelcher_chance = 0
 
 		if check_leadbelcher then
-			leadbelcher_chance = TalentSettings.ogryn_1.passive_1.free_ammo_proc_chance
+			leadbelcher_chance = talent_settings_ogryn_1.passive_1.free_ammo_proc_chance
 		elseif check_leadbelcher_improved then
-			leadbelcher_chance = TalentSettings.ogryn_1.spec_passive_2.increased_passive_proc_chance
+			leadbelcher_chance = talent_settings_ogryn_1.spec_passive_2.increased_passive_proc_chance
 		end
 
 		self._leadbelcher_shot = self:_check_for_lucky_strike(false, true, leadbelcher_chance)

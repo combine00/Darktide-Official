@@ -62,10 +62,6 @@ local psyker_c_ogryn_a = {
 			[1.0] = 4.200229,
 			[2.0] = 1.894094
 		},
-		sound_event_weights = {
-			[1.0] = 0.5,
-			[2.0] = 0.5
-		},
 		randomize_indexes = {}
 	},
 	combat_pause_quirk_messelina_b = {
@@ -78,10 +74,6 @@ local psyker_c_ogryn_a = {
 		sound_events_duration = {
 			[1.0] = 3.73376,
 			[2.0] = 2.060031
-		},
-		sound_event_weights = {
-			[1.0] = 0.5,
-			[2.0] = 0.5
 		},
 		randomize_indexes = {}
 	},

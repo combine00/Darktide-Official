@@ -38,6 +38,12 @@ function Interactable:init(unit, is_server)
 			action_text = nil
 		end
 
+		local missing_players_text = self:get_data(unit, "missing_players_description")
+
+		if missing_players_text == "" then
+			missing_players_text = nil
+		end
+
 		if not start_enabled then
 			self:interactable_disable(unit)
 		end
@@ -49,6 +55,7 @@ function Interactable:init(unit, is_server)
 			interactor_item_to_equip = interactor_item_to_equip,
 			description = description,
 			action_text = action_text,
+			missing_players_text = missing_players_text,
 			interaction_icon = interaction_icon ~= "use_template" and interaction_icon or nil,
 			ui_interaction_type = ui_interaction_type ~= "use_template" and ui_interaction_type or nil,
 			display_start_event = display_start_event
@@ -58,7 +65,7 @@ function Interactable:init(unit, is_server)
 		interactee_extension:set_emissive_material_name(emissive_material_name)
 
 		if require_all_players then
-			interactee_extension:set_block_text("loc_action_interaction_generic_missing_players")
+			interactee_extension:set_block_text(missing_players_text or "loc_action_interaction_generic_missing_players")
 		end
 
 		local has_animation_state_machine = Unit.has_animation_state_machine(unit)
@@ -152,6 +159,15 @@ end
 
 function Interactable:interactable_disable(unit)
 	self:disable(unit)
+end
+
+function Interactable:interactable_disable_local(unit)
+	self:disable(unit, true)
+
+	local interactee_extension = self._interactee_extension
+
+	interactee_extension:set_active(false)
+	interactee_extension:disable_active_hotjoin_sync()
 end
 
 function Interactable:interactable_clear_block(unit)
@@ -315,6 +331,7 @@ Interactable.component_data = {
 			"default",
 			"door_control_panel",
 			"equip_auspex",
+			"gamemode_havoc",
 			"health_station",
 			"health",
 			"inbox",
@@ -349,6 +366,7 @@ Interactable.component_data = {
 			"default",
 			"door_control_panel",
 			"equip_auspex",
+			"gamemode_havoc",
 			"health_station",
 			"health",
 			"inbox",
@@ -484,6 +502,12 @@ Interactable.component_data = {
 		ui_type = "text_box",
 		value = "",
 		ui_name = "Override Action Text",
+		category = "UI"
+	},
+	missing_players_description = {
+		ui_type = "text_box",
+		value = "",
+		ui_name = "Override Missing Players Text",
 		category = "UI"
 	},
 	support_simple_animation = {

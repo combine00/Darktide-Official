@@ -4969,6 +4969,68 @@ return function ()
 		}
 	})
 	define_rule({
+		post_wwise_event = "play_radio_static_end",
+		concurrent_wwise_event = "play_vox_static_loop",
+		pre_wwise_event = "play_radio_static_start",
+		name = "eavesdropping_training_ground_psyker",
+		response = "eavesdropping_training_ground_psyker",
+		database = "conversations_core",
+		wwise_route = 1,
+		category = "vox_prio_0",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"lore_training_psyker_one_c",
+					"lore_training_psyker_four_c"
+				}
+			},
+			{
+				"user_context",
+				"class_name",
+				OP.SET_INCLUDES,
+				args = {
+					"training_ground_psyker"
+				}
+			},
+			{
+				"faction_memory",
+				"eavesdropping",
+				OP.EQ,
+				"0"
+			}
+		},
+		on_done = {
+			{
+				"faction_memory",
+				"eavesdropping",
+				OP.ADD,
+				1
+			}
+		},
+		heard_speak_routing = {
+			target = "disabled"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			},
+			random_ignore_vo = {
+				chance = 0.1,
+				max_failed_tries = 0,
+				hold_for = 0
+			}
+		}
+	})
+	define_rule({
 		name = "enemy_kill_berserker_ext_01_b",
 		wwise_route = 0,
 		response = "enemy_kill_berserker_ext_01_b",
@@ -5237,8 +5299,7 @@ return function ()
 				OP.SET_INTERSECTS,
 				args = {
 					"veteran_female_a",
-					"veteran_male_c",
-					"ogryn_d"
+					"veteran_male_c"
 				}
 			},
 			{
@@ -5280,7 +5341,7 @@ return function ()
 				duration = 0.2
 			},
 			random_ignore_vo = {
-				chance = 0.1,
+				chance = 0.3,
 				max_failed_tries = 0,
 				hold_for = 0
 			}
@@ -5313,8 +5374,7 @@ return function ()
 				OP.SET_INCLUDES,
 				args = {
 					"veteran_female_a",
-					"veteran_male_c",
-					"ogryn_d"
+					"veteran_male_c"
 				}
 			}
 		},
@@ -5505,7 +5565,7 @@ return function ()
 				duration = 0.2
 			},
 			random_ignore_vo = {
-				chance = 0.1,
+				chance = 0.2,
 				max_failed_tries = 0,
 				hold_for = 0
 			}
@@ -5635,8 +5695,7 @@ return function ()
 				OP.SET_INCLUDES,
 				args = {
 					"psyker_female_a",
-					"veteran_female_b",
-					"ogryn_d"
+					"veteran_female_b"
 				}
 			},
 			{
@@ -5686,7 +5745,7 @@ return function ()
 				duration = 0.2
 			},
 			random_ignore_vo = {
-				chance = 0.1,
+				chance = 0.2,
 				max_failed_tries = 0,
 				hold_for = 0
 			}
@@ -5760,8 +5819,7 @@ return function ()
 				OP.SET_INCLUDES,
 				args = {
 					"psyker_female_a",
-					"veteran_female_b",
-					"ogryn_d"
+					"veteran_female_b"
 				}
 			},
 			{
@@ -5870,7 +5928,7 @@ return function ()
 				duration = 0.2
 			},
 			random_ignore_vo = {
-				chance = 0.1,
+				chance = 0.3,
 				max_failed_tries = 0,
 				hold_for = 0
 			}
@@ -6079,7 +6137,7 @@ return function ()
 				duration = 0.2
 			},
 			random_ignore_vo = {
-				chance = 0.3,
+				chance = 0.4,
 				max_failed_tries = 0,
 				hold_for = 0
 			}
@@ -6253,7 +6311,7 @@ return function ()
 				duration = 0.2
 			},
 			random_ignore_vo = {
-				chance = 0.1,
+				chance = 0.3,
 				max_failed_tries = 0,
 				hold_for = 0
 			}
@@ -6470,7 +6528,7 @@ return function ()
 				duration = 0.2
 			},
 			random_ignore_vo = {
-				chance = 0.1,
+				chance = 0.3,
 				max_failed_tries = 0,
 				hold_for = 0
 			}
@@ -6649,7 +6707,7 @@ return function ()
 				duration = 0.2
 			},
 			random_ignore_vo = {
-				chance = 0.1,
+				chance = 0.2,
 				max_failed_tries = 0,
 				hold_for = 0
 			}
@@ -6796,8 +6854,7 @@ return function ()
 				OP.SET_INTERSECTS,
 				args = {
 					"ogryn_c",
-					"psyker_male_a",
-					"ogryn_d"
+					"psyker_male_a"
 				}
 			},
 			{
@@ -6823,7 +6880,7 @@ return function ()
 				duration = 0.2
 			},
 			random_ignore_vo = {
-				chance = 0.1,
+				chance = 0.3,
 				max_failed_tries = 0,
 				hold_for = 0
 			}
@@ -6898,7 +6955,6 @@ return function ()
 				OP.SET_INCLUDES,
 				args = {
 					"ogryn_c",
-					"ogryn_d",
 					"psyker_male_a"
 				}
 			}
@@ -6999,7 +7055,7 @@ return function ()
 				duration = 0.2
 			},
 			random_ignore_vo = {
-				chance = 0.1,
+				chance = 0.3,
 				max_failed_tries = 0,
 				hold_for = 0
 			}
@@ -25147,7 +25203,7 @@ return function ()
 		},
 		on_done = {},
 		heard_speak_routing = {
-			target = "players"
+			target = "mission_giver_default"
 		},
 		on_pre_rule_execution = {
 			delay_vo = {
@@ -25355,7 +25411,7 @@ return function ()
 		},
 		on_done = {},
 		heard_speak_routing = {
-			target = "players"
+			target = "mission_giver_default"
 		},
 		on_pre_rule_execution = {
 			delay_vo = {

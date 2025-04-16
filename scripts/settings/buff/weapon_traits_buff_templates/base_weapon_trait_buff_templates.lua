@@ -2196,9 +2196,42 @@ base_templates.warp_burninating_on_crits_melee = {
 		allow_weapon_special = true
 	},
 	conditional_proc_func = ConditionalFunctions.is_item_slot_wielded,
-	check_proc_func = CheckProcFunctions.all(CheckProcFunctions.on_item_match, CheckProcFunctions.on_melee_crit_hit, CheckProcFunctions.on_damaging_hit),
+	check_proc_func = function (params, template_data, template_context, t)
+		if not CheckProcFunctions.on_item_match(params, template_data, template_context, t) then
+			return false
+		end
+
+		if not CheckProcFunctions.on_damaging_hit(params, template_data, template_context, t) then
+			return false
+		end
+
+		if not CheckProcFunctions.on_melee_crit_hit(params, template_data, template_context, t) and not CheckProcFunctions.on_shout_crit_hit(params, template_data, template_context, t) then
+			return false
+		end
+
+		return true
+	end,
 	start_func = _add_debuff_on_hit_start,
 	proc_func = _add_debuff_on_hit_proc
+}
+base_templates.wind_slash_crits = {
+	class_name = "proc_buff",
+	cooldown_duration = 50,
+	max_stacks = 1,
+	predicted = false,
+	proc_events = {
+		[proc_events.on_sweep_start] = 1
+	},
+	conditional_keywords = {
+		keywords.guaranteed_wind_slash_critical_strike
+	},
+	conditional_keywords_func = function (template_data, template_context)
+		return template_context.active
+	end,
+	check_proc_func = CheckProcFunctions.is_weapon_special_active,
+	proc_func = function (params, template_data, template_context, t)
+		return
+	end
 }
 base_templates.double_shot_on_crit = {
 	hide_icon_in_hud = true,
@@ -2232,11 +2265,11 @@ base_templates.uninterruptable_while_charging = {
 		template_data.weapon_action_component = weapon_action_component
 	end,
 	conditional_stat_buffs_func = function (template_data, template_context)
-		local uninteruptable_actions = template_context.template.uninteruptable_actions
+		local uninterruptable_actions = template_context.template.uninterruptable_actions
 		local weapon_action_component = template_data.weapon_action_component
 		local current_action_name = weapon_action_component.current_action_name
 
-		return uninteruptable_actions[current_action_name] and ConditionalFunctions.is_item_slot_wielded(template_data, template_context)
+		return uninterruptable_actions[current_action_name] and ConditionalFunctions.is_item_slot_wielded(template_data, template_context)
 	end
 }
 base_templates.stacking_buff_on_charge_level = {

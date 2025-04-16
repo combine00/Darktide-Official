@@ -8,24 +8,17 @@ local math_clamp = math.clamp
 local math_lerp = math.lerp
 local math_pow = math.pow
 local math_sign = math.sign
-
-local function _input_threshold(input_axis, threshold)
-	local length = Vector3.length(input_axis)
-
-	if length < threshold then
-		input_axis.x = 0
-		input_axis.y = 0
-		input_axis.z = 0
-	end
-end
-
+local math_min = math.min
+local math_max = math.max
+local math_ease_out_exp = math.ease_out_exp
+local math_pi = math.pi
 local min = -100
 local max = 100
 
 local function _k_value(k_min, k_max, strength)
 	local lerp_t = (strength - min) / (max - min)
 
-	return math.lerp(k_min, k_max, lerp_t)
+	return math_lerp(k_min, k_max, lerp_t)
 end
 
 local _response_curve_funcs = {
@@ -34,22 +27,22 @@ local _response_curve_funcs = {
 	end,
 	exponential = function (n, strength)
 		local k = _k_value(0.5, 2, strength)
-		local abs_n = math.abs(n)
-		local mod = abs_n^k * math.sign(n)
+		local abs_n = math_abs(n)
+		local mod = abs_n^k * math_sign(n)
 
 		return mod
 	end,
 	dynamic = function (n, strength)
 		local k = _k_value(0.7, -0.7, strength)
 		local mod = nil
-		local abs_n = math.abs(n)
+		local abs_n = math_abs(n)
 
 		if abs_n > 0.5 then
 			local numerator = -k * 2 * (abs_n - 0.5) - 2 * (abs_n - 0.5)
 			local denominator = 2 * -k * 2 * (abs_n - 0.5) + k - 1
-			mod = (numerator / denominator * 0.5 + 0.5) * math.sign(n)
+			mod = (numerator / denominator * 0.5 + 0.5) * math_sign(n)
 		else
-			mod = (k * 2 * abs_n - 2 * abs_n) / (2 * k * 2 * abs_n - k - 1) * 0.5 * math.sign(n)
+			mod = (k * 2 * abs_n - 2 * abs_n) / (2 * k * 2 * abs_n - k - 1) * 0.5 * math_sign(n)
 		end
 
 		return mod
@@ -132,8 +125,6 @@ InputFilters.scale_vector3 = {
 		local val = input_service:get(filter_data.input_mappings)
 		val = Vector3.multiply_elements(val, Vector3(1, invert_look_y, 1))
 
-		_input_threshold(val, settings[filter_data.input_threshold] or 0)
-
 		return val * scale
 	end,
 	edit_types = {
@@ -161,9 +152,6 @@ InputFilters.scale_vector3_xy_accelerated_x = {
 		local response_curve_strength = settings[filter_data.response_curve_strength]
 		local val = input_service:get(filter_data.input_mappings)
 		val = Vector3.multiply_elements(val, Vector3(1, invert_look_y, 1))
-
-		_input_threshold(val, settings[filter_data.input_threshold] or 0)
-
 		local mean_dt = Managers.time:mean_dt()
 		local time = Application.time_since_launch()
 
@@ -334,11 +322,11 @@ InputFilters.scalar_combine = {
 		end
 
 		if filter_data.max_value then
-			return_value = math.min(return_value, filter_data.max_value)
+			return_value = math_min(return_value, filter_data.max_value)
 		end
 
 		if filter_data.min_value then
-			return_value = math.max(return_value, filter_data.min_value)
+			return_value = math_max(return_value, filter_data.min_value)
 		end
 
 		if filter_data.to_bool then
@@ -379,7 +367,7 @@ InputFilters.navigate_filter_continuous = {
 	end,
 	update = function (filter_data, input_service)
 		local dt = Managers.time:mean_dt()
-		filter_data.cooldown = math.max(filter_data.cooldown - dt, 0)
+		filter_data.cooldown = math_max(filter_data.cooldown - dt, 0)
 		local disabled = filter_data.cooldown > 0
 		local input_mapping_found = false
 
@@ -409,7 +397,7 @@ InputFilters.navigate_filter_continuous = {
 		if disabled and (input_mapping_found or axis_mapping_found) then
 			local min_multiplier = menu_navigation_settings.view_min_speed_multiplier
 			local view_speed_multiplier_decrease = menu_navigation_settings.view_speed_multiplier_decrease
-			filter_data.cooldown_speed_multiplier = math.max(filter_data.cooldown_speed_multiplier - view_speed_multiplier_decrease * dt, min_multiplier)
+			filter_data.cooldown_speed_multiplier = math_max(filter_data.cooldown_speed_multiplier - view_speed_multiplier_decrease * dt, min_multiplier)
 		end
 
 		if not input_mapping_found and not axis_mapping_found then
@@ -450,7 +438,7 @@ InputFilters.navigate_filter_continuous_fast = {
 	end,
 	update = function (filter_data, input_service)
 		local dt = Managers.time:mean_dt()
-		filter_data.cooldown = math.max(filter_data.cooldown - dt, 0)
+		filter_data.cooldown = math_max(filter_data.cooldown - dt, 0)
 		local disabled = filter_data.cooldown > 0
 		local input_mapping_found = false
 
@@ -480,7 +468,7 @@ InputFilters.navigate_filter_continuous_fast = {
 		if disabled and (input_mapping_found or axis_mapping_found) then
 			local min_multiplier = menu_navigation_settings.view_min_fast_speed_multiplier
 			local view_speed_multiplier_decrease = menu_navigation_settings.view_speed_multiplier_decrease
-			filter_data.cooldown_speed_multiplier = math.max(filter_data.cooldown_speed_multiplier - view_speed_multiplier_decrease * dt, min_multiplier)
+			filter_data.cooldown_speed_multiplier = math_max(filter_data.cooldown_speed_multiplier - view_speed_multiplier_decrease * dt, min_multiplier)
 		end
 
 		if not input_mapping_found and not axis_mapping_found then
@@ -520,7 +508,7 @@ InputFilters.navigate_axis_filter_continuous = {
 	end,
 	update = function (filter_data, input_service)
 		local dt = Managers.time:mean_dt()
-		filter_data.cooldown = math.max(filter_data.cooldown - dt, 0)
+		filter_data.cooldown = math_max(filter_data.cooldown - dt, 0)
 		local disabled = filter_data.cooldown > 0
 		local input_vector = Vector3(0, 0, 0)
 		local input_vector_length = 0
@@ -543,7 +531,7 @@ InputFilters.navigate_axis_filter_continuous = {
 		elseif disabled and input_vector_length > 0 then
 			local min_multiplier = menu_navigation_settings.view_min_speed_multiplier
 			local view_speed_multiplier_decrease = menu_navigation_settings.view_speed_multiplier_decrease
-			filter_data.cooldown_speed_multiplier = math.max(filter_data.cooldown_speed_multiplier - view_speed_multiplier_decrease * dt, min_multiplier)
+			filter_data.cooldown_speed_multiplier = math_max(filter_data.cooldown_speed_multiplier - view_speed_multiplier_decrease * dt, min_multiplier)
 			input_vector = Vector3(0, 0, 0)
 		elseif not disabled and input_vector_length > 0 then
 			filter_data.cooldown = filter_data.initial_cooldown * filter_data.cooldown_speed_multiplier
@@ -568,7 +556,7 @@ InputFilters.mouse_angle_constrained = {
 		current_pos = Vector3.clamp(current_pos, -filter_data.constraint, filter_data.constraint)
 		filter_data.current_pos = Vector3Box(current_pos)
 
-		return math.atan2(current_pos.y, current_pos.x)
+		return math_atan2(current_pos.y, current_pos.x)
 	end
 }
 

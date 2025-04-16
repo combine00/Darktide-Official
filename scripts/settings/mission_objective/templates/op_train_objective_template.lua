@@ -12,26 +12,28 @@ local mission_objective_templates = {
 				event_type = "end_event",
 				progress_bar = true,
 				duration_by_difficulty = {
-					750,
-					700,
-					600,
-					530,
-					500
+					825,
+					770,
+					660,
+					583,
+					550
 				}
 			},
 			objective_flash_train_alert = {
 				description = "loc_objective_op_train_alert_header",
-				objective_category = "overarching",
+				music_wwise_state = "operation_stage_3",
 				ui_state = "alert",
 				header = "loc_objective_op_train_alert_desc",
-				progress_timer = true,
-				duration = 30,
+				turn_off_backfill = true,
 				mission_objective_type = "timed",
-				music_wwise_state = "operation_stage_3"
+				objective_category = "overarching",
+				progress_timer = true,
+				duration = 30
 			},
 			objective_flash_train_defuse_bomb_one = {
 				description = "loc_objective_op_train_defuse_one_desc",
 				music_wwise_state = "operation_stage_1",
+				progression_sync_granularity = 0.001,
 				header = "loc_objective_op_train_defuse_one_header",
 				progress_bar = true,
 				mission_objective_type = "decode"
@@ -39,6 +41,7 @@ local mission_objective_templates = {
 			objective_flash_train_defuse_bomb_two = {
 				description = "loc_objective_op_train_defuse_two_desc",
 				music_wwise_state = "operation_stage_2",
+				progression_sync_granularity = 0.001,
 				header = "loc_objective_op_train_defuse_two_header",
 				turn_off_backfill = true,
 				progress_bar = true,
@@ -59,6 +62,7 @@ local mission_objective_templates = {
 			objective_flash_train_defuse_bomb_three = {
 				description = "loc_objective_op_train_defuse_final_desc",
 				music_wwise_state = "operation_stage_2",
+				progression_sync_granularity = 0.001,
 				header = "loc_objective_op_train_defuse_final_header",
 				progress_bar = true,
 				mission_objective_type = "decode"
@@ -67,6 +71,7 @@ local mission_objective_templates = {
 				description = "loc_objective_op_train_defuse_final_desc",
 				music_wwise_state = "operation_stage_2",
 				header = "loc_objective_op_train_defuse_final_header",
+				progression_sync_granularity = 0.001,
 				mission_objective_type = "decode",
 				hide_widget = true
 			},

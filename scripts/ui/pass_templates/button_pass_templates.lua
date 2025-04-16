@@ -1556,14 +1556,15 @@ ButtonPassTemplates.terminal_button_hold_small = {
 		style = terminal_button_small_text_style,
 		change_function = function (content, style)
 			local hotspot = content.hotspot
-			local default_color = hotspot.disabled and style.disabled_color or style.default_color
+			local disabled = hotspot.disabled or content.start_delay > 0
+			local default_color = disabled and style.disabled_color or style.default_color
 			local hover_color = style.hover_color
 			local text_color = style.text_color
 			local gamepad_active = hotspot.gamepad_active
 			local button_text = content.original_text or ""
 			local gamepad_action = content.input_action
 
-			if gamepad_active and gamepad_action and not hotspot.disabled and not content.ignore_gamepad_on_text then
+			if gamepad_active and gamepad_action and not disabled and not content.ignore_gamepad_on_text then
 				local service_type = "View"
 				local alias_key = Managers.ui:get_input_alias_key(gamepad_action, service_type)
 				local input_text = InputUtils.input_text_for_current_input_device(service_type, alias_key)
@@ -1585,6 +1586,7 @@ ButtonPassTemplates.terminal_button_hold_small = {
 		widget.content.timer = options.timer or 1
 		widget.content.current_timer = 0
 		widget.content.hold_progress = 0
+		widget.content.start_delay = options.start_delay or 0
 		widget.content.complete_function = options.complete_function
 		widget.content.hotspot.pressed_callback = nil
 		widget.content.input_action = options.input_action or "confirm_hold"
@@ -1604,12 +1606,7 @@ ButtonPassTemplates.terminal_button_hold_small = {
 			widget.content.hotspot.hold_sound = options.hold_sound
 		end
 
-		if options.keep_hold_active then
-			widget.content.keep_hold_active = true
-		else
-			widget.content.keep_hold_active = false
-		end
-
+		widget.content.keep_hold_active = not not options.keep_hold_active
 		local width = widget.content.size[1]
 		local height = widget.content.size[2]
 		widget.style.background.size = {
@@ -1643,14 +1640,20 @@ ButtonPassTemplates.terminal_button_hold_small = {
 		local content = widget.content
 		local hotspot = content.hotspot
 		local input_service = renderer.input_service
-		local hold_active = content.start_input_action and input_service and input_service:get(content.start_input_action) or hotspot.on_pressed
+		local button_pressed = content.start_input_action and input_service and input_service:get(content.start_input_action) or hotspot.on_pressed
 		local input_action = content.input_action and input_service and input_service:get(content.input_action)
-		local left_hold = input_service and (input_action or input_service:get("left_hold"))
+		local button_held = input_service and (input_action or input_service:get("left_hold"))
+		content.start_delay = math_max(content.start_delay - dt, 0)
 
-		if not left_hold and content.hold_active then
-			content.hold_active = nil
-		elseif not content.hold_active then
-			content.hold_active = hold_active
+		if content.start_delay > 0 then
+			button_held = false
+			button_pressed = false
+		end
+
+		if button_pressed then
+			content.hold_active = true
+		elseif not button_held then
+			content.hold_active = false
 		end
 
 		if content.hold_active and not hotspot.disabled then
@@ -3172,6 +3175,67 @@ ButtonPassTemplates.menu_panel_button = {
 		visibility_function = function (content)
 			return content.show_alert
 		end
+	},
+	{
+		style_id = "exclamation_mark",
+		pass_type = "texture",
+		value = "content/ui/materials/icons/generic/exclamation_mark",
+		style = {
+			vertical_alignment = "center",
+			horizontal_alignment = "right",
+			color = {
+				255,
+				246,
+				69,
+				69
+			},
+			size = {
+				16,
+				28
+			},
+			offset = {
+				10,
+				15,
+				2
+			}
+		},
+		visibility_function = function (content)
+			return content.show_warning
+		end
+	},
+	{
+		pass_type = "texture",
+		value = "content/ui/materials/icons/generic/exclamation_mark",
+		style_id = "modified_exclamation_mark",
+		style = {
+			vertical_alignment = "center",
+			horizontal_alignment = "right",
+			color = {
+				255,
+				246,
+				202,
+				69
+			},
+			size = {
+				16,
+				28
+			},
+			offset = {
+				10,
+				15,
+				2
+			}
+		},
+		visibility_function = function (content)
+			return content.show_modified
+		end,
+		change_function = function (content, style)
+			if content.show_warning then
+				style.offset[1] = 0
+			else
+				style.offset[1] = 10
+			end
+		end
 	}
 }
 local tab_menu_button_hotspot_content = {
@@ -3225,6 +3289,11 @@ ButtonPassTemplates.tab_menu_button = {
 		pass_type = "text",
 		value_id = "text",
 		style = table.clone(UIFontSettings.tab_menu_button),
+		change_function = function (content, style)
+			local hotspot = content.hotspot
+			local is_disabled = hotspot.disabled
+			style.text_color = is_disabled and style.disabled_color or style.default_color
+		end,
 		visibility_function = function (content, style)
 			local hotspot = content.hotspot
 
@@ -3239,8 +3308,7 @@ ButtonPassTemplates.tab_menu_button = {
 		change_function = function (content, style)
 			local hotspot = content.hotspot
 			local text_color = style.text_color
-			local math_max = math_max
-			local progress = math_max(math_max(hotspot.anim_focus_progress, hotspot.anim_select_progress), math_max(hotspot.anim_hover_progress, hotspot.anim_input_progress))
+			local progress = math_max(hotspot.anim_focus_progress, hotspot.anim_select_progress, hotspot.anim_hover_progress, hotspot.anim_input_progress)
 			text_color[1] = 255 * math.easeInCubic(progress)
 		end,
 		visibility_function = function (content, style)

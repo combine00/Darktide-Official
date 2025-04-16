@@ -1,9 +1,11 @@
+local ActionInputHierarchy = require("scripts/utilities/action/action_input_hierarchy")
 local ArmorSettings = require("scripts/settings/damage/armor_settings")
 local BaseTemplateSettings = require("scripts/settings/equipment/weapon_templates/base_template_settings")
 local BuffSettings = require("scripts/settings/buff/buff_settings")
 local DamageProfileTemplates = require("scripts/settings/damage/damage_profile_templates")
 local DamageSettings = require("scripts/settings/damage/damage_settings")
 local FootstepIntervalsTemplates = require("scripts/settings/equipment/footstep/footstep_intervals_templates")
+local HapticTriggerTemplates = require("scripts/settings/equipment/haptic_trigger_templates")
 local HerdingTemplates = require("scripts/settings/damage/herding_templates")
 local PlayerCharacterConstants = require("scripts/settings/player_character/player_character_constants")
 local ReloadTemplates = require("scripts/settings/equipment/reload_templates/reload_templates")
@@ -115,7 +117,7 @@ local weapon_template = {
 			}
 		},
 		stab = {
-			buffer_time = 0,
+			buffer_time = 0.3,
 			clear_input_queue = true,
 			input_sequence = {
 				{
@@ -130,26 +132,71 @@ local weapon_template = {
 table.add_missing(weapon_template.action_inputs, BaseTemplateSettings.action_inputs)
 
 weapon_template.action_input_hierarchy = {
-	wield = "stay",
-	shoot = "stay",
-	reload = "stay",
-	stab = "stay",
-	zoom = {
-		wield = "base",
-		zoom_release = "base",
-		grenade_ability = "base",
-		brace_reload = "stay",
-		combat_ability = "base",
-		zoom_shoot = {
-			brace_reload = "previous",
-			wield = "base",
-			zoom_release = "base",
-			shoot_release = "previous"
+	{
+		transition = "stay",
+		input = "shoot"
+	},
+	{
+		input = "zoom",
+		transition = {
+			{
+				transition = "base",
+				input = "zoom_release"
+			},
+			{
+				input = "zoom_shoot",
+				transition = {
+					{
+						transition = "previous",
+						input = "brace_reload"
+					},
+					{
+						transition = "base",
+						input = "zoom_release"
+					},
+					{
+						transition = "previous",
+						input = "shoot_release"
+					},
+					{
+						transition = "base",
+						input = "wield"
+					}
+				}
+			},
+			{
+				transition = "stay",
+				input = "brace_reload"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "grenade_ability"
+			}
 		}
+	},
+	{
+		transition = "stay",
+		input = "wield"
+	},
+	{
+		transition = "stay",
+		input = "reload"
+	},
+	{
+		transition = "stay",
+		input = "stab"
 	}
 }
 
-table.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
+ActionInputHierarchy.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
 
 weapon_template.actions = {
 	action_unwield = {
@@ -222,7 +269,7 @@ weapon_template.actions = {
 		total_time = 1,
 		action_movement_curve = {
 			{
-				modifier = 0.5,
+				modifier = 0.6,
 				t = 0.05
 			},
 			{
@@ -230,7 +277,7 @@ weapon_template.actions = {
 				t = 0.15
 			},
 			{
-				modifier = 0.775,
+				modifier = 0.8,
 				t = 0.175
 			},
 			{
@@ -241,7 +288,7 @@ weapon_template.actions = {
 				modifier = 1,
 				t = 0.5
 			},
-			start_modifier = 0.6
+			start_modifier = 0.7
 		},
 		fx = {
 			crit_shoot_sfx_alias = "critical_shot_extra",
@@ -373,10 +420,11 @@ weapon_template.actions = {
 		}
 	},
 	action_zoom = {
-		start_input = "zoom",
-		kind = "aim",
-		spread_template = "default_rippergun_braced",
 		uninterruptible = true,
+		kind = "aim",
+		start_input = "zoom",
+		weapon_handling_template = "time_scale_1_3",
+		spread_template = "default_rippergun_braced",
 		total_time = 1.25,
 		crosshair = {
 			crosshair_type = "spray_n_pray"
@@ -636,7 +684,8 @@ weapon_template.actions = {
 		},
 		time_scale_stat_buffs = {
 			buff_stat_buffs.reload_speed
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_stab = {
 		damage_window_start = 0.36666666666666664,
@@ -739,7 +788,12 @@ weapon_template.actions = {
 		},
 		damage_type = damage_types.combat_blade,
 		damage_profile = DamageProfileTemplates.rippergun_weapon_special,
-		herding_template = HerdingTemplates.stab
+		herding_template = HerdingTemplates.stab,
+		time_scale_stat_buffs = {
+			buff_stat_buffs.attack_speed,
+			buff_stat_buffs.melee_attack_speed
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_inspect = {
 		skip_3p_anims = false,
@@ -752,7 +806,8 @@ weapon_template.actions = {
 		total_time = math.huge,
 		crosshair = {
 			crosshair_type = "inspect"
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	}
 }
 
@@ -932,9 +987,10 @@ weapon_template.dodge_template = "ogryn"
 weapon_template.sprint_template = "ogryn"
 weapon_template.stamina_template = "default"
 weapon_template.toughness_template = "default"
-weapon_template.movement_curve_modifier_template = "default"
 weapon_template.footstep_intervals = FootstepIntervalsTemplates.ogryn_rippergun
+weapon_template.movement_curve_modifier_template = "default"
 weapon_template.smart_targeting_template = SmartTargetingTemplates.spray_n_pray
+weapon_template.haptic_trigger_template = HapticTriggerTemplates.ranged.rippergun
 weapon_template.traits = {}
 local bespoke_traits = table.ukeys(WeaponTraitsBespokeRippergunP1)
 

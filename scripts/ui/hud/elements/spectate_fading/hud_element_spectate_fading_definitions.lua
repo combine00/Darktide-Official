@@ -8,7 +8,7 @@ local scenegraph_definition = {
 		position = {
 			0,
 			0,
-			999
+			0
 		}
 	}
 }

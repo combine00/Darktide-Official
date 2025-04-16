@@ -767,6 +767,7 @@ function BtChaosHoundLeapAction:_start_landing(scratchpad, action_data, t)
 
 	local land_impact_timing = t + action_data.land_impact_timing
 	scratchpad.land_impact_timing = land_impact_timing
+	scratchpad.pounce_component.started_leap = false
 	scratchpad.stagger_component.controlled_stagger_finished = true
 end
 

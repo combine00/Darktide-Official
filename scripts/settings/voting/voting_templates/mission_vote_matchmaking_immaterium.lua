@@ -31,35 +31,38 @@ local mission_vote_matchmaking_immaterium = {
 	},
 	static_params = {
 		matchmaker_type = "mission"
-	},
-	on_started = function (voting_id, template, params)
-		if Managers.ui:view_active("system_view") then
-			Managers.ui:close_view("system_view")
-		end
+	}
+}
 
-		if GameParameters.debug_mission then
-			Managers.voting:cast_vote(voting_id, "yes")
-		elseif not Managers.voting:has_voted(voting_id, Managers.party_immaterium:get_myself():unique_id()) then
-			if params.qp == "true" then
-				local view_context = {
-					qp = params.qp,
-					voting_id = voting_id,
-					backend_mission_id = params.backend_mission_id
-				}
+function mission_vote_matchmaking_immaterium.on_started(voting_id, template, params, started_by_account_id)
+	if Managers.ui:view_active("system_view") then
+		Managers.ui:close_view("system_view")
+	end
 
-				_open_voting_view(view_context)
-			else
-				local view_context = {
-					voting_id = voting_id,
-					backend_mission_id = params.backend_mission_id,
-					mission_data = cjson.decode(params.mission_data).mission
-				}
+	if GameParameters.debug_mission then
+		Managers.voting:cast_vote(voting_id, "yes")
+	elseif not Managers.voting:has_voted(voting_id, Managers.party_immaterium:get_myself():unique_id()) then
+		if params.qp == "true" then
+			local view_context = {
+				qp = params.qp,
+				voting_id = voting_id,
+				backend_mission_id = params.backend_mission_id,
+				started_by_account_id = started_by_account_id
+			}
 
-				_open_voting_view(view_context)
-			end
+			_open_voting_view(view_context)
+		else
+			local view_context = {
+				voting_id = voting_id,
+				backend_mission_id = params.backend_mission_id,
+				mission_data = cjson.decode(params.mission_data).mission,
+				started_by_account_id = started_by_account_id
+			}
+
+			_open_voting_view(view_context)
 		end
 	end
-}
+end
 
 function mission_vote_matchmaking_immaterium.on_completed(voting_id, template, vote_state, result)
 	_close_voting_view()

@@ -565,7 +565,9 @@ local constants = {
 					"idle",
 					"increasing",
 					"decreasing",
-					"exploding"
+					"exploding",
+					"soft_lockout",
+					"lockout"
 				}
 			},
 			overheat_last_charge_at_t = {
@@ -589,6 +591,10 @@ local constants = {
 				network_type = "bool"
 			},
 			num_special_charges = {
+				default_value = 0,
+				network_type = "num_special_charges"
+			},
+			max_num_special_charges = {
 				default_value = 0,
 				network_type = "num_special_charges"
 			},
@@ -748,13 +754,13 @@ end
 
 local buff_component_key_lookup = {}
 
-for i = 1, constants.max_component_buffs do
-	buff_component_key_lookup[i] = {
-		template_name_key = "buff_" .. i .. "_template_name",
-		start_time_key = "buff_" .. i .. "_start_time",
-		active_start_time_key = "buff_" .. i .. "_active_start_time",
-		stack_count_key = "buff_" .. i .. "_stack_count",
-		proc_count_key = "buff_" .. i .. "_proc_count"
+for ii = 1, constants.max_component_buffs do
+	buff_component_key_lookup[ii] = {
+		template_name_key = "buff_" .. ii .. "_template_name",
+		start_time_key = "buff_" .. ii .. "_start_time",
+		active_start_time_key = "buff_" .. ii .. "_active_start_time",
+		stack_count_key = "buff_" .. ii .. "_stack_count",
+		proc_count_key = "buff_" .. ii .. "_proc_count"
 	}
 end
 

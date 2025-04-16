@@ -1,9 +1,8 @@
 local cinematic_scene_templates = {
 	outro_win = {
 		is_skippable = false,
-		use_transition_ui = true,
 		local_player_only = false,
-		instant_black_screen_during_cutscene_loading = false,
+		use_transition_ui = true,
 		music = "victory",
 		hide_players = true,
 		set_random_weapon_event = true,

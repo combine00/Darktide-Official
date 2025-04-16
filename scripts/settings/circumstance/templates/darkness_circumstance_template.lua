@@ -5,9 +5,10 @@ local circumstance_templates = {
 		theme_tag = "darkness",
 		ui = {
 			description = "loc_circumstance_darkness_description",
-			icon = "content/ui/materials/icons/circumstances/darkness_01",
 			display_name = "loc_circumstance_darkness_title",
-			happening_display_name = "loc_happening_darkness"
+			happening_display_name = "loc_happening_darkness",
+			background = "content/ui/materials/backgrounds/mutators/mutator_lights_out",
+			icon = "content/ui/materials/icons/circumstances/darkness_01"
 		},
 		mutators = {
 			"mutator_more_witches",
@@ -25,9 +26,10 @@ local circumstance_templates = {
 		},
 		ui = {
 			description = "loc_circumstance_darkness_hunting_grounds_description",
-			icon = "content/ui/materials/icons/circumstances/darkness_02",
 			display_name = "loc_circumstance_darkness_hunting_grounds_title",
-			happening_display_name = "loc_happening_darkness"
+			happening_display_name = "loc_happening_darkness",
+			background = "content/ui/materials/backgrounds/mutators/mutator_lights_out",
+			icon = "content/ui/materials/icons/circumstances/darkness_02"
 		},
 		mutators = {
 			"mutator_more_witches",

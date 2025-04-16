@@ -58,14 +58,38 @@ local weapon_template = {
 		}
 	},
 	action_input_hierarchy = {
-		wield = "stay",
-		wield_previous = "stay",
-		channel = {
-			cancel_channeling = "base",
-			wield = "base",
-			wield_previous = "base",
-			grenade_ability = {
-				wield_previous = "base"
+		{
+			transition = "stay",
+			input = "wield"
+		},
+		{
+			transition = "stay",
+			input = "wield_previous"
+		},
+		{
+			input = "channel",
+			transition = {
+				{
+					transition = "base",
+					input = "cancel_channeling"
+				},
+				{
+					transition = "base",
+					input = "wield_previous"
+				},
+				{
+					transition = "base",
+					input = "wield"
+				},
+				{
+					input = "grenade_ability",
+					transition = {
+						{
+							transition = "base",
+							input = "wield_previous"
+						}
+					}
+				}
 			}
 		}
 	},
@@ -137,7 +161,8 @@ local weapon_template = {
 					chain_time = 0.5
 				},
 				wield_previous = {
-					action_name = "action_unwield_to_previous"
+					action_name = "action_unwield_to_previous",
+					chain_time = 0.5
 				},
 				grenade_ability = {
 					{
@@ -197,6 +222,7 @@ weapon_template.conditional_state_to_action_input = {
 weapon_template.anim_state_machine_3p = "content/characters/player/human/third_person/animations/pocketables"
 weapon_template.anim_state_machine_1p = "content/characters/player/human/first_person/animations/preacher_relic"
 weapon_template.smart_targeting_template = SmartTargetingTemplates.default_melee
+weapon_template.can_use_while_vaulting = true
 weapon_template.spread_template = "no_spread"
 weapon_template.hud_configuration = {
 	uses_overheat = false,

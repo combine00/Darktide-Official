@@ -58,6 +58,10 @@ function Cover:editor_destroy(unit)
 		return
 	end
 
+	if Cover._nav_info ~= nil then
+		SharedNav.destroy(Cover._nav_info)
+	end
+
 	local world = self._world
 	local line_object = self._line_object
 

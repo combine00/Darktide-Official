@@ -14,6 +14,7 @@ local settings_grid_width = 1000
 local settings_value_width = 500
 local settings_value_height = 64
 local group_header_height = 80
+local group_sub_header_height = 30
 local DEFAULT_NUM_DECIMALS = 0
 local value_font_style = table.clone(UIFontSettings.list_button)
 value_font_style.offset = {
@@ -29,6 +30,15 @@ header_font_style.offset = {
 	0,
 	0
 }
+local sub_header_font_style = table.clone(UIFontSettings.header_4)
+sub_header_font_style.text_vertical_alignment = "bottom"
+sub_header_font_style.font_size = 26
+sub_header_font_style.offset = {
+	30,
+	0,
+	0
+}
+sub_header_font_style.drop_shadow = false
 local blueprints = {
 	spacing_vertical = {
 		size_function = function (parent, entry)
@@ -121,6 +131,27 @@ local blueprints = {
 			content.text = Managers.localization:localize(display_name)
 		end
 	},
+	group_sub_header = {
+		size_function = function (parent, entry)
+			return {
+				entry.size and entry.size[1] or settings_grid_width,
+				entry.size and entry.size[2] or group_sub_header_height
+			}
+		end,
+		pass_template = {
+			{
+				pass_type = "text",
+				value_id = "text",
+				style = sub_header_font_style,
+				value = Localize("loc_settings_option_unavailable")
+			}
+		},
+		init = function (parent, widget, entry, callback_name, changed_callback_name)
+			local content = widget.content
+			local display_name = entry.display_name
+			content.text = Managers.localization:localize(display_name)
+		end
+	},
 	checkbox = {
 		size_function = function (parent, entry)
 			return {
@@ -129,7 +160,7 @@ local blueprints = {
 			}
 		end,
 		pass_template_function = function (parent, entry, size)
-			return CheckboxPassTemplates.settings_checkbox(size[1], size[2], entry.value_width or settings_value_width, 2, true)
+			return CheckboxPassTemplates.settings_checkbox(size[1], size[2], entry.value_width or settings_value_width, 2, true, entry.is_sub_setting)
 		end,
 		init = function (parent, widget, entry, callback_name, changed_callback_name)
 			local content = widget.content
@@ -220,7 +251,7 @@ blueprints.percent_slider = {
 		}
 	end,
 	pass_template_function = function (parent, entry, size)
-		return SliderPassTemplates.settings_percent_slider(size[1], size[2], entry.value_width or settings_value_width, true)
+		return SliderPassTemplates.settings_percent_slider(size[1], size[2], entry.value_width or settings_value_width, true, entry.is_sub_setting)
 	end,
 	init = function (parent, widget, entry, callback_name, changed_callback_name)
 		slider_init_function(parent, widget, entry, callback_name, changed_callback_name)
@@ -312,7 +343,7 @@ blueprints.value_slider = {
 		}
 	end,
 	pass_template_function = function (parent, entry, size)
-		return SliderPassTemplates.settings_value_slider(size[1], size[2], entry.value_width or settings_value_width, true)
+		return SliderPassTemplates.settings_value_slider(size[1], size[2], entry.value_width or settings_value_width, true, entry.is_sub_setting)
 	end,
 	init = function (parent, widget, entry, callback_name, changed_callback_name)
 		slider_init_function(parent, widget, entry, callback_name, changed_callback_name)
@@ -411,7 +442,7 @@ blueprints.slider = {
 		}
 	end,
 	pass_template_function = function (parent, entry, size)
-		return SliderPassTemplates.settings_value_slider(size[1], size[2], entry.value_width or settings_value_width, true)
+		return SliderPassTemplates.settings_value_slider(size[1], size[2], entry.value_width or settings_value_width, true, entry.is_sub_setting)
 	end,
 	init = function (parent, widget, entry, callback_name, changed_callback_name)
 		local content = widget.content
@@ -530,7 +561,7 @@ blueprints.dropdown = {
 		local options = entry.options_function and entry.options_function() or entry.options
 		local num_visible_options = math.min(#options, max_visible_options)
 
-		return DropdownPassTemplates.settings_dropdown(size[1], size[2], entry.value_width or settings_value_width, num_visible_options, true)
+		return DropdownPassTemplates.settings_dropdown(size[1], size[2], entry.value_width or settings_value_width, num_visible_options, true, entry.is_sub_setting)
 	end,
 	init = function (parent, widget, entry, callback_name, changed_callback_name)
 		local content = widget.content
@@ -549,7 +580,8 @@ blueprints.dropdown = {
 		local options_by_id = {}
 
 		for index, option in pairs(options) do
-			options_by_id[option.id] = option
+			local option_id = option.id
+			options_by_id[option_id] = option
 		end
 
 		content.number_format = number_format
@@ -599,6 +631,7 @@ blueprints.dropdown = {
 			parent:set_can_exit(false)
 		end
 
+		local new_selection_index = nil
 		local selected_index = content.selected_index
 		local value, new_value = nil
 		local hotspot = content.hotspot
@@ -638,7 +671,6 @@ blueprints.dropdown = {
 		end
 
 		content.grow_downwards = grow_downwards
-		local new_selection_index = nil
 
 		if not selected_index or not focused then
 			for i = 1, #options do
@@ -654,18 +686,70 @@ blueprints.dropdown = {
 			selected_index = selected_index or 1
 		end
 
+		local is_selected_option_disabled = false
+		local first_option_index_available = nil
+
+		for i = 1, #options do
+			local option = options[i]
+
+			if option.validation_function and not option.validation_function() then
+				option.is_disabled = true
+
+				if content.selected_index == i then
+					is_selected_option_disabled = true
+				end
+			else
+				option.is_disabled = false
+				first_option_index_available = first_option_index_available or i
+			end
+		end
+
+		if is_selected_option_disabled then
+			if first_option_index_available then
+				new_selection_index = first_option_index_available
+				new_value = first_option_index_available
+			else
+				content.selected_index = nil
+				new_value = nil
+			end
+		end
+
+		local prev_option_index, next_option_index = nil
+
+		if selected_index then
+			for i = selected_index - 1, 1, -1 do
+				local option = options[i]
+
+				if not option.is_disabled then
+					prev_option_index = i
+
+					break
+				end
+			end
+
+			for i = selected_index + 1, #options do
+				local option = options[i]
+
+				if not option.is_disabled then
+					next_option_index = i
+
+					break
+				end
+			end
+		end
+
 		if selected_index and focused then
 			if input_service:get("navigate_up_continuous") then
 				if grow_downwards or not grow_downwards and always_keep_order then
-					new_selection_index = math.max(selected_index - 1, 1)
+					new_selection_index = prev_option_index
 				else
-					new_selection_index = math.min(selected_index + 1, num_options)
+					new_selection_index = next_option_index
 				end
 			elseif input_service:get("navigate_down_continuous") then
 				if grow_downwards or not grow_downwards and always_keep_order then
-					new_selection_index = math.min(selected_index + 1, num_options)
+					new_selection_index = next_option_index
 				else
-					new_selection_index = math.max(selected_index - 1, 1)
+					new_selection_index = prev_option_index
 				end
 			end
 		end
@@ -710,11 +794,12 @@ blueprints.dropdown = {
 			local option_hotspot_id = "option_hotspot_" .. option_index
 			local outline_style_id = "outline_" .. option_index
 			local option_hotspot = content[option_hotspot_id]
-			option_hovered = option_hovered or option_hotspot.is_hover
-			option_hotspot.is_selected = actual_i == selected_index
 			local option = options[actual_i]
+			option_hotspot.is_disabled = option.is_disabled
+			option_hovered = option_hovered or option_hotspot.is_hover and not option_hotspot.is_disabled
+			option_hotspot.is_selected = actual_i == selected_index
 
-			if not new_value and focused and not using_gamepad and option_hotspot.on_pressed then
+			if not new_value and focused and not using_gamepad and option_hotspot.on_pressed and not option_hotspot.is_disabled then
 				option_hotspot.on_pressed = nil
 				new_value = option.id
 				content.selected_index = actual_i
@@ -761,7 +846,7 @@ blueprints.keybind = {
 		}
 	end,
 	pass_template_function = function (parent, entry, size)
-		return KeybindPassTemplates.settings_keybind(size[1], size[2], entry.value_width or settings_value_width)
+		return KeybindPassTemplates.settings_keybind(size[1], size[2], entry.value_width or settings_value_width, entry.is_sub_setting)
 	end,
 	init = function (parent, widget, entry, callback_name, changed_callback_name)
 		local content = widget.content
@@ -877,7 +962,7 @@ local function controller_image_apply_text_function(widget)
 							local main_input = key_info.main
 
 							if temp_input_display_values[main_input] then
-								temp_input_display_values[main_input] = temp_input_display_values[main_input] .. " / " .. Localize(display_name)
+								temp_input_display_values[main_input] = temp_input_display_values[main_input] .. "/" .. Localize(display_name)
 							else
 								temp_input_display_values[main_input] = Localize(display_name)
 							end
@@ -896,7 +981,7 @@ local function controller_image_apply_text_function(widget)
 											local additional_alias_display_name = alias:description(extra_alias_name)
 
 											if additional_alias_display_name then
-												temp_input_display_values[main_input] = temp_input_display_values[main_input] .. " / " .. Localize(additional_alias_display_name)
+												temp_input_display_values[main_input] = temp_input_display_values[main_input] .. "/" .. Localize(additional_alias_display_name)
 											end
 										end
 									end
@@ -1792,7 +1877,7 @@ blueprints.large_value_slider = {
 		}
 	end,
 	pass_template_function = function (parent, entry, size)
-		return SliderPassTemplates.value_slider(size[1], size[2], entry.value_width, true)
+		return SliderPassTemplates.value_slider(size[1], size[2], entry.value_width, true, entry.is_sub_setting)
 	end,
 	init = function (parent, widget, entry, callback_name)
 		local content = widget.content

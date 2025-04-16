@@ -14,7 +14,7 @@ function SigninLoader:destroy()
 	return
 end
 
-function SigninLoader:start_loading()
+function SigninLoader:start_loading(context)
 	local package_manager = Managers.package
 	local package_ids = self._package_ids
 

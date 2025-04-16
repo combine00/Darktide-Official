@@ -54,10 +54,6 @@ local zealot_c_veteran_female_a = {
 			[1.0] = 1.680292,
 			[2.0] = 2.653708
 		},
-		sound_event_weights = {
-			[1.0] = 0.5,
-			[2.0] = 0.5
-		},
 		randomize_indexes = {}
 	},
 	combat_pause_quirk_pilgrimage_b = {

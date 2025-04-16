@@ -2,8 +2,10 @@ local BossPatrols = require("scripts/managers/pacing/monster_pacing/boss_patrols
 local PerceptionSettings = require("scripts/settings/perception/perception_settings")
 local AggroStates = PerceptionSettings.aggro_states
 local SPAWN_STINGERS = {
+	renegade_twin_captain_two = "wwise/events/minions/play_minion_twins_ambush_spawn_impact_hit",
+	cultist_captain = "wwise/events/minions/play_minion_captain_spawn_stinger",
 	renegade_twin_captain = "wwise/events/minions/play_minion_twins_ambush_spawn_impact_hit",
-	renegade_twin_captain_two = "wwise/events/minions/play_minion_twins_ambush_spawn_impact_hit"
+	renegade_captain = "wwise/events/minions/play_minion_captain_spawn_stinger"
 }
 local monster_pacing_template = {
 	name = "default_monsters",

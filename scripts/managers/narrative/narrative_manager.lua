@@ -33,7 +33,7 @@ local function _chapter_index_from_backend_id(story_name, backend_id)
 	end
 end
 
-local function _setup_backend_narrative_data(backend_data)
+function NarrativeManager:_setup_backend_narrative_data(backend_data)
 	local data = {
 		stories = {},
 		events = {}
@@ -61,7 +61,7 @@ local function _setup_backend_narrative_data(backend_data)
 
 	local backend_events = backend_data.events
 
-	for event_name, _ in pairs(Events) do
+	for event_name, _ in pairs(self._events) do
 		local completed_on_backend = backend_events and (backend_events[event_name] == "true" or backend_events[event_name] == true)
 		data.events[event_name] = not not completed_on_backend
 
@@ -107,8 +107,10 @@ function NarrativeManager:load_character_narrative(character_id)
 		return Promise.resolved()
 	end
 
+	self._events = table.clone(Events)
+
 	return Managers.backend.interfaces.characters:get_narrative(character_id):next(function (data)
-		self._character_narrative_data[character_id] = _setup_backend_narrative_data(data)
+		self._character_narrative_data[character_id] = self:_setup_backend_narrative_data(data)
 
 		return nil
 	end):catch(function (err)
@@ -348,7 +350,7 @@ function NarrativeManager:reset()
 end
 
 function NarrativeManager:is_event_complete(event_name)
-	if Events[event_name] == nil then
+	if self._events[event_name] == nil then
 		Log.warning("NarrativeManager", "No event with name '%s'.", event_name)
 
 		return false
@@ -361,7 +363,7 @@ function NarrativeManager:is_event_complete(event_name)
 end
 
 function NarrativeManager:can_complete_event(event_name)
-	local event = Events[event_name]
+	local event = self._events[event_name]
 
 	if event == nil then
 		Log.warning("NarrativeManager", "No event with name '%s'.", event_name)
@@ -387,7 +389,7 @@ function NarrativeManager:can_complete_event(event_name)
 end
 
 function NarrativeManager:complete_event(event_name)
-	local event = Events[event_name]
+	local event = self._events[event_name]
 
 	if event == nil then
 		Log.warning("NarrativeManager", "No event with name '%s'.", event_name)
@@ -412,6 +414,34 @@ function NarrativeManager:complete_event(event_name)
 	end
 
 	return true
+end
+
+function NarrativeManager:get_ever_received_havoc_order()
+	return self._ever_received_havoc_order
+end
+
+function NarrativeManager:set_ever_received_havoc_order(data)
+	if data ~= nil and not table.is_empty(data) and data.id ~= nil then
+		self._ever_received_havoc_order = true
+	else
+		self._ever_received_havoc_order = false
+	end
+end
+
+function NarrativeManager:get_havoc_unlock_status()
+	return self._havoc_unlock_status
+end
+
+function NarrativeManager:set_havoc_unlock_status(value)
+	self._havoc_unlock_status = value
+end
+
+function NarrativeManager:get_havoc_cadence_status()
+	return self._havoc_cadence_status
+end
+
+function NarrativeManager:set_havoc_cadence_status(cadence_status)
+	self._havoc_cadence_status = cadence_status
 end
 
 return NarrativeManager

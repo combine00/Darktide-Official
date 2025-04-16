@@ -1,3 +1,4 @@
+local ActionInputHierarchy = require("scripts/utilities/action/action_input_hierarchy")
 local BaseTemplateSettings = require("scripts/settings/equipment/weapon_templates/base_template_settings")
 local DamageProfileTemplates = require("scripts/settings/damage/damage_profile_templates")
 local DamageSettings = require("scripts/settings/damage/damage_settings")
@@ -60,16 +61,34 @@ local weapon_template = {
 table.add_missing(weapon_template.action_inputs, BaseTemplateSettings.action_inputs)
 
 weapon_template.action_input_hierarchy = {
-	wield = "stay",
-	push = "stay",
-	throw_start = {
-		throw_stop = "base",
-		throw_complete = "base",
-		wield = "base"
+	{
+		transition = "stay",
+		input = "push"
+	},
+	{
+		input = "throw_start",
+		transition = {
+			{
+				transition = "base",
+				input = "throw_stop"
+			},
+			{
+				transition = "base",
+				input = "throw_complete"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			}
+		}
+	},
+	{
+		transition = "stay",
+		input = "wield"
 	}
 }
 
-table.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
+ActionInputHierarchy.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
 
 weapon_template.actions = {
 	action_unwield = {

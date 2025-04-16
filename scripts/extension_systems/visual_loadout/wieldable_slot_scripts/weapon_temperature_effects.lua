@@ -1,4 +1,4 @@
-local Action = require("scripts/utilities/weapon/action")
+local Action = require("scripts/utilities/action/action")
 local WieldableSlotScriptInterface = require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/wieldable_slot_script_interface")
 local WeaponTemperatureEffects = class("WeaponTemperatureEffects")
 local FX_SOURCE_NAME = "_muzzle"

@@ -47,6 +47,56 @@ function Account:get_has_migrated_commendation_score()
 	return self:get_data("core", "has_migrated_commendation_score")
 end
 
+function Account:set_havoc_unlock_status(value)
+	local value_type = type(value)
+
+	if value_type ~= "number" and value_type ~= "nil" then
+		return Promise.rejected("Backend was asked to set invalid type '" .. value_type .. "', expected 'number' or 'nil'")
+	end
+
+	return self:set_data("core", {
+		havoc_unlock_status = value
+	})
+end
+
+function Account:get_havoc_unlock_status()
+	return self:get_data("core", "havoc_unlock_status"):next(function (value)
+		local value_type = type(value)
+
+		if value_type ~= "number" and value_type ~= "nil" then
+			return Promise.rejected("Backend returned invalid type '" .. value_type .. "', expected 'number' or 'nil'")
+		end
+
+		return value
+	end):catch(function (err)
+		return Promise.rejected(err)
+	end)
+end
+
+function Account:get_feature_horde_vo()
+	return self:get_data("feature_horde", "vo")
+end
+
+function Account:set_feature_horde_vo(vo_line)
+	return self:get_feature_horde_vo():next(function (vo_player)
+		if vo_player == nil then
+			vo_player = {}
+		end
+
+		if not table.contains(vo_player, vo_line) then
+			table.insert(vo_player, vo_line)
+
+			return self:set_data("feature_horde", {
+				vo = vo_player
+			})
+		end
+	end):catch(function (err)
+		Log.error("BackendAccountVo", "Error setting vo %s", vo_type)
+
+		return Promise.rejected(err)
+	end)
+end
+
 function Account:get()
 	return BackendUtilities.make_account_title_request("account", BackendUtilities.url_builder("")):next(function (data)
 		return data.body
@@ -89,6 +139,17 @@ function Account:get_data(section, part, ...)
 		else
 			return entry
 		end
+	end)
+end
+
+function Account:get_account_name_by_account_id(account_id)
+	local builder = BackendUtilities.url_builder():path("/data/"):path(account_id):path("/account/name")
+	local options = {
+		method = "GET"
+	}
+
+	return Managers.backend:title_request(builder:to_string(), options):next(function (data)
+		return data.body and data.body.name
 	end)
 end
 

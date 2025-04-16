@@ -2,7 +2,6 @@ local BackendError = require("scripts/foundation/managers/backend/backend_error"
 local BackendInterface = require("scripts/backend/backend_interface")
 local BackendManagerTestify = GameParameters.testify and require("scripts/foundation/managers/backend/backend_manager_testify")
 local BackendUtilities = require("scripts/foundation/managers/backend/utilities/backend_utilities")
-local DefaultBackendSettings = require("scripts/settings/backend/default_backend_settings")
 local PriorityQueue = require("scripts/foundation/utilities/priority_queue")
 local Promise = require("scripts/foundation/utilities/promise")
 local XboxLiveUtils = require("scripts/foundation/utilities/xbox_live_utils")
@@ -166,13 +165,6 @@ function BackendManager:update(dt, t)
 		end
 	end
 
-	local authenticated = initialized and self:authenticated()
-	local settings_need_update = not self._settings_promise and not self._backend_settings
-
-	if authenticated and settings_need_update then
-		self:_download_settings()
-	end
-
 	local was_slow_frame = dt >= 0.5
 
 	if not DEDICATED_SERVER and not was_slow_frame then
@@ -225,6 +217,9 @@ function BackendManager:logout()
 		end
 
 		Backend.logout()
+
+		self._initialized = false
+		self._initialize_promise = nil
 	end
 end
 
@@ -265,12 +260,24 @@ function BackendManager:authenticate()
 				return Promise.rejected(error_data)
 			end):next(function (result)
 				local success, error_code = Backend.initialize(debug_log, result.authentication_service_url, result.title_service_url, result.telemetry_service_url)
+
+				if not success then
+					Log.info("Backend", "Backend.initialize() parameters: '%s', '%s', '%s', '%s'", tostring(debug_log), tostring(DEFAULT_AUTHENTICATION_SERIVCE_URL), tostring(DEFAULT_TITLE_SERIVCE_URL), tostring(DEFAULT_TELEMERTY_SERVICE_URL))
+					Log.exception("Backend", "Backend.initialize() failed with error=%s", error_code)
+				end
+
 				self._initialized = true
 
 				self._initialize_promise:resolve()
 			end)
 		else
 			local success, error_code = Backend.initialize(debug_log, DEFAULT_AUTHENTICATION_SERIVCE_URL, DEFAULT_TITLE_SERIVCE_URL, DEFAULT_TELEMERTY_SERVICE_URL)
+
+			if not success then
+				Log.info("Backend", "Backend.initialize() parameters: '%s', '%s', '%s', '%s'", tostring(debug_log), tostring(DEFAULT_AUTHENTICATION_SERIVCE_URL), tostring(DEFAULT_TITLE_SERIVCE_URL), tostring(DEFAULT_TELEMERTY_SERVICE_URL))
+				Log.exception("Backend", "Backend.initialize() failed with error=%s", error_code)
+			end
+
 			self._initialized = true
 
 			self._initialize_promise:resolve()
@@ -326,7 +333,7 @@ function BackendManager:authenticate()
 
 				Backend.set_sd_index_choice(1)
 
-				return Promise.resolved()
+				return Managers.backend:authenticate()
 			end
 
 			return Promise.rejected(error)
@@ -428,7 +435,7 @@ function BackendManager:title_request(path, options)
 	return promise
 end
 
-function BackendManager:send_telemetry_events(data, headers, compress_body)
+function BackendManager:send_telemetry_events(data, headers, compress_body, shutdown)
 	if not self._initialized then
 		return self:_not_initialized()
 	end
@@ -437,7 +444,7 @@ function BackendManager:send_telemetry_events(data, headers, compress_body)
 	local promise = Promise:new()
 	local operation_identifier, error = Backend.send_telemetry_events({
 		events = data
-	}, headers, compress_body)
+	}, headers, compress_body, shutdown)
 
 	if operation_identifier then
 		self._promises[operation_identifier] = promise
@@ -565,18 +572,29 @@ function BackendManager:failed_request()
 	end)
 end
 
-function BackendManager:_download_settings()
-	self._settings_promise = self:title_request(BackendUtilities.url_builder("/gameplay/config/sessions"):to_string())
+function BackendManager:update_backend_settings()
+	if self._settings_promise then
+		return self._settings_promise
+	end
 
-	return self._settings_promise:next(function (message)
-		return message.body
-	end):next(function (settings)
-		self._backend_settings = settings
+	self._backend_settings = nil
+	local session_config = self:title_request(BackendUtilities.url_builder("/gameplay/config/sessions"):to_string()):next(function (data)
+		return data.body
+	end)
+	self._settings_promise = Promise.all(session_config)
+
+	return self._settings_promise:next(function (settings)
+		local backend_settings = {}
+
+		for i = 1, #settings do
+			table.merge(backend_settings, settings[i])
+		end
+
+		self._backend_settings = backend_settings
 		self._settings_promise = nil
 	end):catch(function (error)
 		Log.warning("Failed to fetch backend settings.")
 
-		self._backend_settings = {}
 		self._settings_promise = nil
 
 		return Promise.rejected(error)
@@ -584,18 +602,9 @@ function BackendManager:_download_settings()
 end
 
 function BackendManager:session_setting(...)
-	local res = nil
 	local backend_settings = self._backend_settings
 
-	if backend_settings then
-		res = table.nested_get(backend_settings, ...)
-	end
-
-	if res == nil then
-		res = table.nested_get(DefaultBackendSettings, ...)
-	end
-
-	return res
+	return table.nested_get(backend_settings, ...)
 end
 
 implements(BackendManager, Interface)

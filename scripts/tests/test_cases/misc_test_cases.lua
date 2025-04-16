@@ -489,6 +489,7 @@ function MiscTestCases.play_all_vfx(case_settings)
 			"content/fx/particles/enemies/netgunner/netgunner_net_miss",
 			"content/fx/particles/enemies/plague_ogryn/plague_ogryn_body_odor",
 			"content/fx/particles/environment/foundry_molten_pool_boiling_01",
+			"content/fx/particles/environment/ice_zone/lightnings_emit_from_mesh_01",
 			"content/fx/particles/environment/molten_steel_splash",
 			"content/fx/particles/environment/molten_steel_splashes_impact",
 			"content/fx/particles/environment/roofdust_tremor",
@@ -497,10 +498,12 @@ function MiscTestCases.play_all_vfx(case_settings)
 			"content/fx/particles/interacts/airlock_closing",
 			"content/fx/particles/interacts/airlock_opening",
 			"content/fx/particles/liquid_area/fire_lingering_enemy",
-			"content/fx/particles/weapons/swords/powersword_1h_activate_mesh",
 			"content/fx/particles/weapons/shock_maul/powermaul_1h_activate_mesh",
 			"content/fx/particles/weapons/shock_maul/powermaul_1h_looping_mesh",
-			"content/fx/particles/environment/ice_zone/lightnings_emit_from_mesh_01"
+			"content/fx/particles/weapons/swords/powersword_1h_activate_mesh_loop",
+			"content/fx/particles/weapons/swords/powersword_1h_activate_mesh",
+			"content/fx/particles/weapons/swords/powersword_2h/powersword_2h_activate_mesh_loop",
+			"content/fx/particles/weapons/swords/powersword_2h/powersword_2h_activate_mesh"
 		}
 
 		if TestifySnippets.is_debug_stripped() or BUILD == "release" then
@@ -647,5 +650,30 @@ function MiscTestCases.stress_alt_combinations(case_settings)
 		end
 
 		TestifySnippets.set_render_settings("screen_mode", "borderless_fullscreen", 1)
+	end)
+end
+
+function MiscTestCases.equip_all_horde_mode_buffs(case_settings)
+	Testify:run_case(function (dt, t)
+		local settings = cjson.decode(case_settings or "{}")
+		local archetype = settings.archetype or "veteran"
+
+		TestifySnippets.skip_splash_and_title_screen()
+		TestifySnippets.wait_for_main_menu()
+		Testify:make_request("delete_character_by_name", "Testify")
+		TestifySnippets.create_character_from_main_menu(archetype)
+		TestifySnippets.load_mission("psykhanium")
+		Testify:make_request("wait_for_state_gameplay_reached")
+		TestifySnippets.wait(5)
+
+		local buffs_to_equip = Testify:make_request("all_hordes_buffs_names", "hordes_buff")
+
+		for _, buff_name in ipairs(buffs_to_equip) do
+			Log.info("Testify", "Trying to equip Hordes Buff: %s", buff_name)
+			Managers.event:trigger("mission_buffs_event_request_specific_buff", buff_name, true)
+			TestifySnippets.wait(2)
+		end
+
+		TestifySnippets.wait(10)
 	end)
 end

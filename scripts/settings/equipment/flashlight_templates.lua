@@ -46,6 +46,22 @@ local incandescent_flicker = {
 		min = 10
 	}
 }
+local worn_incandescent_flicker = {
+	min_octave_percentage = 0.35,
+	frequence_multiplier = 0.75,
+	persistance = 12,
+	chance = 0.5,
+	fade_out = true,
+	octaves = 3,
+	duration = {
+		max = 4,
+		min = 2.5
+	},
+	interval = {
+		max = 20,
+		min = 10
+	}
+}
 local flashlight_templates = {
 	default = {
 		light = {
@@ -231,6 +247,43 @@ local flashlight_templates = {
 			}
 		},
 		flicker = incandescent_flicker
+	},
+	ogryn_heavy_stubber_p2 = {
+		light = {
+			first_person = {
+				intensity = 10,
+				cast_shadows = true,
+				spot_reflector = false,
+				color_temperature = 4400,
+				volumetric_intensity = 0.1,
+				ies_profile = "content/environment/ies_profiles/narrow/flashlight_custom_02",
+				spot_angle = {
+					max = 1.2,
+					min = 0
+				},
+				falloff = {
+					far = 35,
+					near = 0
+				}
+			},
+			third_person = {
+				intensity = 10,
+				cast_shadows = true,
+				spot_reflector = false,
+				color_temperature = 4400,
+				volumetric_intensity = 0.6,
+				ies_profile = "content/environment/ies_profiles/narrow/flashlight_custom_02",
+				spot_angle = {
+					max = 0.9,
+					min = 0
+				},
+				falloff = {
+					far = 20,
+					near = 0
+				}
+			}
+		},
+		flicker = worn_incandescent_flicker
 	}
 }
 

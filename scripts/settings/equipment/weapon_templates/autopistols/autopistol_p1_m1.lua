@@ -1,9 +1,11 @@
+local ActionInputHierarchy = require("scripts/utilities/action/action_input_hierarchy")
 local ArmorSettings = require("scripts/settings/damage/armor_settings")
 local BaseTemplateSettings = require("scripts/settings/equipment/weapon_templates/base_template_settings")
 local BuffSettings = require("scripts/settings/buff/buff_settings")
 local DamageSettings = require("scripts/settings/damage/damage_settings")
 local FlashlightTemplates = require("scripts/settings/equipment/flashlight_templates")
 local FootstepIntervalsTemplates = require("scripts/settings/equipment/footstep/footstep_intervals_templates")
+local HapticTriggerTemplates = require("scripts/settings/equipment/haptic_trigger_templates")
 local HitScanTemplates = require("scripts/settings/projectile/hit_scan_templates")
 local LineEffects = require("scripts/settings/effects/line_effects")
 local PlayerCharacterConstants = require("scripts/settings/player_character/player_character_constants")
@@ -135,36 +137,108 @@ local weapon_template = {
 table.add_missing(weapon_template.action_inputs, BaseTemplateSettings.action_inputs)
 
 weapon_template.action_input_hierarchy = {
-	wield = "stay",
-	reload = "stay",
-	weapon_special = "stay",
-	shoot = {
-		zoom = "base",
-		wield = "base",
-		grenade_ability = "base",
-		reload = "base",
-		combat_ability = "base",
-		shoot_release = "base"
-	},
-	zoom = {
-		zoom_release = "base",
-		wield = "base",
-		grenade_ability = "base",
-		reload = "base",
-		combat_ability = "base",
-		zoom_weapon_special = "stay",
-		zoom_shoot = {
-			grenade_ability = "base",
-			wield = "base",
-			zoom_release = "base",
-			reload = "base",
-			combat_ability = "base",
-			shoot_release = "previous"
+	{
+		input = "shoot",
+		transition = {
+			{
+				transition = "base",
+				input = "shoot_release"
+			},
+			{
+				transition = "base",
+				input = "reload"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "grenade_ability"
+			},
+			{
+				transition = "base",
+				input = "zoom"
+			}
 		}
+	},
+	{
+		input = "zoom",
+		transition = {
+			{
+				transition = "base",
+				input = "zoom_release"
+			},
+			{
+				input = "zoom_shoot",
+				transition = {
+					{
+						transition = "base",
+						input = "zoom_release"
+					},
+					{
+						transition = "previous",
+						input = "shoot_release"
+					},
+					{
+						transition = "base",
+						input = "reload"
+					},
+					{
+						transition = "base",
+						input = "wield"
+					},
+					{
+						transition = "base",
+						input = "combat_ability"
+					},
+					{
+						transition = "base",
+						input = "grenade_ability"
+					}
+				}
+			},
+			{
+				transition = "base",
+				input = "reload"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "grenade_ability"
+			},
+			{
+				transition = "stay",
+				input = "zoom_weapon_special"
+			}
+		}
+	},
+	{
+		transition = "stay",
+		input = "wield"
+	},
+	{
+		transition = "stay",
+		input = "reload"
+	},
+	{
+		transition = "stay",
+		input = "weapon_special"
 	}
 }
 
-table.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
+ActionInputHierarchy.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
 
 weapon_template.actions = {
 	action_unwield = {
@@ -219,18 +293,18 @@ weapon_template.actions = {
 	action_shoot_hip = {
 		kind = "shoot_hit_scan",
 		start_input = "shoot",
-		weapon_handling_template = "autogun_full_auto_fast",
-		sprint_ready_up_time = 0.2,
-		sprint_requires_press_to_interrupt = true,
-		ammunition_usage = 1,
 		recoil_template = "default_autopistol_assault",
+		weapon_handling_template = "autogun_full_auto_fast",
+		sprint_ready_up_time = 0,
+		allowed_during_sprint = true,
+		ammunition_usage = 1,
 		anim_end_event = "attack_finished",
 		spread_template = "default_autopistol_assault",
 		stop_input = "shoot_release",
 		total_time = math.huge,
 		action_movement_curve = {
 			{
-				modifier = 1.1,
+				modifier = 1.05,
 				t = 0.25
 			},
 			{
@@ -238,10 +312,10 @@ weapon_template.actions = {
 				t = 0.4
 			},
 			{
-				modifier = 0.5,
+				modifier = 0.8,
 				t = 1
 			},
-			start_modifier = 1.25
+			start_modifier = 1.1
 		},
 		fx = {
 			pre_loop_shoot_sfx_alias = "ranged_pre_loop_shot",
@@ -556,7 +630,8 @@ weapon_template.actions = {
 		},
 		time_scale_stat_buffs = {
 			buff_stat_buffs.reload_speed
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_toggle_flashlight = {
 		kind = "toggle_special",
@@ -630,7 +705,8 @@ weapon_template.actions = {
 		total_time = math.huge,
 		crosshair = {
 			crosshair_type = "inspect"
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	}
 }
 
@@ -734,6 +810,8 @@ weapon_template.stamina_template = "default"
 weapon_template.toughness_template = "assault"
 weapon_template.movement_curve_modifier_template = "autopistol_p1_m1"
 weapon_template.footstep_intervals = FootstepIntervalsTemplates.default
+weapon_template.smart_targeting_template = SmartTargetingTemplates.assault
+weapon_template.haptic_trigger_template = HapticTriggerTemplates.ranged.spray_n_pray
 local WeaponBarUIDescriptionTemplates = require("scripts/settings/equipment/weapon_bar_ui_description_templates")
 weapon_template.base_stats = {
 	autopistol_p1_m1_dps_stat = {
@@ -808,7 +886,6 @@ weapon_template.base_stats = {
 		}
 	}
 }
-weapon_template.smart_targeting_template = SmartTargetingTemplates.assault
 weapon_template.traits = {}
 local bespoke_autogun_p1_traits = table.ukeys(WeaponTraitsBespokeAutopistolP1)
 

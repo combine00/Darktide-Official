@@ -40,14 +40,12 @@ local zealot_c_ogryn_b = {
 	},
 	combat_pause_limited_zealot_c_20_b = {
 		randomize_indexes_n = 0,
-		sound_events_n = 2,
+		sound_events_n = 1,
 		sound_events = {
-			[1.0] = "loc_ogryn_b__combat_pause_limited_zealot_c_20_b_01",
-			[2.0] = "loc_ogryn_b__combat_pause_limited_zealot_c_20_b_02"
+			[1.0] = "loc_ogryn_b__combat_pause_limited_zealot_c_20_b_01"
 		},
 		sound_events_duration = {
-			[1.0] = 1.930083,
-			[2.0] = 4.921604
+			[1.0] = 1.930083
 		},
 		randomize_indexes = {}
 	},
@@ -61,10 +59,6 @@ local zealot_c_ogryn_b = {
 		sound_events_duration = {
 			[1.0] = 3.878698,
 			[2.0] = 2.384635
-		},
-		sound_event_weights = {
-			[1.0] = 0.5,
-			[2.0] = 0.5
 		},
 		randomize_indexes = {}
 	},

@@ -82,7 +82,10 @@ function CharacterStateMachineExtension:_init_components(unit_data, extension_in
 	IntoxicatedMovement.initialize_component(intoxicated_movement_component)
 
 	local minigame_character_state_component = unit_data:write_component("minigame_character_state")
-	minigame_character_state_component.interface_unit_id = NetworkConstants.invalid_level_unit_id
+	minigame_character_state_component.interface_level_unit_id = NetworkConstants.invalid_level_unit_id
+	minigame_character_state_component.interface_game_object_id = NetworkConstants.invalid_game_object_id
+	minigame_character_state_component.interface_is_level_unit = true
+	minigame_character_state_component.pocketable_device_active = false
 
 	return steering, move_state, ladder_character_state_component
 end
@@ -116,8 +119,10 @@ function CharacterStateMachineExtension:_create_init_context(unit, world, physic
 		unit_data = unit_data,
 		locomotion_steering_component = steering_component,
 		movement_state_component = move_state_component,
+		action_sweep_component = unit_data:read_component("action_sweep"),
 		alternate_fire_component = unit_data:read_component("alternate_fire"),
 		character_state_component = unit_data:read_component("character_state"),
+		combat_ability_action_component = unit_data:read_component("combat_ability_action"),
 		disabled_character_state_component = unit_data:read_component("disabled_character_state"),
 		dodge_character_state_component = unit_data:read_component("dodge_character_state"),
 		first_person_component = unit_data:read_component("first_person"),
@@ -131,13 +136,12 @@ function CharacterStateMachineExtension:_create_init_context(unit, world, physic
 		locomotion_force_rotation_component = unit_data:write_component("locomotion_force_rotation"),
 		locomotion_force_translation_component = unit_data:write_component("locomotion_force_translation"),
 		lunge_character_state_component = unit_data:read_component("lunge_character_state"),
+		minigame_character_state_component = unit_data:read_component("minigame_character_state"),
 		movement_settings_component = unit_data:read_component("movement_settings"),
 		sprint_character_state_component = unit_data:read_component("sprint_character_state"),
 		stunned_character_state_component = unit_data:read_component("stunned_character_state"),
 		sway_component = unit_data:read_component("sway"),
 		weapon_action_component = unit_data:read_component("weapon_action"),
-		combat_ability_action_component = unit_data:read_component("combat_ability_action"),
-		action_sweep_component = unit_data:read_component("action_sweep"),
 		player_character_constants = extension_init_data.player_character_constants,
 		breed = extension_init_data.breed,
 		archetype = unit_data:archetype()

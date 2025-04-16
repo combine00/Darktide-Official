@@ -216,8 +216,11 @@ end
 
 minion_difficulty_settings.health = {
 	chaos_poxwalker = _horde_health_steps(150),
+	chaos_lesser_mutated_poxwalker = _horde_health_steps(160),
+	chaos_mutated_poxwalker = _horde_health_steps(180),
 	chaos_newly_infected = _horde_health_steps(120),
 	chaos_armored_infected = _horde_health_steps(250),
+	chaos_mutator_ritualist = _roamer_health_steps(1000),
 	chaos_hound = _special_health_steps(700),
 	chaos_hound_mutator = _special_health_steps(150),
 	chaos_poxwalker_bomber = _special_health_steps(700),
@@ -237,6 +240,7 @@ minion_difficulty_settings.health = {
 	chaos_ogryn_bulwark = _elite_health_steps(2400),
 	chaos_ogryn_executor = _elite_health_steps(1800),
 	chaos_daemonhost = _roamer_health_steps(16000),
+	chaos_mutator_daemonhost = _roamer_health_steps(16000),
 	renegade_captain = _roamer_health_steps(16000),
 	renegade_melee = _roamer_health_steps(250),
 	renegade_rifleman = _roamer_health_steps(150),
@@ -246,35 +250,37 @@ minion_difficulty_settings.health = {
 	renegade_twin_captain = _monster_health_steps(24000),
 	renegade_twin_captain_two = _monster_health_steps(24000),
 	renegade_gunner = _elite_health_steps(600),
+	renegade_radio_operator = _elite_health_steps(1000),
 	renegade_berzerker = _elite_health_steps(1000),
 	cultist_berzerker = _elite_health_steps(1000),
+	cultist_ritualist = _roamer_health_steps(1000),
 	cultist_melee = _roamer_health_steps(275),
 	cultist_assault = _roamer_health_steps(200),
 	cultist_shocktrooper = _elite_health_steps(500),
 	cultist_gunner = _elite_health_steps(700)
 }
 minion_difficulty_settings.hit_mass = {
-	renegade_flamer = 2,
-	renegade_plasma_shocktrooper = 4,
-	cultist_mutant = 10,
-	chaos_ogryn_executor = 12.5,
-	renegade_flamer_mutator = 2,
 	chaos_hound_mutator = 2,
-	cultist_shocktrooper = 2,
-	chaos_ogryn_gunner = 12.5,
-	chaos_beast_of_nurgle = 20,
-	cultist_captain = 20,
-	renegade_twin_captain_two = 4,
 	cultist_berzerker = 4,
-	renegade_twin_captain = 4,
-	cultist_grenadier = 2,
-	chaos_spawn = 20,
-	cultist_flamer = 2,
 	chaos_poxwalker_bomber = 2.5,
+	cultist_mutant = 10,
+	cultist_grenadier = 2,
+	renegade_flamer_mutator = 2,
+	chaos_ogryn_gunner = 12.5,
+	renegade_flamer = 2,
+	chaos_ogryn_executor = 12.5,
+	chaos_spawn = 20,
+	renegade_twin_captain = 4,
+	chaos_beast_of_nurgle = 20,
+	renegade_plasma_shocktrooper = 4,
+	chaos_plague_ogryn = 20,
+	cultist_captain = 20,
+	chaos_mutator_daemonhost = 20,
+	renegade_twin_captain_two = 4,
+	cultist_flamer = 2,
 	renegade_grenadier = 2,
 	cultist_mutant_mutator = 8,
 	chaos_daemonhost = 20,
-	chaos_plague_ogryn = 20,
 	renegade_berzerker = 10,
 	renegade_sniper = 2,
 	renegade_netgunner = 3,
@@ -292,6 +298,22 @@ minion_difficulty_settings.hit_mass = {
 		1.25
 	},
 	chaos_poxwalker = {
+		1.25,
+		1.25,
+		1.25,
+		1.5,
+		1.5,
+		1.5
+	},
+	chaos_lesser_mutated_poxwalker = {
+		1.25,
+		1.25,
+		1.25,
+		1.5,
+		1.5,
+		1.5
+	},
+	chaos_mutated_poxwalker = {
 		1.25,
 		1.25,
 		1.25,
@@ -323,6 +345,30 @@ minion_difficulty_settings.hit_mass = {
 		2.5,
 		3
 	},
+	cultist_ritualist = {
+		2.5,
+		2.5,
+		2.5,
+		2.5,
+		2.5,
+		3
+	},
+	chaos_mutator_ritualist = {
+		2.5,
+		2.5,
+		2.5,
+		2.5,
+		2.5,
+		3
+	},
+	cultist_shocktrooper = {
+		4,
+		4,
+		4,
+		4,
+		4,
+		4
+	},
 	renegade_assault = {
 		1.5,
 		1.5,
@@ -332,11 +378,19 @@ minion_difficulty_settings.hit_mass = {
 		2.5
 	},
 	renegade_gunner = {
-		4,
-		4,
-		4,
-		4,
-		4,
+		5,
+		5,
+		5,
+		5,
+		5,
+		8
+	},
+	renegade_radio_operator = {
+		5,
+		5,
+		5,
+		5,
+		5,
 		8
 	},
 	renegade_melee = {
@@ -356,17 +410,25 @@ minion_difficulty_settings.hit_mass = {
 		2
 	},
 	renegade_shocktrooper = {
-		2,
-		2,
-		2,
-		2,
-		2,
+		5,
+		5,
+		5,
+		5,
+		5,
 		6
 	}
 }
 minion_difficulty_settings.power_level = {
 	horde_default_melee = _step_dmg_horde_melee(400),
 	renegade_default_melee = _step_dmg_roamer_melee(300),
+	chaos_engulfed_enemy_fire_attack = {
+		35,
+		50,
+		75,
+		100,
+		125,
+		200
+	},
 	chaos_ogryn_executor_melee = _step_dmg_melee(400),
 	chaos_poxwalker_bomber_explosion = {
 		200,
@@ -389,6 +451,7 @@ minion_difficulty_settings.power_level = {
 	renegade_default_shot = _step_dmg_ranged(275),
 	renegade_executor_melee = _step_dmg_melee(300),
 	renegade_gunner_shot = _step_dmg_ranged(325),
+	renegade_radio_operator_shot = _step_dmg_ranged(325),
 	renegade_shotgun_shot = _step_dmg_ranged(300),
 	renegade_assault_shot = _step_dmg_ranged(225),
 	cultist_assault_shot = _step_dmg_ranged(250),
@@ -400,11 +463,11 @@ minion_difficulty_settings.power_level = {
 		600
 	},
 	cultist_captain_melee_two_hand = {
-		100,
-		150,
-		300,
+		250,
 		500,
-		800
+		750,
+		1000,
+		1250
 	},
 	cultist_captain_default_shot = _step_dmg_ranged(225),
 	cultist_flamer_default = _step_dmg_ranged(50),
@@ -462,7 +525,7 @@ minion_difficulty_settings.power_level = {
 		500,
 		800
 	},
-	renegade_captain_default_shot = _step_dmg_ranged(225),
+	renegade_captain_default_shot = _step_dmg_ranged(350),
 	daemonhost_corruption_aura = {
 		6,
 		15,
@@ -531,9 +594,9 @@ minion_difficulty_settings.power_level = {
 }
 minion_difficulty_settings.shooting = {
 	chaos_ogryn_gunner = {
-		aim_durations = _equal_difficulty_values(1.3, 1.3),
+		aim_durations = _equal_difficulty_values(1, 1),
 		shoot_cooldown = _shoot_steps_desc(2, 3),
-		time_per_shot = _equal_difficulty_values(0.115, 0.115),
+		time_per_shot = _equal_difficulty_values(0.1, 0.1),
 		num_shots = _shoot_steps_asc(60, 60, true)
 	},
 	cultist_flamer = {
@@ -596,6 +659,13 @@ minion_difficulty_settings.shooting = {
 		shoot_dodge_window = _equal_difficulty_values(0.5, 0.5)
 	},
 	renegade_gunner = {
+		aim_durations = _shoot_steps_desc(0.5, 0.75),
+		shoot_cooldown = _shoot_steps_desc(2, 3),
+		time_per_shot = _equal_difficulty_values(0.0923, 0.0923),
+		num_shots = _shoot_steps_asc(50, 50, true),
+		num_shots_cover = _shoot_steps_asc(50, 50, true)
+	},
+	renegade_radio_operator = {
 		aim_durations = _shoot_steps_desc(0.5, 0.75),
 		shoot_cooldown = _shoot_steps_desc(2, 3),
 		time_per_shot = _equal_difficulty_values(0.0923, 0.0923),
@@ -988,6 +1058,29 @@ minion_difficulty_settings.suppression = {
 		}
 	},
 	renegade_gunner = {
+		above_threshold_decay_multiplier = 2,
+		disable_cover_threshold = 35,
+		max_value = {
+			melee = _sup_scale(40),
+			close = _sup_scale(40),
+			far = _sup_scale(40)
+		},
+		threshold = {
+			melee = _sup_scale(27.5),
+			close = _sup_scale(27.5),
+			far = _sup_scale(27.5)
+		},
+		decay_speeds = {
+			melee = _sup_div_scale(0.05),
+			close = _sup_div_scale(0.3),
+			far = _sup_div_scale(0.5)
+		},
+		immunity_duration = {
+			0.25,
+			0.5
+		}
+	},
+	renegade_radio_operator = {
 		above_threshold_decay_multiplier = 2,
 		disable_cover_threshold = 35,
 		max_value = {

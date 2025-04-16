@@ -71,9 +71,11 @@ function MinionShieldExtension:can_block_attack(damage_profile, attacking_unit, 
 		return false
 	end
 
-	local breed = attacking_owner_unit_data_extension:breed()
+	local unit = self._unit
+	local attacking_owner_breed = attacking_owner_unit_data_extension:breed()
+	local side_system = Managers.state.extension:system("side_system")
 
-	if Breed.is_minion(breed) then
+	if Breed.is_minion(attacking_owner_breed) and side_system:is_ally(unit, attacking_unit_owner_unit) then
 		return true
 	end
 
@@ -84,7 +86,7 @@ function MinionShieldExtension:can_block_attack(damage_profile, attacking_unit, 
 		return false
 	end
 
-	local hit_zone = hit_actor and HitZone.get(self._unit, hit_actor)
+	local hit_zone = hit_actor and HitZone.get(unit, hit_actor)
 	local hit_zone_name = hit_zone and hit_zone.name
 	local attacking_unit_position = POSITION_LOOKUP[attacking_unit]
 	local can_block_from_position = self:can_block_from_position(attacking_unit_position, hit_zone_name)

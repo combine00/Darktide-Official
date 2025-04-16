@@ -1,7 +1,7 @@
-local UIFontSettings = require("scripts/managers/ui/ui_font_settings")
-local UIWidget = require("scripts/managers/ui/ui_widget")
 local ProfileUtils = require("scripts/utilities/profile_utils")
-local PlayerManager = require("scripts/foundation/managers/player/player_manager")
+local UIFontSettings = require("scripts/managers/ui/ui_font_settings")
+local UiSettings = require("scripts/settings/ui/ui_settings")
+local UIWidget = require("scripts/managers/ui/ui_widget")
 local _event_update_player_name, _create_character_text = nil
 local template = {}
 local size = {
@@ -19,6 +19,7 @@ template.position_offset = {
 template.check_line_of_sight = true
 template.max_distance = 15
 template.screen_clamp = false
+template.start_layer = 300
 template.scale_settings = {
 	scale_to = 1,
 	scale_from = 0.5,
@@ -70,6 +71,14 @@ end
 function template.on_exit(widget, marker)
 	Managers.event:unregister(marker, "event_player_profile_updated")
 	Managers.event:unregister(marker, "event_update_player_name")
+
+	if marker.rank_promise then
+		if marker.rank_promise:is_pending() then
+			marker.rank_promise:cancel()
+		end
+
+		marker.rank_promise = nil
+	end
 end
 
 function template.on_enter(widget, marker)
@@ -156,7 +165,8 @@ function _create_character_text(marker)
 	local character_level = profile and profile.current_level or 1
 	local title = ProfileUtils.character_title(profile)
 	local archetype = profile and profile.archetype
-	local string_symbol = archetype and archetype.string_symbol or ""
+	local archetype_name = archetype and archetype.name
+	local string_symbol = archetype_name and UiSettings.archetype_font_icon[archetype_name] or ""
 	local text = string_symbol .. " " .. player:name() .. " - " .. tostring(character_level) .. " "
 
 	if title then
@@ -164,6 +174,26 @@ function _create_character_text(marker)
 	end
 
 	marker.widget.content.header_text = text
+
+	if character_level >= 30 then
+		local rank_promise = Managers.data_service.havoc:havoc_rank_cadence_high(player:account_id())
+
+		rank_promise:next(function (rank)
+			marker.rank_promise = nil
+
+			if rank then
+				text = string_symbol .. " " .. player:name() .. " - " .. tostring(rank) .. " "
+
+				if title then
+					text = text .. "\n" .. title
+				end
+
+				marker.widget.content.header_text = text
+			end
+		end)
+
+		marker.rank_promise = rank_promise
+	end
 end
 
 return template

@@ -612,9 +612,16 @@ function StateMainMenu:_rejoin_game()
 end
 
 function StateMainMenu:_show_reconnect_popup()
+	local description_text = "loc_popup_description_reconnect_to_session"
+	local mission_data = Managers.party_immaterium:current_game_session_mission_data()
+
+	if mission_data and mission_data.mission and mission_data.mission.category == "havoc" then
+		description_text = "loc_system_leave_penalty_description"
+	end
+
 	local context = {
 		title_text = "loc_popup_header_reconnect_to_session",
-		description_text = "loc_popup_description_reconnect_to_session",
+		description_text = description_text,
 		options = {
 			{
 				text = "loc_popup_reconnect_to_session_reconnect_button",

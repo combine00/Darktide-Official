@@ -480,7 +480,7 @@ return function ()
 			},
 			{
 				"faction_memory",
-				"mission_station_end_event_conversation_01_a",
+				"mission_station_end_event_conversation",
 				OP.EQ,
 				0
 			}
@@ -488,7 +488,13 @@ return function ()
 		on_done = {
 			{
 				"faction_memory",
-				"mission_station_end_event_conversation_01_a",
+				"mission_station_end_event_conversation",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"allow_captain_taunt_response",
 				OP.ADD,
 				1
 			}
@@ -571,7 +577,7 @@ return function ()
 			},
 			{
 				"faction_memory",
-				"mission_station_end_event_conversation_02_a",
+				"mission_station_end_event_conversation",
 				OP.EQ,
 				0
 			}
@@ -579,7 +585,13 @@ return function ()
 		on_done = {
 			{
 				"faction_memory",
-				"mission_station_end_event_conversation_02_a",
+				"mission_station_end_event_conversation",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"allow_captain_taunt_response",
 				OP.ADD,
 				1
 			}
@@ -665,7 +677,7 @@ return function ()
 			},
 			{
 				"faction_memory",
-				"mission_station_end_event_conversation_one_a",
+				"mission_station_end_event_conversation",
 				OP.EQ,
 				0
 			}
@@ -673,7 +685,13 @@ return function ()
 		on_done = {
 			{
 				"faction_memory",
-				"mission_station_end_event_conversation_one_a",
+				"mission_station_end_event_conversation",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"allow_captain_taunt_response",
 				OP.ADD,
 				1
 			}
@@ -745,7 +763,7 @@ return function ()
 			},
 			{
 				"faction_memory",
-				"mission_station_end_event_conversation_three_a",
+				"mission_station_end_event_conversation",
 				OP.EQ,
 				0
 			}
@@ -753,7 +771,13 @@ return function ()
 		on_done = {
 			{
 				"faction_memory",
-				"mission_station_end_event_conversation_three_a",
+				"mission_station_end_event_conversation",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"allow_captain_taunt_response",
 				OP.ADD,
 				1
 			}
@@ -824,7 +848,7 @@ return function ()
 			},
 			{
 				"faction_memory",
-				"mission_station_end_event_conversation_two_a",
+				"mission_station_end_event_conversation",
 				OP.EQ,
 				0
 			}
@@ -832,7 +856,7 @@ return function ()
 		on_done = {
 			{
 				"faction_memory",
-				"mission_station_end_event_conversation_two_a",
+				"mission_station_end_event_conversation",
 				OP.ADD,
 				1
 			}
@@ -876,7 +900,14 @@ return function ()
 				}
 			}
 		},
-		on_done = {},
+		on_done = {
+			{
+				"faction_memory",
+				"allow_captain_taunt_response",
+				OP.ADD,
+				1
+			}
+		},
 		heard_speak_routing = {
 			target = "players"
 		},

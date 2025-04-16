@@ -2,9 +2,9 @@ local CraftingMechanicusModifyViewDefinitions = require("scripts/ui/views/crafti
 local CraftingSettings = require("scripts/settings/item/crafting_mechanicus_settings")
 local ItemSlotSettings = require("scripts/settings/item/item_slot_settings")
 local ButtonPassTemplates = require("scripts/ui/pass_templates/button_pass_templates")
+local Items = require("scripts/utilities/items")
 local ViewElementCraftingRecipe = require("scripts/ui/view_elements/view_element_crafting_recipe/view_element_crafting_recipe")
 local ViewElementTabMenu = require("scripts/ui/view_elements/view_element_tab_menu/view_element_tab_menu")
-local ItemUtils = require("scripts/utilities/items")
 
 require("scripts/ui/views/item_grid_view_base/item_grid_view_base")
 
@@ -34,7 +34,15 @@ function CraftingMechanicusModifyView:on_enter()
 	self._crafting_recipe = self:_setup_crafting_recipe("crafting_recipe", "crafting_recipe_pivot")
 
 	if self._preselected_item then
-		self._crafting_recipe:present_recipe_navigation_with_item(CraftingSettings.recipes_ui_order, callback(self, "cb_on_recipe_button_pressed"), callback(self, "_update_weapon_stats_position", "crafting_recipe_pivot", self._crafting_recipe), self._preselected_item, CraftingSettings.type, {
+		local selected_index = self._crafting_recipe:selected_grid_index()
+
+		self._crafting_recipe:present_recipe_navigation_with_item(CraftingSettings.recipes_ui_order, callback(self, "cb_on_recipe_button_pressed"), function ()
+			if selected_index then
+				self._crafting_recipe:select_grid_index(selected_index)
+			end
+
+			self:_update_weapon_stats_position("crafting_recipe_pivot", self._crafting_recipe)
+		end, self._preselected_item, CraftingSettings.type, {
 			masteries_data = self._masteries_data
 		})
 	else
@@ -44,12 +52,19 @@ function CraftingMechanicusModifyView:on_enter()
 	end
 
 	local character_id = self:_player():character_id()
+	local slot_filter_list = {
+		"slot_primary",
+		"slot_secondary",
+		"slot_attachment_1",
+		"slot_attachment_2",
+		"slot_attachment_3"
+	}
 	local item_type_filter_list = {
 		"WEAPON_MELEE",
 		"WEAPON_RANGED",
 		"GADGET"
 	}
-	self._inventory_promise = Managers.data_service.gear:fetch_inventory(character_id, nil, item_type_filter_list)
+	self._inventory_promise = Managers.data_service.gear:fetch_inventory(character_id, slot_filter_list, item_type_filter_list)
 
 	self._inventory_promise:next(function (items)
 		if self._destroyed then
@@ -102,96 +117,96 @@ function CraftingMechanicusModifyView:_setup_sort_options()
 				display_name = Localize("loc_inventory_item_grid_sort_title_format_high_low", true, {
 					sort_name = Localize("loc_inventory_item_grid_sort_title_rarity")
 				}),
-				sort_function = ItemUtils.sort_element_key_comparator({
+				sort_function = Items.sort_element_key_comparator({
 					">",
 					"item",
-					ItemUtils.compare_item_rarity,
+					Items.compare_item_rarity,
 					">",
 					"item",
-					ItemUtils.compare_item_level,
+					Items.compare_item_level,
 					"<",
 					"item",
-					ItemUtils.compare_item_name
+					Items.compare_item_name
 				})
 			},
 			{
 				display_name = Localize("loc_inventory_item_grid_sort_title_format_low_high", true, {
 					sort_name = Localize("loc_inventory_item_grid_sort_title_rarity")
 				}),
-				sort_function = ItemUtils.sort_element_key_comparator({
+				sort_function = Items.sort_element_key_comparator({
 					"<",
 					"item",
-					ItemUtils.compare_item_rarity,
+					Items.compare_item_rarity,
 					">",
 					"item",
-					ItemUtils.compare_item_level,
+					Items.compare_item_level,
 					"<",
 					"item",
-					ItemUtils.compare_item_name
+					Items.compare_item_name
 				})
 			},
 			{
 				display_name = Localize("loc_inventory_item_grid_sort_title_format_high_low", true, {
 					sort_name = Localize("loc_inventory_item_grid_sort_title_item_power")
 				}),
-				sort_function = ItemUtils.sort_element_key_comparator({
+				sort_function = Items.sort_element_key_comparator({
 					">",
 					"item",
-					ItemUtils.compare_item_level,
+					Items.compare_item_level,
 					">",
 					"item",
-					ItemUtils.compare_item_rarity,
+					Items.compare_item_rarity,
 					"<",
 					"item",
-					ItemUtils.compare_item_name
+					Items.compare_item_name
 				})
 			},
 			{
 				display_name = Localize("loc_inventory_item_grid_sort_title_format_low_high", true, {
 					sort_name = Localize("loc_inventory_item_grid_sort_title_item_power")
 				}),
-				sort_function = ItemUtils.sort_element_key_comparator({
+				sort_function = Items.sort_element_key_comparator({
 					"<",
 					"item",
-					ItemUtils.compare_item_level,
+					Items.compare_item_level,
 					">",
 					"item",
-					ItemUtils.compare_item_rarity,
+					Items.compare_item_rarity,
 					"<",
 					"item",
-					ItemUtils.compare_item_name
+					Items.compare_item_name
 				})
 			},
 			{
 				display_name = Localize("loc_inventory_item_grid_sort_title_format_increasing_letters", true, {
 					sort_name = Localize("loc_inventory_item_grid_sort_title_name")
 				}),
-				sort_function = ItemUtils.sort_element_key_comparator({
+				sort_function = Items.sort_element_key_comparator({
 					"<",
 					"item",
-					ItemUtils.compare_item_name,
+					Items.compare_item_name,
 					">",
 					"item",
-					ItemUtils.compare_item_level,
+					Items.compare_item_level,
 					">",
 					"item",
-					ItemUtils.compare_item_rarity
+					Items.compare_item_rarity
 				})
 			},
 			{
 				display_name = Localize("loc_inventory_item_grid_sort_title_format_decreasing_letters", true, {
 					sort_name = Localize("loc_inventory_item_grid_sort_title_name")
 				}),
-				sort_function = ItemUtils.sort_element_key_comparator({
+				sort_function = Items.sort_element_key_comparator({
 					">",
 					"item",
-					ItemUtils.compare_item_name,
+					Items.compare_item_name,
 					">",
 					"item",
-					ItemUtils.compare_item_level,
+					Items.compare_item_level,
 					">",
 					"item",
-					ItemUtils.compare_item_rarity
+					Items.compare_item_rarity
 				})
 			}
 		}
@@ -215,14 +230,6 @@ function CraftingMechanicusModifyView:_update_weapon_stats_position(scenegraph_i
 
 	weapon_stats:set_pivot_offset(position[1], position[2])
 	self:_set_scenegraph_size(scenegraph_id, nil, weapon_stats:grid_height())
-end
-
-function CraftingMechanicusModifyView:_cb_on_present()
-	CraftingMechanicusModifyView.super._cb_on_present(self)
-
-	local index = self._item_grid:selected_grid_index()
-
-	self:scroll_to_grid_index(index, true)
 end
 
 function CraftingMechanicusModifyView:on_back_pressed()
@@ -330,8 +337,15 @@ function CraftingMechanicusModifyView:_preview_item(item)
 
 	if not self._current_item and not self._preselected_item or self._current_item ~= item then
 		self._current_item = item
+		local selected_index = self._crafting_recipe:selected_grid_index()
 
-		self._crafting_recipe:present_recipe_navigation_with_item(CraftingSettings.recipes_ui_order, callback(self, "cb_on_recipe_button_pressed"), callback(self, "_update_weapon_stats_position", "crafting_recipe_pivot", self._crafting_recipe), item, CraftingSettings.type, {
+		self._crafting_recipe:present_recipe_navigation_with_item(CraftingSettings.recipes_ui_order, callback(self, "cb_on_recipe_button_pressed"), function ()
+			if selected_index then
+				self._crafting_recipe:select_grid_index(selected_index)
+			end
+
+			self:_update_weapon_stats_position("crafting_recipe_pivot", self._crafting_recipe)
+		end, item, CraftingSettings.type, {
 			masteries_data = self._masteries_data
 		})
 	end
@@ -407,6 +421,42 @@ function CraftingMechanicusModifyView:_cb_fetch_inventory_items(items, masteries
 	self:cb_switch_tab(tab_index)
 end
 
+function CraftingMechanicusModifyView:cb_switch_tab(tab_index)
+	if self._preselected_item then
+		self._preselected_item = nil
+	else
+		local start_index = 1
+		local equipped_item = nil
+		local tabs_content = CraftingMechanicusModifyViewDefinitions.item_category_tabs_content
+		local tab_slots = tabs_content[tab_index].slot_types
+
+		for i = 1, #tab_slots do
+			local tab_slot = tab_slots[i]
+			equipped_item = self:equipped_item_in_slot(tab_slot)
+
+			if equipped_item then
+				break
+			end
+		end
+
+		if equipped_item then
+			start_index = self:item_grid_index(equipped_item) or start_index
+
+			if start_index then
+				self._selected_gear_id = equipped_item and equipped_item.gear_id
+			end
+		else
+			local first_item = self:first_grid_item()
+
+			if first_item then
+				self._selected_gear_id = first_item and first_item.gear_id
+			end
+		end
+	end
+
+	CraftingMechanicusModifyView.super.cb_switch_tab(self, tab_index)
+end
+
 function CraftingMechanicusModifyView:equipped_item_in_slot(slot_name)
 	local player = self:_player()
 	local profile = player:profile()
@@ -478,9 +528,9 @@ end
 function CraftingMechanicusModifyView:cb_on_favorite_pressed()
 	local widget = self._item_grid and self._item_grid:selected_grid_widget()
 	local gear_id = widget and widget.content.element and widget.content.element.item and widget.content.element.item.gear_id
-	local is_favorite = ItemUtils.is_item_id_favorited(gear_id)
+	local is_favorite = Items.is_item_id_favorited(gear_id)
 
-	ItemUtils.set_item_id_as_favorite(gear_id, not is_favorite)
+	Items.set_item_id_as_favorite(gear_id, not is_favorite)
 end
 
 function CraftingMechanicusModifyView:dialogue_system()

@@ -148,6 +148,9 @@ local action_data = {
 			jump_up_1m = 0.1
 		}
 	},
+	disable = {
+		disable_anims = {}
+	},
 	jump_across = {
 		stagger_immune = true,
 		rotation_duration = 0.1,
@@ -542,13 +545,15 @@ local action_data = {
 		run_anim_event = "move_fwd"
 	},
 	explode = {
-		explode_position_node = "j_spine1",
-		utility_weight = 1,
-		liquid_area = "cultist_flamer_backpack",
 		gib_override_damage_profile = "flamer_backpack_explosion",
 		override_hit_zone_name = "center_mass",
+		utility_weight = 1,
+		liquid_area = "cultist_flamer_backpack",
+		explode_position_node = "j_spine1",
+		interrupted_liquid_area = "interrupted_cultist_flamer_backpack",
 		considerations = UtilityConsiderations.chaos_poxwalker_bomber_explode,
-		explosion_template = ExplosionTemplates.explosion_settings_cultist_flamer
+		explosion_template = ExplosionTemplates.explosion_settings_cultist_flamer,
+		interrupted_explosion_template = ExplosionTemplates.explosion_settings_interrupted_cultist_flamer
 	}
 }
 

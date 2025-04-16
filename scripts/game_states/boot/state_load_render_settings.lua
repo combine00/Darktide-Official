@@ -27,7 +27,7 @@ function StateLoadRenderSettings:_state_update(dt)
 			local setting = settings_to_run[i]
 			local value = setting:get_function()
 
-			setting.on_activated(value, setting)
+			setting.on_activated(value, setting, true)
 		end
 
 		self:_verify_disabled_status(setting)
@@ -53,20 +53,16 @@ function StateLoadRenderSettings:_check_settings_to_tun(settings, settings_to_ru
 			local apply_on_startup = setting.apply_on_startup
 
 			if apply_on_startup then
-				local valid = not setting.validation_function or setting:validation_function()
+				local get_function = setting.get_function
 
-				if valid then
-					local get_function = setting.get_function
+				if get_function then
+					local value = get_function(setting)
 
-					if get_function then
-						local value = get_function(setting)
+					if value ~= nil then
+						local on_activated = setting.on_activated
 
-						if value ~= nil then
-							local on_activated = setting.on_activated
-
-							if on_activated then
-								settings_to_run[#settings_to_run + 1] = setting
-							end
+						if on_activated then
+							settings_to_run[#settings_to_run + 1] = setting
 						end
 					end
 				end

@@ -393,15 +393,16 @@ function GameModeCoopCompleteObjective:_apply_persistent_player_data(player)
 
 		if selected_data then
 			human_data[account_id] = nil
-			selected_data.damage_percent = math.min(selected_data.damage_percent, 0.95)
-			selected_data.permanent_damage_percent = math.min(selected_data.permanent_damage_percent, 0.95)
+			local settings = self._settings.persistent_player_data_settings
+			selected_data.damage_percent = math.min(selected_data.damage_percent, settings.max_damage_percent_from_self)
+			selected_data.permanent_damage_percent = math.min(selected_data.permanent_damage_percent, settings.max_permanent_damage_percent_from_self)
 
 			Log.info("GameModeCoopCompleteObjective", "Player %s inherited persistent data from previous self: %s", account_id, table.tostring(selected_data, 3))
 		elseif #bot_data > 0 then
 			selected_data = table.remove(bot_data, #bot_data)
 			local settings = self._settings.persistent_player_data_settings
-			selected_data.damage_percent = math.min(selected_data.damage_percent, settings.max_damage_percent)
-			selected_data.permanent_damage_percent = math.min(selected_data.permanent_damage_percent, settings.max_permanent_damage_percent)
+			selected_data.damage_percent = math.min(selected_data.damage_percent, settings.max_damage_percent_from_bot)
+			selected_data.permanent_damage_percent = math.min(selected_data.permanent_damage_percent, settings.max_permanent_damage_percent_from_bot)
 
 			Log.info("GameModeCoopCompleteObjective", "Player %s inherited persistent data from previous bot: %s", account_id, table.tostring(selected_data, 3))
 		end
@@ -472,8 +473,9 @@ function GameModeCoopCompleteObjective:should_spawn_dead(player)
 
 		if my_data then
 			local state_name = my_data.character_state_name
+			local respawn_dead_states = self._settings.persistent_player_data_settings.respawn_dead_from_character_states
 
-			return state_name == "hogtied" or state_name == "dead"
+			return table.contains(respawn_dead_states, state_name)
 		end
 	end
 
@@ -536,6 +538,77 @@ function GameModeCoopCompleteObjective:rpc_set_player_respawn_time(channel_id, p
 		else
 			self:_set_ready_time_to_spawn(player, time)
 		end
+	end
+end
+
+function GameModeCoopCompleteObjective:hot_join_sync(sender, channel)
+	GameModeCoopCompleteObjective.super.hot_join_sync(self, sender, channel)
+
+	local sender_player = Managers.player:player(sender, 1)
+	local sender_account_id = sender_player and sender_player:account_id()
+
+	if not sender_account_id then
+		Log.error("GameModeCoopCompleteObjective", "Unable to retrieve account id of peer %s", sender)
+
+		return
+	end
+
+	local mission_id = Managers.mechanism:backend_mission_id()
+
+	if not mission_id then
+		return
+	end
+
+	Managers.data_service.mission_board:fetch_mission(mission_id):next(function (data)
+		local order_owner_id = nil
+		local flags = data.mission and data.mission.flags
+
+		for key, _ in pairs(flags) do
+			if string.find(key, "order%-owner%-") then
+				order_owner_id = string.gsub(key, "order%-owner%-", "")
+
+				break
+			end
+		end
+
+		if order_owner_id then
+			local order_joiner_id = sender_account_id
+
+			self:_queue_join_personal_mission(order_owner_id, mission_id, order_joiner_id)
+		end
+	end)
+end
+
+function GameModeCoopCompleteObjective:_queue_join_personal_mission(order_owner_id, mission_id, order_joiner_id)
+	if not self._join_personal_mission_queue then
+		self._join_personal_mission_queue = {}
+	end
+
+	local queue = self._join_personal_mission_queue
+	local new_entry = {
+		order_owner_id = order_owner_id,
+		mission_id = mission_id,
+		order_joiner_id = order_joiner_id
+	}
+
+	table.insert(queue, new_entry)
+
+	if not self._join_personal_mission_queue_active then
+		self._join_personal_mission_queue_active = true
+
+		self:_next_join_personal_mission()
+	end
+end
+
+function GameModeCoopCompleteObjective:_next_join_personal_mission()
+	local queue = self._join_personal_mission_queue
+
+	if table.is_empty(queue) then
+		self._join_personal_mission_queue_active = false
+	else
+		local args = table.remove(queue)
+
+		Managers.backend.interfaces.orders:join_personal_mission(args.order_owner_id, args.mission_id, args.order_joiner_id):next(self:_next_join_personal_mission())
 	end
 end
 

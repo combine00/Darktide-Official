@@ -101,10 +101,6 @@ local zealot_a_ogryn_b = {
 			[1.0] = 3.347656,
 			[2.0] = 1.971198
 		},
-		sound_event_weights = {
-			[1.0] = 0.5,
-			[2.0] = 0.5
-		},
 		randomize_indexes = {}
 	},
 	combat_pause_quirk_stench_b = {

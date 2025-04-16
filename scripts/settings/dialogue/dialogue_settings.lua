@@ -103,13 +103,20 @@ local DialogueSettings = {
 			"mission_vo_km_enforcer_twins"
 		},
 		tg_shooting_range = {
-			"meat_grinder_vo"
+			"meat_grinder_vo",
+			"mission_vo_psykhanium"
 		},
 		core_research = {
 			"mission_vo_core_research"
 		},
 		op_train = {
 			"mission_vo_op_train"
+		},
+		km_heresy = {
+			"mission_vo_km_heresy"
+		},
+		psykhanium = {
+			"mission_vo_psykhanium"
 		}
 	},
 	player_load_files = {
@@ -254,6 +261,28 @@ local DialogueSettings = {
 		{
 			duration = 9.26,
 			speaker_name = "captain_twin_male_a"
+		}
+	},
+	backend_vo_groups = table.enum("horde_mode"),
+	horde_mode = table.enum("story_echo_morrow_01_a", "story_echo_morrow_05_a", "story_echo_morrow_09_a", "story_echo_morrow_13_a", "story_echo_morrow_17_a", "story_echo_morrow_21_a", "story_echo_morrow_25_a", "story_echo_morrow_29_a", "story_echo_morrow_33_a", "story_echo_zola_01_a", "story_echo_zola_05_a", "story_echo_zola_09_a", "story_echo_zola_13_a", "story_echo_zola_17_a", "story_echo_zola_21_a", "story_echo_zola_25_a"),
+	stats = {
+		horde_mode = {
+			story_echo_morrow_09_a = "hook_backstory_morrow_part_3",
+			story_echo_morrow_33_a = "hook_backstory_morrow_part_9",
+			story_echo_zola_01_a = "hook_backstory_zola_part_1",
+			story_echo_morrow_25_a = "hook_backstory_morrow_part_7",
+			story_echo_zola_05_a = "hook_backstory_zola_part_2",
+			story_echo_zola_09_a = "hook_backstory_zola_part_3",
+			story_echo_morrow_17_a = "hook_backstory_morrow_part_5",
+			story_echo_morrow_01_a = "hook_backstory_morrow_part_1",
+			story_echo_zola_13_a = "hook_backstory_zola_part_4",
+			story_echo_zola_17_a = "hook_backstory_zola_part_5",
+			story_echo_morrow_29_a = "hook_backstory_morrow_part_8",
+			story_echo_morrow_21_a = "hook_backstory_morrow_part_6",
+			story_echo_zola_21_a = "hook_backstory_zola_part_6",
+			story_echo_zola_25_a = "hook_backstory_zola_part_7",
+			story_echo_morrow_05_a = "hook_backstory_morrow_part_2",
+			story_echo_morrow_13_a = "hook_backstory_morrow_part_4"
 		}
 	}
 }

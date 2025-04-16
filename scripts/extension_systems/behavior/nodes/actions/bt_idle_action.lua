@@ -38,4 +38,11 @@ function BtIdleAction:run(unit, breed, blackboard, scratchpad, action_data, dt, 
 	return "running"
 end
 
+function BtIdleAction:init_values(blackboard)
+	local disable_component = Blackboard.write_component(blackboard, "disable")
+	disable_component.is_disabled = false
+	disable_component.type = ""
+	disable_component.attacker_unit = nil
+end
+
 return BtIdleAction

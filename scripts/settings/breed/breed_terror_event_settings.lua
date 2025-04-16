@@ -13,6 +13,9 @@ local breed_terror_event_settings = {
 	chaos_daemonhost = {
 		point_cost = 1000
 	},
+	chaos_mutator_daemonhost = {
+		point_cost = 1000
+	},
 	chaos_hound = {
 		point_cost = 12
 	},
@@ -20,6 +23,12 @@ local breed_terror_event_settings = {
 		point_cost = 1
 	},
 	chaos_armored_infected = {
+		point_cost = 1000
+	},
+	chaos_mutated_poxwalker = {
+		point_cost = 1000
+	},
+	chaos_lesser_mutated_poxwalker = {
 		point_cost = 1000
 	},
 	chaos_ogryn_bulwark = {
@@ -48,6 +57,9 @@ local breed_terror_event_settings = {
 	},
 	renegade_gunner = {
 		point_cost = 5
+	},
+	renegade_radio_operator = {
+		point_cost = math.huge
 	},
 	renegade_melee = {
 		point_cost = 3

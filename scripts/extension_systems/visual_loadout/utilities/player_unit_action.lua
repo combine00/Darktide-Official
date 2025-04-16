@@ -1,4 +1,4 @@
-local Action = require("scripts/utilities/weapon/action")
+local Action = require("scripts/utilities/action/action")
 local WeaponTemplate = require("scripts/utilities/weapon/weapon_template")
 local PlayerUnitAction = {
 	has_current_action_keyword = function (weapon_action_component, keyword)

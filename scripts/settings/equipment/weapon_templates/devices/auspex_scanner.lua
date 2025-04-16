@@ -14,7 +14,10 @@ local weapon_template = {
 		}
 	},
 	action_input_hierarchy = {
-		wield = "stay"
+		{
+			transition = "stay",
+			input = "wield"
+		}
 	},
 	actions = {
 		action_unwield = {
@@ -77,9 +80,9 @@ local function _get_minigame(player)
 
 	local unit_data_extension = ScriptUnit.extension(player_unit, "unit_data_system")
 	local minigame_character_state_component = unit_data_extension:read_component("minigame_character_state")
-	local is_level_unit = true
-	local level_unit_id = minigame_character_state_component.interface_unit_id
-	local interface_unit = Managers.state.unit_spawner:unit(level_unit_id, is_level_unit)
+	local is_level_unit = minigame_character_state_component.interface_is_level_unit
+	local unit_id = is_level_unit and minigame_character_state_component.interface_level_unit_id or minigame_character_state_component.interface_game_object_id
+	local interface_unit = Managers.state.unit_spawner:unit(unit_id, is_level_unit)
 
 	if not interface_unit then
 		return nil

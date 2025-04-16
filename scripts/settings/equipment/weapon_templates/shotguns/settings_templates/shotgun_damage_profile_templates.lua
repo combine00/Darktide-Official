@@ -1,27 +1,24 @@
 local ArmorSettings = require("scripts/settings/damage/armor_settings")
-local PowerLevelSettings = require("scripts/settings/damage/power_level_settings")
 local DamageProfileSettings = require("scripts/settings/damage/damage_profile_settings")
 local DamageSettings = require("scripts/settings/damage/damage_settings")
 local GibbingSettings = require("scripts/settings/gibbing/gibbing_settings")
-local GibbingPower = GibbingSettings.gibbing_power
-local gibbing_types = GibbingSettings.gibbing_types
 local HerdingTemplates = require("scripts/settings/damage/herding_templates")
+local PowerLevelSettings = require("scripts/settings/damage/power_level_settings")
 local WoundsTemplates = require("scripts/settings/damage/wounds_templates")
-local damage_types = DamageSettings.damage_types
 local armor_types = ArmorSettings.types
+local damage_lerp_values = DamageProfileSettings.damage_lerp_values
+local damage_types = DamageSettings.damage_types
+local gibbing_power = GibbingSettings.gibbing_power
+local gibbing_types = GibbingSettings.gibbing_types
+local double_cleave = DamageProfileSettings.double_cleave
+local light_cleave = DamageProfileSettings.light_cleave
+local medium_cleave = DamageProfileSettings.medium_cleave
 local damage_templates = {}
 local overrides = {}
 
 table.make_unique(damage_templates)
 table.make_unique(overrides)
 
-local crit_armor_mod = DamageProfileSettings.crit_armor_mod
-local crit_impact_armor_mod = DamageProfileSettings.crit_impact_armor_mod
-local damage_lerp_values = DamageProfileSettings.damage_lerp_values
-local single_cleave = DamageProfileSettings.single_cleave
-local double_cleave = DamageProfileSettings.double_cleave
-local light_cleave = DamageProfileSettings.light_cleave
-local medium_cleave = DamageProfileSettings.medium_cleave
 damage_templates.default_shotgun_killshot = {
 	ragdoll_only = false,
 	stagger_category = "melee",
@@ -88,7 +85,7 @@ damage_templates.default_shotgun_killshot = {
 		}
 	},
 	critical_strike = {
-		gibbing_power = GibbingPower.heavy,
+		gibbing_power = gibbing_power.heavy,
 		gibbing_type = gibbing_types.ballistic
 	},
 	power_distribution = {
@@ -102,7 +99,7 @@ damage_templates.default_shotgun_killshot = {
 		}
 	},
 	damage_type = damage_types.pellet,
-	gibbing_power = GibbingPower.medium,
+	gibbing_power = gibbing_power.medium,
 	gibbing_type = gibbing_types.ballistic,
 	suppression_value = {
 		0.25,
@@ -203,7 +200,7 @@ damage_templates.default_shotgun_assault = {
 		}
 	},
 	critical_strike = {
-		gibbing_power = GibbingPower.heavy,
+		gibbing_power = gibbing_power.heavy,
 		gibbing_type = gibbing_types.ballistic
 	},
 	power_distribution = {
@@ -217,7 +214,7 @@ damage_templates.default_shotgun_assault = {
 		}
 	},
 	damage_type = damage_types.pellet,
-	gibbing_power = GibbingPower.medium,
+	gibbing_power = gibbing_power.medium,
 	gibbing_type = gibbing_types.ballistic,
 	suppression_value = {
 		0.25,
@@ -315,7 +312,7 @@ damage_templates.shotgun_assault_p2 = {
 		}
 	},
 	critical_strike = {
-		gibbing_power = GibbingPower.heavy,
+		gibbing_power = gibbing_power.heavy,
 		gibbing_type = gibbing_types.ballistic
 	},
 	power_distribution = {
@@ -329,7 +326,7 @@ damage_templates.shotgun_assault_p2 = {
 		}
 	},
 	damage_type = damage_types.pellet,
-	gibbing_power = GibbingPower.medium,
+	gibbing_power = gibbing_power.medium,
 	gibbing_type = gibbing_types.ballistic,
 	suppression_value = {
 		0.6,
@@ -412,7 +409,7 @@ overrides.shotgun_assault_p2_special = {
 		},
 		{
 			"gibbing_power",
-			GibbingPower.medium
+			gibbing_power.medium
 		}
 	}
 }
@@ -464,7 +461,7 @@ overrides.shotgun_assault_p2_special_high_gibbing = {
 		},
 		{
 			"gibbing_power",
-			GibbingPower.impossible
+			gibbing_power.impossible
 		}
 	}
 }
@@ -531,7 +528,7 @@ damage_templates.shotgun_cleaving_special = {
 		}
 	},
 	critical_strike = {
-		gibbing_power = GibbingPower.heavy,
+		gibbing_power = gibbing_power.heavy,
 		gibbing_type = gibbing_types.ballistic
 	},
 	power_distribution = {
@@ -545,7 +542,7 @@ damage_templates.shotgun_cleaving_special = {
 		}
 	},
 	damage_type = damage_types.pellet,
-	gibbing_power = GibbingPower.heavy,
+	gibbing_power = gibbing_power.heavy,
 	gibbing_type = gibbing_types.ballistic,
 	suppression_value = {
 		0.25,
@@ -705,7 +702,7 @@ damage_templates.shotgun_assault_burninating = {
 		}
 	},
 	critical_strike = {
-		gibbing_power = GibbingPower.medium,
+		gibbing_power = gibbing_power.medium,
 		gibbing_type = gibbing_types.ballistic
 	},
 	power_distribution = {
@@ -719,7 +716,7 @@ damage_templates.shotgun_assault_burninating = {
 		}
 	},
 	damage_type = damage_types.pellet,
-	gibbing_power = GibbingPower.light,
+	gibbing_power = gibbing_power.light,
 	gibbing_type = gibbing_types.ballistic,
 	wounds_template = WoundsTemplates.shotgun,
 	on_kill_area_suppression = {
@@ -811,7 +808,7 @@ damage_templates.shotgun_slug_special = {
 		}
 	},
 	critical_strike = {
-		gibbing_power = GibbingPower.medium,
+		gibbing_power = gibbing_power.medium,
 		gibbing_type = gibbing_types.ballistic
 	},
 	power_distribution = {
@@ -825,7 +822,7 @@ damage_templates.shotgun_slug_special = {
 		}
 	},
 	damage_type = damage_types.pellet,
-	gibbing_power = GibbingPower.light,
+	gibbing_power = gibbing_power.light,
 	gibbing_type = gibbing_types.ballistic,
 	suppression_value = {
 		3.5,
@@ -926,7 +923,7 @@ damage_templates.shotgun_p1_m2_assault = {
 		}
 	},
 	critical_strike = {
-		gibbing_power = GibbingPower.medium,
+		gibbing_power = gibbing_power.medium,
 		gibbing_type = gibbing_types.ballistic
 	},
 	power_distribution = {
@@ -940,7 +937,7 @@ damage_templates.shotgun_p1_m2_assault = {
 		}
 	},
 	damage_type = damage_types.pellet,
-	gibbing_power = GibbingPower.light,
+	gibbing_power = gibbing_power.light,
 	gibbing_type = gibbing_types.ballistic,
 	suppression_value = {
 		0.15,
@@ -1041,7 +1038,7 @@ damage_templates.shotgun_p1_m2_killshot = {
 		}
 	},
 	critical_strike = {
-		gibbing_power = GibbingPower.heavy,
+		gibbing_power = gibbing_power.heavy,
 		gibbing_type = gibbing_types.ballistic
 	},
 	power_distribution = {
@@ -1055,7 +1052,7 @@ damage_templates.shotgun_p1_m2_killshot = {
 		}
 	},
 	damage_type = damage_types.pellet,
-	gibbing_power = GibbingPower.medium,
+	gibbing_power = gibbing_power.medium,
 	gibbing_type = gibbing_types.ballistic,
 	suppression_value = {
 		0.15,
@@ -1156,7 +1153,7 @@ damage_templates.shotgun_p1_m3_assault = {
 		}
 	},
 	critical_strike = {
-		gibbing_power = GibbingPower.heavy,
+		gibbing_power = gibbing_power.heavy,
 		gibbing_type = gibbing_types.ballistic
 	},
 	power_distribution = {
@@ -1170,7 +1167,7 @@ damage_templates.shotgun_p1_m3_assault = {
 		}
 	},
 	damage_type = damage_types.pellet,
-	gibbing_power = GibbingPower.medium,
+	gibbing_power = gibbing_power.medium,
 	gibbing_type = gibbing_types.ballistic,
 	suppression_value = {
 		7,
@@ -1268,7 +1265,7 @@ damage_templates.shotgun_p1_m3_killshot = {
 		}
 	},
 	critical_strike = {
-		gibbing_power = GibbingPower.heavy,
+		gibbing_power = gibbing_power.heavy,
 		gibbing_type = gibbing_types.ballistic
 	},
 	power_distribution = {
@@ -1282,7 +1279,7 @@ damage_templates.shotgun_p1_m3_killshot = {
 		}
 	},
 	damage_type = damage_types.pellet,
-	gibbing_power = GibbingPower.medium,
+	gibbing_power = gibbing_power.medium,
 	gibbing_type = gibbing_types.ballistic,
 	suppression_value = {
 		7,
@@ -1405,7 +1402,7 @@ damage_templates.shotgun_weapon_special_bash_light = {
 			}
 		}
 	},
-	gibbing_power = GibbingPower.always,
+	gibbing_power = gibbing_power.always,
 	gibbing_type = gibbing_types.default
 }
 

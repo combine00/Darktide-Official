@@ -10,10 +10,12 @@ function HudElementMissionObjective:init(objective)
 	self._use_counter = true
 	self._current_counter_amount = 0
 	self._max_counter_amount = 0
+	self._hide_max_increment = false
 	self._icon = nil
 	self._progress_bar = false
 	self._progress_bar_icon = nil
 	self._progress_timer = false
+	self._progress_timer_paused = false
 	self._time_left = nil
 	self._marked_units = {}
 	self._marker_ids = {}
@@ -21,6 +23,7 @@ function HudElementMissionObjective:init(objective)
 	self._marker_distances = {}
 	self._objective_category = objective:objective_category()
 	self._locally_added = objective:locally_added()
+	self._sort_order = nil
 	local game_mode_name = Managers.state.game_mode:game_mode_name()
 	local is_in_hub = game_mode_name == "hub" or game_mode_name == "prologue_hub"
 	self._default_marker_type = is_in_hub and "hub_objective" or "objective"
@@ -46,6 +49,10 @@ function HudElementMissionObjective:is_synchronized_with_objective(objective)
 		return false
 	end
 
+	if self._hide_max_increment ~= objective:max_increment_hidden() then
+		return false
+	end
+
 	if self._current_counter_amount ~= objective:incremented_progression() then
 		return false
 	end
@@ -62,7 +69,13 @@ function HudElementMissionObjective:is_synchronized_with_objective(objective)
 		return false
 	end
 
+	local current_progress_timer = objective:progress_timer()
+
 	if self._progress_timer ~= objective:progress_timer() then
+		return false
+	end
+
+	if current_progress_timer and objective.timer_paused and objective:timer_paused() ~= self._progress_timer_paused then
 		return false
 	end
 
@@ -82,6 +95,10 @@ function HudElementMissionObjective:is_synchronized_with_objective(objective)
 		return false
 	end
 
+	if self._sort_order ~= objective:hud_sort_order() then
+		return false
+	end
+
 	return true
 end
 
@@ -95,6 +112,7 @@ function HudElementMissionObjective:synchronize_objective(objective)
 	self._second_progression = objective:second_progression()
 	self._current_counter_amount = objective:incremented_progression()
 	self._max_counter_amount = objective:max_incremented_progression()
+	self._hide_max_increment = objective:max_increment_hidden()
 	self._icon = objective:icon()
 	self._use_counter = objective:use_counter()
 	self._progress_bar = objective:progress_bar()
@@ -103,10 +121,12 @@ function HudElementMissionObjective:synchronize_objective(objective)
 
 	if self._progress_timer then
 		self._time_left = self._max_counter_amount * (1 - self._progression)
+		self._progress_timer_paused = objective.timer_paused and objective:timer_paused()
 	end
 
 	self._marked_units = objective:marked_units()
 	self._marker_type = objective:marker_type()
+	self._sort_order = objective:hud_sort_order()
 end
 
 function HudElementMissionObjective:update_markers()
@@ -181,6 +201,10 @@ function HudElementMissionObjective:_remove_unit_markers(unit)
 	end
 end
 
+function HudElementMissionObjective:sort_order()
+	return self._sort_order
+end
+
 function HudElementMissionObjective:objective_name()
 	return self._objective_name
 end
@@ -209,6 +233,10 @@ function HudElementMissionObjective:max_counter_amount()
 	return self._max_counter_amount
 end
 
+function HudElementMissionObjective:max_increment_hidden()
+	return self._hide_max_increment
+end
+
 function HudElementMissionObjective:progress_bar()
 	return self._progress_bar
 end
@@ -222,7 +250,7 @@ function HudElementMissionObjective:progress_timer()
 end
 
 function HudElementMissionObjective:time_left(dt)
-	if dt then
+	if dt and not self._progress_timer_paused then
 		self._time_left = self._time_left - dt
 	end
 

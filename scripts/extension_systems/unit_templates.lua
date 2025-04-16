@@ -183,6 +183,11 @@ local function _initialize_minion_specific_game_object_data(game_object_type, ga
 	if game_object_type == "minion_daemonhost" then
 		game_object_data.stage = 1
 	end
+
+	if game_object_type == "minion_ritualist" then
+		game_object_data.effect_template_variation_id = -1
+		game_object_data.level_unit_id = NetworkConstants.invalid_level_unit_id
+	end
 end
 
 local function _resolve_minion_attacks(init_data, breed, game_object_data, attack_selection_seed)
@@ -211,6 +216,15 @@ end
 local function _resolve_minion_inventory_and_attacks(init_data, breed, game_object_data, attack_selection_seed, inventory_seed)
 	local mission = Managers.state.mission:mission()
 	local zone_id = mission.zone_id
+
+	if breed.has_havoc_inventory_override then
+		local havoc_mananger = Managers.state.havoc
+
+		if havoc_mananger:is_havoc() then
+			zone_id = breed.has_havoc_inventory_override
+		end
+	end
+
 	local attack_selection_template_name, selected_attack_names, used_weapon_slot_names, combat_range_multi_config_key = _resolve_minion_attacks(init_data, breed, game_object_data, attack_selection_seed)
 	local inventory = nil
 	inventory, inventory_seed = _resolve_minion_inventory(breed.inventory, zone_id, used_weapon_slot_names, attack_selection_template_name, breed.name, inventory_seed)
@@ -226,6 +240,15 @@ end
 local function _resolve_minion_husk_inventory(breed, game_session, game_object_id, attack_selection_seed, inventory_seed)
 	local mission = Managers.state.mission:mission()
 	local zone_id = mission.zone_id
+
+	if breed.has_havoc_inventory_override then
+		local havoc_mananger = Managers.state.havoc
+
+		if havoc_mananger:is_havoc() then
+			zone_id = breed.has_havoc_inventory_override
+		end
+	end
+
 	local used_weapon_slot_names = nil
 
 	if GameSession.has_game_object_field(game_session, game_object_id, "minion_attack_selection_template_id") then
@@ -1804,6 +1827,12 @@ local unit_templates = {
 				})
 			end
 
+			if breed.summon_minions_template then
+				config:add("SummonedMinionsExtension", {
+					breed = breed
+				})
+			end
+
 			if breed.slot_template then
 				config:add("SlotUserExtension", {
 					breed = breed
@@ -1866,7 +1895,7 @@ local unit_templates = {
 				config:add("MinionOutlineExtension", {
 					breed = breed
 				})
-			elseif markable_target then
+			else
 				config:add("MinionOutlineExtension", {
 					breed = breed
 				})
@@ -2060,7 +2089,7 @@ local unit_templates = {
 				config:add("MinionOutlineExtension", {
 					breed = breed
 				})
-			elseif breed.volley_fire_target or breed.psyker_mark_target then
+			else
 				config:add("MinionOutlineExtension", {
 					breed = breed
 				})
@@ -2170,6 +2199,7 @@ local unit_templates = {
 			local pickup_name = pickup_settings.name
 
 			Unit.set_data(unit, "pickup_type", pickup_name)
+			Unit.set_data(unit, "is_pickup", true)
 
 			local radius, categories = _pickup_broadphase_radius_and_categories(pickup_settings)
 
@@ -2264,12 +2294,6 @@ local unit_templates = {
 				game_object_data.yaw = Quaternion.yaw(rotation)
 				game_object_data.pitch = Quaternion.pitch(rotation)
 			end
-
-			local spawn_flow_event = pickup_settings.spawn_flow_event
-
-			if spawn_flow_event then
-				Unit.flow_event(unit, spawn_flow_event)
-			end
 		end,
 		husk_init = function (unit, config, template_context, game_session, game_object_id, owner_id)
 			local go_field = GameSession.game_object_field
@@ -2277,6 +2301,7 @@ local unit_templates = {
 			local pickup_name = NetworkLookup.pickup_names[pickup_id]
 
 			Unit.set_data(unit, "pickup_type", pickup_name)
+			Unit.set_data(unit, "is_pickup", true)
 
 			local pickup_settings = Pickups.by_name[pickup_name]
 			local radius, categories = _pickup_broadphase_radius_and_categories(pickup_settings)
@@ -2328,16 +2353,14 @@ local unit_templates = {
 			end
 
 			config:add("ComponentExtension")
-
-			local spawn_flow_event = pickup_settings.spawn_flow_event
-
-			if spawn_flow_event then
-				Unit.flow_event(unit, spawn_flow_event)
-			end
 		end,
 		local_unit_spawned = function (unit, template_context, game_object_data, pickup_settings, optional_placed_on_unit, optional_spawn_interaction_cooldown, optional_origin_player)
 			if pickup_settings and pickup_settings.spawn_unit_component_event then
 				Component.event(unit, pickup_settings.spawn_unit_component_event, pickup_settings)
+			end
+
+			if pickup_settings and pickup_settings.spawn_flow_event then
+				Unit.flow_event(unit, pickup_settings.spawn_flow_event)
 			end
 		end,
 		husk_unit_spawned = function (unit, template_context, game_session, game_object_id, owner_id)
@@ -2346,6 +2369,10 @@ local unit_templates = {
 
 			if pickup_settings and pickup_settings.spawn_unit_component_event then
 				Component.event(unit, pickup_settings.spawn_unit_component_event, pickup_settings)
+			end
+
+			if pickup_settings and pickup_settings.spawn_flow_event then
+				Unit.flow_event(unit, pickup_settings.spawn_flow_event)
 			end
 		end
 	},
@@ -2572,14 +2599,14 @@ local unit_templates = {
 						{
 							use_as_job = true,
 							class_name = "ProximityHeal",
-							init_data = deployable.proximity_heal_init_data,
-							owner_unit_or_nil = owner_unit_or_nil
+							init_data = deployable.proximity_heal_init_data
 						}
 					}
 				}
 			}
 
 			config:add("SideRelationProximityExtension", {
+				owner_unit_or_nil = owner_unit_or_nil,
 				broadphase = broadphase,
 				relation_init_data = relation_init_data
 			})
@@ -2624,7 +2651,7 @@ local unit_templates = {
 		local_unit_spawned = function (unit, template_context, game_object_data, side_id, deployable, placed_on_unit, owner_unit_or_nil)
 			local job_class = ScriptUnit.extension(unit, "proximity_system")
 
-			Managers.state.unit_job:register(unit, job_class)
+			Managers.state.unit_job:register_job(unit, job_class, true)
 		end
 	},
 	smoke_fog = {
@@ -2724,14 +2751,19 @@ local unit_templates = {
 		game_object_type = function ()
 			return "force_field"
 		end,
-		local_init = function (unit, config, template_context, game_object_data, husk_unit_name, placed_on_unit, owner_unit)
+		local_init = function (unit, config, template_context, game_object_data, husk_unit_name, placed_on_unit, owner_unit, shape_override)
 			local is_server = template_context.is_server
+
+			if shape_override == nil then
+				shape_override = "none"
+			end
 
 			config:add("DeployableUnitLocomotionExtension", {
 				placed_on_unit = placed_on_unit
 			})
 			config:add("ForceFieldExtension", {
-				owner_unit = owner_unit
+				owner_unit = owner_unit,
+				shape_override = shape_override
 			})
 			config:add("ForceFieldHealthExtension", {
 				owner_unit = owner_unit
@@ -2739,6 +2771,7 @@ local unit_templates = {
 
 			local rotation = Unit.local_rotation(unit, 1)
 			game_object_data.unit_name_id = NetworkLookup.force_field_unit_names[husk_unit_name]
+			game_object_data.shape_override = NetworkLookup.force_field_shape_overrides[shape_override]
 			game_object_data.position = Unit.local_position(unit, 1)
 			game_object_data.yaw = Quaternion.yaw(rotation)
 			game_object_data.pitch = 0
@@ -2763,9 +2796,13 @@ local unit_templates = {
 				owner_unit = Managers.state.unit_spawner:unit(owner_unit_id)
 			end
 
+			local shape_override_id = GameSession.game_object_field(game_session, game_object_id, "shape_override")
+			local shape_override = NetworkLookup.force_field_shape_overrides[shape_override_id]
+
 			config:add("DeployableHuskLocomotionExtension", {})
 			config:add("ForceFieldExtension", {
-				owner_unit = owner_unit
+				owner_unit = owner_unit,
+				shape_override = shape_override
 			})
 			config:add("ForceFieldHuskHealthExtension", {})
 		end

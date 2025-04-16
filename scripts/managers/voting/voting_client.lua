@@ -15,6 +15,8 @@ function VotingClient:init(voting_id, initiator_peer, template, optional_params,
 	local network_interface = template.network_interface()
 	self._network_interface = network_interface
 	self._time_left = time_left
+	self._agreement_duration = template.agreement_duration
+	self._agreement_time = nil
 	self._member_list = {}
 	self._votes = {}
 	self._result = nil
@@ -159,6 +161,14 @@ function VotingClient:votes()
 end
 
 function VotingClient:time_left()
+	if self._agreement_time then
+		local duration = self._agreement_duration
+		local time_left = math.max(duration - self._agreement_time, 0)
+		local time_left_normalized = math.max(time_left / duration, 0)
+
+		return time_left, time_left_normalized
+	end
+
 	local duration = self._template.duration
 	local time_left = self._time_left
 	local time_left_normalized = time_left and math.max(time_left / duration, 0)
@@ -172,6 +182,8 @@ function VotingClient:register_vote(voter_peer_id, option)
 	local template = self._template
 
 	_info("Registered vote %q casted by %s in voting %q (%s)", option, voter_peer_id, voting_id, template.name)
+
+	self._agreement_time = nil
 end
 
 function VotingClient:request_vote(option)
@@ -190,6 +202,31 @@ function VotingClient:abort_reason()
 	return self._abort_reason
 end
 
+function VotingClient:_is_current_votes_in_argeement()
+	local votes = self._votes
+	local num_total_votes = table.size(votes)
+
+	if num_total_votes > 0 then
+		local last_vote_option = nil
+
+		for _, option in pairs(votes) do
+			if option == StrictNil then
+				return false
+			end
+
+			if last_vote_option and last_vote_option ~= option then
+				return false
+			end
+
+			last_vote_option = option
+		end
+
+		return true
+	end
+
+	return false
+end
+
 function VotingClient:update(dt, t)
 	if self._state ~= STATES.in_progress then
 		return
@@ -200,6 +237,14 @@ function VotingClient:update(dt, t)
 	if time_left then
 		time_left = math.max(time_left - dt, 0)
 		self._time_left = time_left
+	end
+
+	if self._agreement_duration then
+		if self:_is_current_votes_in_argeement() then
+			self._agreement_time = (self._agreement_time or 0) + dt
+		else
+			self._agreement_time = nil
+		end
 	end
 end
 

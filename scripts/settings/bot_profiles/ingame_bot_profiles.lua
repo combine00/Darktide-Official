@@ -9,7 +9,6 @@ local function ingame_bot_profiles(all_profiles)
 		archetype = "veteran",
 		name_list_id = "male_names_1",
 		current_level = 1,
-		specialization = "veteran_2",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/hair_short_c_02",
 			slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_blonde_02",
@@ -45,7 +44,6 @@ local function ingame_bot_profiles(all_profiles)
 		archetype = "veteran",
 		name_list_id = "male_names_1",
 		current_level = 1,
-		specialization = "veteran_2",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/hair_short_modular_a_03",
 			slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_black_01",
@@ -81,7 +79,6 @@ local function ingame_bot_profiles(all_profiles)
 		archetype = "veteran",
 		name_list_id = "male_names_1",
 		current_level = 1,
-		specialization = "veteran_2",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/hair_short_buzzcut_c",
 			slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_black_01",
@@ -117,7 +114,6 @@ local function ingame_bot_profiles(all_profiles)
 		archetype = "veteran",
 		name_list_id = "female_names_1",
 		current_level = 1,
-		specialization = "veteran_2",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/hair_short_e",
 			slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_brown_02",
@@ -153,7 +149,6 @@ local function ingame_bot_profiles(all_profiles)
 		archetype = "veteran",
 		name_list_id = "female_names_1",
 		current_level = 1,
-		specialization = "veteran_2",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/hair_short_c_02",
 			slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_gray_03",
@@ -189,7 +184,6 @@ local function ingame_bot_profiles(all_profiles)
 		archetype = "veteran",
 		name_list_id = "female_names_1",
 		current_level = 1,
-		specialization = "veteran_2",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/hair_short_modular_b",
 			slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_red_02",
@@ -225,7 +219,6 @@ local function ingame_bot_profiles(all_profiles)
 		archetype = "veteran",
 		name_list_id = "male_names_1",
 		current_level = 1,
-		specialization = "veteran_2",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/hair_short_c_02",
 			slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_blonde_02",
@@ -261,7 +254,6 @@ local function ingame_bot_profiles(all_profiles)
 		archetype = "veteran",
 		name_list_id = "male_names_1",
 		current_level = 1,
-		specialization = "veteran_2",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/hair_short_modular_a_03",
 			slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_black_01",
@@ -297,7 +289,6 @@ local function ingame_bot_profiles(all_profiles)
 		archetype = "veteran",
 		name_list_id = "male_names_1",
 		current_level = 1,
-		specialization = "veteran_2",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/hair_short_buzzcut_c",
 			slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_black_01",
@@ -333,7 +324,6 @@ local function ingame_bot_profiles(all_profiles)
 		archetype = "veteran",
 		name_list_id = "female_names_1",
 		current_level = 1,
-		specialization = "veteran_2",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/hair_short_e",
 			slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_brown_02",
@@ -369,7 +359,6 @@ local function ingame_bot_profiles(all_profiles)
 		archetype = "veteran",
 		name_list_id = "female_names_1",
 		current_level = 1,
-		specialization = "veteran_2",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/hair_short_c_02",
 			slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_gray_03",
@@ -405,7 +394,6 @@ local function ingame_bot_profiles(all_profiles)
 		archetype = "veteran",
 		name_list_id = "female_names_1",
 		current_level = 1,
-		specialization = "veteran_2",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/hair_short_modular_b",
 			slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_red_02",
@@ -441,7 +429,6 @@ local function ingame_bot_profiles(all_profiles)
 		archetype = "veteran",
 		name_list_id = "male_names_1",
 		current_level = 1,
-		specialization = "veteran_2",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/hair_short_c_02",
 			slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_blonde_02",
@@ -477,7 +464,6 @@ local function ingame_bot_profiles(all_profiles)
 		archetype = "veteran",
 		name_list_id = "male_names_1",
 		current_level = 1,
-		specialization = "veteran_2",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/hair_short_modular_a_03",
 			slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_black_01",
@@ -513,7 +499,6 @@ local function ingame_bot_profiles(all_profiles)
 		archetype = "veteran",
 		name_list_id = "male_names_1",
 		current_level = 1,
-		specialization = "veteran_2",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/hair_short_buzzcut_c",
 			slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_black_01",
@@ -549,7 +534,6 @@ local function ingame_bot_profiles(all_profiles)
 		archetype = "veteran",
 		name_list_id = "female_names_1",
 		current_level = 1,
-		specialization = "veteran_2",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/hair_short_e",
 			slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_brown_02",
@@ -585,7 +569,6 @@ local function ingame_bot_profiles(all_profiles)
 		archetype = "veteran",
 		name_list_id = "female_names_1",
 		current_level = 1,
-		specialization = "veteran_2",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/hair_short_c_02",
 			slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_gray_03",
@@ -621,7 +604,6 @@ local function ingame_bot_profiles(all_profiles)
 		archetype = "veteran",
 		name_list_id = "female_names_1",
 		current_level = 1,
-		specialization = "veteran_2",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/hair_short_modular_b",
 			slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_red_02",
@@ -657,7 +639,6 @@ local function ingame_bot_profiles(all_profiles)
 		archetype = "veteran",
 		name_list_id = "male_names_1",
 		current_level = 1,
-		specialization = "veteran_2",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/hair_short_c_02",
 			slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_blonde_02",
@@ -693,7 +674,6 @@ local function ingame_bot_profiles(all_profiles)
 		archetype = "veteran",
 		name_list_id = "male_names_1",
 		current_level = 1,
-		specialization = "veteran_2",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/hair_short_modular_a_03",
 			slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_black_01",
@@ -729,7 +709,6 @@ local function ingame_bot_profiles(all_profiles)
 		archetype = "veteran",
 		name_list_id = "male_names_1",
 		current_level = 1,
-		specialization = "veteran_2",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/hair_short_buzzcut_c",
 			slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_black_01",
@@ -765,7 +744,6 @@ local function ingame_bot_profiles(all_profiles)
 		archetype = "veteran",
 		name_list_id = "female_names_1",
 		current_level = 1,
-		specialization = "veteran_2",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/hair_short_e",
 			slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_brown_02",
@@ -801,7 +779,6 @@ local function ingame_bot_profiles(all_profiles)
 		archetype = "veteran",
 		name_list_id = "female_names_1",
 		current_level = 1,
-		specialization = "veteran_2",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/hair_short_c_02",
 			slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_gray_03",
@@ -837,7 +814,6 @@ local function ingame_bot_profiles(all_profiles)
 		archetype = "veteran",
 		name_list_id = "female_names_1",
 		current_level = 1,
-		specialization = "veteran_2",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/hair_short_modular_b",
 			slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_red_02",

@@ -3,13 +3,14 @@ require("scripts/extension_systems/weapon/actions/action_ability_base")
 local BuffSettings = require("scripts/settings/buff/buff_settings")
 local ShoutAbilityImplementation = require("scripts/extension_systems/ability/utilities/shout_ability_implementation")
 local PlayerUnitVisualLoadout = require("scripts/extension_systems/visual_loadout/utilities/player_unit_visual_loadout")
+local Toughness = require("scripts/utilities/toughness/toughness")
 local Vo = require("scripts/utilities/vo")
 local proc_events = BuffSettings.proc_events
-local ActionShout = class("ActionShout", "ActionAbilityBase")
+local ActionOgrynShout = class("ActionOgrynShout", "ActionAbilityBase")
 local external_properties = {}
 
-function ActionShout:init(action_context, action_params, action_settings)
-	ActionShout.super.init(self, action_context, action_params, action_settings)
+function ActionOgrynShout:init(action_context, action_params, action_settings)
+	ActionOgrynShout.super.init(self, action_context, action_params, action_settings)
 
 	local unit_data_extension = action_context.unit_data_extension
 	self._unit_data_extension = unit_data_extension
@@ -17,19 +18,13 @@ function ActionShout:init(action_context, action_params, action_settings)
 	self._combat_ability_component = unit_data_extension:write_component("combat_ability")
 end
 
-function ActionShout:start(action_settings, t, time_scale, action_start_params)
-	ActionShout.super.start(self, action_settings, t, time_scale, action_start_params)
+function ActionOgrynShout:start(action_settings, t, time_scale, action_start_params)
+	ActionOgrynShout.super.start(self, action_settings, t, time_scale, action_start_params)
 
 	local locomotion_component = self._locomotion_component
 	local locomotion_position = locomotion_component.position
 	local player_position = locomotion_position
 	local player_unit = self._player_unit
-	local rotation = self._first_person_component.rotation
-	local forward = Vector3.normalize(Vector3.flat(Quaternion.forward(rotation)))
-	local shout_direction = forward
-	local ability_template_tweak_data = self._ability_template_tweak_data
-	local self_buff_to_add = ability_template_tweak_data.buff_to_add
-	local slot_to_wield = action_settings.auto_wield_slot
 	local vo_tag = action_settings.vo_tag
 
 	Vo.play_combat_ability_event(player_unit, vo_tag)
@@ -45,15 +40,7 @@ function ActionShout:start(action_settings, t, time_scale, action_start_params)
 
 	self._fx_extension:trigger_gear_wwise_event_with_source("ability_shout", external_properties, source_name, sync_to_clients, include_client)
 
-	if slot_to_wield then
-		local inventory_comp = ScriptUnit.extension(player_unit, "unit_data_system"):read_component("inventory")
-		local wielded_slot = inventory_comp.wielded_slot
-
-		if slot_to_wield ~= wielded_slot then
-			PlayerUnitVisualLoadout.wield_slot(slot_to_wield, player_unit, t)
-		end
-	end
-
+	self._num_hits = 0
 	local anim = action_settings.anim
 	local anim_3p = action_settings.anim_3p or anim
 
@@ -69,6 +56,9 @@ function ActionShout:start(action_settings, t, time_scale, action_start_params)
 		self._fx_extension:spawn_particles(vfx, vfx_pos)
 	end
 
+	local ability_template_tweak_data = self._ability_template_tweak_data
+	local self_buff_to_add = ability_template_tweak_data.buff_to_add
+
 	if self_buff_to_add then
 		local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 
@@ -79,10 +69,25 @@ function ActionShout:start(action_settings, t, time_scale, action_start_params)
 		return
 	end
 
-	ShoutAbilityImplementation.execute(action_settings, player_unit, t, locomotion_component, shout_direction)
+	if action_settings.refill_toughness then
+		Toughness.recover_max_toughness(player_unit, "ability_stance")
+	end
 
-	local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
+	local rotation = self._first_person_component.rotation
+	local shout_direction = Vector3.normalize(Vector3.flat(Quaternion.forward(rotation)))
+	local radius = action_settings.radius
+	local shout_target_template_name = self._ability_template_tweak_data.shout_target_template or action_settings.shout_target_template
+	self._num_hits = ShoutAbilityImplementation.execute(radius, shout_target_template_name, player_unit, t, locomotion_component, shout_direction)
+	local buff_extension = ScriptUnit.extension(self._player_unit, "buff_system")
 	local param_table = buff_extension:request_proc_event_param_table()
+
+	if param_table then
+		param_table.num_hits = self._num_hits
+
+		buff_extension:add_proc_event(proc_events.on_ogryn_shout, param_table)
+	end
+
+	param_table = buff_extension:request_proc_event_param_table()
 
 	if param_table then
 		param_table.unit = player_unit
@@ -93,8 +98,8 @@ function ActionShout:start(action_settings, t, time_scale, action_start_params)
 	self._combat_ability_component.active = true
 end
 
-function ActionShout:finish(reason, data, t, time_in_action, action_settings)
+function ActionOgrynShout:finish(reason, data, t, time_in_action, action_settings)
 	self._combat_ability_component.active = false
 end
 
-return ActionShout
+return ActionOgrynShout

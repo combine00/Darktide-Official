@@ -2,8 +2,8 @@ require("scripts/extension_systems/weapon/actions/action_weapon_base")
 
 local AimProjectile = require("scripts/utilities/aim_projectile")
 local PlayerUnitVisualLoadout = require("scripts/extension_systems/visual_loadout/utilities/player_unit_visual_loadout")
-local ProjectileLocomotionTemplates = require("scripts/settings/projectile_locomotion/projectile_locomotion_templates")
 local ProjectileIntegrationData = require("scripts/extension_systems/locomotion/utilities/projectile_integration_data")
+local ProjectileLocomotionTemplates = require("scripts/settings/projectile_locomotion/projectile_locomotion_templates")
 local ActionAimProjectile = class("ActionAimProjectile", "ActionWeaponBase")
 
 function ActionAimProjectile:init(action_context, ...)
@@ -15,6 +15,8 @@ function ActionAimProjectile:init(action_context, ...)
 end
 
 function ActionAimProjectile:start(action_settings, t, time_scale, action_start_params)
+	ActionAimProjectile.super.start(self, action_settings, t, time_scale, action_start_params)
+
 	local locomotion_template = self:_locomotion_template()
 	local throw_type = action_settings.throw_type or "throw"
 	local throw_config = locomotion_template.trajectory_parameters[throw_type]
@@ -62,7 +64,7 @@ function ActionAimProjectile:_existing_unit()
 end
 
 function ActionAimProjectile:_locomotion_template()
-	local existing_unit, locomotion_extension = self:_existing_unit()
+	local _, locomotion_extension = self:_existing_unit()
 	local action_settings = self._action_settings
 	local weapon_template = self._weapon_template
 	local locomotion_template = nil
@@ -73,8 +75,8 @@ function ActionAimProjectile:_locomotion_template()
 		local template_name_from_action = action_settings.projectile_locomotion_template
 		locomotion_template = ProjectileLocomotionTemplates[template_name_from_action]
 	elseif weapon_template.projectile_template then
-		local projectile_templates = weapon_template.projectile_template
-		locomotion_template = projectile_templates.locomotion_template
+		local projectile_template = weapon_template.projectile_template
+		locomotion_template = projectile_template.locomotion_template
 	end
 
 	return locomotion_template

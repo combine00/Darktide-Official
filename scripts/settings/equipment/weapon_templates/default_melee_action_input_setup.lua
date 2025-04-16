@@ -1,3 +1,4 @@
+local ActionInputHierarchy = require("scripts/utilities/action/action_input_hierarchy")
 local BaseTemplateSettings = require("scripts/settings/equipment/weapon_templates/base_template_settings")
 local default_melee_action_input_setup = {
 	action_inputs = {
@@ -167,40 +168,124 @@ local default_melee_action_input_setup = {
 table.add_missing(default_melee_action_input_setup.action_inputs, BaseTemplateSettings.action_inputs)
 
 default_melee_action_input_setup.action_input_hierarchy = {
-	special_action = "base",
-	wield = "stay",
-	grenade_ability = "base",
-	combat_ability = "base",
-	start_attack = {
-		attack_cancel = "base",
-		wield = "base",
-		heavy_attack = "base",
-		grenade_ability = "base",
-		block = "base",
-		special_action = "base",
-		light_attack = "base"
-	},
-	block = {
-		block_release = "base",
-		wield = "base",
-		grenade_ability = "base",
-		special_action = "base",
-		combat_ability = "base",
-		push = {
-			special_action = "base",
-			push_follow_up_early_release = "base",
-			push_follow_up = {
-				special_action = "base",
-				grenade_ability = "base",
-				push_follow_up_release = "base",
-				wield = "base",
-				block = "base",
-				combat_ability = "base"
+	{
+		input = "start_attack",
+		transition = {
+			{
+				transition = "base",
+				input = "attack_cancel"
+			},
+			{
+				transition = "base",
+				input = "light_attack"
+			},
+			{
+				transition = "base",
+				input = "heavy_attack"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "grenade_ability"
+			},
+			{
+				transition = "base",
+				input = "special_action"
+			},
+			{
+				transition = "base",
+				input = "block"
 			}
 		}
+	},
+	{
+		input = "block",
+		transition = {
+			{
+				transition = "base",
+				input = "block_release"
+			},
+			{
+				input = "push",
+				transition = {
+					{
+						input = "push_follow_up",
+						transition = {
+							{
+								transition = "base",
+								input = "push_follow_up_release"
+							},
+							{
+								transition = "base",
+								input = "wield"
+							},
+							{
+								transition = "base",
+								input = "combat_ability"
+							},
+							{
+								transition = "base",
+								input = "grenade_ability"
+							},
+							{
+								transition = "base",
+								input = "special_action"
+							},
+							{
+								transition = "base",
+								input = "block"
+							}
+						}
+					},
+					{
+						transition = "base",
+						input = "push_follow_up_early_release"
+					},
+					{
+						transition = "base",
+						input = "special_action"
+					}
+				}
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "grenade_ability"
+			},
+			{
+				transition = "base",
+				input = "special_action"
+			}
+		}
+	},
+	{
+		transition = "base",
+		input = "special_action"
+	},
+	{
+		transition = "stay",
+		input = "wield"
+	},
+	{
+		transition = "base",
+		input = "combat_ability"
+	},
+	{
+		transition = "base",
+		input = "grenade_ability"
 	}
 }
 
-table.add_missing(default_melee_action_input_setup.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
+ActionInputHierarchy.add_missing(default_melee_action_input_setup.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
 
 return default_melee_action_input_setup

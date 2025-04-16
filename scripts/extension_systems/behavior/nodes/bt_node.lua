@@ -3,12 +3,13 @@ local BtEnterHooks = require("scripts/extension_systems/behavior/utilities/bt_en
 local BtLeaveHooks = require("scripts/extension_systems/behavior/utilities/bt_leave_hooks")
 local BtNode = class("BtNode")
 
-function BtNode:init(identifier, parent, condition_name, enter_hook, leave_hook, tree_node)
+function BtNode:init(identifier, parent, condition_name, enter_hook, leave_hook, run_hook, tree_node)
 	self.tree_node = tree_node
 	self.parent = parent
 	self.identifier = identifier
 	local condition = BtConditions[condition_name]
 	self.condition_name = condition_name
+	self.run_hook = run_hook
 
 	self:_init_enter_function(enter_hook)
 	self:_init_leave_function(leave_hook)

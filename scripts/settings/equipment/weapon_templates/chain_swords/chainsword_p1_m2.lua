@@ -6,6 +6,7 @@ local ChainSpeedTemplates = require("scripts/settings/equipment/chain_speed_temp
 local DamageProfileTemplates = require("scripts/settings/damage/damage_profile_templates")
 local DamageSettings = require("scripts/settings/damage/damage_settings")
 local FootstepIntervalsTemplates = require("scripts/settings/equipment/footstep/footstep_intervals_templates")
+local HapticTriggerTemplates = require("scripts/settings/equipment/haptic_trigger_templates")
 local HerdingTemplates = require("scripts/settings/damage/herding_templates")
 local HitZone = require("scripts/utilities/attack/hit_zone")
 local MeleeActionInputSetupMid = require("scripts/settings/equipment/weapon_templates/melee_action_input_setup_mid")
@@ -1632,7 +1633,8 @@ weapon_template.actions = {
 		time_scale_stat_buffs = {
 			buff_stat_buffs.attack_speed,
 			buff_stat_buffs.melee_attack_speed
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.melee.push
 	},
 	action_toggle_special = {
 		deactivate_anim_event = "deactivate",
@@ -1673,14 +1675,15 @@ weapon_template.hud_configuration = {
 }
 weapon_template.sprint_ready_up_time = 0.1
 weapon_template.max_first_person_anim_movement_speed = 5.8
-weapon_template.smart_targeting_template = SmartTargetingTemplates.default_melee
 weapon_template.damage_window_start_sweep_trail_offset = -0.45
 weapon_template.damage_window_end_sweep_trail_offset = 0.45
 weapon_template.ammo_template = "no_ammo"
 weapon_template.weapon_special_class = "WeaponSpecialDeactivateAfterNumActivations"
 weapon_template.weapon_special_tweak_data = {
 	keep_active_on_sprint = true,
+	keep_active_on_vault = true,
 	num_activations = 1,
+	keep_active_on_stun = true,
 	active_duration = 4
 }
 weapon_template.fx_sources = {
@@ -1705,6 +1708,8 @@ weapon_template.sprint_template = "default"
 weapon_template.stamina_template = "default"
 weapon_template.toughness_template = "default"
 weapon_template.movement_curve_modifier_template = "chainsword_p1_m1"
+weapon_template.smart_targeting_template = SmartTargetingTemplates.default_melee
+weapon_template.haptic_trigger_template = HapticTriggerTemplates.melee.chainsword
 weapon_template.footstep_intervals = FootstepIntervalsTemplates.chainsword
 weapon_template.overclocks = {
 	armor_pierce_up_dps_down = {

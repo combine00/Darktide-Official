@@ -42,11 +42,14 @@ end
 
 local template_groups = {
 	{
-		"chain_swords",
-		"chainsword_p1_m1",
-		"chainsword_p1_m2",
+		"chain_swords_2h",
 		"chainsword_2h_p1_m1",
 		"chainsword_2h_p1_m2"
+	},
+	{
+		"chain_swords",
+		"chainsword_p1_m1",
+		"chainsword_p1_m2"
 	},
 	{
 		"chain_axes",
@@ -89,6 +92,11 @@ local template_groups = {
 		"combatsword_p3_m3"
 	},
 	{
+		"force_swords_2h",
+		"forcesword_2h_p1_m1",
+		"forcesword_2h_p1_m2"
+	},
+	{
 		"force_swords",
 		"forcesword_p1_m1",
 		"forcesword_p1_m2",
@@ -114,10 +122,14 @@ local template_groups = {
 		"ogryn_powermaul_slabshield_p1_m1"
 	},
 	{
-		"ogryn_axes_2h",
+		"ogryn_pickaxes_2h",
 		"ogryn_pickaxe_2h_p1_m1",
 		"ogryn_pickaxe_2h_p1_m2",
 		"ogryn_pickaxe_2h_p1_m3"
+	},
+	{
+		"power_mauls_2h",
+		"powermaul_2h_p1_m1"
 	},
 	{
 		"power_mauls",
@@ -125,8 +137,9 @@ local template_groups = {
 		"powermaul_p1_m2"
 	},
 	{
-		"power_mauls_2h",
-		"powermaul_2h_p1_m1"
+		"power_swords_2h",
+		"powersword_2h_p1_m1",
+		"powersword_2h_p1_m2"
 	},
 	{
 		"power_swords",
@@ -134,7 +147,7 @@ local template_groups = {
 		"powersword_p1_m2"
 	},
 	{
-		"thunder_hammers",
+		"thunder_hammers_2h",
 		"thunderhammer_2h_p1_m1",
 		"thunderhammer_2h_p1_m2"
 	},
@@ -198,7 +211,10 @@ local template_groups = {
 		"ogryn_heavystubbers",
 		"ogryn_heavystubber_p1_m1",
 		"ogryn_heavystubber_p1_m2",
-		"ogryn_heavystubber_p1_m3"
+		"ogryn_heavystubber_p1_m3",
+		"ogryn_heavystubber_p2_m1",
+		"ogryn_heavystubber_p2_m2",
+		"ogryn_heavystubber_p2_m3"
 	},
 	{
 		"plasma_rifles",
@@ -228,6 +244,18 @@ local template_groups = {
 		"stubrevolver_p1_m2"
 	},
 	{
+		"bot_weapons",
+		"bot_autogun_killshot",
+		"bot_combataxe_linesman",
+		"bot_combatsword_linesman_p1",
+		"bot_combatsword_linesman_p2",
+		"bot_lasgun_killshot",
+		"bot_laspistol_killshot",
+		"bot_zola_laspistol",
+		"high_bot_autogun_killshot",
+		"high_bot_lasgun_killshot"
+	},
+	{
 		"combat_abilities",
 		"psyker_force_field",
 		"psyker_force_field_dome",
@@ -244,9 +272,6 @@ local template_groups = {
 	},
 	{
 		"grenades",
-		"frag_grenade",
-		"krak_grenade",
-		"smoke_grenade",
 		"ogryn_grenade_box",
 		"ogryn_grenade_box_cluster",
 		"ogryn_grenade_frag",
@@ -254,6 +279,9 @@ local template_groups = {
 		"psyker_smite",
 		"psyker_chain_lightning",
 		"psyker_throwing_knives",
+		"frag_grenade",
+		"krak_grenade",
+		"smoke_grenade",
 		"shock_grenade",
 		"fire_grenade",
 		"zealot_throwing_knives"
@@ -265,34 +293,28 @@ local template_groups = {
 	},
 	{
 		"pocketables",
+		"ammo_cache_pocketable",
 		"breach_charge_pocketable",
+		"communications_hack_device_pocketable",
+		"grimoire_pocketable",
+		"medical_crate_pocketable",
 		"syringe_ability_boost_pocketable",
 		"syringe_corruption_pocketable",
 		"syringe_power_boost_pocketable",
 		"syringe_speed_boost_pocketable",
-		"ammo_cache_pocketable",
-		"grimoire_pocketable",
-		"medical_crate_pocketable",
 		"tome_pocketable"
+	},
+	{
+		"unarmed",
+		"unarmed_hub_ogryn",
+		"unarmed_hub_psyker",
+		"unarmed_hub_veteran",
+		"unarmed_hub_zealot",
+		"unarmed_training_grounds",
+		"unarmed"
 	}
 }
-local template_names = {
-	"bot_autogun_killshot",
-	"bot_combataxe_linesman",
-	"bot_combatsword_linesman_p1",
-	"bot_combatsword_linesman_p2",
-	"bot_lasgun_killshot",
-	"bot_laspistol_killshot",
-	"bot_zola_laspistol",
-	"high_bot_autogun_killshot",
-	"high_bot_lasgun_killshot",
-	"unarmed_hub_ogryn",
-	"unarmed_hub_psyker",
-	"unarmed_hub_veteran",
-	"unarmed_hub_zealot",
-	"unarmed_training_grounds",
-	"unarmed"
-}
+local template_names = {}
 local path_prefix = "scripts/settings/equipment/weapon_templates/%s"
 
 _require_weapon_templates(path_prefix, template_groups, template_names)
@@ -543,19 +565,18 @@ local function _generate_chain_attack_info(weapon_template, working_templates, f
 				end
 
 				combo[#combo + 1] = attack_name
-				local chain_actions = actions[attack_name].allowed_chain_actions
-				local start_attack_name = chain_actions.start_attack and chain_actions.start_attack.action_name or nil
+				local action_chain_actions = actions[attack_name].allowed_chain_actions
+				local start_attack_name = action_chain_actions.start_attack and action_chain_actions.start_attack.action_name or nil
 
 				if start_attack_name then
-					attack_name = nil
 					local start_attack = actions[start_attack_name]
-					chain_actions = start_attack.allowed_chain_actions
-					attack_name = chain_actions[action_name] and chain_actions[action_name].action_name or nil
+					action_chain_actions = start_attack.allowed_chain_actions
+					attack_name = action_chain_actions[action_name] and action_chain_actions[action_name].action_name or nil
 				elseif not actions[attack_name].fire_configuration and not actions[attack_name].damage_profile then
 					for j = 1, #charge_input_templates do
 						local input_template = charge_input_templates[j]
 						action_name = _find_action_based_on_input(weapon_template.action_inputs, input_template)
-						attack_name = chain_actions[action_name] and chain_actions[action_name].action_name
+						attack_name = action_chain_actions[action_name] and action_chain_actions[action_name].action_name
 
 						if attack_name then
 							combo[#combo] = attack_name

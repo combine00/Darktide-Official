@@ -29,6 +29,12 @@ function SpecialsPacing:init(nav_world)
 end
 
 function SpecialsPacing:on_spawn_points_generated(template)
+	local add_max_alive_specials = Managers.state.havoc:get_modifier_value("add_max_alive_specials")
+
+	if add_max_alive_specials then
+		self._max_alive_specials_bonus = self._max_alive_specials_bonus + add_max_alive_specials
+	end
+
 	local first_spawn_timer_modifer = template.first_spawn_timer_modifer
 
 	self:_setup(template, first_spawn_timer_modifer)
@@ -222,10 +228,10 @@ function SpecialsPacing:update(dt, t, side_id, target_side_id)
 
 	local main_path_manager = Managers.state.main_path
 	local furthest_travel_distance = main_path_manager:furthest_travel_distance(target_side_id)
-	local traveled_this_frame = furthest_travel_distance - self._old_furthest_travel_distance
-	self._old_furthest_travel_distance = furthest_travel_distance
 	local time_since_forward_travel_changed = main_path_manager:time_since_forward_travel_changed(target_side_id)
 	local time_since_forward_behind_changed = main_path_manager:time_since_behind_travel_changed(target_side_id)
+	local traveled_this_frame = furthest_travel_distance - self._old_furthest_travel_distance
+	self._old_furthest_travel_distance = furthest_travel_distance
 	local travel_distance_allowed_forward = time_since_forward_travel_changed < TRAVEL_DISTANCE_CHANGE_ALLOWANCE_FORWARD_MIN or TRAVEL_DISTANCE_CHANGE_ALLOWANCE_FORWARD_MAX < time_since_forward_travel_changed
 	local travel_distance_allowed_behind = time_since_forward_behind_changed < TRAVEL_DISTANCE_CHANGE_ALLOWANCE_BEHIND_MIN or TRAVEL_DISTANCE_CHANGE_ALLOWANCE_BEHIND_MAX < time_since_forward_behind_changed
 	local travel_distance_allowed = travel_distance_allowed_forward or travel_distance_allowed_behind
@@ -556,7 +562,12 @@ function SpecialsPacing:_spawn_special(specials_slot, side_id, target_side_id)
 
 	local slot_target_unit = specials_slot.target_unit
 	local target_unit = ALIVE[slot_target_unit] and slot_target_unit or closest_target_unit
-	local unit = Managers.state.minion_spawn:spawn_minion(breed_name, spawn_position, Quaternion.identity(), side_id, aggro_states.aggroed, target_unit, nil, nil, nil, nil, optional_health_modifier)
+	local minion_spawn_manager = Managers.state.minion_spawn
+	local param_table = minion_spawn_manager:request_param_table()
+	param_table.optional_aggro_state = aggro_states.aggroed
+	param_table.optional_target_unit = target_unit
+	param_table.optional_health_modifier = optional_health_modifier
+	local unit = minion_spawn_manager:spawn_minion(breed_name, spawn_position, Quaternion.identity(), side_id, param_table)
 
 	return true, unit
 end
@@ -815,9 +826,12 @@ function SpecialsPacing:_filter_too_close_spawners(target_side_id, optional_spaw
 end
 
 function SpecialsPacing:_add_spawner_special(spawner, breed_name, side_id, target_side_id, optional_health_modifier)
+	local param_table = spawner:request_param_table()
+	param_table.target_side_id = target_side_id
+	param_table.max_health_modifier = optional_health_modifier
 	local spawner_queue_id = spawner:add_spawns({
 		breed_name
-	}, side_id, target_side_id, nil, nil, nil, nil, nil, optional_health_modifier)
+	}, side_id, param_table)
 
 	return spawner_queue_id, spawner
 end
@@ -836,7 +850,7 @@ function SpecialsPacing:_check_stuck_special(unit, specials_slot, template, targ
 		local failed_move_attempts = navigation_extension:failed_move_attempts()
 
 		if NUM_FAILED_MOVE_TO_DESPAWN < failed_move_attempts then
-			Managers.state.minion_spawn:despawn(unit)
+			Managers.state.minion_spawn:despawn_minion(unit)
 
 			return
 		end
@@ -863,7 +877,7 @@ function SpecialsPacing:_check_stuck_special(unit, specials_slot, template, targ
 		local distance_behind_sq = Vector3.distance_squared(special_position, behind_position)
 
 		if destroy_special_distance_sq <= distance_ahead_sq and destroy_special_distance_sq <= distance_behind_sq then
-			Managers.state.minion_spawn:despawn(unit)
+			Managers.state.minion_spawn:despawn_minion(unit)
 		end
 	end
 end
@@ -1193,6 +1207,8 @@ function SpecialsPacing:_update_rush_prevention(target_side_id, template, t)
 		second_ahead_distance = behind_travel_distance
 		second_behind_distance = ahead_travel_distance
 	else
+		local nav_spawn_points = self._nav_spawn_points
+
 		for i = 1, num_target_units do
 			local target_unit = target_units[i]
 
@@ -1201,7 +1217,7 @@ function SpecialsPacing:_update_rush_prevention(target_side_id, template, t)
 				local navmesh_position = NavQueries.position_on_mesh_with_outside_position(nav_world, nil, enemy_position, ABOVE, BELOW, LATERAL)
 
 				if navmesh_position then
-					local spawn_point_group_index = SpawnPointQueries.group_from_position(nav_world, self._nav_spawn_points, navmesh_position)
+					local spawn_point_group_index = SpawnPointQueries.group_from_position(nav_world, nav_spawn_points, navmesh_position)
 					local start_index = Managers.state.main_path:node_index_by_nav_group_index(spawn_point_group_index or 1)
 					local end_index = start_index + 1
 					local _, enemy_travel_distance, _, _, _ = MainPathQueries.closest_position_between_nodes(navmesh_position, start_index, end_index)

@@ -6,6 +6,27 @@ table.make_unique(templates)
 local stat_buffs = BuffSettings.stat_buffs
 local proc_events = BuffSettings.proc_events
 templates.weapon_trait_bespoke_flamer_p1_toughness_on_continuous_fire = {
+	format_values = {
+		toughness = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_flamer_p1_toughness_on_continuous_fire",
+				find_value_type = "trait_override",
+				path = {
+					"toughness_fixed_percentage"
+				}
+			}
+		},
+		ammo = {
+			value = "10%",
+			format_type = "string"
+		},
+		stacks = {
+			value = "5",
+			format_type = "string"
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_flamer_p1_toughness_on_continuous_fire = {
 			{
@@ -24,6 +45,28 @@ templates.weapon_trait_bespoke_flamer_p1_toughness_on_continuous_fire = {
 	}
 }
 templates.weapon_trait_bespoke_flamer_p1_power_bonus_on_continuous_fire = {
+	format_values = {
+		power_level = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_flamer_p1_power_bonus_on_continuous_fire",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.power_level_modifier
+				}
+			}
+		},
+		ammo = {
+			value = "10%",
+			format_type = "string"
+		},
+		stacks = {
+			value = "5",
+			format_type = "string"
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_flamer_p1_power_bonus_on_continuous_fire = {
 			{
@@ -50,6 +93,20 @@ templates.weapon_trait_bespoke_flamer_p1_power_bonus_on_continuous_fire = {
 	}
 }
 templates.weapon_trait_bespoke_flamer_p1_faster_reload_on_empty_clip = {
+	format_values = {
+		reload_speed = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_flamer_p1_faster_reload_on_empty_clip",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.reload_speed
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_flamer_p1_faster_reload_on_empty_clip = {
 			{
@@ -76,6 +133,24 @@ templates.weapon_trait_bespoke_flamer_p1_faster_reload_on_empty_clip = {
 	}
 }
 templates.weapon_trait_bespoke_flamer_p1_power_scales_with_clip_percentage = {
+	format_values = {
+		power_level = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_flamer_p1_power_scales_with_clip_percentage",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.power_level_modifier
+				}
+			}
+		},
+		stacks = {
+			value = "5",
+			format_type = "string"
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_flamer_p1_power_scales_with_clip_percentage = {
 			{
@@ -102,6 +177,31 @@ templates.weapon_trait_bespoke_flamer_p1_power_scales_with_clip_percentage = {
 	}
 }
 templates.weapon_trait_bespoke_flamer_p1_negate_stagger_reduction_with_primary_on_burning = {
+	format_values = {
+		stagger_reduction = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_flamer_p1_negate_stagger_reduction_with_primary_on_burning",
+				find_value_type = "trait_override",
+				path = {
+					"conditional_stat_buffs",
+					stat_buffs.stagger_burning_reduction_modifier
+				}
+			}
+		},
+		impact_modifier = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_flamer_p1_negate_stagger_reduction_with_primary_on_burning",
+				find_value_type = "trait_override",
+				path = {
+					"conditional_stat_buffs",
+					stat_buffs.ranged_impact_modifier
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_flamer_p1_negate_stagger_reduction_with_primary_on_burning = {
 			{
@@ -132,6 +232,19 @@ templates.weapon_trait_bespoke_flamer_p1_negate_stagger_reduction_with_primary_o
 	}
 }
 templates.weapon_trait_bespoke_flamer_p1_chance_to_explode_elites_on_kill = {
+	format_values = {
+		proc_chance = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_flamer_p1_chance_to_explode_elites_on_kill",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_kill
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_flamer_p1_chance_to_explode_elites_on_kill = {
 			{
@@ -158,6 +271,18 @@ templates.weapon_trait_bespoke_flamer_p1_chance_to_explode_elites_on_kill = {
 	}
 }
 templates.weapon_trait_bespoke_flamer_p1_ammo_from_reserve_on_crit = {
+	format_values = {
+		ammo_amount = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_flamer_p1_ammo_from_reserve_on_crit",
+				find_value_type = "trait_override",
+				path = {
+					"num_ammmo_to_move"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_flamer_p1_ammo_from_reserve_on_crit = {
 			{
@@ -176,6 +301,50 @@ templates.weapon_trait_bespoke_flamer_p1_ammo_from_reserve_on_crit = {
 	}
 }
 templates.weapon_trait_bespoke_flamer_p1_burned_targets_receive_rending_debuff = {
+	format_values = {
+		num_stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_flamer_p1_burned_targets_receive_rending_debuff",
+				find_value_type = "trait_override",
+				path = {
+					"target_buff_data",
+					"num_stacks_on_proc"
+				}
+			}
+		},
+		rending_percentage = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "rending_debuff",
+				find_value_type = "buff_template",
+				path = {
+					"stat_buffs",
+					stat_buffs.rending_multiplier
+				}
+			}
+		},
+		duration = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "rending_debuff",
+				find_value_type = "buff_template",
+				path = {
+					"duration"
+				}
+			}
+		},
+		max_stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "rending_debuff",
+				find_value_type = "buff_template",
+				path = {
+					"max_stacks"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_flamer_p1_burned_targets_receive_rending_debuff = {
 			{

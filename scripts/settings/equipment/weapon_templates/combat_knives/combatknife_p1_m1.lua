@@ -5,6 +5,7 @@ local BuffSettings = require("scripts/settings/buff/buff_settings")
 local DamageProfileTemplates = require("scripts/settings/damage/damage_profile_templates")
 local DamageSettings = require("scripts/settings/damage/damage_settings")
 local FootstepIntervalsTemplates = require("scripts/settings/equipment/footstep/footstep_intervals_templates")
+local HapticTriggerTemplates = require("scripts/settings/equipment/haptic_trigger_templates")
 local HitZone = require("scripts/utilities/attack/hit_zone")
 local MeleeActionInputSetupFast = require("scripts/settings/equipment/weapon_templates/melee_action_input_setup_fast")
 local PlayerCharacterConstants = require("scripts/settings/player_character/player_character_constants")
@@ -601,14 +602,14 @@ weapon_template.actions = {
 		end
 	},
 	action_left_light_2 = {
-		damage_window_start = 0.23,
+		damage_window_start = 0.2833333333333333,
 		hit_armor_anim = "attack_hit_shield",
 		weapon_handling_template = "time_scale_1_3_ninja",
 		kind = "sweep",
 		first_person_hit_stop_anim = "attack_hit",
 		range_mod = 1.25,
 		allowed_during_sprint = true,
-		damage_window_end = 0.45,
+		damage_window_end = 0.35,
 		anim_end_event = "attack_finished",
 		anim_event_3p = "attack_swing_stab",
 		anim_event = "attack_swing_stab_03",
@@ -672,7 +673,7 @@ weapon_template.actions = {
 			anchor_point_offset = {
 				0,
 				0,
-				-0.2
+				-0.3
 			}
 		},
 		damage_profile = DamageProfileTemplates.light_combat_knife_ninja_fencer_stab,
@@ -1034,7 +1035,8 @@ weapon_template.actions = {
 		inner_damage_profile = DamageProfileTemplates.ninja_push,
 		inner_damage_type = damage_types.physical,
 		outer_damage_profile = DamageProfileTemplates.light_push,
-		outer_damage_type = damage_types.physical
+		outer_damage_type = damage_types.physical,
+		haptic_trigger_template = HapticTriggerTemplates.melee.push
 	},
 	action_special_jab = {
 		damage_window_start = 0.24,
@@ -1309,13 +1311,14 @@ weapon_template.keywords = {
 	"combat_knife",
 	"p1"
 }
-weapon_template.smart_targeting_template = SmartTargetingTemplates.default_melee
 weapon_template.dodge_template = "ninja_knife"
 weapon_template.sprint_template = "ninja_l"
 weapon_template.stamina_template = "combat_knife_p1"
 weapon_template.toughness_template = "assault"
 weapon_template.movement_curve_modifier_template = "default"
 weapon_template.footstep_intervals = FootstepIntervalsTemplates.combat_knife
+weapon_template.smart_targeting_template = SmartTargetingTemplates.default_melee
+weapon_template.haptic_trigger_template = HapticTriggerTemplates.melee.light
 weapon_template.overclocks = {
 	armor_pierce_up_dps_down = {
 		combatknife_p1_m1_dps_stat = -0.1,

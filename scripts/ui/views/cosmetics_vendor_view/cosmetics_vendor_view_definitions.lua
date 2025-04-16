@@ -38,6 +38,14 @@ local category_button_size = {
 	100,
 	100
 }
+local wallet_text_font_style = table.clone(UIFontSettings.currency_title)
+wallet_text_font_style.text_horizontal_alignment = "right"
+wallet_text_font_style.text_vertical_alignment = "center"
+wallet_text_font_style.original_offset = {
+	0,
+	0,
+	1
+}
 local scenegraph_definition = {
 	screen = UIWorkspaceSettings.screen,
 	canvas = {
@@ -263,6 +271,34 @@ local scenegraph_definition = {
 			0,
 			0
 		}
+	},
+	wallet_pivot = {
+		vertical_alignment = "top",
+		parent = "screen",
+		horizontal_alignment = "right",
+		size = {
+			0,
+			0
+		},
+		position = {
+			-20,
+			50,
+			60
+		}
+	},
+	corner_top_right = {
+		vertical_alignment = "top",
+		parent = "screen",
+		horizontal_alignment = "right",
+		size = {
+			540,
+			224
+		},
+		position = {
+			0,
+			-65,
+			55
+		}
 	}
 }
 local item_restrictions_title_style = {
@@ -307,6 +343,20 @@ local item_restrictions_body_style = {
 	}
 }
 local widget_definitions = {
+	corner_top_right = UIWidget.create_definition({
+		{
+			value = "content/ui/materials/frames/screen/cosmetic_upper_right",
+			style_id = "texture",
+			pass_type = "texture_uv",
+			style = {
+				offset = {
+					0,
+					-1,
+					1
+				}
+			}
+		}
+	}, "corner_top_right"),
 	button_pivot_background = UIWidget.create_definition({
 		{
 			value_id = "background",
@@ -430,6 +480,39 @@ local widget_definitions = {
 		visible = false
 	})
 }
+local wallet_definitions = UIWidget.create_definition({
+	{
+		value_id = "texture",
+		style_id = "texture",
+		pass_type = "texture",
+		value = "content/ui/materials/icons/currencies/marks_small",
+		style = {
+			vertical_alignment = "center",
+			horizontal_alignment = "right",
+			size = {
+				42,
+				30
+			},
+			offset = {
+				0,
+				0,
+				1
+			},
+			original_offset = {
+				0,
+				0,
+				1
+			}
+		}
+	},
+	{
+		value_id = "text",
+		style_id = "text",
+		pass_type = "text",
+		value = "0",
+		style = wallet_text_font_style
+	}
+}, "wallet_pivot")
 local animations = {
 	on_enter = {
 		{
@@ -495,6 +578,7 @@ return {
 	animations = animations,
 	widget_definitions = widget_definitions,
 	scenegraph_definition = scenegraph_definition,
+	wallet_definitions = wallet_definitions,
 	item_sub_title_pass = item_sub_title_pass,
 	item_text_pass = item_text_pass
 }

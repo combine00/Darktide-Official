@@ -1,9 +1,11 @@
+local ActionInputHierarchy = require("scripts/utilities/action/action_input_hierarchy")
 local ArmorSettings = require("scripts/settings/damage/armor_settings")
 local BaseTemplateSettings = require("scripts/settings/equipment/weapon_templates/base_template_settings")
 local BuffSettings = require("scripts/settings/buff/buff_settings")
 local DamageProfileTemplates = require("scripts/settings/damage/damage_profile_templates")
 local DamageSettings = require("scripts/settings/damage/damage_settings")
 local FootstepIntervalsTemplates = require("scripts/settings/equipment/footstep/footstep_intervals_templates")
+local HapticTriggerTemplates = require("scripts/settings/equipment/haptic_trigger_templates")
 local HitScanTemplates = require("scripts/settings/projectile/hit_scan_templates")
 local HoloSightTemplates = require("scripts/settings/equipment/holo_sight_templates")
 local LineEffects = require("scripts/settings/effects/line_effects")
@@ -115,22 +117,58 @@ local weapon_template = {
 table.add_missing(weapon_template.action_inputs, BaseTemplateSettings.action_inputs)
 
 weapon_template.action_input_hierarchy = {
-	wield = "stay",
-	reload = "stay",
-	shoot_pressed = "stay",
-	special_action_push = "base",
-	zoom = {
-		zoom_shoot = "stay",
-		wield = "base",
-		zoom_release = "previous",
-		grenade_ability = "base",
-		reload = "base",
-		combat_ability = "base",
-		special_action_push = "base"
+	{
+		transition = "stay",
+		input = "shoot_pressed"
+	},
+	{
+		input = "zoom",
+		transition = {
+			{
+				transition = "previous",
+				input = "zoom_release"
+			},
+			{
+				transition = "base",
+				input = "special_action_push"
+			},
+			{
+				transition = "stay",
+				input = "zoom_shoot"
+			},
+			{
+				transition = "base",
+				input = "reload"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "grenade_ability"
+			}
+		}
+	},
+	{
+		transition = "base",
+		input = "special_action_push"
+	},
+	{
+		transition = "stay",
+		input = "wield"
+	},
+	{
+		transition = "stay",
+		input = "reload"
 	}
 }
 
-table.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
+ActionInputHierarchy.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
 
 weapon_template.actions = {
 	action_unwield = {
@@ -147,7 +185,7 @@ weapon_template.actions = {
 		wield_anim_event = "equip",
 		uninterruptible = true,
 		kind = "ranged_wield",
-		total_time = 1,
+		total_time = 0.33,
 		conditional_state_to_action_input = {
 			started_reload = {
 				input_name = "reload"
@@ -551,7 +589,8 @@ weapon_template.actions = {
 		},
 		time_scale_stat_buffs = {
 			buff_stat_buffs.reload_speed
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_normal_push = {
 		kind = "push",
@@ -635,7 +674,8 @@ weapon_template.actions = {
 		inner_damage_profile = DamageProfileTemplates.default_push,
 		inner_damage_type = damage_types.physical,
 		outer_damage_profile = DamageProfileTemplates.light_push,
-		outer_damage_type = damage_types.physical
+		outer_damage_type = damage_types.physical,
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_psyker_push = {
 		kind = "push",
@@ -731,7 +771,8 @@ weapon_template.actions = {
 			local is_psyker = archetype.name == "psyker"
 
 			return is_psyker
-		end
+		end,
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_inspect = {
 		skip_3p_anims = false,
@@ -744,7 +785,8 @@ weapon_template.actions = {
 		total_time = math.huge,
 		crosshair = {
 			crosshair_type = "inspect"
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	}
 }
 local WeaponBarUIDescriptionTemplates = require("scripts/settings/equipment/weapon_bar_ui_description_templates")
@@ -933,15 +975,16 @@ weapon_template.keywords = {
 	"p1",
 	"lasweapon"
 }
-weapon_template.smart_targeting_template = SmartTargetingTemplates.killshot
-weapon_template.holo_sight_template = HoloSightTemplates.laspistol
+weapon_template.can_use_while_vaulting = true
 weapon_template.dodge_template = "assault"
 weapon_template.sprint_template = "ninja_l"
 weapon_template.stamina_template = "default"
 weapon_template.toughness_template = "assault"
-weapon_template.can_use_while_vaulting = true
 weapon_template.movement_curve_modifier_template = "default"
 weapon_template.footstep_intervals = FootstepIntervalsTemplates.default
+weapon_template.smart_targeting_template = SmartTargetingTemplates.killshot
+weapon_template.haptic_trigger_template = HapticTriggerTemplates.ranged.assault
+weapon_template.holo_sight_template = HoloSightTemplates.laspistol
 weapon_template.traits = {}
 local bespoke_lasgun_p1_traits = table.ukeys(WeaponTraitsBespokeLaspistolP1)
 

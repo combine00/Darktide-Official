@@ -17,7 +17,6 @@ function MissionObjectiveBase:init()
 	self._marked_units = {}
 	self._synchronizer_extension = nil
 	self._synchronizer_unit = nil
-	self._paused = false
 	self._stage = 1
 	self._stage_count = 1
 	self._progression = 0
@@ -26,13 +25,16 @@ function MissionObjectiveBase:init()
 	self._incremented_progression = 0
 	self._max_incremented_progression = 0
 	self._progression_sync_granularity = 0.01
+	self._hide_max_increment = false
 	self._ui_state = "default"
 	self._header = ""
 	self._description = ""
 	self._override_header = nil
 	self._override_description = nil
 	self._music_wwise_state = WWISE_MUSIC_STATE_NONE
+	self._music_wwise_priority = 0
 	self._mission_giver_voice_profile = nil
+	self._hud_sort_order = nil
 	self._use_hud = true
 	self._use_hud_changed = false
 	self._hide_widget = false
@@ -60,9 +62,10 @@ function MissionObjectiveBase:start_objective(mission_objective_data, registered
 	self._order_of_activation = last_activation_order
 	last_activation_order = last_activation_order + 1
 	self._ui_state = mission_objective_data.ui_state or "default"
-	self._header = mission_objective_data.header and Localize(mission_objective_data.header) or ""
-	self._description = mission_objective_data.description and Localize(mission_objective_data.description) or ""
+	self._header = mission_objective_data.localized_header or mission_objective_data.header and Localize(mission_objective_data.header, true, mission_objective_data.header_data) or ""
+	self._description = mission_objective_data.description and Localize(mission_objective_data.description, true, mission_objective_data.description_data) or ""
 	self._music_wwise_state = mission_objective_data.music_wwise_state or WWISE_MUSIC_STATE_NONE
+	self._music_wwise_priority = mission_objective_data.music_wwise_priority or 0
 	self._music_ignore_start_event = mission_objective_data.music_ignore_start_event or false
 	self._mission_giver_voice_profile = mission_objective_data.mission_giver_voice_profile
 	self._use_hud = mission_objective_data.hidden ~= true
@@ -79,6 +82,8 @@ function MissionObjectiveBase:start_objective(mission_objective_data, registered
 	self._event_type = mission_objective_data.event_type or OBJECTIVE_EVENT_TYPES.None
 	self._icon = mission_objective_data.icon
 	self._marker_type = mission_objective_data.marker_type or self._marker_type
+	self._hud_sort_order = mission_objective_data.hud_sort_order or nil
+	self._hide_max_increment = mission_objective_data.hide_max_increment or false
 	self._turn_off_backfill = mission_objective_data.turn_off_backfill == true
 	self._locally_added = mission_objective_data.locally_added or false
 	self._stage = 1
@@ -389,28 +394,12 @@ function MissionObjectiveBase:order_of_activation()
 	return self._order_of_activation
 end
 
-function MissionObjectiveBase:is_paused()
-	return self._paused
-end
-
-function MissionObjectiveBase:pause()
-	self._paused = true
-end
-
-function MissionObjectiveBase:resume()
-	self._paused = false
-end
-
 function MissionObjectiveBase:max_progression_achieved()
-	return self._progression == 1 and not self._paused
+	return self._progression == 1
 end
 
 function MissionObjectiveBase:evaluate_at_level_end()
 	return self._evaluate_at_level_end
-end
-
-function MissionObjectiveBase:is_done()
-	return self:max_progression_achieved()
 end
 
 function MissionObjectiveBase:event_type()
@@ -469,6 +458,14 @@ function MissionObjectiveBase:set_max_increment(max_amount)
 	self._max_incremented_progression = max_amount
 end
 
+function MissionObjectiveBase:hide_max_increment()
+	self._hide_max_increment = true
+end
+
+function MissionObjectiveBase:max_increment_hidden()
+	return self._hide_max_increment
+end
+
 function MissionObjectiveBase:max_incremented_progression()
 	return self._max_incremented_progression
 end
@@ -479,6 +476,10 @@ end
 
 function MissionObjectiveBase:music_wwise_state()
 	return self._music_wwise_state
+end
+
+function MissionObjectiveBase:music_wwise_priority()
+	return self._music_wwise_priority
 end
 
 function MissionObjectiveBase:mission_giver_voice_profile()
@@ -503,6 +504,10 @@ end
 
 function MissionObjectiveBase:use_hud()
 	return self._use_hud
+end
+
+function MissionObjectiveBase:hud_sort_order()
+	return self._hud_sort_order
 end
 
 function MissionObjectiveBase:use_hud_changed_state()

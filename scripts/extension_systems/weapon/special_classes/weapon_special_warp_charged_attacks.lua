@@ -1,3 +1,4 @@
+local HazardProp = require("scripts/utilities/level_props/hazard_prop")
 local WarpCharge = require("scripts/utilities/warp_charge")
 local WeaponSpecial = require("scripts/utilities/weapon_special")
 local WeaponSpecialInterface = require("scripts/extension_systems/weapon/special_classes/weapon_special_interface")
@@ -40,6 +41,19 @@ end
 
 function WeaponSpecialWarpChargedAttacks:process_hit(t, weapon, action_settings, num_hit_enemies, target_is_alive, target_unit, damage, result, damage_efficiency, stagger_result, hit_position, attack_direction, abort_attack, optional_origin_slot)
 	if not target_is_alive then
+		return
+	end
+
+	local target_is_hazard_prop, hazard_prop_is_active = HazardProp.status(target_unit)
+
+	if target_is_hazard_prop and not hazard_prop_is_active then
+		return
+	end
+
+	local hit_unit_data_extension = ScriptUnit.has_extension(target_unit, "unit_data_system")
+	local target_breed_or_nil = hit_unit_data_extension and hit_unit_data_extension:breed()
+
+	if not target_breed_or_nil then
 		return
 	end
 

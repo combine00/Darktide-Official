@@ -13,6 +13,8 @@ function PresenceEntryMyself.get_platform()
 		platform = "xbox"
 	elseif authenticate_method == Managers.backend.AUTH_METHOD_XBOXLIVE and Application.xbox_live and Application.xbox_live() == true then
 		platform = "xbox"
+	elseif authenticate_method == Managers.backend.AUTH_METHOD_PSN then
+		platform = "psn"
 	else
 		Log.warning("PresenceEntryMyself", "Could not resolve a platform for authenticate_method: " .. tostring(authenticate_method))
 
@@ -39,6 +41,9 @@ function PresenceEntryMyself:reset()
 	self._cross_play_disabled_in_party = nil
 	self._is_cross_playing = nil
 	self._psn_session_id = nil
+	self._havoc_status = nil
+	self._havoc_rank_cadence_high = nil
+	self._havoc_rank_all_time_high = nil
 end
 
 function PresenceEntryMyself:account_id()
@@ -120,7 +125,7 @@ function PresenceEntryMyself:is_online()
 	return true
 end
 
-function PresenceEntryMyself:platform_persona_name_or_account_name()
+function PresenceEntryMyself:platform_persona_name_or_account_name(in_platform, in_platform_id)
 	return self:account_name()
 end
 
@@ -182,6 +187,34 @@ function PresenceEntryMyself:set_psn_session_id(value)
 	self._psn_session_id = value or "none"
 end
 
+function PresenceEntryMyself:set_havoc_status(value)
+	self._havoc_status = value or "none"
+end
+
+function PresenceEntryMyself:havoc_status()
+	return self._havoc_status or "none"
+end
+
+function PresenceEntryMyself:set_havoc_rank_cadence_high(value)
+	self._havoc_rank_cadence_high = value or "none"
+end
+
+function PresenceEntryMyself:set_havoc_rank_all_time_high(value)
+	self._havoc_rank_all_time_high = value or "none"
+end
+
+function PresenceEntryMyself:havoc_rank_cadence_high()
+	local rank = self._havoc_rank_cadence_high
+
+	return rank ~= "none" and tonumber(rank) or nil
+end
+
+function PresenceEntryMyself:havoc_rank_all_time_high()
+	local rank = self._havoc_rank_all_time_high
+
+	return rank ~= "none" and tonumber(rank) or nil
+end
+
 function PresenceEntryMyself:is_alive()
 	return true
 end
@@ -225,6 +258,18 @@ function PresenceEntryMyself:create_key_values(white_list)
 
 	if not white_list or white_list.psn_session_id then
 		key_values.psn_session_id = self._psn_session_id
+	end
+
+	if not white_list or white_list.havoc_status then
+		key_values.havoc_status = self._havoc_status
+	end
+
+	if not white_list or white_list.havoc_rank_cadence_high then
+		key_values.havoc_rank_cadence_high = self._havoc_rank_cadence_high
+	end
+
+	if not white_list or white_list.havoc_rank_all_time_high then
+		key_values.havoc_rank_all_time_high = self._havoc_rank_all_time_high
 	end
 
 	return key_values

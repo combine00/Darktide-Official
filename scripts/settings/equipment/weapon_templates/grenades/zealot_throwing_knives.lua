@@ -1,3 +1,4 @@
+local ActionInputHierarchy = require("scripts/utilities/action/action_input_hierarchy")
 local BaseTemplateSettings = require("scripts/settings/equipment/weapon_templates/base_template_settings")
 local FootstepIntervalsTemplates = require("scripts/settings/equipment/footstep/footstep_intervals_templates")
 local ProjectileTemplates = require("scripts/settings/projectile/projectile_templates")
@@ -38,13 +39,25 @@ weapon_template.action_inputs = {
 table.add_missing(weapon_template.action_inputs, BaseTemplateSettings.action_inputs)
 
 weapon_template.action_input_hierarchy = {
-	quick_throw = "stay",
-	throw_pressed = "stay",
-	combat_ability = "stay",
-	unwield_to_previous = "stay"
+	{
+		transition = "stay",
+		input = "throw_pressed"
+	},
+	{
+		transition = "stay",
+		input = "quick_throw"
+	},
+	{
+		transition = "stay",
+		input = "unwield_to_previous"
+	},
+	{
+		transition = "stay",
+		input = "combat_ability"
+	}
 }
 
-table.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
+ActionInputHierarchy.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
 
 weapon_template.actions = {
 	action_wield = {
@@ -75,9 +88,8 @@ weapon_template.actions = {
 	},
 	throw = {
 		sprint_requires_press_to_interrupt = false,
-		anim_noammo_event = "to_noammo",
-		kind = "spawn_projectile",
 		use_ability_charge = true,
+		kind = "spawn_projectile",
 		override_origin_slot = "slot_grenade_ability",
 		allowed_during_sprint = true,
 		ability_type = "grenade_ability",
@@ -85,6 +97,7 @@ weapon_template.actions = {
 		time_scale_stat_buffs = false,
 		anim_event_last = "attack_shoot_last",
 		fire_time = 0.1,
+		anim_event_no_ammo = "to_noammo",
 		anim_event_non_last = "attack_shoot_right",
 		uninterruptible = true,
 		total_time = 0.5,

@@ -10,7 +10,9 @@ local reload_template = {
 reload_template.eject_mag = {
 	time = 2.8,
 	show_magazine_ammo_time = 1,
-	anim_1p = function (inventory_slot_component)
+	anim_1p = function (condition_func_params)
+		local inventory_slot_component = condition_func_params.inventory_slot_component
+
 		if inventory_slot_component.current_ammunition_reserve == 1 then
 			return "reload_partial"
 		elseif inventory_slot_component.current_ammunition_clip > 0 then
@@ -44,7 +46,9 @@ reload_template.eject_mag_restart = {
 reload_template.fit_new_mag = {
 	time = 2.3,
 	show_magazine_ammo_time = 0.3,
-	anim_1p = function (inventory_slot_component)
+	anim_1p = function (condition_func_params)
+		local inventory_slot_component = condition_func_params.inventory_slot_component
+
 		if inventory_slot_component.current_ammunition_clip > 0 or inventory_slot_component.current_ammunition_reserve == 1 then
 			return "reload_middle_partial"
 		else

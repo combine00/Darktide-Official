@@ -1,8 +1,8 @@
 local SmartTargeting = require("scripts/utilities/smart_targeting")
 local EMPTY_TABLE = {}
-local PsykerSingleTargetSmartTargetingActionModule = class("PsykerSingleTargetSmartTargetingActionModule")
+local PsykerSmiteTargetingActionModule = class("PsykerSmiteTargetingActionModule")
 
-function PsykerSingleTargetSmartTargetingActionModule:init(physics_world, player_unit, component, action_settings)
+function PsykerSmiteTargetingActionModule:init(physics_world, player_unit, component, action_settings)
 	self._physics_world = physics_world
 	self._player_unit = player_unit
 	self._component = component
@@ -14,14 +14,14 @@ function PsykerSingleTargetSmartTargetingActionModule:init(physics_world, player
 	self._smart_targeting_extension = ScriptUnit.extension(player_unit, "smart_targeting_system")
 end
 
-function PsykerSingleTargetSmartTargetingActionModule:start(action_settings, t)
+function PsykerSmiteTargetingActionModule:start(action_settings, t)
 	local component = self._component
 	component.target_unit_1 = nil
 	component.target_unit_2 = nil
 	component.target_unit_3 = nil
 end
 
-function PsykerSingleTargetSmartTargetingActionModule:fixed_update(dt, t)
+function PsykerSmiteTargetingActionModule:fixed_update(dt, t)
 	if self._unit_data_extension.is_resimulating then
 		return
 	end
@@ -50,7 +50,7 @@ function PsykerSingleTargetSmartTargetingActionModule:fixed_update(dt, t)
 	end
 end
 
-function PsykerSingleTargetSmartTargetingActionModule:finish(reason, data, t)
+function PsykerSmiteTargetingActionModule:finish(reason, data, t)
 	if reason == "hold_input_released" or reason == "stunned" then
 		local component = self._component
 		component.target_unit_1 = nil
@@ -59,4 +59,4 @@ function PsykerSingleTargetSmartTargetingActionModule:finish(reason, data, t)
 	end
 end
 
-return PsykerSingleTargetSmartTargetingActionModule
+return PsykerSmiteTargetingActionModule

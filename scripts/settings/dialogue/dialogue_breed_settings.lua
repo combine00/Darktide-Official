@@ -9,6 +9,7 @@ local dialogue_breed_settings = {
 		"contract_vendor",
 		"shipmistress",
 		"enemy_nemesis_wolfer",
+		"enemy_ritualist",
 		"enemy_wolfer_adjutant",
 		"interrogator",
 		"barber",
@@ -50,6 +51,24 @@ dialogue_breed_settings.chaos_beast_of_nurgle = {
 	dialogue_memory_faction_name = "enemy"
 }
 dialogue_breed_settings.chaos_poxwalker = {
+	trigger_seen_vo = false,
+	vo_class_name = "chaos_poxwalker",
+	trigger_heard_vo = false,
+	is_network_synced = false,
+	has_dialogue_extension = false,
+	vo_triggers_enemy_kill_query = false,
+	dialogue_memory_faction_name = "enemy"
+}
+dialogue_breed_settings.chaos_mutated_poxwalker = {
+	trigger_seen_vo = false,
+	vo_class_name = "chaos_poxwalker",
+	trigger_heard_vo = false,
+	is_network_synced = false,
+	has_dialogue_extension = false,
+	vo_triggers_enemy_kill_query = false,
+	dialogue_memory_faction_name = "enemy"
+}
+dialogue_breed_settings.chaos_lesser_mutated_poxwalker = {
 	trigger_seen_vo = false,
 	vo_class_name = "chaos_poxwalker",
 	trigger_heard_vo = false,
@@ -132,6 +151,19 @@ dialogue_breed_settings.chaos_daemonhost = {
 		"enemy_daemonhost_a"
 	}
 }
+dialogue_breed_settings.chaos_mutator_daemonhost = {
+	trigger_seen_vo = true,
+	vo_class_name = "enemy_daemonhost",
+	trigger_heard_vo = true,
+	is_network_synced = false,
+	has_dialogue_extension = true,
+	vo_triggers_enemy_kill_query = true,
+	dialogue_memory_faction_name = "enemy",
+	wwise_voice_switch_group = "switch_voice_enemy_chaos_daemonhost",
+	wwise_voices = {
+		"enemy_daemonhost_a"
+	}
+}
 dialogue_breed_settings.chaos_spawn = {
 	trigger_seen_vo = true,
 	vo_class_name = "chaos_spawn",
@@ -194,6 +226,7 @@ dialogue_breed_settings.mission_giver = {
 		"contract_vendor_a",
 		"shipmistress_a",
 		"enemy_nemesis_wolfer_a",
+		"enemy_ritualist_a",
 		"enemy_wolfer_adjutant_a",
 		"enemy_wolfer_adjutant_b",
 		"enemy_wolfer_adjutant_c",
@@ -452,6 +485,20 @@ dialogue_breed_settings.dreg_lector = {
 		"dreg_lector_a"
 	}
 }
+dialogue_breed_settings.enemy_ritualist = {
+	trigger_seen_vo = false,
+	vo_class_name = "enemy_ritualist",
+	trigger_heard_vo = false,
+	is_network_synced = true,
+	has_dialogue_extension = true,
+	vo_triggers_enemy_kill_query = false,
+	dialogue_memory_faction_name = "npc",
+	prop_name = "voice_over_2d",
+	wwise_voice_switch_group = "voice_profile",
+	wwise_voices = {
+		"enemy_ritualist_a"
+	}
+}
 dialogue_breed_settings.confessional = {
 	trigger_seen_vo = false,
 	vo_class_name = "confessional",
@@ -575,6 +622,19 @@ dialogue_breed_settings.renegade_grenadier = {
 dialogue_breed_settings.renegade_gunner = {
 	trigger_seen_vo = true,
 	vo_class_name = "renegade_gunner",
+	trigger_heard_vo = false,
+	is_network_synced = false,
+	has_dialogue_extension = true,
+	vo_triggers_enemy_kill_query = true,
+	dialogue_memory_faction_name = "enemy",
+	wwise_voice_switch_group = "switch_voice_enemy_traitor_gunner",
+	wwise_voices = {
+		"enemy_traitor_gunner_a"
+	}
+}
+dialogue_breed_settings.renegade_radio_operator = {
+	trigger_seen_vo = true,
+	vo_class_name = "renegade_radio_operator",
 	trigger_heard_vo = false,
 	is_network_synced = false,
 	has_dialogue_extension = true,
@@ -825,6 +885,8 @@ dialogue_breed_settings.cultist_melee = {
 		"enemy_cultist_melee_fighter_c"
 	}
 }
+dialogue_breed_settings.cultist_ritualist = table.clone(dialogue_breed_settings.cultist_melee)
+dialogue_breed_settings.chaos_mutator_ritualist = table.clone(dialogue_breed_settings.cultist_ritualist)
 dialogue_breed_settings.cultist_assault = {
 	trigger_seen_vo = false,
 	vo_class_name = "cultist_assault",
@@ -1061,7 +1123,9 @@ dialogue_breed_settings.mourningstar_soldier = {
 		"mourningstar_soldier_male_g",
 		"mourningstar_soldier_male_h",
 		"mourningstar_officer_male_a",
-		"mourningstar_officer_male_b"
+		"mourningstar_officer_male_b",
+		"steelhead_a",
+		"steelhead_b"
 	}
 }
 dialogue_breed_settings.barber = {
@@ -1120,6 +1184,43 @@ dialogue_breed_settings.warp_echo = {
 	wwise_voices = {
 		"warp_echo_moebian_a",
 		"warp_echo_moebian_b"
+	}
+}
+dialogue_breed_settings.past = {
+	trigger_seen_vo = false,
+	vo_class_name = "past",
+	trigger_heard_vo = false,
+	is_network_synced = true,
+	has_dialogue_extension = true,
+	vo_triggers_enemy_kill_query = false,
+	dialogue_memory_faction_name = "npc",
+	prop_name = "voice_over_2d",
+	wwise_voice_switch_group = "voice_profile",
+	wwise_voices = {
+		"past_armourer_a",
+		"past_auspex_operator_a",
+		"past_brother_a",
+		"past_cartel_tough_a",
+		"past_cartel_tough_c",
+		"past_enemy_nemesis_wolfer_a",
+		"past_explicator_a",
+		"past_explicator_b",
+		"past_interrogator_a",
+		"past_interrogator_b",
+		"past_legion_captain_a",
+		"past_legion_commissar_a",
+		"past_legion_trooper_a",
+		"past_legion_trooper_b",
+		"past_legion_trooper_c",
+		"past_magos_biologis_a",
+		"past_ragged_king_a",
+		"past_sergeant_a",
+		"past_tertium_enforcer_a",
+		"past_tertium_enforcer_b",
+		"past_world_eater_a",
+		"past_young_explicator_a",
+		"past_young_sergeant_a",
+		"fx"
 	}
 }
 dialogue_breed_settings.cargo_pilot = {

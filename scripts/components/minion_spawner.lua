@@ -142,6 +142,10 @@ function MinionSpawner:editor_destroy(unit)
 		return
 	end
 
+	if MinionSpawner._nav_info ~= nil then
+		SharedNav.destroy(MinionSpawner._nav_info)
+	end
+
 	local world = self._world
 	local line_object = self._line_object
 

@@ -70,6 +70,12 @@ local weapon_movement_curve_modifier_templates = {
 			lerp_perfect = 1.25,
 			lerp_basic = 0.4
 		}
+	},
+	forcesword_2h = {
+		modifier = {
+			lerp_perfect = 1.1,
+			lerp_basic = 0.6
+		}
 	}
 }
 

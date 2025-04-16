@@ -1,7 +1,7 @@
 local UIHudSettings = require("scripts/settings/ui/ui_hud_settings")
 local hud_element_mission_objective_feed_settings = {
-	description_text_height_offset = 5,
 	entry_spacing = 0,
+	description_text_height_offset = 5,
 	scan_delay = 0.25,
 	header_size = {
 		460,
@@ -12,13 +12,21 @@ local hud_element_mission_objective_feed_settings = {
 		event_remove_mission_objective = "_remove_objective"
 	},
 	entry_spacing_by_category = {
-		default = 10,
+		default = 0,
 		side_mission = 0,
+		warning = 0,
 		overarching = 10
+	},
+	widget_padding_by_category = {
+		default = 10,
+		side_mission = 10,
+		warning = 0,
+		overarching = 30
 	},
 	entry_order_by_objective_category = {
 		default = 2,
 		side_mission = 3,
+		warning = 4,
 		overarching = 1
 	},
 	base_color = UIHudSettings.color_tint_main_1,
@@ -52,6 +60,14 @@ local hud_element_mission_objective_feed_settings = {
 			icon = UIHudSettings.color_tint_6,
 			header_text = UIHudSettings.color_tint_6,
 			counter_text = UIHudSettings.color_tint_6
+		},
+		warning = {
+			bar = UIHudSettings.color_tint_main_1,
+			bar_frame = UIHudSettings.color_tint_main_1,
+			bar_background = UIHudSettings.color_tint_0,
+			icon = UIHudSettings.color_tint_main_1,
+			header_text = UIHudSettings.color_tint_main_1,
+			counter_text = UIHudSettings.color_tint_main_1
 		}
 	},
 	size_by_category = {
@@ -71,6 +87,12 @@ local hud_element_mission_objective_feed_settings = {
 			icon = {
 				20,
 				20
+			}
+		},
+		warning = {
+			icon = {
+				0,
+				0
 			}
 		}
 	},
@@ -92,6 +114,13 @@ local hud_element_mission_objective_feed_settings = {
 		side_mission = {
 			icon = {
 				16,
+				0,
+				6
+			}
+		},
+		warning = {
+			icon = {
+				0,
 				0,
 				6
 			}

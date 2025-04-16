@@ -114,7 +114,9 @@ function GameplaySession:update(session_id, participants, kicked_participants_ac
 		}
 	}
 
-	Log.info("GameplaySession", "Posting gameplay session update (%s) with participant_count=%s, kicked_participants_count=%s, backfill_wanted=%s", session_id, #participants, kicked_participants_account_ids and #kicked_participants_account_ids or -1, backfill_wanted and "true" or "false")
+	if not DevParameters.disable_session_update_print then
+		Log.info("GameplaySession", "Posting gameplay session update (%s) with participant_count=%s, kicked_participants_count=%s, backfill_wanted=%s", session_id, #participants, kicked_participants_account_ids and #kicked_participants_account_ids or -1, backfill_wanted and "true" or "false")
+	end
 
 	return Managers.backend:title_request("/gameplay/sessions/" .. session_id .. "/update", {
 		method = "POST",
@@ -218,6 +220,17 @@ function GameplaySession:events(session_id, events)
 	end
 
 	return promise
+end
+
+function GameplaySession:lock(category, lock_state, participants)
+	return Managers.backend:title_request("/gameplay/sessions/lock", {
+		method = "PUT",
+		body = {
+			category = category,
+			lockState = lock_state,
+			participants = participants
+		}
+	})
 end
 
 implements(GameplaySession, Interface)

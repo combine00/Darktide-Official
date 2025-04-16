@@ -303,6 +303,15 @@ required_aquilas_title_style.offset = {
 	-55,
 	2
 }
+local wait_reason_style = table.clone(UIFontSettings.header_1)
+wait_reason_style.font_size = 30
+wait_reason_style.text_horizontal_alignment = "center"
+wait_reason_style.text_vertical_alignment = "center"
+wait_reason_style.offset = {
+	0,
+	100,
+	0
+}
 local widget_definitions = {
 	background = UIWidget.create_definition({
 		{
@@ -624,6 +633,13 @@ local widget_definitions = {
 					1
 				}
 			}
+		},
+		{
+			value_id = "text",
+			style_id = "text",
+			pass_type = "text",
+			value = "",
+			style = wait_reason_style
 		}
 	}, "loading", {
 		visible = false

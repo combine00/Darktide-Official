@@ -9,6 +9,7 @@ function ConstantElementBase:init(parent, draw_layer, start_scale, definitions)
 	self._draw_layer = draw_layer
 	self._parent = parent
 	self._is_visible = true
+	self._event_list = {}
 	self._ui_scenegraph = self:_create_scenegraph(definitions, start_scale)
 	self._widgets_by_name = {}
 	self._widgets = {}
@@ -53,6 +54,30 @@ end
 
 function ConstantElementBase:has_widget(name)
 	return self._widgets_by_name[name] ~= nil
+end
+
+function ConstantElementBase:_register_event(event_name, function_name)
+	function_name = function_name or event_name
+
+	Managers.event:register(self, event_name, function_name)
+
+	self._event_list[event_name] = function_name
+end
+
+function ConstantElementBase:_unregister_event(event_name)
+	Managers.event:unregister(self, event_name)
+
+	self._event_list[event_name] = nil
+end
+
+function ConstantElementBase:_unregister_events()
+	if self._event_list then
+		for event_name, _ in pairs(self._event_list) do
+			self:_unregister_event(event_name)
+		end
+
+		self._event_list = {}
+	end
 end
 
 function ConstantElementBase:_create_sequence_animator(definitions)
@@ -223,7 +248,7 @@ function ConstantElementBase:_localize(text, no_cache, context)
 end
 
 function ConstantElementBase:destroy()
-	return
+	self:_unregister_events()
 end
 
 return ConstantElementBase

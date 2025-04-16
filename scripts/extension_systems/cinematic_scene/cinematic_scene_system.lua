@@ -49,7 +49,7 @@ local CINEMATIC_VIEWS = {
 	[CINEMATIC_NAMES.hub_location_intro_gun_shop] = "cutscene_view"
 }
 
-local function get_origin_level_names(cinematic_name)
+local function _origin_level_names(cinematic_name)
 	local component_system = Managers.state.extension:system("component_system")
 	local scenes = component_system:get_units_from_component_name("CinematicScene")
 	local origin_level_names = {}
@@ -78,7 +78,7 @@ function CinematicSceneSystem:init(extension_init_context, system_init_data, ...
 	local world = extension_init_context.world
 	self._world = world
 	self._level = nil
-	self._cinematics = self:_fetch_settings(system_init_data.mission, extension_init_context.circumstance_name)
+	self._cinematics = self:_mission_settings(system_init_data.mission, extension_init_context.circumstance_name)
 	self._cinematics_setups = {}
 	self._cinematics_left_to_play = 0
 	self._current_cinematic_name = CINEMATIC_NAMES.none
@@ -117,7 +117,7 @@ function CinematicSceneSystem:_on_spawn_group_loaded()
 	end
 end
 
-function CinematicSceneSystem:_fetch_settings(mission, circumstance_name)
+function CinematicSceneSystem:_mission_settings(mission, circumstance_name)
 	local original_settings = mission.cinematics or {}
 	local circumstance_template = CircumstanceTemplates[circumstance_name]
 	local mission_overrides = circumstance_template.mission_overrides
@@ -254,7 +254,7 @@ function CinematicSceneSystem:_on_level_loaded(cinematic_name)
 end
 
 function CinematicSceneSystem:load_cutscene(cinematic_name, preload_id)
-	local origin_level_names = get_origin_level_names(cinematic_name)
+	local origin_level_names = _origin_level_names(cinematic_name)
 
 	if #origin_level_names == 0 then
 		Managers.event:trigger("cutscene_loaded_all_clients", true, preload_id)
@@ -334,7 +334,7 @@ function CinematicSceneSystem:_play_cutscene(cinematic_name, client_channel_id)
 end
 
 function CinematicSceneSystem:_prepare_cutscene_levels(cinematic_name, client_channel_id)
-	local origin_level_names = get_origin_level_names(cinematic_name)
+	local origin_level_names = _origin_level_names(cinematic_name)
 
 	if #origin_level_names == 0 then
 		return false

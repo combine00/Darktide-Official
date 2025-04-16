@@ -6,6 +6,7 @@ local DamageProfileTemplates = require("scripts/settings/damage/damage_profile_t
 local DamageSettings = require("scripts/settings/damage/damage_settings")
 local ExplosionTemplates = require("scripts/settings/damage/explosion_templates")
 local FootstepIntervalsTemplates = require("scripts/settings/equipment/footstep/footstep_intervals_templates")
+local HapticTriggerTemplates = require("scripts/settings/equipment/haptic_trigger_templates")
 local HerdingTemplates = require("scripts/settings/damage/herding_templates")
 local HitZone = require("scripts/utilities/attack/hit_zone")
 local MeleeActionInputSetupSlow = require("scripts/settings/equipment/weapon_templates/melee_action_input_setup_slow")
@@ -408,7 +409,7 @@ weapon_template.actions = {
 		first_person_hit_anim = "hit_up_shake",
 		first_person_hit_stop_anim = "attack_hit",
 		kind = "sweep",
-		allowed_during_sprint = "true",
+		allowed_during_sprint = true,
 		attack_direction_override = "up",
 		damage_window_end = 0.6,
 		uninterruptible = true,
@@ -494,11 +495,12 @@ weapon_template.actions = {
 	action_right_heavy = {
 		damage_window_start = 0.38333333333333336,
 		hit_armor_anim = "attack_hit_shield",
-		range_mod = 1.25,
 		kind = "sweep",
+		weapon_handling_template = "time_scale_1_3",
 		first_person_hit_anim = "hit_right_shake",
 		first_person_hit_stop_anim = "attack_hit",
-		weapon_handling_template = "time_scale_1_3",
+		allowed_during_sprint = true,
+		range_mod = 1.25,
 		attack_direction_override = "right",
 		damage_window_end = 0.5166666666666667,
 		uninterruptible = true,
@@ -572,11 +574,12 @@ weapon_template.actions = {
 		herding_template = HerdingTemplates.thunder_hammer_right_heavy
 	},
 	action_melee_start_left_2 = {
-		chain_anim_event_3p = "attack_swing_charge_left",
+		allowed_during_sprint = true,
 		chain_anim_event = "attack_swing_charge_left_pose",
-		first_person_hit_stop_anim = "attack_hit",
+		chain_anim_event_3p = "attack_swing_charge_left",
 		kind = "windup",
 		first_person_hit_anim = "attack_hit",
+		first_person_hit_stop_anim = "attack_hit",
 		uninterruptible = true,
 		anim_event = "attack_swing_charge_left",
 		hit_stop_anim = "attack_hit",
@@ -639,14 +642,15 @@ weapon_template.actions = {
 	action_left_light_2 = {
 		damage_window_start = 0.4666666666666667,
 		hit_armor_anim = "attack_hit_shield",
-		weapon_handling_template = "time_scale_1_2",
+		anim_event_3p = "attack_swing_left_diagonal_slow",
 		kind = "sweep",
 		first_person_hit_anim = "hit_left_down_shake",
-		range_mod = 1.25,
+		weapon_handling_template = "time_scale_1_2",
 		first_person_hit_stop_anim = "attack_hit",
+		allowed_during_sprint = true,
 		damage_window_end = 0.6,
-		anim_event_3p = "attack_swing_left_diagonal_slow",
 		anim_end_event = "attack_finished",
+		range_mod = 1.25,
 		attack_direction_override = "left",
 		uninterruptible = true,
 		anim_event = "attack_swing_left_diagonal",
@@ -733,6 +737,7 @@ weapon_template.actions = {
 		herding_template = HerdingTemplates.linesman_left_heavy
 	},
 	action_melee_start_right_2 = {
+		allowed_during_sprint = true,
 		first_person_hit_stop_anim = "attack_hit",
 		kind = "windup",
 		first_person_hit_anim = "attack_hit",
@@ -798,14 +803,15 @@ weapon_template.actions = {
 	action_right_light_2 = {
 		damage_window_start = 0.38333333333333336,
 		hit_armor_anim = "attack_hit_shield",
+		anim_event_3p = "attack_swing_right_diagonal_slow",
 		weapon_handling_template = "time_scale_1_2",
-		kind = "sweep",
 		first_person_hit_anim = "hit_right_down_shake",
 		first_person_hit_stop_anim = "attack_hit",
+		kind = "sweep",
+		allowed_during_sprint = true,
 		range_mod = 1.25,
-		anim_event_3p = "attack_swing_right_diagonal_slow",
-		attack_direction_override = "right",
 		damage_window_end = 0.5333333333333333,
+		attack_direction_override = "right",
 		uninterruptible = true,
 		anim_event = "attack_swing_right_diagonal",
 		total_time = 2,
@@ -888,6 +894,7 @@ weapon_template.actions = {
 		herding_template = HerdingTemplates.linesman_right_heavy
 	},
 	action_melee_start_heavy_follow_up_part_1 = {
+		allowed_during_sprint = true,
 		first_person_hit_stop_anim = "attack_hit",
 		kind = "windup",
 		first_person_hit_anim = "attack_hit",
@@ -1337,7 +1344,8 @@ weapon_template.actions = {
 		inner_damage_profile = DamageProfileTemplates.ogryn_push,
 		inner_damage_type = damage_types.physical,
 		outer_damage_profile = DamageProfileTemplates.default_push,
-		outer_damage_type = damage_types.physical
+		outer_damage_type = damage_types.physical,
+		haptic_trigger_template = HapticTriggerTemplates.melee.push
 	},
 	action_right_light_pushfollow = {
 		damage_window_start = 0.4,
@@ -1425,7 +1433,7 @@ weapon_template.actions = {
 	action_weapon_special = {
 		kind = "activate_special",
 		start_input = "special_action",
-		activation_time = 0.8,
+		activation_time = 0.75,
 		allowed_during_sprint = true,
 		anim_event = "activate",
 		skip_3p_anims = false,
@@ -1436,19 +1444,19 @@ weapon_template.actions = {
 				t = 0.15
 			},
 			{
-				modifier = 0.5,
+				modifier = 0.6,
 				t = 0.2
 			},
 			{
-				modifier = 0.3,
+				modifier = 0.5,
 				t = 0.3
 			},
 			{
-				modifier = 0.1,
-				t = 0.6
+				modifier = 0.6,
+				t = 0.9
 			},
 			{
-				modifier = 0.55,
+				modifier = 0.8,
 				t = 1.2
 			},
 			{
@@ -1474,11 +1482,11 @@ weapon_template.actions = {
 			},
 			start_attack = {
 				action_name = "action_melee_start_left",
-				chain_time = 1
+				chain_time = 0.85
 			},
 			block = {
 				action_name = "action_block",
-				chain_time = 1
+				chain_time = 0.85
 			}
 		}
 	},
@@ -1486,7 +1494,7 @@ weapon_template.actions = {
 		kind = "activate_special",
 		anim_event = "activate",
 		allowed_during_sprint = true,
-		activation_time = 0.8,
+		activation_time = 0.75,
 		skip_3p_anims = false,
 		total_time = 1.2,
 		action_movement_curve = {
@@ -1495,19 +1503,23 @@ weapon_template.actions = {
 				t = 0.15
 			},
 			{
-				modifier = 0.5,
+				modifier = 0.6,
 				t = 0.2
 			},
 			{
-				modifier = 0.3,
+				modifier = 0.4,
 				t = 0.3
 			},
 			{
-				modifier = 0.1,
+				modifier = 0.3,
 				t = 0.6
 			},
 			{
-				modifier = 0.55,
+				modifier = 0.5,
+				t = 0.9
+			},
+			{
+				modifier = 0.8,
 				t = 1.2
 			},
 			{
@@ -1533,11 +1545,11 @@ weapon_template.actions = {
 			},
 			start_attack = {
 				action_name = "action_melee_start_left",
-				chain_time = 1
+				chain_time = 0.85
 			},
 			block = {
 				action_name = "action_block",
-				chain_time = 1
+				chain_time = 0.85
 			}
 		}
 	},
@@ -2056,6 +2068,8 @@ weapon_template.weapon_special_tweak_data = {
 	active_on_abort = true,
 	allow_reactivation_while_active = true,
 	keep_active_on_sprint = true,
+	keep_active_on_vault = true,
+	keep_active_on_stun = true,
 	disorientation_type = "ogryn_powermaul_disorientation",
 	active_duration = 4,
 	explosion_template = ExplosionTemplates.powermaul_activated_impact
@@ -2088,5 +2102,6 @@ weapon_template.toughness_template = "default"
 weapon_template.movement_curve_modifier_template = "ogryn_club_p1_m1"
 weapon_template.footstep_intervals = FootstepIntervalsTemplates.ogryn_powermaul
 weapon_template.smart_targeting_template = SmartTargetingTemplates.default_melee
+weapon_template.haptic_trigger_template = HapticTriggerTemplates.melee.medium
 
 return weapon_template

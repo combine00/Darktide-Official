@@ -428,21 +428,21 @@ recoil_templates.rippergun_p1_m2_assault = {
 	moving = {
 		new_influence_percent = 0.75,
 		inherits = {
-			"default_rippergun_assault",
+			"rippergun_p1_m2_assault",
 			"still"
 		}
 	},
 	crouch_still = {
 		new_influence_percent = 0.75,
 		inherits = {
-			"default_rippergun_assault",
+			"rippergun_p1_m2_assault",
 			"still"
 		}
 	},
 	crouch_moving = {
 		new_influence_percent = 0.75,
 		inherits = {
-			"default_rippergun_assault",
+			"rippergun_p1_m2_assault",
 			"still"
 		}
 	}
@@ -631,7 +631,7 @@ recoil_templates.rippergun_p1_m2_spraynpray = {
 	moving = {
 		new_influence_percent = 0.5,
 		inherits = {
-			"default_rippergun_spraynpray",
+			"rippergun_p1_m2_spraynpray",
 			"still"
 		},
 		rise = {
@@ -644,14 +644,14 @@ recoil_templates.rippergun_p1_m2_spraynpray = {
 	crouch_still = {
 		new_influence_percent = 0.5,
 		inherits = {
-			"default_rippergun_spraynpray",
+			"rippergun_p1_m2_spraynpray",
 			"still"
 		}
 	},
 	crouch_moving = {
 		new_influence_percent = 0.5,
 		inherits = {
-			"default_rippergun_spraynpray",
+			"rippergun_p1_m2_spraynpray",
 			"still"
 		}
 	}

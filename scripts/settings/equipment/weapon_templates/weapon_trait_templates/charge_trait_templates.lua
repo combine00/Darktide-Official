@@ -157,6 +157,41 @@ local charge_trait_templates = {
 			}
 		}
 	},
+	forcesword_2h_p1_m1_warp_charge_cost_stat = {
+		{
+			"warp_charge_percent",
+			{
+				max = 0.75,
+				min = 0.25
+			}
+		},
+		{
+			"full_charge_warp_charge_percent",
+			{
+				max = 0.75,
+				min = 0.25
+			}
+		}
+	},
+	forcesword_2h_p1_m1_warp_charge_cost_perk = {
+		{
+			"warp_charge_percent",
+			0.05
+		},
+		{
+			"full_charge_warp_charge_percent",
+			0.05
+		}
+	},
+	forcesword_2h_p1_m1_weapon_special_warp_charge_cost = {
+		{
+			"warp_charge_percent",
+			{
+				max = 1,
+				min = 0.1
+			}
+		}
+	},
 	plasmagun_charge_speed_stat = {
 		{
 			"charge_duration",
@@ -176,6 +211,32 @@ local charge_trait_templates = {
 		},
 		{
 			"full_charge_overheat_percent",
+			{
+				max = 1,
+				min = 0
+			}
+		}
+	},
+	powersword_2h_p1_heat_stat = {
+		{
+			"overheat_overtime",
+			"overheat_percent",
+			{
+				max = 1,
+				min = 0
+			}
+		},
+		{
+			"overheat_swing",
+			"overheat_percent",
+			{
+				max = 1,
+				min = 0
+			}
+		},
+		{
+			"overheat_decay",
+			"auto_vent_duration",
 			{
 				max = 1,
 				min = 0

@@ -42,6 +42,10 @@ function ExternalPaymentPlatformBase:fail_txn(order_id)
 	return Promise.resolved(nil)
 end
 
+function ExternalPaymentPlatformBase:show_empty_store_error()
+	return Promise.resolved(nil)
+end
+
 implements(ExternalPaymentPlatformBase, ExternalPaymentPlatformInterface)
 
 return ExternalPaymentPlatformBase

@@ -142,6 +142,74 @@ local mission_templates = {
 		spawn_settings = {
 			next_mission = "recent_mission"
 		}
+	},
+	km_heresy = {
+		mission_name = "loc_mission_name_km_heresy",
+		mission_type = "investigation",
+		mission_description = "loc_mission_board_main_objective_heresy_description",
+		texture_small = "content/ui/textures/missions/km_heresy_small",
+		texture_medium = "content/ui/textures/missions/km_heresy_medium",
+		mechanism_name = "adventure",
+		face_state_machine_key = "state_machine_missions",
+		coordinates = "loc_mission_coordinates_km_heresy",
+		texture_big = "content/ui/textures/missions/km_heresy_big",
+		zone_id = "entertainment",
+		wwise_state = "zone_6",
+		level = "content/levels/entertainment/missions/mission_km_heresy",
+		game_mode_name = "coop_complete_objective",
+		mission_intro_minimum_time = 5,
+		objectives = "km_heresy",
+		mission_brief_material = "content/environment/cinematic/mission_briefing/mission_briefing_hologram_km_heresy_01",
+		testify_flags = {},
+		cinematics = {
+			intro_abc = {
+				"c_cam"
+			},
+			outro_fail = {
+				"outro_fail"
+			},
+			outro_win = {
+				"outro_win"
+			},
+			traitor_captain_intro = {
+				"traitor_captain_intro"
+			}
+		},
+		pickup_settings = {},
+		hazard_prop_settings = {
+			explosion = 0.3,
+			fire = 0.2,
+			none = 0.4
+		},
+		terror_event_templates = {
+			"terror_events_km_heresy"
+		},
+		health_station = {},
+		mission_brief_vo = {
+			vo_profile = "interrogator_a",
+			wwise_route_key = 1,
+			vo_events = {
+				"mission_heresy_briefing_a",
+				"mission_heresy_briefing_b",
+				"mission_heresy_briefing_c"
+			},
+			mission_giver_packs = {
+				interrogator_a = {
+					"enemy_nemesis_wolfer",
+					"enemy_ritualist",
+					"explicator",
+					"interrogator"
+				}
+			}
+		},
+		dialogue_settings = {
+			npc_story_ticker_enabled = false,
+			short_story_ticker_enabled = true,
+			story_ticker_enabled = true
+		},
+		spawn_settings = {
+			next_mission = "recent_mission"
+		}
 	}
 }
 

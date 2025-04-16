@@ -2111,6 +2111,822 @@ spread_templates.ogryn_heavystubber_spread_spraynpray_braced_m3 = {
 		}
 	}
 }
+spread_templates.ogryn_heavystubber_p2_m1_spread_aim = {
+	still = {
+		max_spread = {
+			yaw = 3.6,
+			pitch = 3.6
+		},
+		randomized_spread = {
+			random_ratio = 0.2,
+			first_shot_min_ratio = 0.3,
+			first_shot_random_ratio = 0.5,
+			min_ratio = 0.1
+		},
+		decay = {
+			from_shooting_grace_time = 0.1,
+			shooting = {
+				yaw = 0.675,
+				pitch = 0.675
+			},
+			idle = {
+				yaw = 1.5,
+				pitch = 1.5
+			}
+		},
+		continuous_spread = {
+			min_pitch = {
+				lerp_perfect = 0.2,
+				lerp_basic = 0.7
+			},
+			min_yaw = {
+				lerp_perfect = 0.2,
+				lerp_basic = 0.7
+			}
+		},
+		immediate_spread = {
+			alternate_fire_start = {
+				{
+					yaw = 0.5,
+					pitch = 0.5
+				}
+			},
+			suppression_hit = {
+				{
+					yaw = 0,
+					pitch = 0
+				}
+			},
+			damage_hit = {
+				{
+					yaw = 0,
+					pitch = 0
+				}
+			},
+			shooting = {
+				{
+					pitch = {
+						lerp_perfect = 0.3,
+						lerp_basic = 0.8
+					},
+					yaw = {
+						lerp_perfect = 0.3,
+						lerp_basic = 0.8
+					}
+				}
+			},
+			num_shots_clear_time = {
+				lerp_perfect = 0.3,
+				lerp_basic = 0.3
+			}
+		}
+	},
+	moving = {
+		inherits = {
+			"ogryn_heavystubber_p2_m1_spread_aim",
+			"still"
+		},
+		continuous_spread = {
+			min_pitch = {
+				lerp_perfect = 0.5,
+				lerp_basic = 1.4
+			},
+			min_yaw = {
+				lerp_perfect = 0.5,
+				lerp_basic = 1.4
+			}
+		}
+	},
+	crouch_still = {
+		inherits = {
+			"ogryn_heavystubber_p2_m1_spread_aim",
+			"still"
+		},
+		continuous_spread = {
+			min_pitch = {
+				lerp_perfect = 0.15,
+				lerp_basic = 0.6
+			},
+			min_yaw = {
+				lerp_perfect = 0.15,
+				lerp_basic = 0.6
+			}
+		}
+	},
+	crouch_moving = {
+		inherits = {
+			"ogryn_heavystubber_p2_m1_spread_aim",
+			"still"
+		},
+		continuous_spread = {
+			min_pitch = {
+				lerp_perfect = 0.5,
+				lerp_basic = 1.4
+			},
+			min_yaw = {
+				lerp_perfect = 0.5,
+				lerp_basic = 1.4
+			}
+		}
+	}
+}
+local pitch_spread_p2_m1 = 2.6
+local yaw_spread_p2_m1 = pitch_spread_p2_m1
+spread_templates.ogryn_heavystubber_p2_m1_spread_hip = {
+	still = {
+		max_spread = {
+			yaw = 5,
+			pitch = 5
+		},
+		decay = {
+			from_shooting_grace_time = 0.025,
+			shooting = {
+				yaw = 0.5,
+				pitch = 0.5
+			},
+			idle = {
+				yaw = 1,
+				pitch = 1
+			}
+		},
+		continuous_spread = {
+			min_yaw = 1.7,
+			min_pitch = 1.7
+		},
+		randomized_spread = {
+			first_shot_min_ratio = 0.35,
+			max_yaw_delta = 0.8,
+			first_shot_random_ratio = 0.8,
+			random_ratio = 0.85,
+			max_pitch_delta = 0.8,
+			min_ratio = 0.2
+		},
+		immediate_spread = {
+			num_shots_clear_time = 1.5,
+			suppression_hit = {
+				{
+					yaw = 0.25,
+					pitch = 0.25
+				}
+			},
+			damage_hit = {
+				{
+					yaw = 0.4,
+					pitch = 0.4
+				}
+			},
+			shooting = {
+				{
+					pitch = pitch_spread_p2_m1 * 0.03,
+					yaw = yaw_spread_p2_m1 * 0.03
+				},
+				{
+					pitch = pitch_spread_p2_m1 * 0.02,
+					yaw = yaw_spread_p2_m1 * 0.02
+				},
+				{
+					pitch = pitch_spread_p2_m1 * 0.03,
+					yaw = yaw_spread_p2_m1 * 0.03
+				},
+				{
+					pitch = pitch_spread_p2_m1 * 0.06,
+					yaw = yaw_spread_p2_m1 * 0.06
+				},
+				{
+					pitch = pitch_spread_p2_m1 * 0.1,
+					yaw = yaw_spread_p2_m1 * 0.1
+				},
+				{
+					pitch = pitch_spread_p2_m1 * 0.2,
+					yaw = yaw_spread_p2_m1 * 0.2
+				},
+				{
+					pitch = pitch_spread_p2_m1 * 0.1,
+					yaw = yaw_spread_p2_m1 * 0.1
+				},
+				{
+					pitch = pitch_spread_p2_m1 * 0.2,
+					yaw = yaw_spread_p2_m1 * 0.2
+				},
+				{
+					pitch = pitch_spread_p2_m1 * 0.3,
+					yaw = yaw_spread_p2_m1 * 0.3
+				},
+				{
+					pitch = pitch_spread_p2_m1 * 0.2,
+					yaw = yaw_spread_p2_m1 * 0.2
+				}
+			}
+		}
+	},
+	moving = {
+		inherits = {
+			"ogryn_heavystubber_p2_m1_spread_hip",
+			"still"
+		},
+		continuous_spread = {
+			min_yaw = 2.3,
+			min_pitch = 2.3
+		},
+		immediate_spread = {
+			num_shots_clear_time = 0.25,
+			suppression_hit = {
+				{
+					yaw = 0.25,
+					pitch = 0.25
+				}
+			},
+			damage_hit = {
+				{
+					yaw = 0.4,
+					pitch = 0.4
+				}
+			},
+			shooting = {
+				{
+					pitch = pitch_spread_p2_m1 * 0.2,
+					yaw = yaw_spread_p2_m1 * 0.2
+				},
+				{
+					pitch = pitch_spread_p2_m1 * 0.3,
+					yaw = yaw_spread_p2_m1 * 0.3
+				},
+				{
+					pitch = pitch_spread_p2_m1 * 0.5,
+					yaw = yaw_spread_p2_m1 * 0.5
+				},
+				{
+					pitch = pitch_spread_p2_m1 * 0.4,
+					yaw = yaw_spread_p2_m1 * 0.4
+				},
+				{
+					pitch = pitch_spread_p2_m1 * 0.3,
+					yaw = yaw_spread_p2_m1 * 0.3
+				},
+				{
+					pitch = pitch_spread_p2_m1 * 0.2,
+					yaw = yaw_spread_p2_m1 * 0.2
+				}
+			}
+		}
+	},
+	crouch_still = {
+		continuous_spread = {
+			min_yaw = 1.2,
+			min_pitch = 1.2
+		},
+		inherits = {
+			"ogryn_heavystubber_p2_m1_spread_hip",
+			"still"
+		}
+	},
+	crouch_moving = {
+		inherits = {
+			"ogryn_heavystubber_p2_m1_spread_hip",
+			"still"
+		}
+	}
+}
+spread_templates.ogryn_heavystubber_p2_spread_aim = {
+	still = {
+		max_spread = {
+			yaw = 3.6,
+			pitch = 3.6
+		},
+		randomized_spread = {
+			random_ratio = 0.2,
+			first_shot_min_ratio = 0.3,
+			first_shot_random_ratio = 0.5,
+			min_ratio = 0.1
+		},
+		decay = {
+			from_shooting_grace_time = 0.15,
+			shooting = {
+				yaw = 0.675,
+				pitch = 0.675
+			},
+			idle = {
+				yaw = 1.5,
+				pitch = 1.5
+			}
+		},
+		continuous_spread = {
+			min_pitch = {
+				lerp_perfect = 0.2,
+				lerp_basic = 0.9
+			},
+			min_yaw = {
+				lerp_perfect = 0.2,
+				lerp_basic = 0.9
+			}
+		},
+		immediate_spread = {
+			alternate_fire_start = {
+				{
+					yaw = 0.1,
+					pitch = 0.1
+				}
+			},
+			suppression_hit = {
+				{
+					yaw = 0,
+					pitch = 0
+				}
+			},
+			damage_hit = {
+				{
+					yaw = 0,
+					pitch = 0
+				}
+			},
+			shooting = {
+				{
+					pitch = {
+						lerp_perfect = 0.25,
+						lerp_basic = 0.75
+					},
+					yaw = {
+						lerp_perfect = 0.25,
+						lerp_basic = 0.75
+					}
+				}
+			},
+			num_shots_clear_time = {
+				lerp_perfect = 0.6,
+				lerp_basic = 0.6
+			}
+		}
+	},
+	moving = {
+		inherits = {
+			"ogryn_heavystubber_p2_spread_aim",
+			"still"
+		},
+		continuous_spread = {
+			min_pitch = {
+				lerp_perfect = 0.5,
+				lerp_basic = 1.5
+			},
+			min_yaw = {
+				lerp_perfect = 0.5,
+				lerp_basic = 1.5
+			}
+		}
+	},
+	crouch_still = {
+		inherits = {
+			"ogryn_heavystubber_p2_spread_aim",
+			"still"
+		},
+		continuous_spread = {
+			min_pitch = {
+				lerp_perfect = 0.15,
+				lerp_basic = 0.6
+			},
+			min_yaw = {
+				lerp_perfect = 0.15,
+				lerp_basic = 0.6
+			}
+		}
+	},
+	crouch_moving = {
+		inherits = {
+			"ogryn_heavystubber_p2_spread_aim",
+			"still"
+		},
+		continuous_spread = {
+			min_pitch = {
+				lerp_perfect = 0.5,
+				lerp_basic = 1.3
+			},
+			min_yaw = {
+				lerp_perfect = 0.5,
+				lerp_basic = 1.3
+			}
+		}
+	}
+}
+local pitch_spread_p2_m2 = 2.8
+local yaw_spread_p2_m2 = pitch_spread_p2_m2
+spread_templates.ogryn_heavystubber_p2_m2_spread_hip = {
+	still = {
+		max_spread = {
+			yaw = 5,
+			pitch = 5
+		},
+		decay = {
+			from_shooting_grace_time = 0.025,
+			shooting = {
+				yaw = 0.5,
+				pitch = 0.5
+			},
+			idle = {
+				yaw = 1,
+				pitch = 1
+			}
+		},
+		continuous_spread = {
+			min_yaw = 1.8,
+			min_pitch = 1.8
+		},
+		randomized_spread = {
+			first_shot_min_ratio = 0.35,
+			max_yaw_delta = 0.8,
+			first_shot_random_ratio = 0.8,
+			random_ratio = 0.85,
+			max_pitch_delta = 0.8,
+			min_ratio = 0.2
+		},
+		immediate_spread = {
+			num_shots_clear_time = 1.5,
+			suppression_hit = {
+				{
+					yaw = 0.25,
+					pitch = 0.25
+				}
+			},
+			damage_hit = {
+				{
+					yaw = 0.4,
+					pitch = 0.4
+				}
+			},
+			shooting = {
+				{
+					pitch = pitch_spread_p2_m2 * 0.04,
+					yaw = yaw_spread_p2_m2 * 0.04
+				},
+				{
+					pitch = pitch_spread_p2_m2 * 0.05,
+					yaw = yaw_spread_p2_m2 * 0.05
+				},
+				{
+					pitch = pitch_spread_p2_m2 * 0.07,
+					yaw = yaw_spread_p2_m2 * 0.07
+				},
+				{
+					pitch = pitch_spread_p2_m2 * 0.09,
+					yaw = yaw_spread_p2_m2 * 0.09
+				},
+				{
+					pitch = pitch_spread_p2_m2 * 0.1,
+					yaw = yaw_spread_p2_m2 * 0.1
+				},
+				{
+					pitch = pitch_spread_p2_m2 * 0.2,
+					yaw = yaw_spread_p2_m2 * 0.2
+				},
+				{
+					pitch = pitch_spread_p2_m2 * 0.1,
+					yaw = yaw_spread_p2_m2 * 0.1
+				},
+				{
+					pitch = pitch_spread_p2_m2 * 0.2,
+					yaw = yaw_spread_p2_m2 * 0.2
+				},
+				{
+					pitch = pitch_spread_p2_m2 * 0.3,
+					yaw = yaw_spread_p2_m2 * 0.3
+				},
+				{
+					pitch = pitch_spread_p2_m2 * 0.2,
+					yaw = yaw_spread_p2_m2 * 0.2
+				}
+			}
+		}
+	},
+	moving = {
+		inherits = {
+			"ogryn_heavystubber_p2_m2_spread_hip",
+			"still"
+		},
+		continuous_spread = {
+			min_yaw = 2.3,
+			min_pitch = 2.3
+		},
+		immediate_spread = {
+			num_shots_clear_time = 0.25,
+			suppression_hit = {
+				{
+					yaw = 0.25,
+					pitch = 0.25
+				}
+			},
+			damage_hit = {
+				{
+					yaw = 0.4,
+					pitch = 0.4
+				}
+			},
+			shooting = {
+				{
+					pitch = pitch_spread_p2_m2 * 0.2,
+					yaw = yaw_spread_p2_m2 * 0.2
+				},
+				{
+					pitch = pitch_spread_p2_m2 * 0.3,
+					yaw = yaw_spread_p2_m2 * 0.3
+				},
+				{
+					pitch = pitch_spread_p2_m2 * 0.5,
+					yaw = yaw_spread_p2_m2 * 0.5
+				},
+				{
+					pitch = pitch_spread_p2_m2 * 0.4,
+					yaw = yaw_spread_p2_m2 * 0.4
+				},
+				{
+					pitch = pitch_spread_p2_m2 * 0.3,
+					yaw = yaw_spread_p2_m2 * 0.3
+				},
+				{
+					pitch = pitch_spread_p2_m2 * 0.2,
+					yaw = yaw_spread_p2_m2 * 0.2
+				}
+			}
+		}
+	},
+	crouch_still = {
+		continuous_spread = {
+			min_yaw = 1.5,
+			min_pitch = 1.5
+		},
+		inherits = {
+			"ogryn_heavystubber_p2_m2_spread_hip",
+			"still"
+		}
+	},
+	crouch_moving = {
+		inherits = {
+			"ogryn_heavystubber_p2_m2_spread_hip",
+			"still"
+		}
+	}
+}
+local pitch_spread_p2_m3 = 3
+local yaw_spread_p2_m3 = pitch_spread_p2_m3
+spread_templates.ogryn_heavystubber_p2_m3_spread_hip = {
+	still = {
+		max_spread = {
+			yaw = 6,
+			pitch = 6
+		},
+		decay = {
+			from_shooting_grace_time = 0.025,
+			shooting = {
+				yaw = 0.5,
+				pitch = 0.5
+			},
+			idle = {
+				yaw = 1.2,
+				pitch = 1.2
+			}
+		},
+		continuous_spread = {
+			min_yaw = 2.3,
+			min_pitch = 2.3
+		},
+		immediate_spread = {
+			num_shots_clear_time = 1.5,
+			suppression_hit = {
+				{
+					yaw = 0.25,
+					pitch = 0.25
+				}
+			},
+			damage_hit = {
+				{
+					yaw = 0.4,
+					pitch = 0.4
+				}
+			},
+			shooting = {
+				{
+					pitch = pitch_spread_p2_m3 * 0.05,
+					yaw = yaw_spread_p2_m3 * 0.05
+				},
+				{
+					pitch = pitch_spread_p2_m3 * 0.09,
+					yaw = yaw_spread_p2_m3 * 0.09
+				},
+				{
+					pitch = pitch_spread_p2_m3 * 0.3,
+					yaw = yaw_spread_p2_m3 * 0.3
+				},
+				{
+					pitch = pitch_spread_p2_m3 * 0.7,
+					yaw = yaw_spread_p2_m3 * 0.7
+				},
+				{
+					pitch = pitch_spread_p2_m3 * 0.4,
+					yaw = yaw_spread_p2_m3 * 0.4
+				},
+				{
+					pitch = pitch_spread_p2_m3 * 0.3,
+					yaw = yaw_spread_p2_m3 * 0.3
+				},
+				{
+					pitch = pitch_spread_p2_m3 * 0.3,
+					yaw = yaw_spread_p2_m3 * 0.3
+				},
+				{
+					pitch = pitch_spread_p2_m3 * 0.4,
+					yaw = yaw_spread_p2_m3 * 0.4
+				},
+				{
+					pitch = pitch_spread_p2_m3 * 0.3,
+					yaw = yaw_spread_p2_m3 * 0.3
+				}
+			}
+		}
+	},
+	moving = {
+		inherits = {
+			"ogryn_heavystubber_p2_m3_spread_hip",
+			"still"
+		},
+		continuous_spread = {
+			min_yaw = 2.5,
+			min_pitch = 2.5
+		},
+		immediate_spread = {
+			num_shots_clear_time = 0.25,
+			suppression_hit = {
+				{
+					yaw = 0.25,
+					pitch = 0.25
+				}
+			},
+			damage_hit = {
+				{
+					yaw = 0.4,
+					pitch = 0.4
+				}
+			},
+			shooting = {
+				{
+					pitch = pitch_spread_p2_m3 * 0.2,
+					yaw = yaw_spread_p2_m3 * 0.2
+				},
+				{
+					pitch = pitch_spread_p2_m3 * 0.3,
+					yaw = yaw_spread_p2_m3 * 0.3
+				},
+				{
+					pitch = pitch_spread_p2_m3 * 0.5,
+					yaw = yaw_spread_p2_m3 * 0.5
+				},
+				{
+					pitch = pitch_spread_p2_m3 * 0.4,
+					yaw = yaw_spread_p2_m3 * 0.4
+				},
+				{
+					pitch = pitch_spread_p2_m3 * 0.3,
+					yaw = yaw_spread_p2_m3 * 0.3
+				},
+				{
+					pitch = pitch_spread_p2_m3 * 0.2,
+					yaw = yaw_spread_p2_m3 * 0.2
+				}
+			}
+		}
+	},
+	crouch_still = {
+		continuous_spread = {
+			min_yaw = 1.7,
+			min_pitch = 1.7
+		},
+		inherits = {
+			"ogryn_heavystubber_p2_m3_spread_hip",
+			"still"
+		}
+	},
+	crouch_moving = {
+		inherits = {
+			"ogryn_heavystubber_p2_m3_spread_hip",
+			"still"
+		}
+	}
+}
+spread_templates.ogryn_heavystubber_p2_m3_spread_aim = {
+	still = {
+		max_spread = {
+			yaw = 3.6,
+			pitch = 3.6
+		},
+		randomized_spread = {
+			random_ratio = 0.2,
+			first_shot_min_ratio = 0.3,
+			first_shot_random_ratio = 0.5,
+			min_ratio = 0.1
+		},
+		decay = {
+			from_shooting_grace_time = 0.15,
+			shooting = {
+				yaw = 0.675,
+				pitch = 0.675
+			},
+			idle = {
+				yaw = 2,
+				pitch = 2
+			}
+		},
+		continuous_spread = {
+			min_pitch = {
+				lerp_perfect = 0.2,
+				lerp_basic = 0.9
+			},
+			min_yaw = {
+				lerp_perfect = 0.2,
+				lerp_basic = 0.9
+			}
+		},
+		immediate_spread = {
+			alternate_fire_start = {
+				{
+					yaw = 0.1,
+					pitch = 0.1
+				}
+			},
+			suppression_hit = {
+				{
+					yaw = 0,
+					pitch = 0
+				}
+			},
+			damage_hit = {
+				{
+					yaw = 0,
+					pitch = 0
+				}
+			},
+			shooting = {
+				{
+					pitch = {
+						lerp_perfect = 0,
+						lerp_basic = 1.7
+					},
+					yaw = {
+						lerp_perfect = 0,
+						lerp_basic = 1.7
+					}
+				}
+			},
+			num_shots_clear_time = {
+				lerp_perfect = 1,
+				lerp_basic = 1
+			}
+		}
+	},
+	moving = {
+		inherits = {
+			"ogryn_heavystubber_p2_m3_spread_aim",
+			"still"
+		},
+		continuous_spread = {
+			min_pitch = {
+				lerp_perfect = 0.5,
+				lerp_basic = 1.4
+			},
+			min_yaw = {
+				lerp_perfect = 0.5,
+				lerp_basic = 1.4
+			}
+		}
+	},
+	crouch_still = {
+		inherits = {
+			"ogryn_heavystubber_p2_m3_spread_aim",
+			"still"
+		},
+		continuous_spread = {
+			min_pitch = {
+				lerp_perfect = 0.15,
+				lerp_basic = 0.6
+			},
+			min_yaw = {
+				lerp_perfect = 0.15,
+				lerp_basic = 0.6
+			}
+		}
+	},
+	crouch_moving = {
+		inherits = {
+			"ogryn_heavystubber_p2_m3_spread_aim",
+			"still"
+		},
+		continuous_spread = {
+			min_pitch = {
+				lerp_perfect = 0.5,
+				lerp_basic = 1.3
+			},
+			min_yaw = {
+				lerp_perfect = 0.5,
+				lerp_basic = 1.3
+			}
+		}
+	}
+}
 
 return {
 	base_templates = spread_templates,

@@ -2,11 +2,12 @@ local Definitions = require("scripts/ui/views/end_view/end_view_definitions")
 local DefaultViewInputSettings = require("scripts/settings/input/default_view_input_settings")
 local EndViewSettings = require("scripts/ui/views/end_view/end_view_settings")
 local EndViewTestify = GameParameters.testify and require("scripts/ui/views/end_view/end_view_testify")
+local LoadingStateData = require("scripts/ui/loading_state_data")
 local MasterItems = require("scripts/backend/master_items")
 local Missions = require("scripts/settings/mission/mission_templates")
 local ProfileUtils = require("scripts/utilities/profile_utils")
 local SocialConstants = require("scripts/managers/data_service/services/social/social_constants")
-local TextUtilities = require("scripts/utilities/ui/text")
+local Text = require("scripts/utilities/ui/text")
 local UIProfileSpawner = require("scripts/managers/ui/ui_profile_spawner")
 local UISettings = require("scripts/settings/ui/ui_settings")
 local UIWidget = require("scripts/managers/ui/ui_widget")
@@ -46,8 +47,10 @@ function EndView:init(settings, context)
 	self._num_members_in_my_party = 1
 	self._has_shown_summary_view = false
 	self._fetch_party_done = false
+	local level, dynamic_level_package = self:select_target_level()
+	self._level = level
 
-	EndView.super.init(self, definitions, settings, context)
+	EndView.super.init(self, definitions, settings, context, dynamic_level_package)
 
 	self._pass_draw = false
 	self._pass_input = true
@@ -56,6 +59,7 @@ end
 function EndView:on_enter()
 	EndView.super.on_enter(self)
 
+	self._waiting = false
 	self._widget_alpha = 0
 	self._game_mode_condition_widgets = {}
 
@@ -90,6 +94,8 @@ function EndView:on_enter()
 end
 
 function EndView:on_exit()
+	Managers.event:trigger("event_stop_waiting")
+
 	if Managers.ui:view_active(SUMMARY_VIEW_NAME) then
 		Managers.ui:close_view(SUMMARY_VIEW_NAME)
 	end
@@ -181,7 +187,43 @@ function EndView:update(dt, t, input_service)
 		self:_update_buttons()
 	end
 
+	local waiting = not session_report or not end_time
+
+	if self._waiting ~= waiting then
+		if waiting then
+			Managers.event:trigger("event_start_waiting")
+		else
+			Managers.event:trigger("event_stop_waiting")
+
+			self._widgets_by_name.loading.content.visible = false
+		end
+
+		self._waiting = waiting
+	end
+
+	Managers.event:trigger("event_set_waiting_state", LoadingStateData.WAIT_REASON.backend)
+
+	if self._waiting or DevParameters.debug_load_wait_info then
+		local wait_reason, wait_time, debug_opacity = Managers.ui:current_wait_info()
+		local opacity_multiplier = math.clamp(wait_time - 5, 0, 1) * 255
+
+		if DevParameters.debug_load_wait_info then
+			opacity_multiplier = debug_opacity
+		end
+
+		if opacity_multiplier > 0 then
+			local loading_widget = self._widgets_by_name.loading
+			loading_widget.content.text = wait_reason or ""
+			loading_widget.content.visible = true
+			loading_widget.style.text.text_color[1] = opacity_multiplier
+			loading_widget.style.icon.color[1] = opacity_multiplier
+			loading_widget.style.background.color[1] = opacity_multiplier * 0.5
+		end
+	end
+
 	if not session_report then
+		Managers.event:trigger("event_set_waiting_state", LoadingStateData.WAIT_REASON.backend)
+
 		local progression_manager = Managers.progression
 
 		if progression_manager:session_report_success() then
@@ -199,6 +241,8 @@ function EndView:update(dt, t, input_service)
 	end
 
 	if not end_time then
+		Managers.event:trigger("event_set_waiting_state", LoadingStateData.WAIT_REASON.dedicated_server)
+
 		end_time = Managers.progression:game_score_end_time()
 		self._end_time = end_time
 
@@ -210,6 +254,8 @@ function EndView:update(dt, t, input_service)
 	end
 
 	if session_report and end_time and show_player_view_time and show_player_view_time < server_time and not is_showing_player_view then
+		Managers.event:trigger("event_stop_waiting")
+
 		local character_session_report = self._session_report.character
 		local context = self._context
 		local summary_view_context = self._end_player_view_context
@@ -271,7 +317,7 @@ function EndView:event_register_end_of_round_camera(camera_unit)
 	local viewport_name = EndViewSettings.viewport_name
 	local viewport_type = EndViewSettings.viewport_type
 	local viewport_layer = EndViewSettings.viewport_layer
-	local shading_environment = EndViewSettings.shading_environment
+	local shading_environment = self._level.shading_environment
 
 	self._world_spawner:create_viewport(camera_unit, viewport_name, viewport_type, viewport_layer, shading_environment)
 end
@@ -437,7 +483,7 @@ function EndView:_update_buttons()
 	local continue_button_action = _continue_button_action
 	local can_skip = self._can_skip
 	local input_legend_text_template = can_skip and Localize("loc_input_legend_text_template") or nil
-	local button_text = TextUtilities.localize_with_button_hint(continue_button_action, continue_button_loc_string, nil, service_type, input_legend_text_template)
+	local button_text = Text.localize_with_button_hint(continue_button_action, continue_button_loc_string, nil, service_type, input_legend_text_template)
 	local time = continue_button_content.time
 
 	if time and self._has_shown_summary_view then
@@ -456,7 +502,7 @@ function EndView:_update_buttons()
 	voting_widget_content.already_in_party = already_in_party
 	local loc_string = EndViewSettings.stay_in_party_vote_text
 	local vote_button_action = _vote_button_action
-	local vote_button_text = TextUtilities.localize_with_button_hint(vote_button_action, loc_string, nil, service_type, input_legend_text_template)
+	local vote_button_text = Text.localize_with_button_hint(vote_button_action, loc_string, nil, service_type, input_legend_text_template)
 	voting_widget_content.vote_text = vote_button_text
 	local voting_widget_style = voting_widget.style
 	local vote_count_style = voting_widget_style.vote_count_text
@@ -499,6 +545,19 @@ function EndView:_setup_stay_in_party_vote()
 	hotspot.pressed_callback = callback(self, "_cb_on_stay_in_party_pressed")
 end
 
+function EndView:select_target_level()
+	local level_name = nil
+	local played_mission = self._context.played_mission
+	level_name = played_mission == "psykhanium" and "horde" or "default"
+	local level = EndViewSettings.levels_by_id[level_name] or EndViewSettings.levels_by_id.default
+	local level_packages = {
+		is_level_package = true,
+		name = level.level_name
+	}
+
+	return level, level_packages
+end
+
 function EndView:_setup_background_world()
 	self:_register_event("event_register_end_of_round_camera", "event_register_end_of_round_camera")
 
@@ -536,7 +595,9 @@ function EndView:_setup_background_world()
 	local world_layer = EndViewSettings.world_layer
 	local world_timer_name = EndViewSettings.timer_name
 	self._world_spawner = UIWorldSpawner:new(world_name, world_layer, world_timer_name, self.view_name)
-	local level_name = EndViewSettings.level_name
+	local level_name = nil
+	local target_level = self._level
+	level_name = self._level.level_name
 
 	self._world_spawner:spawn_level(level_name)
 	self:_register_event("end_of_round_blur_background_world", "_end_of_round_blur_background_world")
@@ -801,14 +862,14 @@ function EndView:_set_character_names()
 					widget_content.character_name = character_name
 				elseif not self._has_shown_summary_view then
 					local character_level = report.currentLevel
-					widget_content.character_name = TextUtilities.formatted_character_name(character_name, character_level)
+					widget_content.character_name = Text.formatted_character_name(character_name, character_level)
 				elseif player_info:is_own_player() then
 					local character_level = player_info:character_level()
-					widget_content.character_name = TextUtilities.formatted_character_name(character_name, character_level)
+					widget_content.character_name = Text.formatted_character_name(character_name, character_level)
 				else
 					local xp = report.currentXp
 					local level_after_mission = self:_level_from_xp(experience_settings, xp)
-					widget_content.character_name = TextUtilities.formatted_character_name(character_name, level_after_mission)
+					widget_content.character_name = Text.formatted_character_name(character_name, level_after_mission)
 				end
 
 				widget_content.account_name = player_info:user_display_name()
@@ -827,12 +888,13 @@ function EndView:_set_mission_key(mission_key, session_report, render_scale)
 
 	if self._round_won and team_session_report then
 		local mission_time_in_sec = team_session_report.play_time_seconds
+		local game_mode_completion_time_seconds = team_session_report.game_mode_completion_time_seconds or nil
 		local mission_sub_header_style = widget.style.mission_sub_header
 		local stats_text_color = mission_sub_header_style.stats_text_color
 		local text_params = {
 			total_kills = team_session_report.total_kills,
 			total_deaths = team_session_report.total_deaths,
-			mission_time = TextUtilities.format_time_span_long_form_localized(mission_time_in_sec),
+			mission_time = Text.format_time_span_long_form_localized(game_mode_completion_time_seconds or mission_time_in_sec),
 			font_size = mission_sub_header_style.stats_font_size * render_scale,
 			font_color = string.format("%d,%d,%d", stats_text_color[2], stats_text_color[3], stats_text_color[4])
 		}

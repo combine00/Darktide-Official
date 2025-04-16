@@ -6,6 +6,52 @@ table.make_unique(weapon_traits_ranged_aimed)
 local stat_buffs = BuffSettings.stat_buffs
 local proc_events = BuffSettings.proc_events
 weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_on_weakspot_hit_increase_damage = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_weakspot_hit_increase_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_hit
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_weakspot_hit_increase_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.damage
+				}
+			}
+		},
+		duration = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_weakspot_hit_increase_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_weakspot_hit_increase_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_ranged_aimed_wield_on_weakspot_hit_increase_damage_buff = {
 			{
@@ -52,6 +98,52 @@ weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_on_weakspot_hit_incre
 	}
 }
 weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_on_weakspot_hit_increase_impact = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_weakspot_hit_increase_impact_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_hit
+				}
+			}
+		},
+		impact = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_weakspot_hit_increase_impact_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.ranged_impact_modifier
+				}
+			}
+		},
+		duration = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_weakspot_hit_increase_impact_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_weakspot_hit_increase_impact_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_ranged_aimed_wield_on_weakspot_hit_increase_impact_buff = {
 			{
@@ -98,6 +190,18 @@ weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_on_weakspot_hit_incre
 	}
 }
 weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_on_weakspot_hit_apply_bleeding = {
+	format_values = {
+		cooldown = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_weakspot_hit_apply_bleeding_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_ranged_aimed_wield_on_weakspot_hit_apply_bleeding_buff = {
 			{
@@ -180,6 +284,20 @@ weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_on_weakspot_kill_heal
 	}
 }
 weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_while_aiming_increased_attack = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_while_aiming_increased_attack_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.damage
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_ranged_aimed_wield_while_aiming_increased_attack_buff = {
 			{
@@ -206,6 +324,20 @@ weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_while_aiming_increase
 	}
 }
 weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_while_aiming_increased_impact = {
+	format_values = {
+		impact = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_while_aiming_increased_impact_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.ranged_impact_modifier
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_ranged_aimed_wield_while_aiming_increased_impact_buff = {
 			{
@@ -232,6 +364,20 @@ weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_while_aiming_increase
 	}
 }
 weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_while_aiming_finesse_bonus = {
+	format_values = {
+		finesse = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_while_aiming_finesse_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.finesse_modifier_bonus
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_ranged_aimed_wield_while_aiming_finesse_bonus_buff = {
 			{
@@ -258,6 +404,20 @@ weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_while_aiming_finesse_
 	}
 }
 weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_while_aiming_increased_crit_chance = {
+	format_values = {
+		crit_chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_while_aiming_increased_crit_chance_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.critical_strike_chance
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_ranged_aimed_wield_while_aiming_increased_crit_chance_buff = {
 			{
@@ -284,6 +444,20 @@ weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_while_aiming_increase
 	}
 }
 weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_while_aiming_increased_unarmored_damage = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_while_aiming_increased_unarmored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.unarmored_damage
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_ranged_aimed_wield_while_aiming_increased_unarmored_damage_buff = {
 			{
@@ -310,6 +484,20 @@ weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_while_aiming_increase
 	}
 }
 weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_while_aiming_increased_armored_damage = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_while_aiming_increased_armored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.armored_damage
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_ranged_aimed_wield_while_aiming_increased_armored_damage_buff = {
 			{
@@ -336,6 +524,20 @@ weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_while_aiming_increase
 	}
 }
 weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_while_aiming_increased_resistant_damage = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_while_aiming_increased_resistant_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.resistant_damage
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_ranged_aimed_wield_while_aiming_increased_resistant_damage_buff = {
 			{
@@ -362,6 +564,20 @@ weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_while_aiming_increase
 	}
 }
 weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_while_aiming_increased_berserker_damage = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_while_aiming_increased_berserker_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.berserker_damage
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_ranged_aimed_wield_while_aiming_increased_berserker_damage_buff = {
 			{
@@ -388,6 +604,20 @@ weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_while_aiming_increase
 	}
 }
 weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_while_aiming_increased_super_armor_damage = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_while_aiming_increased_super_armor_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.super_armor_damage
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_ranged_aimed_wield_while_aiming_increased_super_armor_damage_buff = {
 			{
@@ -414,6 +644,20 @@ weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_while_aiming_increase
 	}
 }
 weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_while_aiming_increased_disgustingly_resilient_damage = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_while_aiming_increased_disgustingly_resilient_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.disgustingly_resilient_damage
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_ranged_aimed_wield_while_aiming_increased_disgustingly_resilient_damage_buff = {
 			{
@@ -440,6 +684,52 @@ weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_while_aiming_increase
 	}
 }
 weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_on_enter_ads_increase_damage = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increase_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_alternative_fire_start
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increase_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.damage
+				}
+			}
+		},
+		duration = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increase_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increase_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_ranged_aimed_wield_on_enter_ads_increase_damage_buff = {
 			{
@@ -486,6 +776,52 @@ weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_on_enter_ads_increase
 	}
 }
 weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_on_enter_ads_increase_impact = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increase_impact_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_alternative_fire_start
+				}
+			}
+		},
+		impact = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increase_impact_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.ranged_impact_modifier
+				}
+			}
+		},
+		duration = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increase_impact_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increase_impact_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_ranged_aimed_wield_on_enter_ads_increase_impact_buff = {
 			{
@@ -532,6 +868,40 @@ weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_on_enter_ads_increase
 	}
 }
 weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_on_enter_ads_apply_bleeding = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_apply_bleeding_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_alternative_fire_start
+				}
+			}
+		},
+		duration = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_apply_bleeding_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_apply_bleeding_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_ranged_aimed_wield_on_enter_ads_apply_bleeding_buff = {
 			{
@@ -566,6 +936,52 @@ weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_on_enter_ads_apply_bl
 	}
 }
 weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_on_enter_ads_finesse_bonus = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_finesse_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_alternative_fire_start
+				}
+			}
+		},
+		finesse = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_finesse_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.finesse_modifier_bonus
+				}
+			}
+		},
+		duration = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_finesse_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_finesse_bonus_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_ranged_aimed_wield_on_enter_ads_finesse_bonus_buff = {
 			{
@@ -612,6 +1028,52 @@ weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_on_enter_ads_finesse_
 	}
 }
 weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_on_enter_ads_increased_unarmored_damage = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increased_unarmored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_alternative_fire_start
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increased_unarmored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.unarmored_damage
+				}
+			}
+		},
+		duration = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increased_unarmored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increased_unarmored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_ranged_aimed_wield_on_enter_ads_increased_unarmored_damage_buff = {
 			{
@@ -658,6 +1120,52 @@ weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_on_enter_ads_increase
 	}
 }
 weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_on_enter_ads_increased_armored_damage = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increased_armored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_alternative_fire_start
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increased_armored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.armored_damage
+				}
+			}
+		},
+		duration = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increased_armored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increased_armored_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_ranged_aimed_wield_on_enter_ads_increased_armored_damage_buff = {
 			{
@@ -704,6 +1212,52 @@ weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_on_enter_ads_increase
 	}
 }
 weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_on_enter_ads_increased_resistant_damage = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increased_resistant_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_alternative_fire_start
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increased_resistant_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.resistant_damage
+				}
+			}
+		},
+		duration = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increased_resistant_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increased_resistant_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_ranged_aimed_wield_on_enter_ads_increased_resistant_damage_buff = {
 			{
@@ -750,6 +1304,52 @@ weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_on_enter_ads_increase
 	}
 }
 weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_on_enter_ads_increased_berserker_damage = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increased_berserker_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_alternative_fire_start
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increased_berserker_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.berserker_damage
+				}
+			}
+		},
+		duration = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increased_berserker_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increased_berserker_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_ranged_aimed_wield_on_enter_ads_increased_berserker_damage_buff = {
 			{
@@ -796,6 +1396,52 @@ weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_on_enter_ads_increase
 	}
 }
 weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_on_enter_ads_increased_super_armor_damage = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increased_super_armor_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_alternative_fire_start
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increased_super_armor_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.super_armor_damage
+				}
+			}
+		},
+		duration = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increased_super_armor_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increased_super_armor_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_ranged_aimed_wield_on_enter_ads_increased_super_armor_damage_buff = {
 			{
@@ -842,6 +1488,52 @@ weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_on_enter_ads_increase
 	}
 }
 weapon_traits_ranged_aimed.weapon_trait_ranged_aimed_wield_on_enter_ads_increased_disgustingly_resilient_damage = {
+	format_values = {
+		chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increased_disgustingly_resilient_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"proc_events",
+					proc_events.on_alternative_fire_start
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increased_disgustingly_resilient_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.disgustingly_resilient_damage
+				}
+			}
+		},
+		duration = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increased_disgustingly_resilient_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		},
+		cooldown = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_ranged_aimed_wield_on_enter_ads_increased_disgustingly_resilient_damage_buff",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_ranged_aimed_wield_on_enter_ads_increased_disgustingly_resilient_damage_buff = {
 			{

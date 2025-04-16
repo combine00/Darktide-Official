@@ -1,5 +1,7 @@
-local MinionState = require("scripts/utilities/minion_state")
+local BuffSettings = require("scripts/settings/buff/buff_settings")
 local FixedFrame = require("scripts/utilities/fixed_frame")
+local MinionState = require("scripts/utilities/minion_state")
+local proc_events = BuffSettings.proc_events
 local SmokeFogExtension = class("SmokeFogExtension")
 local DEFAULT_INNER_RADIUS = 4.5
 local DEFAULT_OUTER_RADIUS = 4.5
@@ -141,6 +143,22 @@ function SmokeFogExtension:on_unit_enter(unit, t)
 		}
 	end
 
+	local owner_unit = self.owner_unit
+	local owner_buff_extension = self._owner_buff_extension
+	local player_unit_spawn_manager = Managers.state.player_unit_spawn
+	local player = owner_unit and player_unit_spawn_manager:owner(owner_unit)
+
+	if player and owner_buff_extension then
+		local param_table = owner_buff_extension:request_proc_event_param_table()
+
+		if param_table then
+			param_table.fog_owner_unit = self.owner_unit
+			param_table.target_unit = unit
+
+			owner_buff_extension:add_proc_event(proc_events.on_unit_enter_fog, param_table)
+		end
+	end
+
 	self:on_unit_engulfed_by_fog(unit)
 end
 
@@ -161,6 +179,22 @@ function SmokeFogExtension:on_unit_exit(unit, t)
 		unit_buff_extension:remove_externally_controlled_buff(local_index, component_index)
 
 		buff_affected_units[unit] = nil
+	end
+
+	local owner_unit = self.owner_unit
+	local owner_buff_extension = self._owner_buff_extension
+	local player_unit_spawn_manager = Managers.state.player_unit_spawn
+	local player = owner_unit and player_unit_spawn_manager:owner(owner_unit)
+
+	if player and owner_buff_extension then
+		local param_table = owner_buff_extension:request_proc_event_param_table()
+
+		if param_table then
+			param_table.fog_owner_unit = self.owner_unit
+			param_table.target_unit = unit
+
+			owner_buff_extension:add_proc_event(proc_events.on_unit_exit_fog, param_table)
+		end
 	end
 
 	local leaving_fog_buff_template_name = self._leaving_fog_buff_template_name

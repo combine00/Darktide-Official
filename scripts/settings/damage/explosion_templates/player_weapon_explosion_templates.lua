@@ -10,6 +10,11 @@ local explosion_templates = {
 		collision_filter = "filter_player_character_explosion",
 		damage_profile = DamageProfileTemplates.plasma_overheat,
 		close_damage_profile = DamageProfileTemplates.plasma_overheat,
+		broadphase_explosion_filter = {
+			"heroes",
+			"villains",
+			"destructibles"
+		},
 		explosion_area_suppression = {
 			suppression_falloff = true,
 			instant_aggro = true,
@@ -26,9 +31,9 @@ local explosion_templates = {
 	},
 	ogryn_thumper_grenade = {
 		damage_falloff = true,
-		collision_filter = "filter_player_character_explosion",
-		static_power_level = 500,
 		scalable_radius = true,
+		static_power_level = 500,
+		collision_filter = "filter_player_character_explosion",
 		radius = {
 			8,
 			12
@@ -41,6 +46,11 @@ local explosion_templates = {
 		close_damage_type = damage_types.laser,
 		damage_profile = DamageProfileTemplates.ogryn_thumper_p1_m2_default,
 		damage_type = damage_types.laser,
+		broadphase_explosion_filter = {
+			"heroes",
+			"villains",
+			"destructibles"
+		},
 		explosion_area_suppression = {
 			suppression_falloff = true,
 			instant_aggro = true,
@@ -69,9 +79,9 @@ local explosion_templates = {
 	},
 	ogryn_thumper_grenade_instant = {
 		damage_falloff = true,
-		collision_filter = "filter_player_character_explosion",
-		static_power_level = 500,
 		scalable_radius = true,
+		static_power_level = 500,
+		collision_filter = "filter_player_character_explosion",
 		radius = {
 			5,
 			10
@@ -84,6 +94,11 @@ local explosion_templates = {
 		close_damage_type = damage_types.grenade_frag,
 		damage_profile = DamageProfileTemplates.ogryn_thumper_p1_m2_default_instant,
 		damage_type = damage_types.grenade_frag,
+		broadphase_explosion_filter = {
+			"heroes",
+			"villains",
+			"destructibles"
+		},
 		explosion_area_suppression = {
 			suppression_falloff = true,
 			instant_aggro = true,
@@ -128,6 +143,11 @@ local explosion_templates = {
 		close_damage_type = damage_types.blunt_thunder,
 		damage_profile = DamageProfileTemplates.powermaul_explosion_outer,
 		damage_type = damage_types.blunt_thunder,
+		broadphase_explosion_filter = {
+			"heroes",
+			"villains",
+			"destructibles"
+		},
 		explosion_area_suppression = {
 			suppression_falloff = true,
 			instant_aggro = true,
@@ -168,6 +188,11 @@ local explosion_templates = {
 		close_damage_type = damage_types.blunt_thunder,
 		damage_profile = DamageProfileTemplates.powermaul_explosion_outer,
 		damage_type = damage_types.blunt_thunder,
+		broadphase_explosion_filter = {
+			"heroes",
+			"villains",
+			"destructibles"
+		},
 		explosion_area_suppression = {
 			suppression_falloff = true,
 			instant_aggro = true,
@@ -208,6 +233,11 @@ local explosion_templates = {
 		close_damage_type = damage_types.blunt_thunder,
 		damage_profile = DamageProfileTemplates.powermaul_explosion_outer,
 		damage_type = damage_types.blunt_thunder,
+		broadphase_explosion_filter = {
+			"heroes",
+			"villains",
+			"destructibles"
+		},
 		explosion_area_suppression = {
 			suppression_falloff = true,
 			instant_aggro = true,
@@ -230,13 +260,63 @@ local explosion_templates = {
 			}
 		}
 	},
+	forcesword_activated_implosion = {
+		static_power_level = 500,
+		min_radius = 3,
+		collision_filter = "filter_player_character_explosion",
+		override_friendly_fire = false,
+		min_close_radius = 2,
+		radius = {
+			4,
+			8
+		},
+		close_radius = {
+			1,
+			3
+		},
+		close_damage_profile = DamageProfileTemplates.forcesword_explosion,
+		close_damage_type = damage_types.blunt_thunder,
+		damage_profile = DamageProfileTemplates.forcesword_explosion_outer,
+		damage_type = damage_types.blunt_thunder,
+		broadphase_explosion_filter = {
+			"heroes",
+			"villains",
+			"destructibles"
+		},
+		explosion_area_suppression = {
+			suppression_falloff = true,
+			instant_aggro = true,
+			distance = {
+				10,
+				15
+			},
+			suppression_value = {
+				20,
+				50
+			}
+		},
+		vfx = {
+			"content/fx/particles/weapons/power_maul/power_maul_push_shockwave"
+		},
+		sfx = {
+			{
+				event_name = "wwise/events/weapon/play_explosion_grenade_krak",
+				has_husk_events = true
+			}
+		}
+	},
 	trait_buff_flamer_p1_minion_explosion = {
 		static_power_level = 1000,
 		radius = 3,
-		damage_falloff = false,
 		min_radius = 0.25,
+		damage_falloff = false,
 		collision_filter = "filter_player_character_explosion",
 		damage_profile = DamageProfileTemplates.default_grenade,
+		broadphase_explosion_filter = {
+			"heroes",
+			"villains",
+			"destructibles"
+		},
 		explosion_area_suppression = {
 			suppression_falloff = true,
 			instant_aggro = true,
@@ -254,10 +334,15 @@ local explosion_templates = {
 	trait_buff_forcestaff_p2_minion_explosion = {
 		static_power_level = 600,
 		radius = 4,
-		damage_falloff = true,
 		min_radius = 0.5,
+		damage_falloff = true,
 		collision_filter = "filter_player_character_explosion",
 		damage_profile = DamageProfileTemplates.default_grenade,
+		broadphase_explosion_filter = {
+			"heroes",
+			"villains",
+			"destructibles"
+		},
 		explosion_area_suppression = {
 			suppression_falloff = true,
 			instant_aggro = true,
@@ -273,5 +358,46 @@ local explosion_templates = {
 		}
 	}
 }
+
+local function _create_trait_buff_powersword_2h_lockout_proc_explosion_buff(radius, min_radius, close_radius, min_close_radius)
+	return {
+		static_power_level = 500,
+		collision_filter = "filter_player_character_explosion",
+		override_friendly_fire = false,
+		radius = radius,
+		min_radius = min_radius,
+		close_radius = close_radius,
+		min_close_radius = min_close_radius,
+		close_damage_profile = DamageProfileTemplates.powersword_explosion,
+		close_damage_type = damage_types.blunt_thunder,
+		damage_profile = DamageProfileTemplates.powersword_explosion_outer,
+		damage_type = damage_types.blunt_thunder,
+		broadphase_explosion_filter = {
+			"heroes",
+			"villains",
+			"destructibles"
+		},
+		explosion_area_suppression = {
+			suppression_falloff = true,
+			instant_aggro = true,
+			distance = 5,
+			suppression_value = 10
+		},
+		vfx = {
+			"content/fx/particles/weapons/power_maul/power_maul_push_shockwave"
+		},
+		sfx = {
+			{
+				event_name = "wwise/events/weapon/play_ogryn_powermaul_1h_hit_sparks",
+				has_husk_events = true
+			}
+		}
+	}
+end
+
+explosion_templates.trait_buff_powersword_2h_lockout_proc_explosion_1 = _create_trait_buff_powersword_2h_lockout_proc_explosion_buff(3, 3, 2, 2)
+explosion_templates.trait_buff_powersword_2h_lockout_proc_explosion_2 = _create_trait_buff_powersword_2h_lockout_proc_explosion_buff(3.5, 3.5, 2.25, 2.25)
+explosion_templates.trait_buff_powersword_2h_lockout_proc_explosion_3 = _create_trait_buff_powersword_2h_lockout_proc_explosion_buff(4, 4, 2.5, 2.5)
+explosion_templates.trait_buff_powersword_2h_lockout_proc_explosion_4 = _create_trait_buff_powersword_2h_lockout_proc_explosion_buff(4.5, 4.5, 2.75, 2.75)
 
 return explosion_templates

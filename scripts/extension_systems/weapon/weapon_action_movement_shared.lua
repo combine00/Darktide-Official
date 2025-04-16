@@ -1,4 +1,4 @@
-local Action = require("scripts/utilities/weapon/action")
+local Action = require("scripts/utilities/action/action")
 local WeaponTemplate = require("scripts/utilities/weapon/weapon_template")
 local WeaponActionMovementSharedFunctions = {
 	action_movement_curve = function (weapon_action_component, action_sweep_component)

@@ -33,6 +33,7 @@ local categories = {
 	"Effects",
 	"Equipment",
 	"Error",
+	"Explosion Rework Testing",
 	"Event",
 	"Feature Info",
 	"FGRL",
@@ -47,6 +48,7 @@ local categories = {
 	"Hit Mass",
 	"Horde Picker",
 	"Hordes",
+	"Hordes Mode",
 	"Hub",
 	"Hud",
 	"Imgui",
@@ -93,7 +95,7 @@ local categories = {
 	"Push",
 	"Respawn",
 	"Roamers",
-	"Rumble",
+	"Rumble & Haptics",
 	"Script Components",
 	"Shading Environment",
 	"Shooting Range",
@@ -226,6 +228,10 @@ local params = {
 		category = "Input"
 	},
 	debug_input_filter_response_curves = {
+		value = false,
+		category = "Input"
+	},
+	preview_action_input_hierarchy = {
 		value = false,
 		category = "Input"
 	}
@@ -368,6 +374,15 @@ params.debug_log_data_service_backend_cache = {
 	value = false,
 	category = "Backend"
 }
+params.auto_select_backend_environment = {
+	value = false,
+	category = "Backend",
+	options = {
+		false,
+		"staging",
+		"dev"
+	}
+}
 params.backend_telemetry_enable = {
 	value = false,
 	category = "Backend"
@@ -389,6 +404,10 @@ params.disable_chat = {
 	category = "Chat"
 }
 params.debug_template_effects = {
+	value = false,
+	category = "Effects"
+}
+params.debug_draw_cultist_ritualist_chanting_effects = {
 	value = false,
 	category = "Effects"
 }
@@ -511,7 +530,7 @@ params.debug_fill_pickup_spawners = {
 		"side_mission"
 	}
 }
-params.debug_medkits = {
+params.debug_proximity_heal = {
 	value = false,
 	category = "Pickups"
 }
@@ -567,6 +586,46 @@ params.dont_randomize_destructibles = {
 	value = false,
 	category = "Destructibles"
 }
+
+local function _split_filter_string(filters_string)
+	local seperator = "%s"
+
+	return string.split(filters_string, seperator)
+end
+
+local function _generate_filter_string(filters)
+	local filter_string = ""
+
+	for _, filter in ipairs(filters) do
+		filter_string = filter_string .. " " .. filter
+	end
+
+	return #filter_string > 0 and string.trim(filter_string) or filter_string
+end
+
+local function _toggle_physics_filter(new_filter)
+	local current_active_filters_string = DevParameters.physics_debug_multiple_active_filters_string
+	local filters = _split_filter_string(current_active_filters_string)
+	local existing_filter_index = -1
+
+	for index, filter in ipairs(filters) do
+		if filter == new_filter then
+			existing_filter_index = index
+		end
+	end
+
+	if existing_filter_index > 0 then
+		table.remove(filters, existing_filter_index)
+	else
+		table.insert(filters, new_filter)
+	end
+
+	local new_filter_string = _generate_filter_string(filters)
+
+	ParameterResolver.set_dev_parameter("physics_debug_multiple_active_filters_string", new_filter_string)
+	ParameterResolver.set_dev_parameter("physics_debug_filters_active", "ACTIVE FILTERS: " .. #filters)
+end
+
 params.physics_debug = {
 	value = false,
 	category = "Physics"
@@ -600,8 +659,10 @@ params.physics_debug_filter = {
 		"filter_minion_shooting_geometry",
 		"filter_minion_throwing",
 		"filter_minion_shooting_no_friendly_fire",
+		"filter_minion_explosion",
 		"filter_player_character_melee_sweep",
 		"filter_player_character_ballistic_raycast",
+		"filter_player_character_explosion",
 		"filter_player_character_shooting_projectile",
 		"filter_player_character_shooting_raycast",
 		"filter_player_character_shooting_raycast_dynamics",
@@ -611,7 +672,14 @@ params.physics_debug_filter = {
 		"filter_player_ping_target_selection",
 		"filter_ray_aim_assist",
 		"filter_simple_geometry"
-	}
+	},
+	on_value_set = function (new_value, old_value)
+		local is_multiple_filters_allowed = DevParameters.physics_debug_allow_multiple_filters
+
+		if is_multiple_filters_allowed then
+			_toggle_physics_filter(new_value)
+		end
+	end
 }
 params.physics_debug_range = {
 	value = 30,
@@ -630,6 +698,36 @@ params.physics_debug_only_draw_selected_unit = {
 }
 params.physics_debug_draw_no_depth = {
 	value = false,
+	category = "Physics"
+}
+params.physics_debug_allow_multiple_filters = {
+	value = false,
+	category = "Physics"
+}
+params.physics_debug_filters_active = {
+	value = "ACTIVE FILTERS",
+	readonly = false,
+	category = "Physics",
+	hidden = false,
+	dynamic_contents = true,
+	options_function = function ()
+		local current_active_filters_string = DevParameters.physics_debug_multiple_active_filters_string
+
+		return _split_filter_string(current_active_filters_string)
+	end,
+	options_texts_function = function ()
+		local current_active_filters_string = DevParameters.physics_debug_multiple_active_filters_string
+
+		return _split_filter_string(current_active_filters_string)
+	end,
+	on_value_set = function (new_value, old_value)
+		_toggle_physics_filter(new_value)
+	end
+}
+params.physics_debug_multiple_active_filters_string = {
+	value = "",
+	readonly = false,
+	hidden = true,
 	category = "Physics"
 }
 params.disable_self_assist = {
@@ -1367,6 +1465,8 @@ params.debug_buffs_show_categories = {
 		"weapon_traits",
 		"talents_secondary",
 		"gadget",
+		"hordes_buff",
+		"hordes_sub_buff",
 		"aura"
 	}
 }
@@ -1488,6 +1588,10 @@ params.debug_lua_sound_reflection = {
 	category = "Wwise"
 }
 params.always_play_husk_effects = {
+	value = false,
+	category = "Wwise"
+}
+params.debug_wwise_timestamp = {
 	value = false,
 	category = "Wwise"
 }
@@ -2233,6 +2337,10 @@ params.debug_minion_aiming = {
 	value = false,
 	category = "Minions"
 }
+params.print_minion_spawn = {
+	value = false,
+	category = "Minions"
+}
 params.debug_minion_spawners = {
 	value = false,
 	category = "Minions"
@@ -2282,6 +2390,10 @@ params.enable_minion_auto_stagger = {
 	category = "Minions"
 }
 params.ignore_stuck_minions_warning = {
+	value = false,
+	category = "Minions"
+}
+params.ignore_horde_failed_spawn_warning = {
 	value = false,
 	category = "Minions"
 }
@@ -2431,6 +2543,57 @@ params.resistance = {
 		Managers.state.difficulty:set_resistance(new_value)
 	end
 }
+params.havoc_rank = {
+	value = 0,
+	category = "Difficulty",
+	options = {
+		0,
+		1,
+		2,
+		3,
+		4,
+		5,
+		6,
+		7,
+		8,
+		9,
+		10,
+		11,
+		12,
+		13,
+		14,
+		15,
+		16,
+		17,
+		18,
+		19,
+		20,
+		21,
+		22,
+		23,
+		24,
+		25,
+		26,
+		27,
+		28,
+		29,
+		30,
+		35,
+		40,
+		45,
+		50,
+		55,
+		60,
+		65,
+		70,
+		75,
+		80,
+		85,
+		90,
+		95,
+		100
+	}
+}
 params.minion_friendly_fire = {
 	value = true,
 	category = "Difficulty"
@@ -2560,6 +2723,14 @@ params.debug_horde_pacing = {
 	value = false,
 	category = "Hordes"
 }
+params.hordes_mode_override_wave_number = {
+	value = false,
+	category = "Hordes Mode"
+}
+params.hordes_mode_wave_number = {
+	value = 3,
+	category = "Hordes Mode"
+}
 params.debug_groups = {
 	value = false,
 	category = "Groups"
@@ -2641,6 +2812,10 @@ params.disable_monster_pacing = {
 	category = "Monsters"
 }
 params.debug_monster_pacing = {
+	value = false,
+	category = "Monsters"
+}
+params.debug_mutator_monster_pacing = {
 	value = false,
 	category = "Monsters"
 }
@@ -3159,6 +3334,13 @@ params.perfhud_backend_server = {
 		Application.console_command("perfhud", "backend", "server")
 	end
 }
+params.perfhud_io = {
+	value = false,
+	category = "PerfHud",
+	on_value_set = function (new_value)
+		Application.console_command("perfhud", "io")
+	end
+}
 params.ui_developer_mode = {
 	value = false,
 	category = "UI"
@@ -3274,11 +3456,19 @@ params.ui_debug_lobby_screen = {
 	value = false,
 	category = "UI"
 }
+params.ui_debug_lobby_screen_havoc = {
+	value = false,
+	category = "UI"
+}
 params.ui_debug_mission_intro = {
 	value = false,
 	category = "UI"
 }
 params.ui_debug_mission_outro = {
+	value = false,
+	category = "UI"
+}
+params.ui_debug_havoc_menu = {
 	value = false,
 	category = "UI"
 }
@@ -3341,6 +3531,14 @@ params.ui_always_show_tutorial_popup = {
 	value = false,
 	category = "UI"
 }
+params.debug_hud_element_fading = {
+	value = false,
+	category = "UI"
+}
+params.debug_draw_world_marker_component = {
+	value = false,
+	category = "UI"
+}
 params.override_stun_type = {
 	value = false,
 	category = "Damage",
@@ -3374,8 +3572,8 @@ params.debug_async_explosions = {
 	category = "Damage"
 }
 params.enable_damage_debug = {
-	value = false,
-	category = "Damage"
+	category = "Damage",
+	value = IS_WINDOWS
 }
 params.debug_damage_power_level = {
 	value = 500,
@@ -3464,6 +3662,10 @@ params.player_weapon_instakill = {
 	category = "Damage"
 }
 params.player_damage_disabled = {
+	value = false,
+	category = "Damage"
+}
+params.always_min_damage_knocked_down_damage_tick = {
 	value = false,
 	category = "Damage"
 }
@@ -3878,6 +4080,10 @@ params.disable_achievement_backend_update = {
 		end
 	end
 }
+params.debug_trophies = {
+	value = false,
+	category = "Game Mode"
+}
 params.debug_shading_environment = {
 	value = false,
 	category = "Shading Environment"
@@ -3897,6 +4103,10 @@ params.gameplay_timer_base_time_scale = {
 }
 params.debug_grow_queue_callstacks = {
 	value = false,
+	category = "Gameplay State"
+}
+params.mission_seed_override = {
+	value = "none",
 	category = "Gameplay State"
 }
 params.debug_respawn_beacon = {
@@ -3968,6 +4178,10 @@ params.debug_matchmaking = {
 }
 params.debug_time_since_last_transmit = {
 	value = true,
+	category = "Network"
+}
+params.disable_session_update_print = {
+	value = false,
 	category = "Network"
 }
 params.visualize_input_packets_received = {
@@ -4219,6 +4433,14 @@ params.draw_package_loading = {
 	value = false,
 	category = "Loading"
 }
+params.debug_load_wait_info = {
+	value = false,
+	category = "Loading"
+}
+params.show_perfhud_io_loading_screen = {
+	value = true,
+	category = "Loading"
+}
 params.debug_language_override = {
 	name = "Language Override",
 	category = "Localization",
@@ -4296,11 +4518,23 @@ params.debug_show_logs_ps5_friends_blocks_update = {
 	value = false,
 	category = "Social Features"
 }
+params.debug_print_ps5_block_users_states = {
+	value = false,
+	category = "Social Features"
+}
+params.debug_print_party_channels = {
+	value = false,
+	category = "Social Features"
+}
 params.use_localized_talent_names_in_debug_menu = {
 	value = false,
 	category = "Talents"
 }
 params.debug_skip_backend_talent_verification = {
+	value = false,
+	category = "Talents"
+}
+params.talent_tree_infinite_points = {
 	value = false,
 	category = "Talents"
 }
@@ -4432,6 +4666,10 @@ params.debug_draw_damage_profile_ranges = {
 	value = false,
 	category = "Weapon"
 }
+params.debug_always_ogryn_box_of_surprise = {
+	value = false,
+	category = "Weapon"
+}
 params.debug_always_extra_grenade_throw_chance = {
 	value = false,
 	category = "Weapon"
@@ -4472,11 +4710,11 @@ params.debug_charge_effects = {
 	value = false,
 	category = "Weapon Effects"
 }
-params.debug_force_weapon_effects = {
+params.debug_force_weapon_block_effects = {
 	value = false,
 	category = "Weapon Effects"
 }
-params.debug_force_weapon_block_effects = {
+params.debug_force_weapon_effects = {
 	value = false,
 	category = "Weapon Effects"
 }
@@ -4488,11 +4726,19 @@ params.debug_grimoire_effects = {
 	value = false,
 	category = "Weapon Effects"
 }
+params.debug_melee_idling_effects = {
+	value = false,
+	category = "Weapon Effects"
+}
 params.debug_plasmagun_overheat_effects = {
 	value = false,
 	category = "Weapon Effects"
 }
 params.debug_power_weapon_effects = {
+	value = false,
+	category = "Weapon Effects"
+}
+params.debug_power_weapon_overheat_effects = {
 	value = false,
 	category = "Weapon Effects"
 }
@@ -4961,6 +5207,10 @@ params.skip_prologue = {
 	category = "Game Flow",
 	value = BUILD ~= "release"
 }
+params.show_game_states = {
+	value = true,
+	category = "Game Flow"
+}
 params.debug_ledge_finder_rays = {
 	value = false,
 	category = "Ledge Finder"
@@ -5060,7 +5310,58 @@ params.unlock_all_shooting_range_enemies = {
 }
 params.trace_rumble_activation_events = {
 	value = false,
-	category = "Rumble"
+	category = "Rumble & Haptics"
+}
+params.trace_haptics_activation_events = {
+	value = false,
+	category = "Rumble & Haptics"
+}
+params.debug_haptics = {
+	value = false,
+	category = "Rumble & Haptics"
+}
+
+local function _draw_broadphase_spheres_of_all_units_in_broadphase()
+	local destructible_system = Managers.state.extension:system("destructible_system")
+
+	if destructible_system then
+		destructible_system:debug_draw_destructibles_in_broadphase()
+	end
+
+	local broadphase_system = Managers.state.extension:system("broadphase_system")
+
+	if broadphase_system then
+		broadphase_system:debug_draw_units_in_broadphase()
+	end
+
+	local hazard_prop_system = Managers.state.extension:system("hazard_prop_system")
+
+	if hazard_prop_system then
+		hazard_prop_system:debug_draw_props_in_broadphase()
+	end
+end
+
+params.broadphase_use_seperate_query_for_destructibles = {
+	value = true,
+	category = "Explosion Rework Testing"
+}
+params.show_broadphase_sphere_upon_spawning = {
+	value = false,
+	category = "Explosion Rework Testing"
+}
+params.show_broadphase_spheres_for_explosion_targets = {
+	value = false,
+	category = "Explosion Rework Testing",
+	on_value_set = function (new_value, old_value)
+		if new_value then
+			_draw_broadphase_spheres_of_all_units_in_broadphase()
+			ParameterResolver.set_dev_parameter("show_broadphase_spheres_for_explosion_targets", false)
+		end
+	end
+}
+params.switch_to_explosion_physics_overlap = {
+	value = false,
+	category = "Explosion Rework Testing"
 }
 params.category_log_levels = {
 	hidden = true,

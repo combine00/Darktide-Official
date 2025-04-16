@@ -23,8 +23,16 @@ function UnitJobManager:delete_units()
 	end
 end
 
-function UnitJobManager:register(unit, job_class)
+function UnitJobManager:register_job(unit, job_class, start_job)
 	self._units[unit] = job_class
+
+	if start_job then
+		job_class:start_job()
+	end
+end
+
+function UnitJobManager:unregister_job(unit)
+	self._units[unit] = nil
 end
 
 function UnitJobManager:update(dt, t)

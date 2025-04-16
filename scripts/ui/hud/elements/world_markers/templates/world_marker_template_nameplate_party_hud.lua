@@ -1,6 +1,7 @@
-local UIFontSettings = require("scripts/managers/ui/ui_font_settings")
-local UIWidget = require("scripts/managers/ui/ui_widget")
 local ProfileUtils = require("scripts/utilities/profile_utils")
+local UIFontSettings = require("scripts/managers/ui/ui_font_settings")
+local UiSettings = require("scripts/settings/ui/ui_settings")
+local UIWidget = require("scripts/managers/ui/ui_widget")
 local template = {}
 local size = {
 	400,
@@ -17,6 +18,7 @@ template.position_offset = {
 template.check_line_of_sight = false
 template.max_distance = 100
 template.screen_clamp = false
+template.start_layer = 300
 template.scale_settings = {
 	scale_to = 1,
 	scale_from = 0.8,
@@ -67,6 +69,14 @@ end
 
 function template.on_exit(widget, marker)
 	Managers.event:unregister(marker, "event_player_profile_updated")
+
+	if marker.rank_promise then
+		if marker.rank_promise:is_pending() then
+			marker.rank_promise:cancel()
+		end
+
+		marker.rank_promise = nil
+	end
 end
 
 function template.on_enter(widget, marker)
@@ -88,7 +98,8 @@ function template.on_enter(widget, marker)
 			local player_profile = data:profile()
 			local title = player_profile and ProfileUtils.character_title(player_profile)
 			local archetype = profile and profile.archetype
-			local string_symbol = archetype and archetype.string_symbol or ""
+			local archetype_name = archetype and archetype.name
+			local string_symbol = archetype_name and UiSettings.archetype_font_icon[archetype_name] or ""
 			local text = string_symbol .. " " .. data:name() .. " - " .. tostring(character_level) .. " "
 
 			if title then
@@ -96,6 +107,26 @@ function template.on_enter(widget, marker)
 			end
 
 			marker.widget.content.header_text = text
+
+			if character_level >= 30 then
+				local rank_promise = Managers.data_service.havoc:havoc_rank_cadence_high(data:account_id())
+
+				rank_promise:next(function (rank)
+					marker.rank_promise = nil
+
+					if rank then
+						text = string_symbol .. " " .. data:name() .. " - " .. tostring(rank) .. " "
+
+						if title then
+							text = text .. "\n" .. title
+						end
+
+						marker.widget.content.header_text = text
+					end
+				end)
+
+				marker.rank_promise = rank_promise
+			end
 		end
 	end
 
@@ -104,7 +135,8 @@ function template.on_enter(widget, marker)
 	Managers.event:register(marker, "event_player_profile_updated", "cb_event_player_profile_updated")
 
 	local archetype = profile and profile.archetype
-	local string_symbol = archetype and archetype.string_symbol or ""
+	local archetype_name = archetype and archetype.name
+	local string_symbol = archetype_name and UiSettings.archetype_font_icon[archetype_name] or ""
 	local text = string_symbol .. " " .. data:name() .. " - " .. tostring(character_level) .. " "
 	content.header_text = text
 	local force_update = true

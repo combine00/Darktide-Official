@@ -5,6 +5,30 @@ table.make_unique(templates)
 
 local stat_buffs = BuffSettings.stat_buffs
 templates.weapon_trait_bespoke_combatsword_p1_chained_hits_increases_melee_cleave = {
+	format_values = {
+		cleave = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_combatsword_p1_chained_hits_increases_melee_cleave_parent",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.max_hit_mass_attack_modifier
+				}
+			}
+		},
+		stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_combatsword_p1_chained_hits_increases_melee_cleave_child",
+				find_value_type = "buff_template",
+				path = {
+					"max_stacks"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_combatsword_p1_chained_hits_increases_melee_cleave_parent = {
 			{
@@ -31,6 +55,30 @@ templates.weapon_trait_bespoke_combatsword_p1_chained_hits_increases_melee_cleav
 	}
 }
 templates.weapon_trait_bespoke_combatsword_p1_chained_hits_increases_crit_chance = {
+	format_values = {
+		crit_chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_combatsword_p1_chained_hits_increases_crit_chance_parent",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.critical_strike_chance
+				}
+			}
+		},
+		stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_combatsword_p1_chained_hits_increases_crit_chance_child",
+				find_value_type = "buff_template",
+				path = {
+					"max_stacks"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_combatsword_p1_chained_hits_increases_crit_chance_parent = {
 			{
@@ -57,6 +105,41 @@ templates.weapon_trait_bespoke_combatsword_p1_chained_hits_increases_crit_chance
 	}
 }
 templates.weapon_trait_bespoke_combatsword_p1_increased_attack_cleave_on_multiple_hits = {
+	format_values = {
+		cleave = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_combatsword_p1_increased_attack_cleave_on_multiple_hits",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.max_hit_mass_attack_modifier
+				}
+			}
+		},
+		multiple_hit = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_combatsword_p1_increased_attack_cleave_on_multiple_hits",
+				find_value_type = "buff_template",
+				path = {
+					"buff_data",
+					"required_num_hits"
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_combatsword_p1_increased_attack_cleave_on_multiple_hits",
+				find_value_type = "buff_template",
+				path = {
+					"active_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_combatsword_p1_increased_attack_cleave_on_multiple_hits = {
 			{
@@ -83,6 +166,41 @@ templates.weapon_trait_bespoke_combatsword_p1_increased_attack_cleave_on_multipl
 	}
 }
 templates.weapon_trait_bespoke_combatsword_p1_increased_melee_damage_on_multiple_hits = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_combatsword_p1_increased_melee_damage_on_multiple_hits",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.melee_power_level_modifier
+				}
+			}
+		},
+		multiple_hit = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_combatsword_p1_increased_melee_damage_on_multiple_hits",
+				find_value_type = "buff_template",
+				path = {
+					"buff_data",
+					"required_num_hits"
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_combatsword_p1_increased_melee_damage_on_multiple_hits",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_combatsword_p1_increased_melee_damage_on_multiple_hits = {
 			{
@@ -113,6 +231,30 @@ templates.weapon_trait_bespoke_combatsword_p1_increased_melee_damage_on_multiple
 	}
 }
 templates.weapon_trait_bespoke_combatsword_p1_infinite_melee_cleave_on_crit = {
+	format_values = {
+		hit_mass = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_combatsword_p1_infinite_melee_cleave_on_crit",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.max_hit_mass_attack_modifier
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_combatsword_p1_infinite_melee_cleave_on_crit",
+				find_value_type = "buff_template",
+				path = {
+					"active_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_combatsword_p1_infinite_melee_cleave_on_crit = {
 			{
@@ -139,6 +281,40 @@ templates.weapon_trait_bespoke_combatsword_p1_infinite_melee_cleave_on_crit = {
 	}
 }
 templates.weapon_trait_bespoke_combatsword_p1_stacking_increase_impact_on_hit = {
+	format_values = {
+		impact = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_combatsword_p1_stacking_increase_impact_on_hit_parent",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.melee_impact_modifier
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_combatsword_p1_stacking_increase_impact_on_hit_parent",
+				find_value_type = "trait_override",
+				path = {
+					"child_duration"
+				}
+			}
+		},
+		stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_combatsword_p1_stacking_increase_impact_on_hit_child",
+				find_value_type = "buff_template",
+				path = {
+					"max_stacks"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_combatsword_p1_stacking_increase_impact_on_hit_parent = {
 			{
@@ -169,6 +345,41 @@ templates.weapon_trait_bespoke_combatsword_p1_stacking_increase_impact_on_hit = 
 	}
 }
 templates.weapon_trait_bespoke_combatsword_p1_staggered_targets_receive_increased_stagger_debuff = {
+	format_values = {
+		stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_combatsword_p1_staggered_targets_receive_increased_stagger_debuff",
+				find_value_type = "trait_override",
+				path = {
+					"target_buff_data",
+					"num_stacks_on_proc"
+				}
+			}
+		},
+		impact = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "increase_impact_received_while_staggered",
+				find_value_type = "buff_template",
+				path = {
+					"stat_buffs",
+					stat_buffs.impact_modifier
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "increase_impact_received_while_staggered",
+				find_value_type = "buff_template",
+				path = {
+					"duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_combatsword_p1_staggered_targets_receive_increased_stagger_debuff = {
 			{
@@ -195,6 +406,41 @@ templates.weapon_trait_bespoke_combatsword_p1_staggered_targets_receive_increase
 	}
 }
 templates.weapon_trait_bespoke_combatsword_p1_staggered_targets_receive_increased_damage_debuff = {
+	format_values = {
+		stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_combatsword_p1_staggered_targets_receive_increased_damage_debuff",
+				find_value_type = "trait_override",
+				path = {
+					"target_buff_data",
+					"num_stacks_on_proc"
+				}
+			}
+		},
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "increase_damage_received_while_staggered",
+				find_value_type = "buff_template",
+				path = {
+					"conditional_stat_buffs",
+					stat_buffs.damage_vs_staggered
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "increase_damage_received_while_staggered",
+				find_value_type = "buff_template",
+				path = {
+					"duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_combatsword_p1_staggered_targets_receive_increased_damage_debuff = {
 			{
@@ -221,6 +467,20 @@ templates.weapon_trait_bespoke_combatsword_p1_staggered_targets_receive_increase
 	}
 }
 templates.weapon_trait_bespoke_combatsword_p1_increase_stagger_per_hit_in_sweep = {
+	format_values = {
+		impact = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_combatsword_p1_increase_stagger_per_hit_in_sweep_parent",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.melee_impact_modifier
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_combatsword_p1_increase_stagger_per_hit_in_sweep_parent = {
 			{
@@ -247,6 +507,40 @@ templates.weapon_trait_bespoke_combatsword_p1_increase_stagger_per_hit_in_sweep 
 	}
 }
 templates.weapon_trait_bespoke_combatsword_p1_consecutive_hits_increases_stagger = {
+	format_values = {
+		impact = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_combatsword_p1_consecutive_hits_increases_stagger_parent",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.melee_impact_modifier
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_combatsword_p1_consecutive_hits_increases_stagger_parent",
+				find_value_type = "buff_template",
+				path = {
+					"child_duration"
+				}
+			}
+		},
+		stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_combatsword_p1_consecutive_hits_increases_stagger_child",
+				find_value_type = "buff_template",
+				path = {
+					"max_stacks"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_combatsword_p1_consecutive_hits_increases_stagger_parent = {
 			{

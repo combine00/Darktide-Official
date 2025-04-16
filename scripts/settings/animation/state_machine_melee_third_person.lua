@@ -15,10 +15,16 @@ local state_machine_settings = {
 	["content/characters/player/human/third_person/animations/2h_power_sword"] = {
 		blend_time = DEFAULT_BLEND_TIME
 	},
+	["content/characters/player/human/third_person/animations/2h_chain_sword"] = {
+		blend_time = DEFAULT_BLEND_TIME
+	},
 	["content/characters/player/human/third_person/animations/chain_sword"] = {
 		blend_time = DEFAULT_BLEND_TIME
 	},
 	["content/characters/player/human/third_person/animations/force_sword"] = {
+		blend_time = DEFAULT_BLEND_TIME
+	},
+	["content/characters/player/human/third_person/animations/2h_force_sword"] = {
 		blend_time = DEFAULT_BLEND_TIME
 	},
 	["content/characters/player/human/third_person/animations/combat_knife"] = {

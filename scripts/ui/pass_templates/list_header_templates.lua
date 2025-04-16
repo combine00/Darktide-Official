@@ -3,6 +3,7 @@ local UISoundEvents = require("scripts/settings/ui/ui_sound_events")
 local UIResolution = require("scripts/managers/ui/ui_resolution")
 local ColorUtilities = require("scripts/utilities/ui/colors")
 local highlight_size_addition = 10
+local TAB_SIZE = 20
 
 local function list_item_focused_visibility_function(content, style)
 	local hotspot = content.hotspot or content.parent and content.parent.hotspot
@@ -42,17 +43,19 @@ local ListHeaderPassTemplates = {
 	list_item_highight_focused_visibility_function = list_item_highight_focused_visibility_function
 }
 
-function ListHeaderPassTemplates.list_header(header_width, height, use_is_focused)
+function ListHeaderPassTemplates.list_header(header_width, height, use_is_focused, is_sub_setting)
 	local header_font_style = table.clone(UIFontSettings.header_4)
+	local default_offset = table.shallow_copy(header_font_style.offset)
 	header_font_style.size = {
 		header_width,
 		height
 	}
 	header_font_style.size_addition = {
-		-60,
+		-60 + (is_sub_setting and TAB_SIZE or 0),
 		0,
 		1
 	}
+	header_font_style.offset[1] = default_offset[1] + (is_sub_setting and TAB_SIZE or 0)
 	header_font_style.default_color = Color.terminal_text_body(255, true)
 	header_font_style.text_color = Color.terminal_text_body(255, true)
 	header_font_style.hover_color = Color.terminal_text_header_selected(255, true)
@@ -66,29 +69,29 @@ function ListHeaderPassTemplates.list_header(header_width, height, use_is_focuse
 				use_is_focused = use_is_focused
 			},
 			style = ListHeaderPassTemplates.default_hotspot_style
-		},
-		{
-			style_id = "hotspot",
-			pass_type = "logic",
-			value = function (pass, renderer, style, content, position, size)
-				local hotspot = content.hotspot
-				local highlight_progress = math.max(hotspot.anim_select_progress, hotspot.anim_hover_progress, hotspot.anim_focus_progress)
-				content.highlight_progress = highlight_progress
-				local dt = renderer.dt
-				local exclusive_focus = content.exclusive_focus
-				local anim_exclusive_focus_progress = content.anim_exclusive_focus_progress or 0
-				local anim_focus_speed = style.anim_focus_speed
-				local anim_delta = dt * anim_focus_speed
-
-				if exclusive_focus then
-					anim_exclusive_focus_progress = math.min(anim_exclusive_focus_progress + anim_delta, 1)
-				else
-					anim_exclusive_focus_progress = math.max(anim_exclusive_focus_progress - anim_delta, 0)
-				end
-
-				content.anim_exclusive_focus_progress = anim_exclusive_focus_progress
-			end
 		}
+	}
+	passes[2] = {
+		style_id = "hotspot",
+		pass_type = "logic",
+		value = function (pass, renderer, style, content, position, size)
+			local hotspot = content.hotspot
+			local highlight_progress = math.max(hotspot.anim_select_progress, hotspot.anim_hover_progress, hotspot.anim_focus_progress)
+			content.highlight_progress = highlight_progress
+			local dt = renderer.dt
+			local exclusive_focus = content.exclusive_focus
+			local anim_exclusive_focus_progress = content.anim_exclusive_focus_progress or 0
+			local anim_focus_speed = style.anim_focus_speed
+			local anim_delta = dt * anim_focus_speed
+
+			if exclusive_focus then
+				anim_exclusive_focus_progress = math.min(anim_exclusive_focus_progress + anim_delta, 1)
+			else
+				anim_exclusive_focus_progress = math.max(anim_exclusive_focus_progress - anim_delta, 0)
+			end
+
+			content.anim_exclusive_focus_progress = anim_exclusive_focus_progress
+		end
 	}
 
 	if header_width > 0 then

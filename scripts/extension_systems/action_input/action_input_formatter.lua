@@ -72,28 +72,27 @@ function _read_action_inputs(name, action_inputs, sequences, network_lookup, tot
 		network_lookup[action_input] = network_lookup_i
 		local input_sequence = data.input_sequence
 		local num_elements = input_sequence and #input_sequence or 0
-		local clear_input_queue = data.clear_input_queue or false
 		local config = {
 			action_input_name = action_input,
 			elements = Script.new_array(num_elements),
 			buffer_time = data.buffer_time,
 			reevaluation_time = data.reevaluation_time or nil,
-			clear_input_queue = clear_input_queue,
+			clear_input_queue = data.clear_input_queue or false,
 			max_queue = data.max_queue or false,
 			dont_queue = data.dont_queue
 		}
 
-		for i = 1, num_elements do
-			local element = input_sequence[i]
+		for ii = 1, num_elements do
+			local element = input_sequence[ii]
 			local inputs = element.inputs
 
 			if inputs then
-				for j = 1, #inputs do
-					local sub_element = inputs[j]
+				for jj = 1, #inputs do
+					local sub_element = inputs[jj]
 				end
 			end
 
-			config.elements[i] = element
+			config.elements[ii] = element
 		end
 
 		sequences[action_input] = config
@@ -106,23 +105,21 @@ end
 function _read_hierarchy(hierarchy_data, sequences, hierarchy_depth)
 	hierarchy_depth = hierarchy_depth and hierarchy_depth + 1 or 1
 	local best_children_hierarchy_depth = nil
-	local keys = table.keys(hierarchy_data)
 
-	table.sort(keys)
+	for _, entry in ipairs(hierarchy_data) do
+		local action_input = entry.input
+		local transition = entry.transition
 
-	for _, action_input in ipairs(keys) do
-		local children = hierarchy_data[action_input]
-
-		if type(children) == "table" then
-			local child_hierarchy_depth = _read_hierarchy(children, sequences, hierarchy_depth)
+		if type(transition) == "table" then
+			local child_hierarchy_depth = _read_hierarchy(transition, sequences, hierarchy_depth)
 
 			if not best_children_hierarchy_depth or best_children_hierarchy_depth < child_hierarchy_depth then
 				best_children_hierarchy_depth = child_hierarchy_depth
 			end
 		else
-			local stay = children == "stay"
-			local base = children == "base"
-			slot13 = children == "previous"
+			local stay = transition == "stay"
+			local base = transition == "base"
+			slot13 = transition == "previous"
 		end
 	end
 

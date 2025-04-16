@@ -1,9 +1,8 @@
 local cinematic_scene_templates = {
 	intro_abc = {
 		is_skippable = false,
-		use_transition_ui = false,
 		local_player_only = false,
-		instant_black_screen_during_cutscene_loading = false,
+		use_transition_ui = false,
 		music = "mission_intro",
 		hide_players = true,
 		set_random_weapon_event = true,

@@ -796,9 +796,9 @@ function InteractorExtension:hud_description()
 	end
 
 	local interaction = self:interaction()
-	local hud_description = interaction:hud_description(self._unit, target_unit, actor_node_index)
+	local hud_description, hud_description_context = interaction:hud_description(self._unit, target_unit, actor_node_index)
 
-	return hud_description
+	return hud_description, hud_description_context
 end
 
 function InteractorExtension:hud_block_text()

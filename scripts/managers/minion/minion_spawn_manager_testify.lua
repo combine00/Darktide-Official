@@ -7,4 +7,10 @@ function MinionSpawnManagerTestify.spawn_minion(minion_spawn_manager, minion_dat
 	return target_spawn
 end
 
+function MinionSpawnManagerTestify.spawned_minions(minion_spawn_manager)
+	local spawned_minions = minion_spawn_manager:spawned_minions()
+
+	return spawned_minions
+end
+
 return MinionSpawnManagerTestify

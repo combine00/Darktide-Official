@@ -4,7 +4,6 @@ local AimAssist = require("scripts/utilities/aim_assist")
 local AlternateFire = require("scripts/utilities/alternate_fire")
 local BuffSettings = require("scripts/settings/buff/buff_settings")
 local PlayerUnitVisualLoadout = require("scripts/extension_systems/visual_loadout/utilities/player_unit_visual_loadout")
-local WeaponSpecial = require("scripts/utilities/weapon_special")
 local buff_proc_events = BuffSettings.proc_events
 local ActionUnwield = class("ActionUnwield", "ActionWeaponBase")
 
@@ -52,11 +51,15 @@ function ActionUnwield:start(action_settings, t, time_scale, action_start_params
 	local alternate_fire_component = self._alternate_fire_component
 
 	if alternate_fire_component.is_active then
-		AlternateFire.stop(alternate_fire_component, self._peeking_component, self._first_person_extension, self._weapon_tweak_templates_component, self._animation_extension, self._weapon_template, false, self._player_unit, true)
+		AlternateFire.stop(alternate_fire_component, self._peeking_component, self._first_person_extension, self._weapon_tweak_templates_component, self._animation_extension, self._weapon_template, self._player_unit, true)
 	end
 
 	AimAssist.reset_ramp_multiplier(self._aim_assist_ramp_component)
 	self._weapon_extension:set_wielded_weapon_weapon_special_active(t, false, "unwield")
+
+	if IS_PLAYSTATION and self._is_local_unit and self._is_human_controlled then
+		Managers.input.haptic_trigger_effects:unwield()
+	end
 end
 
 function ActionUnwield:fixed_update(dt, t, time_in_action)

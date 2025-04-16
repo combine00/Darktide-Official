@@ -551,6 +551,9 @@ local disorientation_settings = {
 			screen_space_effect = "content/fx/particles/screenspace/screen_stunned_light",
 			hit_react_anim_1p = "shake_medium",
 			hit_react_anim_3p = "hit_react"
+		},
+		trait_bespoke_powersword_2h_p1_trade_overheat_lockout_for_damage = {
+			sound_event = "wwise/events/player/play_player_get_hit_light_2d"
 		}
 	}
 }

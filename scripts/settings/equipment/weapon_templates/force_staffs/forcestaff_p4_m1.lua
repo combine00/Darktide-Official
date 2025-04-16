@@ -1,9 +1,11 @@
+local ActionInputHierarchy = require("scripts/utilities/action/action_input_hierarchy")
 local BaseTemplateSettings = require("scripts/settings/equipment/weapon_templates/base_template_settings")
 local BuffSettings = require("scripts/settings/buff/buff_settings")
 local DamageProfileTemplates = require("scripts/settings/damage/damage_profile_templates")
 local DamageSettings = require("scripts/settings/damage/damage_settings")
 local ExplosionTemplates = require("scripts/settings/damage/explosion_templates")
 local FootstepIntervalsTemplates = require("scripts/settings/equipment/footstep/footstep_intervals_templates")
+local HapticTriggerTemplates = require("scripts/settings/equipment/haptic_trigger_templates")
 local HerdingTemplates = require("scripts/settings/damage/herding_templates")
 local PlayerCharacterConstants = require("scripts/settings/player_character/player_character_constants")
 local ProjectileTemplates = require("scripts/settings/projectile/projectile_templates")
@@ -22,7 +24,6 @@ local explosion_trait_templates = WeaponTraitTemplates[template_types.explosion]
 local charge_trait_templates = WeaponTraitTemplates[template_types.charge]
 local warp_charge_trait_templates = WeaponTraitTemplates[template_types.warp_charge]
 local weapon_template = {
-	smart_targeting_template = SmartTargetingTemplates.force_staff_single_target,
 	action_inputs = {
 		shoot_pressed = {
 			buffer_time = 0.15,
@@ -83,7 +84,7 @@ local weapon_template = {
 			}
 		},
 		vent_release = {
-			buffer_time = 0.1,
+			buffer_time = 0.261,
 			input_sequence = {
 				{
 					value = false,
@@ -145,32 +146,92 @@ local weapon_template = {
 table.add_missing(weapon_template.action_inputs, BaseTemplateSettings.action_inputs)
 
 weapon_template.action_input_hierarchy = {
-	wield = "stay",
-	shoot_pressed = "stay",
-	charge = {
-		charge_release = "base",
-		wield = "base",
-		vent = "base",
-		shoot_charged = "base",
-		combat_ability = "base"
+	{
+		transition = "stay",
+		input = "wield"
 	},
-	vent = {
-		wield = "base",
-		vent_release = "base",
-		combat_ability = "base",
-		grenade_ability = "base"
+	{
+		transition = "stay",
+		input = "shoot_pressed"
 	},
-	special_action_hold = {
-		special_action = "base",
-		special_action_light = "base",
-		special_action_heavy = "base",
-		wield = "base",
-		grenade_ability = "base",
-		combat_ability = "base"
+	{
+		input = "charge",
+		transition = {
+			{
+				transition = "base",
+				input = "shoot_charged"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "charge_release"
+			},
+			{
+				transition = "base",
+				input = "vent"
+			}
+		}
+	},
+	{
+		input = "vent",
+		transition = {
+			{
+				transition = "base",
+				input = "vent_release"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "grenade_ability"
+			}
+		}
+	},
+	{
+		input = "special_action_hold",
+		transition = {
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "special_action"
+			},
+			{
+				transition = "base",
+				input = "special_action_light"
+			},
+			{
+				transition = "base",
+				input = "special_action_heavy"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "grenade_ability"
+			}
+		}
 	}
 }
 
-table.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
+ActionInputHierarchy.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
 
 weapon_template.actions = {
 	action_unwield = {
@@ -259,7 +320,7 @@ weapon_template.actions = {
 			},
 			vent = {
 				action_name = "action_vent",
-				chain_time = 0.2
+				chain_time = 0.29
 			},
 			shoot_pressed = {
 				action_name = "rapid_left",
@@ -526,7 +587,8 @@ weapon_template.actions = {
 		},
 		anim_end_event_condition_func = function (unit, data, end_reason)
 			return end_reason ~= "new_interrupting_action" and end_reason ~= "action_complete"
-		end
+		end,
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_swipe_start = {
 		anim_end_event = "attack_finished",
@@ -582,7 +644,8 @@ weapon_template.actions = {
 		},
 		anim_end_event_condition_func = function (unit, data, end_reason)
 			return end_reason ~= "new_interrupting_action" and end_reason ~= "action_complete"
-		end
+		end,
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_stab = {
 		damage_window_start = 0.11666666666666667,
@@ -684,7 +747,8 @@ weapon_template.actions = {
 		time_scale_stat_buffs = {
 			buff_stat_buffs.attack_speed,
 			buff_stat_buffs.melee_attack_speed
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_stab_heavy = {
 		damage_window_start = 0.13333333333333333,
@@ -787,7 +851,8 @@ weapon_template.actions = {
 		time_scale_stat_buffs = {
 			buff_stat_buffs.attack_speed,
 			buff_stat_buffs.melee_attack_speed
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_swipe = {
 		damage_window_start = 0.6333333333333333,
@@ -891,7 +956,8 @@ weapon_template.actions = {
 		time_scale_stat_buffs = {
 			buff_stat_buffs.attack_speed,
 			buff_stat_buffs.melee_attack_speed
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_swipe_heavy = {
 		damage_window_start = 0.31666666666666665,
@@ -994,7 +1060,8 @@ weapon_template.actions = {
 		time_scale_stat_buffs = {
 			buff_stat_buffs.attack_speed,
 			buff_stat_buffs.melee_attack_speed
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_vent = {
 		allowed_during_sprint = true,
@@ -1003,6 +1070,7 @@ weapon_template.actions = {
 		kind = "vent_warp_charge",
 		prevent_sprint = true,
 		vent_vfx = "content/fx/particles/abilities/psyker_venting",
+		minimum_hold_time = 0.26,
 		anim_end_event = "vent_end",
 		vo_tag = "ability_venting",
 		abort_sprint = true,
@@ -1060,7 +1128,8 @@ weapon_template.actions = {
 		},
 		time_scale_stat_buffs = {
 			buff_stat_buffs.vent_warp_charge_multiplier
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_inspect = {
 		skip_3p_anims = false,
@@ -1073,7 +1142,8 @@ weapon_template.actions = {
 		total_time = math.huge,
 		crosshair = {
 			crosshair_type = "inspect"
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	}
 }
 
@@ -1109,6 +1179,8 @@ weapon_template.stamina_template = "default"
 weapon_template.toughness_template = "default"
 weapon_template.warp_charge_template = "forcestaff_p4_m1"
 weapon_template.footstep_intervals = FootstepIntervalsTemplates.default
+weapon_template.smart_targeting_template = SmartTargetingTemplates.force_staff_single_target
+weapon_template.haptic_trigger_template = HapticTriggerTemplates.ranged.forcestaff
 local WeaponBarUIDescriptionTemplates = require("scripts/settings/equipment/weapon_bar_ui_description_templates")
 weapon_template.base_stats = {
 	forcestaff_p4_m1_dps_stat = {

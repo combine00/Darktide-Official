@@ -1,3 +1,4 @@
+local ActionInputHierarchy = require("scripts/utilities/action/action_input_hierarchy")
 local BaseTemplateSettings = require("scripts/settings/equipment/weapon_templates/base_template_settings")
 local BuffSettings = require("scripts/settings/buff/buff_settings")
 local FootstepIntervalsTemplates = require("scripts/settings/equipment/footstep/footstep_intervals_templates")
@@ -41,16 +42,6 @@ local function _select_throw_anim(action_settings, condition_func_params)
 end
 
 weapon_template.action_inputs = {
-	combat_ability = {
-		buffer_time = 0,
-		clear_input_queue = true,
-		input_sequence = {
-			{
-				value = true,
-				input = "combat_ability_pressed"
-			}
-		}
-	},
 	shoot = {
 		buffer_time = 0.2,
 		max_queue = 1,
@@ -160,39 +151,109 @@ weapon_template.action_inputs = {
 				time_window = math.huge
 			}
 		}
+	},
+	combat_ability = {
+		buffer_time = 0,
+		clear_input_queue = true,
+		input_sequence = {
+			{
+				value = true,
+				input = "combat_ability_pressed"
+			}
+		}
 	}
 }
 
 table.add_missing(weapon_template.action_inputs, BaseTemplateSettings.action_inputs)
 
 weapon_template.action_input_hierarchy = {
-	shoot = "stay",
-	wield = "stay",
-	rewield = "stay",
-	combat_ability = "stay",
-	vent = {
-		wield = "base",
-		vent_release = "base",
-		combat_ability = "base"
+	{
+		input = "vent",
+		transition = {
+			{
+				transition = "base",
+				input = "vent_release"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			}
+		}
 	},
-	force_vent = {
-		wield = "base",
-		combat_ability = "base",
-		force_vent_release = "base"
+	{
+		input = "force_vent",
+		transition = {
+			{
+				transition = "base",
+				input = "force_vent_release"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			}
+		}
 	},
-	zoom = {
-		zoom_release = "base",
-		wield = "base",
-		zoom_shoot = "base",
-		force_vent = "base",
-		combat_ability = "base"
+	{
+		input = "zoom",
+		transition = {
+			{
+				transition = "base",
+				input = "zoom_release"
+			},
+			{
+				transition = "base",
+				input = "zoom_shoot"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "force_vent"
+			}
+		}
 	},
-	inspect_start = {
-		inspect_stop = "base"
+	{
+		transition = "stay",
+		input = "shoot"
+	},
+	{
+		transition = "stay",
+		input = "wield"
+	},
+	{
+		transition = "stay",
+		input = "rewield"
+	},
+	{
+		transition = "stay",
+		input = "combat_ability"
+	},
+	{
+		input = "inspect_start",
+		transition = {
+			{
+				transition = "base",
+				input = "inspect_stop"
+			}
+		}
 	}
 }
 
-table.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
+ActionInputHierarchy.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
 
 weapon_template.actions = {
 	action_unwield = {
@@ -286,20 +347,19 @@ weapon_template.actions = {
 		sprint_requires_press_to_interrupt = true,
 		kind = "spawn_projectile",
 		should_crit = true,
-		use_target = true,
+		track_towards_target = true,
 		ability_type = "grenade_ability",
 		use_ability_charge = true,
-		target_position_distance = 50,
 		target_finder_module_class_name = "smart_target_targeting",
+		track_towards_position = false,
 		anim_event_last = "attack_shoot_last",
 		fire_time = 0.25,
 		charge_template = "psyker_throwing_knives",
 		vo_tag = "ability_gunslinger",
-		use_target_position = false,
 		anim_event_non_last = "attack_shoot",
 		uninterruptible = true,
 		extra_projectile_on_crit = true,
-		total_time = 1,
+		total_time = 0.8,
 		action_movement_curve = {
 			{
 				modifier = 0.5,
@@ -349,16 +409,15 @@ weapon_template.actions = {
 		}
 	},
 	action_rapid_left = {
+		kind = "spawn_projectile",
 		target_finder_module_class_name = "smart_target_targeting",
 		psyker_smite = true,
-		sprint_requires_press_to_interrupt = true,
 		weapon_handling_template = "time_scale_1_5",
 		should_crit = true,
-		use_target = true,
-		use_target_position = false,
+		track_towards_position = false,
+		track_towards_target = true,
 		ability_type = "grenade_ability",
-		target_position_distance = 50,
-		kind = "spawn_projectile",
+		sprint_requires_press_to_interrupt = true,
 		use_ability_charge = true,
 		anim_event_last = "attack_shoot_last",
 		fire_time = 0.25,
@@ -367,7 +426,7 @@ weapon_template.actions = {
 		anim_event_non_last = "attack_shoot",
 		uninterruptible = true,
 		extra_projectile_on_crit = true,
-		total_time = 1,
+		total_time = 0.8,
 		action_movement_curve = {
 			{
 				modifier = 0.5,
@@ -423,8 +482,8 @@ weapon_template.actions = {
 		weapon_handling_template = "time_scale_1_5",
 		should_crit = true,
 		prefer_previous_action_targeting_result = true,
-		use_target = true,
-		use_target_position = false,
+		track_towards_position = false,
+		track_towards_target = true,
 		ability_type = "grenade_ability",
 		use_ability_charge = true,
 		sprint_requires_press_to_interrupt = true,
@@ -433,11 +492,10 @@ weapon_template.actions = {
 		charge_template = "psyker_throwing_knives_homing",
 		vo_tag = "ability_gunslinger",
 		sticky_targeting = true,
-		target_position_distance = 100,
 		anim_event_non_last = "attack_shoot_zoomed",
 		uninterruptible = true,
 		extra_projectile_on_crit = true,
-		total_time = 1.5,
+		total_time = 1.25,
 		action_movement_curve = {
 			{
 				modifier = 0.5,

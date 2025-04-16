@@ -123,21 +123,21 @@ function ViewElementWintrackMastery:_on_reward_items_hover_start(items, index, w
 		}
 
 		if item.type == "perk_unlock" then
-			title = item.display_name
+			title = item.display_name or ""
 			description = Localize("loc_mastery_reward_perk_tooltip")
 		elseif string.find(item.type, "mark_unlock") then
 			description = Localize("loc_mastery_reward_mark_tooltip")
 			icon = item.icon
-			title = item.display_name
+			title = item.display_name or ""
 			icon_size = item.icon_size and table.clone(item.icon_size) or {
 				0,
 				0
 			}
 		elseif item.type == "mastery_points" then
-			title = item.display_name
+			title = item.display_name or ""
 			description = Localize("loc_mastery_reward_blessingpoints_tooltip")
 		elseif item.type == "expertise_point" then
-			title = item.display_name
+			title = item.display_name or ""
 			description = Localize("loc_mastery_reward_power_tooltip")
 		else
 			return

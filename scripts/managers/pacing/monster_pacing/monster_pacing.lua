@@ -3,8 +3,8 @@ local LiquidArea = require("scripts/extension_systems/liquid_area/utilities/liqu
 local LiquidAreaTemplates = require("scripts/settings/liquid_area/liquid_area_templates")
 local MainPathQueries = require("scripts/utilities/main_path_queries")
 local MinionPatrols = require("scripts/utilities/minion_patrols")
-local MonsterSettings = require("scripts/settings/monster/monster_settings")
 local MonsterInjectionTemplates = require("scripts/managers/pacing/monster_pacing/templates/monster_injection_templates")
+local MonsterSettings = require("scripts/settings/monster/monster_settings")
 local Navigation = require("scripts/extension_systems/navigation/utilities/navigation")
 local NavQueries = require("scripts/utilities/nav_queries")
 local PerceptionSettings = require("scripts/settings/perception/perception_settings")
@@ -135,6 +135,14 @@ function MonsterPacing:_generate_spawns(template)
 		end
 
 		num_to_spawn = math.max(num_to_spawn, #boss_injections)
+
+		if is_monster then
+			local add_num_monsters = Managers.state.havoc:get_modifier_value("add_num_monsters")
+
+			if add_num_monsters then
+				num_to_spawn = num_to_spawn + add_num_monsters
+			end
+		end
 
 		if current_num_sections < num_to_spawn then
 			Log.warning("MonsterPacing", "Requested %s spawns for type %s but only had %s sections. Clamped.", num_to_spawn, spawn_type, current_num_sections)
@@ -453,6 +461,24 @@ function MonsterPacing:add_spawn_point(unit, position, path_position, travel_dis
 	return true
 end
 
+local captain_breeds = {
+	renegade = "renegade_captain",
+	cultist = "cultist_captain"
+}
+
+function MonsterPacing:_get_captain_faction(monster)
+	if monster.breed_name ~= "MUTATOR_CAPTAIN" then
+		return monster
+	end
+
+	local current_faction = Managers.state.pacing:current_faction()
+	local correct_captain = captain_breeds[current_faction]
+	monster.breed_name = correct_captain
+	monster.stinger = self._template.spawn_stingers[correct_captain]
+
+	return monster
+end
+
 function MonsterPacing:update(dt, t, side_id, target_side_id)
 	local disabled = self._disabled
 
@@ -477,6 +503,8 @@ function MonsterPacing:update(dt, t, side_id, target_side_id)
 			local spawn_travel_distance = monster.travel_distance
 
 			if spawn_travel_distance <= ahead_travel_distance then
+				monster = self:_get_captain_faction(monster)
+
 				self:_spawn_monster(monster, ahead_target_unit, side_id)
 				table.remove(monsters, i)
 
@@ -589,7 +617,7 @@ function MonsterPacing:update(dt, t, side_id, target_side_id)
 				if despawn_distance_when_passive <= travel_distance_diff then
 					local minion_spawn_manager = Managers.state.minion_spawn
 
-					minion_spawn_manager:despawn(spawned_unit)
+					minion_spawn_manager:despawn_minion(spawned_unit)
 					table.remove(alive_monsters, i)
 
 					local aggroed_index = table.find(aggroed_monster_units, spawned_unit)
@@ -631,15 +659,26 @@ function MonsterPacing:_spawn_monster(monster, ahead_target_unit, side_id)
 	local aggro_state = aggro_states[breed_name]
 	local spawned_unit = nil
 	local spawn_max_health_modifier = self._health_modifier
+	local minion_spawn_manager = Managers.state.minion_spawn
+	local param_table = minion_spawn_manager:request_param_table()
+	param_table.optional_health_modifier = spawn_max_health_modifier
 
 	if aggro_state then
-		spawned_unit = Managers.state.minion_spawn:spawn_minion(breed_name, spawn_position, Quaternion.identity(), side_id, aggro_state, ahead_target_unit, nil, nil, nil, nil, spawn_max_health_modifier)
+		param_table.optional_aggro_state = aggro_states.aggroed
+		param_table.optional_target_unit = ahead_target_unit
+		spawned_unit = minion_spawn_manager:spawn_minion(breed_name, spawn_position, Quaternion.identity(), side_id, param_table)
 
 		if aggro_state == perception_aggro_states.aggroed then
 			self._aggroed_monster_units[#self._aggroed_monster_units + 1] = spawned_unit
 		end
 	else
-		spawned_unit = Managers.state.minion_spawn:spawn_minion(breed_name, spawn_position, Quaternion.identity(), side_id, nil, nil, nil, nil, nil, nil, spawn_max_health_modifier)
+		spawned_unit = minion_spawn_manager:spawn_minion(breed_name, spawn_position, Quaternion.identity(), side_id, param_table)
+	end
+
+	local force_horde_on_spawn = template.force_horde
+
+	if force_horde_on_spawn then
+		Managers.state.pacing:force_horde_pacing_spawn()
 	end
 
 	if monster.set_enraged then
@@ -705,7 +744,10 @@ function MonsterPacing:_spawn_boss_patrol(boss_patrol, ahead_travel_distance, si
 	for i = 1, num_positions do
 		local breed_name = spawn_list[i]
 		local spawn_position = flood_fill_positions[i]
-		local unit = minion_spawn_manager:spawn_minion(breed_name, spawn_position, Quaternion.identity(), side_id, perception_aggro_states.passive, nil, nil, group_id, nil, nil)
+		local param_table = minion_spawn_manager:request_param_table()
+		param_table.optional_aggro_state = perception_aggro_states.passive
+		param_table.optional_group_id = group_id
+		local unit = minion_spawn_manager:spawn_minion(breed_name, spawn_position, Quaternion.identity(), side_id, param_table)
 		local blackboard = BLACKBOARDS[unit]
 		local patrol_component = Blackboard.write_component(blackboard, "patrol")
 
@@ -746,32 +788,36 @@ function MonsterPacing:remove_monsters_behind_pos(position)
 	end
 
 	local nav_spawn_points = main_path_manager:nav_spawn_points()
-	local target_navmesh_position = NavQueries.position_on_mesh_with_outside_position(self._nav_world, nil, position, 1, 1, 1)
+	local nav_world = self._nav_world
+	local target_navmesh_position = NavQueries.position_on_mesh_with_outside_position(nav_world, nil, position, 1, 1, 1)
 
 	if target_navmesh_position then
-		local group_index = SpawnPointQueries.group_from_position(self._nav_world, nav_spawn_points, target_navmesh_position)
+		local group_index = SpawnPointQueries.group_from_position(nav_world, nav_spawn_points, target_navmesh_position)
 
 		if group_index then
 			local start_index = main_path_manager:node_index_by_nav_group_index(group_index)
 			local end_index = start_index + 1
 			local _, distance, _, _, _ = MainPathQueries.closest_position_between_nodes(position, start_index, end_index)
+			local monsters = self._monsters
 
-			if self._monsters then
-				for i = #self._monsters, 1, -1 do
-					local monster = self._monsters[i]
+			if monsters then
+				for i = #monsters, 1, -1 do
+					local monster = monsters[i]
 
 					if monster.travel_distance <= distance then
-						table.remove(self._monsters, i)
+						table.remove(monsters, i)
 					end
 				end
 			end
 
-			if self._boss_patrols then
-				for i = #self._boss_patrols, 1, -1 do
-					local boss_patrol = self._boss_patrols[i]
+			local boss_patrols = self._boss_patrols
+
+			if boss_patrols then
+				for i = #boss_patrols, 1, -1 do
+					local boss_patrol = boss_patrols[i]
 
 					if boss_patrol.travel_distance <= distance then
-						table.remove(self._boss_patrols, i)
+						table.remove(boss_patrols, i)
 					end
 				end
 			end

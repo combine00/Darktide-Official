@@ -1,25 +1,23 @@
 local ButtonPassTemplates = require("scripts/ui/pass_templates/button_pass_templates")
 local lobby_view_settings = {
-	timer_name = "ui",
+	field_of_view = 40,
 	raycast_delay_duration = 0.15,
 	viewport_type = "default",
 	world_layer = 2,
-	field_of_view = 40,
+	list_button_spacing = 10,
 	character_spacing_width = 1.1,
 	character_name_y_offset_no_title = 115,
-	back_row_additional_spacing_width = 0.05,
-	max_player_slots = 4,
 	back_row_additional_spacing_depth = 0.8,
-	shading_environment = "content/shading_environments/ui/lobby",
-	debug_character_count = 4,
+	max_player_slots = 4,
+	timer_name = "ui",
 	tooltip_fade_delay = 0.3,
+	debug_character_count = 4,
 	tooltip_fade_speed = 7,
-	list_button_spacing = 10,
+	back_row_additional_spacing_width = 0.05,
+	character_archetype_title_y_offset_no_title = 140,
 	delay_ready_exit = 3,
 	viewport_name = "ui_lobby_view_world_viewport",
 	viewport_layer = 1,
-	character_archetype_title_y_offset_no_title = 140,
-	level_name = "content/levels/ui/lobby/lobby",
 	character_name_y_offset = 105,
 	character_archetype_title_y_offset = 152,
 	world_name = "ui_lobby_view_world",
@@ -46,6 +44,20 @@ local lobby_view_settings = {
 	loadout_size = {
 		270,
 		200
+	},
+	levels_by_id = {
+		default = {
+			shading_environment = "content/shading_environments/ui/lobby",
+			level_name = "content/levels/ui/lobby/lobby"
+		},
+		havoc = {
+			shading_environment = "content/shading_environments/ui/lobby",
+			level_name = "content/levels/ui/havoc_lobby/havoc_lobby"
+		},
+		horde = {
+			shading_environment = "content/shading_environments/ui/lobby",
+			level_name = "content/levels/ui/horde_lobby/horde_lobby"
+		}
 	},
 	ignored_slots = {
 		"slot_pocketable",

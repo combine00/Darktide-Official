@@ -92,7 +92,8 @@ local husk_data_component_config = {
 		"overheat_current_percentage",
 		"special_active",
 		"reload_state",
-		"num_special_charges"
+		"num_special_charges",
+		"max_num_special_charges"
 	},
 	slot_secondary = {
 		"current_ammunition_clip",
@@ -103,10 +104,14 @@ local husk_data_component_config = {
 		"overheat_current_percentage",
 		"special_active",
 		"reload_state",
-		"num_special_charges"
+		"num_special_charges",
+		"max_num_special_charges"
 	},
 	minigame_character_state = {
-		"interface_unit_id"
+		"interface_game_object_id",
+		"interface_is_level_unit",
+		"interface_level_unit_id",
+		"pocketable_device_active"
 	},
 	slot_luggable = {
 		"existing_unit_3p"

@@ -15,7 +15,7 @@ local function _debug_print(format, ...)
 	end
 end
 
-function GameStateMachine:init(parent, start_state, params, optional_creation_context, state_change_callbacks, name, log_breadcrumbs)
+function GameStateMachine:init(parent, start_state, params, optional_creation_context, state_change_callbacks, parent_name, name, log_breadcrumbs)
 	self._parent = parent
 	self._next_state = start_state
 	self._next_state_params = params
@@ -30,7 +30,7 @@ function GameStateMachine:init(parent, start_state, params, optional_creation_co
 		end
 	end
 
-	_debug_print("[%s] Init statemachine with '%s'", name, start_state.__class_name)
+	GameStateDebugInfo:on_state_machine_created(parent_name, name, start_state.__class_name)
 	self:_change_state()
 end
 
@@ -59,19 +59,21 @@ function GameStateMachine:_log_state_change(current_state, next_state)
 		next_state_name = next_state.__class_name
 	end
 
-	_debug_print("[%s] Changing state '%s' -> '%s'", self._name, current_state_name, next_state_name)
+	GameStateDebugInfo:on_change_state(self._name, next_state_name)
 	Profiler.send_message(string.format("[%s] Changing state '%s' -> '%s'", self._name, current_state_name, next_state_name))
 end
 
 function GameStateMachine:_change_state()
 	local new_state = self._next_state
 	local params = self._next_state_params
+	local exit_params = self._exit_params
 	self._next_state = nil
 	self._next_state_params = nil
+	self._exit_params = nil
 	local current_state_name = self:current_state_name()
 
 	if self._state and self._state.on_exit then
-		self._state:on_exit()
+		self._state:on_exit(exit_params)
 		self._state:delete()
 	end
 
@@ -93,13 +95,14 @@ function GameStateMachine:_change_state()
 	end
 end
 
-function GameStateMachine:force_change_state(state, params)
+function GameStateMachine:force_change_state(state, params, exit_params)
 	if self._state == state then
 		return
 	end
 
 	self._next_state = state
 	self._next_state_params = params
+	self._exit_params = exit_params
 
 	self:_log_state_change(self._state, self._next_state)
 	self:_change_state()
@@ -161,11 +164,11 @@ function GameStateMachine:destroy(...)
 		ferror("[GameStateMachine] - Trying to terminate state machine without cleaning up registered callbacks.")
 	end
 
-	_debug_print("[%s] Exit statemachine from '%s'", self._name, self._state.__class_name)
-
 	if self._state and self._state.on_exit then
 		self._state:on_exit(...)
 	end
+
+	GameStateDebugInfo:on_destroy_state_machine(self._name)
 end
 
 function GameStateMachine:current_state_name()

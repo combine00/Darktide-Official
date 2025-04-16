@@ -1,16 +1,16 @@
-local Breeds = require("scripts/settings/breed/breeds")
 local Archetypes = require("scripts/settings/archetype/archetypes")
-local HomePlanets = require("scripts/settings/character/home_planets")
+local Breeds = require("scripts/settings/breed/breeds")
 local Childhood = require("scripts/settings/character/childhood")
-local GrowingUp = require("scripts/settings/character/growing_up")
-local FormativeEvent = require("scripts/settings/character/formative_event")
 local Crimes = require("scripts/settings/character/crimes")
-local Personalities = require("scripts/settings/character/personalities")
-local PlayerCharacterCreatorPresets = require("scripts/settings/player_character/player_character_creator_presets")
-local ProfileUtils = require("scripts/utilities/profile_utils")
+local FormativeEvent = require("scripts/settings/character/formative_event")
+local GrowingUp = require("scripts/settings/character/growing_up")
+local HomePlanets = require("scripts/settings/character/home_planets")
 local ItemSlotSettings = require("scripts/settings/item/item_slot_settings")
 local ItemUtils = require("scripts/utilities/items")
 local MasterItems = require("scripts/backend/master_items")
+local Personalities = require("scripts/settings/character/personalities")
+local PlayerCharacterCreatorPresets = require("scripts/settings/player_character/player_character_creator_presets")
+local ProfileUtils = require("scripts/utilities/profile_utils")
 local CharacterCreate = class("CharacterCreate")
 local fallback_slots_to_strip = {
 	"slot_body_face",
@@ -321,8 +321,8 @@ function CharacterCreate:_setup_appearance_presets(verified_items)
 					body_parts = {}
 				}
 
-				for i = 1, #self._inventory_slots_array do
-					local slot_name = self._inventory_slots_array[i]
+				for ii = 1, #self._inventory_slots_array do
+					local slot_name = self._inventory_slots_array[ii]
 					local preset_item = preset_slots[slot_name]
 
 					if preset_item and verified_items[preset_item] then
@@ -414,22 +414,22 @@ end
 
 function CharacterCreate:_setup_item_categories(source_items)
 	local destination_table = {}
+	local loop_table_order = {
+		"archetypes",
+		"breeds",
+		"genders",
+		"slots"
+	}
+	local default_table_arrays = {
+		archetypes = self._archetype_names_array,
+		breed = self._breeds_array,
+		genders = self._genders_array,
+		slots = self._inventory_slots_array
+	}
 
 	local function next_category(item, lookup_index, destination)
-		local loop_table_order = {
-			"archetypes",
-			"breeds",
-			"genders",
-			"slots"
-		}
-		local default_table_arrays = {
-			archetypes = self._archetype_names_array,
-			breed = self._breeds_array,
-			genders = self._genders_array,
-			slots = self._inventory_slots_array
-		}
 		local table_key = loop_table_order[lookup_index]
-		local values = {}
+		local values = nil
 		values = item[table_key] and not table.is_empty(item[table_key]) and item[table_key] or default_table_arrays[table_key] or {}
 		local next_lookup_index = lookup_index < #loop_table_order and lookup_index + 1 or nil
 
@@ -467,7 +467,7 @@ function CharacterCreate:breed()
 	return self._profile.breed
 end
 
-function CharacterCreate:set_breed(breed_name)
+function CharacterCreate:_set_breed(breed_name)
 	self._profile.breed = breed_name
 
 	self:_increase_value_version("breed")
@@ -523,7 +523,7 @@ function CharacterCreate:set_archetype(archetype)
 
 	local breed_name = archetype.breed
 
-	self:set_breed(breed_name)
+	self:_set_breed(breed_name)
 
 	if is_diff_archetype then
 		self:_randomize_archetype_properties()
@@ -545,14 +545,6 @@ function CharacterCreate:set_specialization(specialization)
 	self._profile.specialization = specialization
 
 	self:_increase_value_version("specialization")
-end
-
-function CharacterCreate:specialization()
-	if self._profile.specialization then
-		local specialization_name = self._profile.specialization
-
-		return self._profile.archetype.specializations[specialization_name]
-	end
 end
 
 function CharacterCreate:_fetch_suggested_names_by_profile()
@@ -658,9 +650,20 @@ function CharacterCreate:personality_options()
 end
 
 function CharacterCreate:_randomize_personality()
-	local personality = self:personality_options()
+	local personalities = self:personality_options()
+	local personality_id = personalities[math.random(1, #personalities)]
+	local planet_option = self:planet()
 
-	return personality[math.random(1, #personality)]
+	if planet_option then
+		local personality = Personalities[personality_id]
+
+		while personality.home_planets and not table.array_contains(personality.home_planets, planet_option) do
+			personality_id = personalities[math.random(1, #personalities)]
+			personality = Personalities[personality_id]
+		end
+	end
+
+	return personality_id
 end
 
 function CharacterCreate:planet()

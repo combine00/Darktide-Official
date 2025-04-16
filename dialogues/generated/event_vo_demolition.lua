@@ -131,22 +131,9 @@ return function ()
 					"purser",
 					"enginseer"
 				}
-			},
-			{
-				"faction_memory",
-				"event_demolition_last_corruptor",
-				OP.EQ,
-				0
 			}
 		},
-		on_done = {
-			{
-				"faction_memory",
-				"event_demolition_last_corruptor",
-				OP.ADD,
-				1
-			}
-		},
+		on_done = {},
 		heard_speak_routing = {
 			target = "disabled"
 		}
@@ -181,24 +168,12 @@ return function ()
 					"sergeant",
 					"explicator",
 					"pilot",
-					"tech_priest"
+					"tech_priest",
+					"training_ground_psyker"
 				}
-			},
-			{
-				"faction_memory",
-				"event_demolition_more_corruptors",
-				OP.EQ,
-				0
 			}
 		},
-		on_done = {
-			{
-				"faction_memory",
-				"event_demolition_more_corruptors",
-				OP.ADD,
-				1
-			}
-		},
+		on_done = {},
 		heard_speak_routing = {
 			target = "disabled"
 		}
@@ -233,7 +208,8 @@ return function ()
 					"sergeant",
 					"explicator",
 					"pilot",
-					"tech_priest"
+					"tech_priest",
+					"training_ground_psyker"
 				}
 			},
 			{

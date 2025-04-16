@@ -1,7 +1,9 @@
-local SpecialRulesSetting = require("scripts/settings/ability/special_rules_settings")
+local BuffSettings = require("scripts/settings/buff/buff_settings")
+local SpecialRulesSettings = require("scripts/settings/ability/special_rules_settings")
 local TalentSettings = require("scripts/settings/talent/talent_settings")
 local ForceFieldExtension = class("ForceFieldExtension")
-local special_rules = SpecialRulesSetting.special_rules
+local buff_keywords = BuffSettings.keywords
+local special_rules = SpecialRulesSettings.special_rules
 local talent_settings = TalentSettings.psyker_3.combat_ability
 local SOUND_EVENTS_WALL = {
 	stop = "wwise/events/player/stop_ability_psyker_protectorate_shield",
@@ -73,9 +75,12 @@ function ForceFieldExtension:init(extension_init_context, unit, extension_init_d
 		p7
 	}
 	local owner_unit = self.owner_unit
-	self.buff_extension = ScriptUnit.extension(owner_unit, "buff_system")
+	local buff_extension = ScriptUnit.extension(owner_unit, "buff_system")
+	self.buff_extension = buff_extension
 	self.talent_extension = ScriptUnit.extension(owner_unit, "talent_system")
-	local sphere_shield = self.talent_extension:has_special_rule(special_rules.psyker_sphere_shield)
+	self._shape_override = extension_init_data.shape_override
+	local override_shield_as_sphere = extension_init_data.shape_override == "sphere"
+	local sphere_shield = override_shield_as_sphere or self.talent_extension:has_special_rule(special_rules.psyker_sphere_shield)
 	self._sphere_shield = sphere_shield
 	local duration = talent_settings.duration
 	local sphere_duration = talent_settings.sphere_duration

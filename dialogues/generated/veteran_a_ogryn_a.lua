@@ -1,4 +1,15 @@
 local veteran_a_ogryn_a = {
+	combat_pause_limited_bolt_on_a_veteran_a_03_b = {
+		randomize_indexes_n = 0,
+		sound_events_n = 1,
+		sound_events = {
+			[1.0] = "loc_ogryn_a__combat_pause_limited_bolt_on_a_veteran_a_03_b_01"
+		},
+		sound_events_duration = {
+			[1.0] = 3.45678
+		},
+		randomize_indexes = {}
+	},
 	combat_pause_limited_veteran_a_10_b = {
 		randomize_indexes_n = 0,
 		sound_events_n = 2,
@@ -66,10 +77,6 @@ local veteran_a_ogryn_a = {
 			[1.0] = 2.717531,
 			[2.0] = 2.58101
 		},
-		sound_event_weights = {
-			[1.0] = 0.5,
-			[2.0] = 0.5
-		},
 		randomize_indexes = {}
 	},
 	combat_pause_quirk_emperor_b = {
@@ -96,10 +103,6 @@ local veteran_a_ogryn_a = {
 			[1.0] = 3.822365,
 			[2.0] = 3.307781
 		},
-		sound_event_weights = {
-			[1.0] = 0.5,
-			[2.0] = 0.5
-		},
 		randomize_indexes = {}
 	},
 	combat_pause_quirk_rations_b = {
@@ -112,10 +115,6 @@ local veteran_a_ogryn_a = {
 		sound_events_duration = {
 			[1.0] = 3.770302,
 			[2.0] = 3.500104
-		},
-		sound_event_weights = {
-			[1.0] = 0.5,
-			[2.0] = 0.5
 		},
 		randomize_indexes = {}
 	},

@@ -1,4 +1,4 @@
-local Action = require("scripts/utilities/weapon/action")
+local Action = require("scripts/utilities/action/action")
 local ChainLightning = require("scripts/utilities/action/chain_lightning")
 local ChainLightningTarget = require("scripts/utilities/action/chain_lightning_target")
 local Spread = require("scripts/utilities/spread")

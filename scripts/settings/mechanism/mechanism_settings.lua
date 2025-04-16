@@ -11,7 +11,8 @@ local mechanism_settings = {
 		},
 		player_package_synchronization_settings = {
 			prioritization_template = "default"
-		}
+		},
+		loader_paths = {}
 	},
 	onboarding = {
 		class_name = "MechanismOnboarding",
@@ -27,7 +28,8 @@ local mechanism_settings = {
 		},
 		player_package_synchronization_settings = {
 			prioritization_template = "default"
-		}
+		},
+		loader_paths = {}
 	},
 	hub = {
 		class_name = "MechanismHub",
@@ -43,7 +45,8 @@ local mechanism_settings = {
 		},
 		player_package_synchronization_settings = {
 			prioritization_template = "hub"
-		}
+		},
+		loader_paths = {}
 	},
 	idle = {
 		class_name = "MechanismIdle",
@@ -53,7 +56,8 @@ local mechanism_settings = {
 		},
 		player_package_synchronization_settings = {
 			prioritization_template = "default"
-		}
+		},
+		loader_paths = {}
 	},
 	adventure = {
 		class_name = "MechanismAdventure",
@@ -73,7 +77,8 @@ local mechanism_settings = {
 		},
 		player_package_synchronization_settings = {
 			prioritization_template = "default"
-		}
+		},
+		loader_paths = {}
 	},
 	left_session = {
 		class_name = "MechanismLeftSession",
@@ -85,7 +90,8 @@ local mechanism_settings = {
 		},
 		player_package_synchronization_settings = {
 			prioritization_template = "default"
-		}
+		},
+		loader_paths = {}
 	}
 }
 

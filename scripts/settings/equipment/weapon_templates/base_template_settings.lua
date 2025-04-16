@@ -1,7 +1,7 @@
 local PlayerCharacterConstants = require("scripts/settings/player_character/player_character_constants")
 local ProjectileTemplates = require("scripts/settings/projectile/projectile_templates")
-local SpecialRulesSetting = require("scripts/settings/ability/special_rules_settings")
-local special_rules = SpecialRulesSetting.special_rules
+local SpecialRulesSettings = require("scripts/settings/ability/special_rules_settings")
+local special_rules = SpecialRulesSettings.special_rules
 local wield_inputs = PlayerCharacterConstants.wield_inputs
 
 local function _quick_throw_allowed(action_settings, condition_func_params, used_input)
@@ -29,7 +29,7 @@ local function _quick_throw_allowed(action_settings, condition_func_params, used
 end
 
 local base_template_settings = {
-	action_inputs = {
+	combat_ability_action_inputs = {
 		combat_ability = {
 			buffer_time = 0,
 			clear_input_queue = true,
@@ -39,7 +39,9 @@ local base_template_settings = {
 					input = "combat_ability_pressed"
 				}
 			}
-		},
+		}
+	},
+	action_inputs = {
 		grenade_ability = {
 			buffer_time = 0,
 			clear_input_queue = true,
@@ -83,72 +85,94 @@ local base_template_settings = {
 				}
 			}
 		}
+	}
+}
+
+table.add_missing(base_template_settings.action_inputs, base_template_settings.combat_ability_action_inputs)
+
+base_template_settings.combat_ability_actions = {
+	combat_ability = {
+		slot_to_wield = "slot_combat_ability",
+		start_input = "combat_ability",
+		uninterruptible = true,
+		kind = "unwield_to_specific",
+		sprint_ready_up_time = 0,
+		total_time = 0,
+		allowed_chain_actions = {}
+	}
+}
+base_template_settings.grenade_ability_actions = {
+	grenade_ability = {
+		allowed_during_sprint = true,
+		slot_to_wield = "slot_grenade_ability",
+		start_input = "grenade_ability",
+		kind = "unwield_to_specific",
+		action_priority = 1,
+		uninterruptible = true,
+		total_time = 0,
+		allowed_chain_actions = {},
+		action_condition_func = function (action_settings, condition_func_params, used_input)
+			return not _quick_throw_allowed(action_settings, condition_func_params, used_input)
+		end
 	},
-	actions = {
-		combat_ability = {
-			slot_to_wield = "slot_combat_ability",
-			start_input = "combat_ability",
-			uninterruptible = true,
-			kind = "unwield_to_specific",
-			sprint_ready_up_time = 0,
-			total_time = 0,
-			allowed_chain_actions = {}
-		},
-		grenade_ability = {
-			allowed_during_sprint = true,
-			slot_to_wield = "slot_grenade_ability",
-			start_input = "grenade_ability",
-			kind = "unwield_to_specific",
-			action_priority = 1,
-			uninterruptible = true,
-			total_time = 0,
-			allowed_chain_actions = {},
-			action_condition_func = function (action_settings, condition_func_params, used_input)
-				return not _quick_throw_allowed(action_settings, condition_func_params, used_input)
-			end
-		},
-		grenade_ability_quick_throw = {
-			uninterruptible = true,
-			start_input = "grenade_ability",
-			stop_alternate_fire = true,
-			kind = "spawn_projectile",
-			sprint_requires_press_to_interrupt = false,
-			action_priority = 2,
-			use_ability_charge = true,
-			allowed_during_sprint = true,
-			ability_type = "grenade_ability",
-			anim_time_scale = 1.25,
-			time_scale_stat_buffs = false,
-			fire_time = 0.25,
-			override_origin_slot = "slot_grenade_ability",
-			anim_event = "ability_knife_throw",
-			total_time = 0.55,
-			action_movement_curve = {
-				{
-					modifier = 0.5,
-					t = 0.2
-				},
-				{
-					modifier = 0.4,
-					t = 0.3
-				},
-				{
-					modifier = 1,
-					t = 0.5
-				},
-				start_modifier = 0.8
+	grenade_ability_quick_throw = {
+		uninterruptible = true,
+		start_input = "grenade_ability",
+		stop_alternate_fire = true,
+		kind = "spawn_projectile",
+		sprint_requires_press_to_interrupt = false,
+		action_priority = 2,
+		use_ability_charge = true,
+		allowed_during_sprint = true,
+		ability_type = "grenade_ability",
+		anim_time_scale = 1.25,
+		time_scale_stat_buffs = false,
+		fire_time = 0.25,
+		override_origin_slot = "slot_grenade_ability",
+		anim_event = "ability_knife_throw",
+		total_time = 0.55,
+		action_movement_curve = {
+			{
+				modifier = 0.5,
+				t = 0.2
 			},
-			projectile_template = ProjectileTemplates.zealot_throwing_knives,
-			action_condition_func = function (action_settings, condition_func_params, used_input)
-				return _quick_throw_allowed(action_settings, condition_func_params, used_input)
-			end
-		}
+			{
+				modifier = 0.4,
+				t = 0.3
+			},
+			{
+				modifier = 1,
+				t = 0.5
+			},
+			start_modifier = 0.8
+		},
+		projectile_template = ProjectileTemplates.zealot_throwing_knives,
+		action_condition_func = function (action_settings, condition_func_params, used_input)
+			return _quick_throw_allowed(action_settings, condition_func_params, used_input)
+		end
+	}
+}
+base_template_settings.actions = {}
+
+table.add_missing(base_template_settings.actions, base_template_settings.combat_ability_actions)
+table.add_missing(base_template_settings.actions, base_template_settings.grenade_ability_actions)
+
+base_template_settings.action_input_hierarchy = {
+	{
+		transition = "stay",
+		input = "combat_ability"
 	},
-	action_input_hierarchy = {
-		grenade_ability = "stay",
-		combat_ability = "stay",
-		inspect_start = {
-			inspect_stop = "base"
+	{
+		transition = "stay",
+		input = "grenade_ability"
+	},
+	{
+		input = "inspect_start",
+		transition = {
+			{
+				transition = "base",
+				input = "inspect_stop"
+			}
 		}
 	}
 }

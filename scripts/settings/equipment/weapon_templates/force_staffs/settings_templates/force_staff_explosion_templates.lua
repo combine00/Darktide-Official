@@ -30,6 +30,11 @@ explosion_templates.default_force_staff_demolition = {
 	close_damage_type = damage_types.force_staff_explosion,
 	damage_profile = DamageProfileTemplates.default_force_staff_demolition,
 	damage_type = damage_types.force_staff_explosion,
+	broadphase_explosion_filter = {
+		"heroes",
+		"villains",
+		"destructibles"
+	},
 	scalable_vfx = {
 		{
 			radius_variable_name = "radius",
@@ -69,6 +74,11 @@ explosion_templates.force_staff_p4_demolition = {
 	close_damage_type = damage_types.force_staff_bfg,
 	damage_profile = DamageProfileTemplates.force_staff_p4_demolition,
 	damage_type = damage_types.force_staff_bfg,
+	broadphase_explosion_filter = {
+		"heroes",
+		"villains",
+		"destructibles"
+	},
 	scalable_vfx = {
 		{
 			radius_variable_name = "radius",
@@ -93,6 +103,11 @@ explosion_templates.default_force_staff_assault = {
 	close_damage_type = damage_types.force_staff_explosion,
 	damage_profile = DamageProfileTemplates.psyker_smite_heavy,
 	damage_type = damage_types.force_staff_explosion,
+	broadphase_explosion_filter = {
+		"heroes",
+		"villains",
+		"destructibles"
+	},
 	vfx = {
 		"content/fx/particles/abilities/psyker_smite_projectile_impact_01"
 	},

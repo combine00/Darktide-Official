@@ -95,6 +95,15 @@ local elements = {
 		}
 	},
 	{
+		package = "packages/ui/hud/weapon_counter/weapon_counter",
+		use_hud_scale = true,
+		class_name = "HudElementWeaponCounter",
+		filename = "scripts/ui/hud/elements/weapon_counter/hud_element_weapon_counter",
+		visibility_groups = {
+			"alive"
+		}
+	},
+	{
 		package = "packages/ui/hud/tactical_overlay/tactical_overlay",
 		use_hud_scale = false,
 		class_name = "HudElementTacticalOverlay",

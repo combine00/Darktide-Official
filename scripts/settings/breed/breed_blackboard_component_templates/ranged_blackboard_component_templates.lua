@@ -38,6 +38,11 @@ local ranged_base = {
 		lean_dot = "number",
 		controlled_aim_position = "Vector3Box",
 		controlled_aiming = "boolean"
+	},
+	gib_override = {
+		target_template = "string",
+		should_override = "boolean",
+		override_hit_zone_name = "string"
 	}
 }
 
@@ -77,15 +82,9 @@ cultist_flamer.slot = nil
 cultist_flamer.blocked = nil
 cultist_flamer.suppression = nil
 cultist_flamer.statistics = {
-	flamer_effect_id = "number",
 	flamer_backpack_impacts = "number",
 	num_attacks_done = "number",
 	num_in_liquid = "number"
-}
-cultist_flamer.gib_override = {
-	target_template = "string",
-	should_override = "boolean",
-	override_hit_zone_name = "string"
 }
 local renegade_flamer = table.clone(cultist_flamer)
 local grenadier = table.clone(ranged_base)
@@ -199,6 +198,11 @@ renegade_twin_captain_two.nearby_units_broadphase = {
 	next_broadphase_t = "number",
 	num_units = "number"
 }
+local renegade_radio_operator = table.clone(riflemen)
+renegade_radio_operator.summon = {
+	next_summon_t = "number",
+	amount = "number"
+}
 local templates = {
 	cultist_flamer = cultist_flamer,
 	grenadier = grenadier,
@@ -206,12 +210,13 @@ local templates = {
 	ranged_base = ranged_base,
 	ranged_cover_user = ranged_cover_user,
 	ranged_patroller = ranged_patroller,
-	renegade_flamer = renegade_flamer,
 	ranged_patroller_no_suppression = ranged_patroller_no_suppression,
-	riflemen = riflemen,
-	sniper = sniper,
+	renegade_flamer = renegade_flamer,
+	renegade_radio_operator = renegade_radio_operator,
 	renegade_twin_captain = renegade_twin_captain,
-	renegade_twin_captain_two = renegade_twin_captain_two
+	renegade_twin_captain_two = renegade_twin_captain_two,
+	riflemen = riflemen,
+	sniper = sniper
 }
 
 return templates

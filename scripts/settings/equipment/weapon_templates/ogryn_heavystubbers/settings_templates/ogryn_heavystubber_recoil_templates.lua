@@ -170,86 +170,6 @@ local assault_random_scale_m2 = {
 		}
 	}
 }
-local killshot_scale = {
-	{
-		1,
-		{
-			1,
-			1
-		}
-	},
-	{
-		6,
-		{
-			0.2,
-			0.5
-		}
-	},
-	{
-		15,
-		{
-			0.15,
-			0.3
-		}
-	},
-	{
-		30,
-		{
-			0.3,
-			0.1
-		}
-	}
-}
-local killshot_random_scale = {
-	{
-		1,
-		{
-			0.1,
-			0.25
-		}
-	},
-	{
-		3,
-		{
-			0.2,
-			0.5
-		}
-	},
-	{
-		6,
-		{
-			0.3,
-			0.6
-		}
-	},
-	{
-		10,
-		{
-			0.5,
-			0.7
-		}
-	},
-	{
-		20,
-		{
-			0.4,
-			1
-		}
-	},
-	{
-		30,
-		{
-			0.5,
-			1
-		}
-	}
-}
-local num_shot = 30
-local pitch_base = 0.2
-local yaw_base = 0
-local lerp_distance = 0.75
-local killshot_offset_range = generate_offset_range(num_shot, 0.125, 0, lerp_distance, create_scale(killshot_scale))
-local killshot_random_range = generate_offset_range(30, 0.04, 0.03, 0.75, create_scale(killshot_random_scale))
 local assault_offset_range = generate_offset_range(30, 0.015, 0, 0.95, create_scale(assault_scale))
 local assault_random_range = generate_offset_range(30, 0.01, 0.02, 0.95, create_scale(assault_random_scale))
 local assault_offset_range_m2 = generate_offset_range(50, 0.045, 0, 0.75, create_scale(assault_scale_m2))
@@ -740,11 +660,6 @@ recoil_templates.default_ogryn_heavystubber_recoil_spraynpray_brace = {
 		}
 	}
 }
-local firerate = 0.096
-local shot_decay = 3.5
-local rise_time = 0.04784000000000001
-local decay_time = firerate - rise_time
-local shot_rise = decay_time * shot_decay
 recoil_templates.default_ogryn_heavystubber_recoil_spraynpray_hip_m2 = {
 	still = {
 		camera_recoil_percentage = 0.85,
@@ -1438,8 +1353,8 @@ recoil_templates.recoil_ogryn_heavystubber_p2_m3_braced = {
 					0.0825
 				},
 				yaw = {
-					-0.02,
-					0.0325
+					-0.015,
+					0.0275
 				}
 			},
 			{
@@ -1448,8 +1363,8 @@ recoil_templates.recoil_ogryn_heavystubber_p2_m3_braced = {
 					0.07
 				},
 				yaw = {
-					-0.02,
-					0.0375
+					-0.015,
+					0.0275
 				}
 			},
 			{
@@ -1458,8 +1373,8 @@ recoil_templates.recoil_ogryn_heavystubber_p2_m3_braced = {
 					0.0625
 				},
 				yaw = {
-					-0.02,
-					0.0375
+					-0.015,
+					0.0275
 				}
 			},
 			{
@@ -1468,8 +1383,8 @@ recoil_templates.recoil_ogryn_heavystubber_p2_m3_braced = {
 					0.0475
 				},
 				yaw = {
-					-0.02,
-					0.0375
+					-0.015,
+					0.0275
 				}
 			}
 		},

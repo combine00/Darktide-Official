@@ -18,9 +18,7 @@ local mission_templates = {
 		zone_id = "operations",
 		mission_description = "loc_mission_board_main_objective_train_description",
 		pickup_pool = "operations_distribution_pool",
-		testify_flags = {
-			validate_minion_pathing_on_mission = false
-		},
+		testify_flags = {},
 		cinematics = {
 			intro_abc = {
 				"c_cam"
@@ -62,6 +60,7 @@ local mission_templates = {
 		},
 		mission_brief_vo = {
 			vo_profile = "sergeant_a",
+			wwise_state = "None",
 			wwise_route_key = 1,
 			mission_giver_packs = {
 				sergeant_a = {

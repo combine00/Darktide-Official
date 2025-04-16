@@ -9,7 +9,12 @@ local cultist_gunner_default = {
 	spread = math.degrees_to_radians(1.5),
 	effect_template = EffectTemplates.cultist_gunner_stubber,
 	damage_type = damage_types.minion_auto_bullet,
-	line_effect = LineEffects.cultist_autogun_bullet
+	line_effect = LineEffects.cultist_autogun_bullet,
+	damage_falloff = {
+		falloff_range = 30,
+		max_range = 30,
+		max_power_reduction = 0.5
+	}
 }
 local cultist_gunner_sweep = table.clone(cultist_gunner_default)
 cultist_gunner_sweep.hit_scan_template = HitScanTemplates.gunner_bullet

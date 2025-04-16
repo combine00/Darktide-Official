@@ -6,6 +6,20 @@ local gadget_traits_common = {}
 table.make_unique(gadget_traits_common)
 
 gadget_traits_common.gadget_toughness_increase = {
+	format_values = {
+		toughness_bonus = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "gadget_toughness_increase",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.toughness_bonus
+				}
+			}
+		}
+	},
 	buffs = {
 		gadget_toughness_increase = {
 			{
@@ -32,6 +46,20 @@ gadget_traits_common.gadget_toughness_increase = {
 	}
 }
 gadget_traits_common.gadget_health_increase = {
+	format_values = {
+		max_health_modifier = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "gadget_health_increase",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.max_health_modifier
+				}
+			}
+		}
+	},
 	buffs = {
 		gadget_health_increase = {
 			{
@@ -58,6 +86,23 @@ gadget_traits_common.gadget_health_increase = {
 	}
 }
 gadget_traits_common.gadget_toughness_damage_reduction = {
+	format_values = {
+		toughness_damage_modifier = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "gadget_toughness_damage_reduction",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.toughness_damage_taken_multiplier
+				}
+			},
+			value_manipulation = function (value)
+				return 100 - value * 100
+			end
+		}
+	},
 	buffs = {
 		gadget_toughness_damage_reduction = {
 			{
@@ -93,7 +138,64 @@ gadget_traits_common.gadget_stamina_increase = {
 		}
 	}
 }
+gadget_traits_common.gadget_innate_ammo_increase = {
+	buffs = {
+		gadget_innate_ammo_increase = {
+			{},
+			{},
+			{},
+			{}
+		}
+	}
+}
+gadget_traits_common.gadget_innate_health_increase = {
+	buffs = {
+		gadget_innate_health_increase = {
+			{},
+			{},
+			{},
+			{}
+		}
+	}
+}
+gadget_traits_common.gadget_innate_max_wounds_increase = {
+	buffs = {
+		gadget_innate_max_wounds_increase = {
+			{},
+			{},
+			{},
+			{}
+		}
+	}
+}
+gadget_traits_common.gadget_innate_toughness_increase = {
+	buffs = {
+		gadget_innate_toughness_increase = {
+			{},
+			{},
+			{},
+			{}
+		}
+	}
+}
 gadget_traits_common.gadget_damage_reduction_vs_flamers = {
+	format_values = {
+		damage_reduction = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "gadget_damage_reduction_vs_flamers",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.damage_taken_by_cultist_flamer_multiplier
+				}
+			},
+			value_manipulation = function (value)
+				return 100 - value * 100
+			end
+		}
+	},
 	buffs = {
 		gadget_damage_reduction_vs_flamers = {
 			{
@@ -124,6 +226,23 @@ gadget_traits_common.gadget_damage_reduction_vs_flamers = {
 	}
 }
 gadget_traits_common.gadget_damage_reduction_vs_snipers = {
+	format_values = {
+		damage_reduction = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "gadget_damage_reduction_vs_snipers",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.damage_taken_by_renegade_sniper_multiplier
+				}
+			},
+			value_manipulation = function (value)
+				return 100 - value * 100
+			end
+		}
+	},
 	buffs = {
 		gadget_damage_reduction_vs_snipers = {
 			{
@@ -150,6 +269,23 @@ gadget_traits_common.gadget_damage_reduction_vs_snipers = {
 	}
 }
 gadget_traits_common.gadget_damage_reduction_vs_grenadiers = {
+	format_values = {
+		damage_reduction = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "gadget_damage_reduction_vs_grenadiers",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.damage_taken_by_renegade_grenadier_multiplier
+				}
+			},
+			value_manipulation = function (value)
+				return 100 - value * 100
+			end
+		}
+	},
 	buffs = {
 		gadget_damage_reduction_vs_grenadiers = {
 			{
@@ -180,6 +316,23 @@ gadget_traits_common.gadget_damage_reduction_vs_grenadiers = {
 	}
 }
 gadget_traits_common.gadget_damage_reduction_vs_hounds = {
+	format_values = {
+		damage_reduction = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "gadget_damage_reduction_vs_hounds",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.damage_taken_by_chaos_hound_multiplier
+				}
+			},
+			value_manipulation = function (value)
+				return 100 - value * 100
+			end
+		}
+	},
 	buffs = {
 		gadget_damage_reduction_vs_hounds = {
 			{
@@ -206,6 +359,23 @@ gadget_traits_common.gadget_damage_reduction_vs_hounds = {
 	}
 }
 gadget_traits_common.gadget_damage_reduction_vs_mutants = {
+	format_values = {
+		damage_reduction = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "gadget_damage_reduction_vs_mutants",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.damage_taken_by_cultist_mutant_multiplier
+				}
+			},
+			value_manipulation = function (value)
+				return 100 - value * 100
+			end
+		}
+	},
 	buffs = {
 		gadget_damage_reduction_vs_mutants = {
 			{
@@ -232,6 +402,23 @@ gadget_traits_common.gadget_damage_reduction_vs_mutants = {
 	}
 }
 gadget_traits_common.gadget_damage_reduction_vs_gunners = {
+	format_values = {
+		damage_reduction = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "gadget_damage_reduction_vs_gunners",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.damage_taken_by_cultist_gunner_multiplier
+				}
+			},
+			value_manipulation = function (value)
+				return 100 - value * 100
+			end
+		}
+	},
 	buffs = {
 		gadget_damage_reduction_vs_gunners = {
 			{
@@ -266,6 +453,23 @@ gadget_traits_common.gadget_damage_reduction_vs_gunners = {
 	}
 }
 gadget_traits_common.gadget_damage_reduction_vs_bombers = {
+	format_values = {
+		damage_reduction = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "gadget_damage_reduction_vs_bombers",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.damage_taken_by_chaos_poxwalker_bomber_multiplier
+				}
+			},
+			value_manipulation = function (value)
+				return 100 - value * 100
+			end
+		}
+	},
 	buffs = {
 		gadget_damage_reduction_vs_bombers = {
 			{
@@ -292,6 +496,23 @@ gadget_traits_common.gadget_damage_reduction_vs_bombers = {
 	}
 }
 gadget_traits_common.gadget_corruption_resistance = {
+	format_values = {
+		corruption_taken_multiplier = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "gadget_corruption_resistance",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.corruption_taken_multiplier
+				}
+			},
+			value_manipulation = function (value)
+				return 100 - value * 100
+			end
+		}
+	},
 	buffs = {
 		gadget_corruption_resistance = {
 			{
@@ -318,6 +539,20 @@ gadget_traits_common.gadget_corruption_resistance = {
 	}
 }
 gadget_traits_common.gadget_mission_xp_increase = {
+	format_values = {
+		mission_reward_xp_modifier = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "gadget_mission_xp_increase",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					meta_stat_buffs.mission_reward_xp_modifier
+				}
+			}
+		}
+	},
 	buffs = {
 		gadget_mission_xp_increase = {
 			{
@@ -344,6 +579,20 @@ gadget_traits_common.gadget_mission_xp_increase = {
 	}
 }
 gadget_traits_common.gadget_mission_credits_increase = {
+	format_values = {
+		mission_reward_credit_modifier = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "gadget_mission_credits_increase",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					meta_stat_buffs.mission_reward_credit_modifier
+				}
+			}
+		}
+	},
 	buffs = {
 		gadget_mission_credits_increase = {
 			{
@@ -370,6 +619,20 @@ gadget_traits_common.gadget_mission_credits_increase = {
 	}
 }
 gadget_traits_common.gadget_mission_reward_gear_instead_of_weapon_increase = {
+	format_values = {
+		mission_reward_gear_instead_of_weapon_modifier = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "gadget_mission_reward_gear_instead_of_weapon_increase",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					meta_stat_buffs.mission_reward_gear_instead_of_weapon_modifier
+				}
+			}
+		}
+	},
 	buffs = {
 		gadget_mission_reward_gear_instead_of_weapon_increase = {
 			{
@@ -396,6 +659,23 @@ gadget_traits_common.gadget_mission_reward_gear_instead_of_weapon_increase = {
 	}
 }
 gadget_traits_common.gadget_permanent_damage_resistance = {
+	format_values = {
+		permanent_damage_converter_resistance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "gadget_permanent_damage_resistance",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.corruption_taken_grimoire_multiplier
+				}
+			},
+			value_manipulation = function (value)
+				return 100 - value * 100
+			end
+		}
+	},
 	buffs = {
 		gadget_permanent_damage_resistance = {
 			{
@@ -422,6 +702,20 @@ gadget_traits_common.gadget_permanent_damage_resistance = {
 	}
 }
 gadget_traits_common.gadget_revive_speed_increase = {
+	format_values = {
+		revive_speed_modifier = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "gadget_revive_speed_increase",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.revive_speed_modifier
+				}
+			}
+		}
+	},
 	buffs = {
 		gadget_revive_speed_increase = {
 			{
@@ -448,6 +742,23 @@ gadget_traits_common.gadget_revive_speed_increase = {
 	}
 }
 gadget_traits_common.gadget_cooldown_reduction = {
+	format_values = {
+		ability_cooldown_modifier = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "gadget_cooldown_reduction",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.ability_cooldown_modifier
+				}
+			},
+			value_manipulation = function (value)
+				return -value * 100
+			end
+		}
+	},
 	buffs = {
 		gadget_cooldown_reduction = {
 			{
@@ -474,6 +785,23 @@ gadget_traits_common.gadget_cooldown_reduction = {
 	}
 }
 gadget_traits_common.gadget_sprint_cost_reduction = {
+	format_values = {
+		sprinting_cost_multiplier = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "gadget_sprint_cost_reduction",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.sprinting_cost_multiplier
+				}
+			},
+			value_manipulation = function (value)
+				return 100 - value * 100
+			end
+		}
+	},
 	buffs = {
 		gadget_sprint_cost_reduction = {
 			{
@@ -500,6 +828,23 @@ gadget_traits_common.gadget_sprint_cost_reduction = {
 	}
 }
 gadget_traits_common.gadget_block_cost_reduction = {
+	format_values = {
+		block_cost_multiplier = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "gadget_block_cost_reduction",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.block_cost_multiplier
+				}
+			},
+			value_manipulation = function (value)
+				return 100 - value * 100
+			end
+		}
+	},
 	buffs = {
 		gadget_block_cost_reduction = {
 			{
@@ -526,6 +871,20 @@ gadget_traits_common.gadget_block_cost_reduction = {
 	}
 }
 gadget_traits_common.gadget_stamina_regeneration = {
+	format_values = {
+		stamina_regeneration_modifier = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "gadget_stamina_regeneration",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.stamina_regeneration_modifier
+				}
+			}
+		}
+	},
 	buffs = {
 		gadget_stamina_regeneration = {
 			{
@@ -552,6 +911,20 @@ gadget_traits_common.gadget_stamina_regeneration = {
 	}
 }
 gadget_traits_common.gadget_toughness_regen_delay = {
+	format_values = {
+		toughness_regen_delay_multiplier = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "gadget_toughness_regen_delay",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.toughness_regen_rate_modifier
+				}
+			}
+		}
+	},
 	buffs = {
 		gadget_toughness_regen_delay = {
 			{

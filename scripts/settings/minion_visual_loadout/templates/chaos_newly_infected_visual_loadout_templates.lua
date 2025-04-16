@@ -8,6 +8,7 @@ local templates = {
 local basic_newly_infected_template = {
 	slots = {
 		slot_body = {
+			use_outline = true,
 			items = {
 				"content/items/characters/minions/chaos_traitor_guard/attachments_base/newly_infected_body_a"
 			}
@@ -28,8 +29,9 @@ local basic_newly_infected_template = {
 			}
 		},
 		slot_melee_weapon = {
-			drop_on_death = true,
+			use_outline = true,
 			is_weapon = true,
+			drop_on_death = true,
 			items = {
 				"content/items/weapons/minions/melee/renegade_melee_weapon_01",
 				"content/items/weapons/minions/melee/renegade_melee_weapon_02",
@@ -40,6 +42,7 @@ local basic_newly_infected_template = {
 			}
 		},
 		slot_hair = {
+			use_outline = true,
 			items = {
 				"content/items/characters/minions/chaos_traitor_guard/attachments_base/hair_a",
 				"content/items/characters/minions/chaos_traitor_guard/attachments_base/hair_a_var_01",
@@ -116,6 +119,7 @@ default_1.gib_variations = {
 	"lowerbody_b"
 }
 default_1.slots.slot_lowerbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_b",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_b_var_01",
@@ -130,6 +134,7 @@ default_2.gib_variations = {
 	"lowerbody_c"
 }
 default_2.slots.slot_lowerbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_c",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_c_var_01",
@@ -145,6 +150,7 @@ default_3.gib_variations = {
 	"lowerbody_b"
 }
 default_3.slots.slot_lowerbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_b",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_b_var_01",
@@ -155,6 +161,7 @@ default_3.slots.slot_lowerbody = {
 	}
 }
 default_3.slots.slot_upperbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_upperbody_a",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_upperbody_a_var_01",
@@ -176,6 +183,7 @@ default_4.gib_variations = {
 	"lowerbody_c"
 }
 default_4.slots.slot_lowerbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_c",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_c_var_01",
@@ -186,6 +194,7 @@ default_4.slots.slot_lowerbody = {
 	}
 }
 default_4.slots.slot_upperbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_upperbody_a",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_upperbody_a_var_01",
@@ -207,6 +216,7 @@ default_5.gib_variations = {
 	"lowerbody_a"
 }
 default_5.slots.slot_lowerbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_a",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_a_var_01",
@@ -217,6 +227,7 @@ default_5.slots.slot_lowerbody = {
 	}
 }
 default_5.slots.slot_upperbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_upperbody_b",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_upperbody_b_var_01",
@@ -232,6 +243,7 @@ default_6.gib_variations = {
 	"lowerbody_b"
 }
 default_6.slots.slot_lowerbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_b",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_b_var_01",
@@ -242,6 +254,7 @@ default_6.slots.slot_lowerbody = {
 	}
 }
 default_6.slots.slot_upperbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_upperbody_b",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_upperbody_b_var_01",
@@ -257,6 +270,7 @@ default_7.gib_variations = {
 	"lowerbody_c"
 }
 default_7.slots.slot_lowerbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_c",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_c_var_01",
@@ -267,6 +281,7 @@ default_7.slots.slot_lowerbody = {
 	}
 }
 default_7.slots.slot_upperbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_upperbody_b",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_upperbody_b_var_01",
@@ -287,6 +302,7 @@ default_8.slots.slot_hair = {
 	}
 }
 default_8.slots.slot_lowerbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_b",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_b_var_01",
@@ -297,6 +313,7 @@ default_8.slots.slot_lowerbody = {
 	}
 }
 default_8.slots.slot_upperbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_upperbody_c",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_upperbody_c_var_01",
@@ -317,6 +334,7 @@ default_9.slots.slot_hair = {
 	}
 }
 default_9.slots.slot_lowerbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_c",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_c_var_01",
@@ -327,6 +345,7 @@ default_9.slots.slot_lowerbody = {
 	}
 }
 default_9.slots.slot_upperbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_upperbody_c",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_upperbody_c_var_01",
@@ -342,6 +361,7 @@ default_10.gib_variations = {
 	"lowerbody_b"
 }
 default_10.slots.slot_lowerbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_b",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_b_var_01",
@@ -352,6 +372,7 @@ default_10.slots.slot_lowerbody = {
 	}
 }
 default_10.slots.slot_upperbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_upperbody_d",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_upperbody_d_var_01",
@@ -367,6 +388,7 @@ default_11.gib_variations = {
 	"lowerbody_c"
 }
 default_11.slots.slot_lowerbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_c",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_c_var_01",
@@ -377,6 +399,7 @@ default_11.slots.slot_lowerbody = {
 	}
 }
 default_11.slots.slot_upperbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_upperbody_d",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_upperbody_d_var_01",
@@ -392,6 +415,7 @@ default_12.gib_variations = {
 	"lowerbody_b"
 }
 default_12.slots.slot_lowerbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_b",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_b_var_01",
@@ -402,6 +426,7 @@ default_12.slots.slot_lowerbody = {
 	}
 }
 default_12.slots.slot_upperbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_upperbody_e",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_upperbody_e_var_01",
@@ -423,6 +448,7 @@ default_13.gib_variations = {
 	"lowerbody_c"
 }
 default_13.slots.slot_lowerbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_c",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_c_var_01",
@@ -433,6 +459,7 @@ default_13.slots.slot_lowerbody = {
 	}
 }
 default_13.slots.slot_upperbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_upperbody_e",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_upperbody_e_var_01",
@@ -454,6 +481,7 @@ default_14.gib_variations = {
 	"lowerbody_b"
 }
 default_14.slots.slot_lowerbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_b",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_b_var_01",
@@ -464,6 +492,7 @@ default_14.slots.slot_lowerbody = {
 	}
 }
 default_14.slots.slot_upperbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_upperbody_f",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_upperbody_f_var_01",
@@ -485,6 +514,7 @@ default_15.gib_variations = {
 	"lowerbody_c"
 }
 default_15.slots.slot_lowerbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_c",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_c_var_01",
@@ -495,6 +525,7 @@ default_15.slots.slot_lowerbody = {
 	}
 }
 default_15.slots.slot_upperbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_upperbody_f",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_upperbody_f_var_01",
@@ -516,6 +547,7 @@ default_16.gib_variations = {
 	"lowerbody_b"
 }
 default_16.slots.slot_lowerbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_b",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_b_var_01",
@@ -526,6 +558,7 @@ default_16.slots.slot_lowerbody = {
 	}
 }
 default_16.slots.slot_upperbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_fullbody_a",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_fullbody_a_var_01",
@@ -547,6 +580,7 @@ default_17.gib_variations = {
 	"lowerbody_c"
 }
 default_17.slots.slot_lowerbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_c",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_c_var_01",
@@ -557,6 +591,7 @@ default_17.slots.slot_lowerbody = {
 	}
 }
 default_17.slots.slot_upperbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_fullbody_a",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_fullbody_a_var_01",
@@ -577,6 +612,7 @@ default_18.gib_variations = {
 	"fullbody_a"
 }
 default_18.slots.slot_upperbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_fullbody_a",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_fullbody_a_var_01",
@@ -594,6 +630,7 @@ default_18.slots.slot_upperbody_decal = {
 }
 local default_19 = table.clone(default_16)
 default_19.slots.slot_lowerbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_b_var_foundry_01",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_lowerbody_b_var_foundry_02",
@@ -602,6 +639,7 @@ default_19.slots.slot_lowerbody = {
 	}
 }
 default_19.slots.slot_upperbody = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_fullbody_a_var_foundry_01",
 		"content/items/characters/minions/chaos_traitor_guard/attachments_gear/newly_infected_fullbody_a_var_foundry_02",
@@ -627,6 +665,7 @@ default_20.gib_variations = {
 	"lowerbody_b"
 }
 default_20.slots.slot_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/newly_infected_body_b"
 	}
@@ -637,6 +676,7 @@ default_21.gib_variations = {
 	"lowerbody_c"
 }
 default_21.slots.slot_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/newly_infected_body_b"
 	}
@@ -649,6 +689,7 @@ default_22.gib_variations = {
 	"lowerbody_b"
 }
 default_22.slots.slot_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/newly_infected_body_b"
 	}
@@ -662,6 +703,7 @@ default_23.gib_variations = {
 }
 default_23.variation = variations.default_4
 default_23.slots.slot_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/newly_infected_body_b"
 	}
@@ -674,6 +716,7 @@ default_24.gib_variations = {
 	"lowerbody_a"
 }
 default_24.slots.slot_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/newly_infected_body_b"
 	}
@@ -686,6 +729,7 @@ default_25.gib_variations = {
 	"lowerbody_b"
 }
 default_25.slots.slot_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/newly_infected_body_b"
 	}
@@ -698,6 +742,7 @@ default_26.gib_variations = {
 	"lowerbody_c"
 }
 default_26.slots.slot_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/newly_infected_body_b"
 	}
@@ -709,6 +754,7 @@ default_27.gib_variations = {
 	"lowerbody_b"
 }
 default_27.slots.slot_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/newly_infected_body_b"
 	}
@@ -725,6 +771,7 @@ default_28.slots.slot_hair = {
 	}
 }
 default_28.slots.slot_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/newly_infected_body_b"
 	}
@@ -742,6 +789,7 @@ default_29.slots.slot_hair = {
 	}
 }
 default_29.slots.slot_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/newly_infected_body_b"
 	}
@@ -754,6 +802,7 @@ default_30.gib_variations = {
 	"lowerbody_c"
 }
 default_30.slots.slot_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/newly_infected_body_b"
 	}
@@ -766,6 +815,7 @@ default_31.gib_variations = {
 	"lowerbody_b"
 }
 default_31.slots.slot_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/newly_infected_body_b"
 	}
@@ -778,6 +828,7 @@ default_32.gib_variations = {
 	"lowerbody_c"
 }
 default_32.slots.slot_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/newly_infected_body_b"
 	}
@@ -790,6 +841,7 @@ default_32.gib_variations = {
 	"lowerbody_b"
 }
 default_33.slots.slot_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/newly_infected_body_b"
 	}
@@ -802,6 +854,7 @@ default_34.gib_variations = {
 	"lowerbody_c"
 }
 default_34.slots.slot_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/newly_infected_body_b"
 	}
@@ -814,6 +867,7 @@ default_35.gib_variations = {
 	"lowerbody_b"
 }
 default_35.slots.slot_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/newly_infected_body_b"
 	}
@@ -826,6 +880,7 @@ default_36.gib_variations = {
 	"lowerbody_c"
 }
 default_36.slots.slot_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/newly_infected_body_b"
 	}
@@ -837,12 +892,14 @@ default_37.gib_variations = {
 	"head_body_01_var_01"
 }
 default_37.slots.slot_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/newly_infected_body_b"
 	}
 }
 local default_38 = table.clone(default_37)
 default_38.slots.slot_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_traitor_guard/attachments_base/newly_infected_body_b"
 	}

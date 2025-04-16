@@ -57,10 +57,9 @@ function ActionWeaponBase:start(action_settings, t, time_scale, action_start_par
 	self:_setup_charge_template(action_settings)
 
 	if action_settings.stop_alternate_fire and self._alternate_fire_component.is_active then
-		local skip_unaim_anim = not not action_settings.skip_unaim_anim
 		local from_action_input = true
 
-		AlternateFire.stop(self._alternate_fire_component, self._peeking_component, self._first_person_extension, self._weapon_tweak_templates_component, self._animation_extension, self._weapon_template, skip_unaim_anim, self._player_unit, from_action_input)
+		AlternateFire.stop(self._alternate_fire_component, self._peeking_component, self._first_person_extension, self._weapon_tweak_templates_component, self._animation_extension, self._weapon_template, self._player_unit, from_action_input)
 	end
 
 	local use_ability_charge = action_settings.use_ability_charge
@@ -73,6 +72,8 @@ function ActionWeaponBase:start(action_settings, t, time_scale, action_start_par
 	if action_settings.delay_explosion_to_finish then
 		self._prevent_explosion = true
 	end
+
+	self:_set_haptic_trigger_template(self._action_settings, self._weapon_template)
 end
 
 function ActionWeaponBase:finish(reason, data, t, time_in_action)
@@ -100,6 +101,27 @@ function ActionWeaponBase:finish(reason, data, t, time_in_action)
 
 		WarpCharge.check_and_set_state(t, warp_charge_component, buff_extension)
 	end
+
+	self:_set_haptic_trigger_template(nil, self._weapon_template)
+end
+
+function ActionWeaponBase:_set_haptic_trigger_template(action_settings, weapon_template)
+	if not IS_PLAYSTATION then
+		return
+	end
+
+	if self._is_local_unit and self._is_human_controlled then
+		local inventory_component = self._inventory_component
+		local wielded_slot = inventory_component.wielded_slot
+		local condition_func_params = wielded_slot ~= "none" and self._weapon_extension:condition_func_params(wielded_slot)
+
+		Managers.input.haptic_trigger_effects:set_haptic_trigger_template(action_settings, weapon_template, condition_func_params)
+	end
+end
+
+function ActionWeaponBase:server_correction_occurred()
+	ActionWeaponBase.super.server_correction_occurred(self)
+	self:_set_haptic_trigger_template(self._action_settings, self._weapon_template)
 end
 
 function ActionWeaponBase:_check_for_critical_strike(is_melee, is_ranged, action_auto_crit, should_crit)
@@ -150,6 +172,15 @@ function ActionWeaponBase:_check_for_lucky_strike(is_melee, is_ranged, chance)
 		return
 	end
 
+	local buff_extension = self._buff_extension
+	local stat_buffs = buff_extension:stat_buffs()
+	local leadbelcher_chance_bonus = stat_buffs.leadbelcher_chance_bonus
+	chance = chance + leadbelcher_chance_bonus
+
+	if buff_extension:has_keyword("guaranteed_leadbelcher") then
+		chance = 1
+	end
+
 	local critical_strike_component = self._critical_strike_component
 	local seed = critical_strike_component.seed
 	local prd_state = critical_strike_component.prd_state
@@ -193,7 +224,7 @@ end
 function ActionWeaponBase:_setup_charge_template(action_settings)
 	local weapon_tweak_templates_component = self._weapon_tweak_templates_component
 	local weapon_template = self._weapon_template
-	local charge_template = action_settings.charge_template or weapon_template.charge_template or "none"
+	local charge_template = action_settings.charge_template or weapon_template.charge_template or weapon_template.special_charge_template or "none"
 	weapon_tweak_templates_component.charge_template_name = charge_template
 end
 

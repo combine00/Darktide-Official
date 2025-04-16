@@ -9,6 +9,30 @@ end
 
 local stat_buffs = BuffSettings.stat_buffs
 templates.weapon_trait_bespoke_autogun_p1_consecutive_hits_increases_close_damage = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_autogun_p1_consecutive_hits_increases_close_damage_parent",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.damage_near
+				}
+			}
+		},
+		stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_autogun_p1_consecutive_hits_increases_close_damage_child",
+				find_value_type = "buff_template",
+				path = {
+					"max_stacks"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_autogun_p1_consecutive_hits_increases_close_damage_parent = {
 			{
@@ -35,6 +59,32 @@ templates.weapon_trait_bespoke_autogun_p1_consecutive_hits_increases_close_damag
 	}
 }
 templates.weapon_trait_bespoke_autogun_p1_hipfire_while_sprinting = {
+	format_values = {
+		weapon_spread = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_autogun_p1_hipfire_while_sprinting",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.spread_modifier
+				}
+			}
+		},
+		damage_near = {
+			prefix = "-",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_autogun_p1_hipfire_while_sprinting",
+				find_value_type = "trait_override",
+				path = {
+					"conditional_stat_buffs",
+					stat_buffs.damage_near
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_autogun_p1_hipfire_while_sprinting = {
 			{
@@ -73,6 +123,40 @@ templates.weapon_trait_bespoke_autogun_p1_hipfire_while_sprinting = {
 	}
 }
 templates.weapon_trait_bespoke_autogun_p1_increase_power_on_close_kill = {
+	format_values = {
+		power_level = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_autogun_p1_increase_power_on_close_kill_parent",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.power_level_modifier
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_autogun_p1_increase_power_on_close_kill_parent",
+				find_value_type = "trait_override",
+				path = {
+					"child_duration"
+				}
+			}
+		},
+		stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_autogun_p1_increase_power_on_close_kill_child",
+				find_value_type = "buff_template",
+				path = {
+					"max_stacks"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_autogun_p1_increase_power_on_close_kill_parent = {
 			{
@@ -103,6 +187,40 @@ templates.weapon_trait_bespoke_autogun_p1_increase_power_on_close_kill = {
 	}
 }
 templates.weapon_trait_bespoke_autogun_p1_increase_close_damage_on_close_kill = {
+	format_values = {
+		close_damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_autogun_p1_increase_close_damage_on_close_kill_parent",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.damage_near
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_autogun_p1_increase_close_damage_on_close_kill_parent",
+				find_value_type = "trait_override",
+				path = {
+					"child_duration"
+				}
+			}
+		},
+		stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_autogun_p1_increase_close_damage_on_close_kill_child",
+				find_value_type = "buff_template",
+				path = {
+					"max_stacks"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_autogun_p1_increase_close_damage_on_close_kill_parent = {
 			{
@@ -133,6 +251,30 @@ templates.weapon_trait_bespoke_autogun_p1_increase_close_damage_on_close_kill = 
 	}
 }
 templates.weapon_trait_bespoke_autogun_p1_increase_damage_on_close_kill = {
+	format_values = {
+		movement_speed = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_autogun_p1_increase_damage_on_close_kill_parent",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.damage
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_autogun_p1_increase_damage_on_close_kill_parent",
+				find_value_type = "trait_override",
+				path = {
+					"child_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_autogun_p1_increase_damage_on_close_kill_parent = {
 			{
@@ -163,6 +305,20 @@ templates.weapon_trait_bespoke_autogun_p1_increase_damage_on_close_kill = {
 	}
 }
 templates.weapon_trait_bespoke_autogun_p1_suppression_on_close_kill = {
+	format_values = {
+		range = {
+			format_type = "string",
+			find_value = {
+				find_value_type = "rarity_value",
+				trait_value = {
+					"5m",
+					"6m",
+					"7m",
+					"8m"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_autogun_p1_suppression_on_close_kill = {
 			{
@@ -201,6 +357,18 @@ templates.weapon_trait_bespoke_autogun_p1_suppression_on_close_kill = {
 	}
 }
 templates.weapon_trait_bespoke_autogun_p1_count_as_dodge_vs_ranged_on_close_kill = {
+	format_values = {
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_autogun_p1_count_as_dodge_vs_ranged_on_close_kill",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_autogun_p1_count_as_dodge_vs_ranged_on_close_kill = {
 			{
@@ -219,6 +387,30 @@ templates.weapon_trait_bespoke_autogun_p1_count_as_dodge_vs_ranged_on_close_kill
 	}
 }
 templates.weapon_trait_bespoke_autogun_p1_reload_speed_on_dodge = {
+	format_values = {
+		reload_speed = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_autogun_p1_reload_speed_on_dodge",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.reload_speed
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_autogun_p1_reload_speed_on_dodge",
+				find_value_type = "buff_template",
+				path = {
+					"active_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_autogun_p1_reload_speed_on_dodge = {
 			{
@@ -245,6 +437,40 @@ templates.weapon_trait_bespoke_autogun_p1_reload_speed_on_dodge = {
 	}
 }
 templates.weapon_trait_bespoke_autogun_p1_reload_speed_on_slide = {
+	format_values = {
+		reload_speed = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_autogun_p1_reload_speed_on_slide_parent",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.reload_speed
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_autogun_p1_reload_speed_on_slide_parent",
+				find_value_type = "trait_override",
+				path = {
+					"child_duration"
+				}
+			}
+		},
+		stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_autogun_p1_reload_speed_on_slide_child",
+				find_value_type = "buff_template",
+				path = {
+					"max_stacks"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_autogun_p1_reload_speed_on_slide_parent = {
 			{
@@ -275,6 +501,20 @@ templates.weapon_trait_bespoke_autogun_p1_reload_speed_on_slide = {
 	}
 }
 templates.weapon_trait_bespoke_autogun_p1_allow_flanking_and_increased_damage_when_flanking = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_autogun_p1_allow_flanking_and_increased_damage_when_flanking",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.flanking_damage
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_autogun_p1_allow_flanking_and_increased_damage_when_flanking = {
 			{
@@ -301,6 +541,18 @@ templates.weapon_trait_bespoke_autogun_p1_allow_flanking_and_increased_damage_wh
 	}
 }
 templates.weapon_trait_bespoke_autogun_p1_increased_sprint_speed = {
+	format_values = {
+		stamina = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_autogun_p1_increased_sprint_speed",
+				find_value_type = "trait_override",
+				path = {
+					"conditional_threshold"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_autogun_p1_increased_sprint_speed = {
 			{
@@ -319,6 +571,20 @@ templates.weapon_trait_bespoke_autogun_p1_increased_sprint_speed = {
 	}
 }
 templates.weapon_trait_bespoke_autogun_p1_followup_shots_ranged_damage = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_autogun_p1_followup_shots_ranged_damage",
+				find_value_type = "trait_override",
+				path = {
+					"conditional_stat_buffs",
+					stat_buffs.ranged_damage
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_autogun_p1_followup_shots_ranged_damage = {
 			{
@@ -345,6 +611,20 @@ templates.weapon_trait_bespoke_autogun_p1_followup_shots_ranged_damage = {
 	}
 }
 templates.weapon_trait_bespoke_autogun_p1_followup_shots_ranged_weakspot_damage = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_autogun_p1_followup_shots_ranged_weakspot_damage",
+				find_value_type = "trait_override",
+				path = {
+					"conditional_stat_buffs",
+					stat_buffs.ranged_weakspot_damage
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_autogun_p1_followup_shots_ranged_weakspot_damage = {
 			{
@@ -371,6 +651,29 @@ templates.weapon_trait_bespoke_autogun_p1_followup_shots_ranged_weakspot_damage 
 	}
 }
 templates.weapon_trait_bespoke_autogun_p1_improved_sprint_dodge = {
+	format_values = {
+		movement_speed = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_autogun_p1_improved_sprint_dodge",
+				find_value_type = "trait_override",
+				path = {
+					"proc_stat_buffs",
+					stat_buffs.sprint_movement_speed
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_autogun_p1_improved_sprint_dodge",
+				find_value_type = "buff_template",
+				path = {
+					"active_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_autogun_p1_improved_sprint_dodge = {
 			{

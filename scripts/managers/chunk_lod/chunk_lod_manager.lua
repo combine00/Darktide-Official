@@ -135,7 +135,7 @@ end
 
 local INDEX_ACTOR = 4
 
-function ChunkLodManager:_async_raycast_result_cb(id, hits, num_hits, data)
+function ChunkLodManager:_async_raycast_result_cb(id, data, hits, num_hits)
 	if num_hits <= 0 then
 		return
 	end
@@ -215,6 +215,7 @@ function ChunkLodManager:_update_level_lods(level, show_all)
 	local level_set_lod_level_type = Level.set_lod_level_type
 
 	level_set_lod_level_type(level, LodLevelType.SHOW_LEVEL)
+	Level.trigger_event(level, "set_lod_level_type_show_level")
 	self:_set_show_chunk_units(level, true)
 
 	if #neighbours > 0 then
@@ -228,13 +229,16 @@ function ChunkLodManager:_update_level_lods(level, show_all)
 
 				if show_units then
 					level_set_lod_level_type(neighbour_level, LodLevelType.SHOW_LEVEL)
+					Level.trigger_event(neighbour_level, "set_lod_level_type_show_level")
 				else
 					if lod_state == "Proxy" then
 						level_set_lod_level_type(neighbour_level, LodLevelType.SHOW_LOD_UNIT)
+						Level.trigger_event(neighbour_level, "set_lod_level_type_show_lod_unit")
 					end
 
 					if lod_state == "None" then
 						level_set_lod_level_type(neighbour_level, LodLevelType.HIDE)
+						Level.trigger_event(neighbour_level, "set_lod_level_type_hide")
 					end
 				end
 

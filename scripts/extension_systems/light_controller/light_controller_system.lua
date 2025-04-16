@@ -16,7 +16,8 @@ function LightControllerSystem:init(extension_init_context, system_init_data, ..
 	self._network_event_delegate = nil
 	self._light_group_extensions = {}
 	local themes = system_init_data.themes or {}
-	self._mission_settings_light_groups = self:_extract_light_groups(themes) or {}
+
+	self:setup_light_groups(themes)
 
 	if not self._is_server and self._extension_init_context.network_event_delegate ~= nil then
 		self._network_event_delegate = self._extension_init_context.network_event_delegate
@@ -25,21 +26,29 @@ function LightControllerSystem:init(extension_init_context, system_init_data, ..
 	end
 end
 
+function LightControllerSystem:setup_light_groups(themes)
+	self._mission_settings_light_groups = self:_extract_light_groups(themes) or {}
+end
+
 function LightControllerSystem:_extract_light_groups(themes)
 	local Theme_light_groups = Theme.light_groups
 	local light_groups = {}
 
-	for _, theme in ipairs(themes) do
-		local theme_groups = Theme_light_groups(theme)
+	if themes then
+		for _, theme in ipairs(themes) do
+			local theme_groups = Theme_light_groups(theme)
 
-		if theme_groups ~= nil then
-			for group_name, setting in pairs(theme_groups) do
-				light_groups[group_name] = setting ~= "OFF"
+			if theme_groups ~= nil then
+				for group_name, setting in pairs(theme_groups) do
+					light_groups[group_name] = setting ~= "OFF"
+				end
+
+				return light_groups
 			end
-
-			return light_groups
 		end
 	end
+
+	return light_groups
 end
 
 function LightControllerSystem:_fetch_settings(mission, circumstance_name)
@@ -68,6 +77,20 @@ function LightControllerSystem:on_remove_extension(unit, extension_name)
 end
 
 function LightControllerSystem:on_gameplay_post_init(level)
+	for light_group_name, is_enabled in pairs(self._mission_settings_light_groups) do
+		self:_set_light_group_enabled(light_group_name, is_enabled, true)
+	end
+end
+
+function LightControllerSystem:on_theme_changed(themes)
+	if self._mission_settings_light_groups then
+		for light_group_name, is_enabled in pairs(self._mission_settings_light_groups) do
+			self:_set_light_group_enabled(light_group_name, false, true)
+		end
+	end
+
+	self:setup_light_groups(themes)
+
 	for light_group_name, is_enabled in pairs(self._mission_settings_light_groups) do
 		self:_set_light_group_enabled(light_group_name, is_enabled, true)
 	end

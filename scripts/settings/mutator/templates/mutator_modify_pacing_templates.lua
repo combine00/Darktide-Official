@@ -91,6 +91,159 @@ local mutator_templates = {
 			}
 		}
 	},
+	mutator_live_abhuman_monster = {
+		class = "scripts/managers/mutator/mutators/mutator_modify_pacing",
+		modify_pacing = {
+			monster_spawn_type = "monsters",
+			monsters_per_travel_distance = {
+				90,
+				160
+			},
+			monster_breed_name = {
+				"chaos_plague_ogryn"
+			}
+		}
+	},
+	mutator_live_abhuman_replacement = {
+		class = "scripts/managers/mutator/mutators/mutator_replace_breed",
+		init_replacement_breed = {
+			breed_replacement = {
+				renegade_executor = "chaos_ogryn_executor",
+				renegade_berzerker = "chaos_ogryn_bulwark",
+				renegade_gunner = "chaos_ogryn_gunner"
+			}
+		}
+	},
+	mutator_monster_spawner = {
+		class = "scripts/managers/mutator/mutators/mutator_monster_spawner",
+		spawner_template = {
+			force_horde_on_spawn = true,
+			trigger_distance = 55,
+			monster_breed_name = {
+				"chaos_mutator_daemonhost"
+			},
+			num_to_spawn_per_mission = {
+				dm_rise = 5,
+				cm_raid = 5,
+				lm_scavenge = 5,
+				lm_rails = 5,
+				km_heresy = 5,
+				lm_cooling = 5,
+				fm_cargo = 5,
+				hm_strain = 5,
+				cm_habs = 3,
+				km_enforcer = 5,
+				fm_armoury = 5,
+				fm_resurgence = 5,
+				km_station = 5,
+				hm_complex = 5,
+				cm_archives = 5,
+				dm_forge = 5,
+				hm_cartel = 5,
+				dm_propaganda = 5,
+				core_research = 4
+			}
+		}
+	},
+	mutator_monster_havoc_twins = {
+		class = "scripts/managers/mutator/mutators/mutator_monster_spawner",
+		spawner_template = {
+			injection_template = "havoc_twins",
+			trigger_distance = 55,
+			force_horde_on_spawn = true,
+			num_to_spawn = 1,
+			monster_breed_name = {
+				"havoc_twins"
+			}
+		}
+	},
+	havoc_mutator_more_captains_01 = {
+		class = "scripts/managers/mutator/mutators/mutator_modify_pacing",
+		modify_pacing = {
+			monster_spawn_type = "captains",
+			monsters_per_travel_distance = {
+				240,
+				360
+			},
+			monster_breed_name = {
+				"MUTATOR_CAPTAIN"
+			}
+		}
+	},
+	havoc_mutator_more_captains_02 = {
+		class = "scripts/managers/mutator/mutators/mutator_modify_pacing",
+		modify_pacing = {
+			monster_spawn_type = "captains",
+			monsters_per_travel_distance = {
+				120,
+				240
+			},
+			monster_breed_name = {
+				"MUTATOR_CAPTAIN"
+			}
+		}
+	},
+	havoc_mutator_more_hordes_01 = {
+		class = "scripts/managers/mutator/mutators/mutator_modify_pacing",
+		modify_pacing = {
+			required_horde_travel_distance = 60
+		}
+	},
+	havoc_mutator_more_hordes_02 = {
+		class = "scripts/managers/mutator/mutators/mutator_modify_pacing",
+		modify_pacing = {
+			required_horde_travel_distance = 30
+		}
+	},
+	havoc_mutator_monster_specials_01 = {
+		class = "scripts/managers/mutator/mutators/mutator_modify_pacing",
+		init_modify_pacing = {
+			specials_monster_spawn_config = {
+				max_monsters = 1,
+				chance_to_spawn_monster = 0.05,
+				health_modifiers = {
+					chaos_beast_of_nurgle = 0.4,
+					chaos_spawn = 0.4,
+					chaos_plague_ogryn = 0.4
+				},
+				max_monster_duration = {
+					550,
+					600
+				},
+				breeds = {
+					"chaos_plague_ogryn",
+					"chaos_beast_of_nurgle",
+					"chaos_spawn"
+				}
+			}
+		}
+	},
+	havoc_mutator_monster_specials_02 = {
+		class = "scripts/managers/mutator/mutators/mutator_modify_pacing",
+		init_modify_pacing = {
+			specials_monster_spawn_config = {
+				max_monsters = 1,
+				chance_to_spawn_monster = 0.1,
+				health_modifiers = {
+					chaos_beast_of_nurgle = 0.4,
+					chaos_spawn = 0.4,
+					chaos_plague_ogryn = 0.4
+				},
+				max_monster_duration = {
+					450,
+					500
+				},
+				breeds = {
+					"chaos_plague_ogryn",
+					"chaos_beast_of_nurgle",
+					"chaos_spawn"
+				}
+			}
+		}
+	},
+	mutator_decreased_horde_pacing_stinger = {
+		class = "scripts/managers/mutator/mutators/mutator_base"
+	},
 	mutator_more_boss_patrols = {
 		class = "scripts/managers/mutator/mutators/mutator_modify_pacing",
 		modify_pacing = {
@@ -209,17 +362,6 @@ local mutator_templates = {
 		class = "scripts/managers/mutator/mutators/mutator_modify_pacing",
 		init_modify_pacing = {
 			horde_timer_modifier = 99999
-		}
-	},
-	mutator_renegade_flamer_none_packs = {
-		class = "scripts/managers/mutator/mutators/mutator_modify_pacing",
-		init_modify_pacing = {
-			override_roamer_packs = {
-				none = {
-					renegade = RoamerPacks.renegade_flamers_mutator,
-					cultist = RoamerPacks.renegade_flamers_mutator
-				}
-			}
 		}
 	},
 	mutator_only_traitor_guard_faction = {
@@ -445,6 +587,66 @@ local mutator_templates = {
 			}
 		}
 	},
+	mutator_live_event_only_beast = {
+		class = "scripts/managers/mutator/mutators/mutator_modify_pacing",
+		init_modify_pacing = {
+			specials_monster_spawn_config = {
+				max_monsters = 2,
+				chance_to_spawn_monster = 0.2,
+				max_monster_duration = {
+					180,
+					600
+				},
+				breeds = {
+					"chaos_beast_of_nurgle"
+				}
+			}
+		}
+	},
+	mutator_headshot_parasite_enemies = {
+		class = "scripts/managers/mutator/mutators/mutator_minion_nurgle_blessing",
+		random_spawn_buff_templates = {
+			buffs = {
+				"headshot_parasite_enemies"
+			},
+			breed_chances = {
+				renegade_flamer = 0.05,
+				chaos_mutated_poxwalker = 0.1,
+				renegade_assault = 0.1,
+				cultist_grenadier = 0.1,
+				cultist_melee = 0.1,
+				chaos_lesser_mutated_poxwalker = 0.1,
+				cultist_flamer = 0.1,
+				chaos_beast_of_nurgle = 0,
+				cultist_mutant = 0,
+				chaos_poxwalker = 0.1,
+				renegade_rifleman = 0.1,
+				cultist_shocktrooper = 0.1,
+				chaos_ogryn_gunner = 0.2,
+				cultist_assault = 0.1,
+				renegade_shocktrooper = 0.1,
+				chaos_armored_infected = 0.05,
+				renegade_gunner = 0.1,
+				cultist_berzerker = 0.1,
+				chaos_newly_infected = 0.1,
+				chaos_spawn = 0,
+				renegade_melee = 0.1,
+				chaos_ogryn_executor = 0.2,
+				chaos_poxwalker_bomber = 0,
+				renegade_grenadier = 0.1,
+				chaos_daemonhost = 0,
+				chaos_plague_ogryn = 0,
+				renegade_berzerker = 0.25,
+				renegade_sniper = 0,
+				renegade_netgunner = 0,
+				renegade_captain = 0,
+				chaos_hound = 0,
+				chaos_ogryn_bulwark = 0.2,
+				cultist_gunner = 0.1,
+				renegade_executor = 0.05
+			}
+		}
+	},
 	mutator_no_monsters = {
 		class = "scripts/managers/mutator/mutators/mutator_modify_pacing",
 		init_modify_pacing = {
@@ -568,12 +770,32 @@ local mutator_templates = {
 	mutator_single_twin = {
 		class = "scripts/managers/mutator/mutators/mutator_base"
 	},
-	mutator_maelstrom_armored_infected = {
+	mutator_havoc_armored_infected = {
 		class = "scripts/managers/mutator/mutators/mutator_replace_breed",
 		init_replacement_breed = {
 			breed_replacement = {
 				chaos_poxwalker = "chaos_armored_infected",
 				chaos_newly_infected = "chaos_armored_infected"
+			}
+		}
+	},
+	mutator_maelstrom_mutated_poxwalker = {
+		class = "scripts/managers/mutator/mutators/mutator_replace_breed",
+		init_replacement_breed = {
+			breed_replacement = {
+				chaos_poxwalker = "chaos_mutated_poxwalker",
+				chaos_newly_infected = "chaos_lesser_mutated_poxwalker"
+			}
+		}
+	},
+	mutator_communication_hack_event = {
+		class = "scripts/managers/mutator/mutators/mutator_nurgle_warp",
+		compositions = {
+			{
+				"renegade_radio_operator",
+				"renegade_netgunner",
+				"renegade_executor",
+				"renegade_executor"
 			}
 		}
 	}

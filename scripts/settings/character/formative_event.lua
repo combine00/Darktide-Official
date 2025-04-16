@@ -271,4 +271,4 @@ local formative_event = {
 	}
 }
 
-return formative_event
+return settings("FormativeEvent", formative_event)

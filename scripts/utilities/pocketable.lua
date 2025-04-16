@@ -38,7 +38,7 @@ function Pocketable.drop_pocketable(t, physics_world, is_server, player_unit, in
 			position = hit_position
 		end
 
-		_drop_pickup(item_name, position, rotation)
+		_drop_pickup(item_name, position, rotation, player_unit)
 	end
 
 	PlayerUnitVisualLoadout.unequip_item_from_slot(player_unit, slot_name, t)
@@ -70,7 +70,7 @@ function Pocketable.equip_pocketable(t, is_server, player_unit, pickup_unit, inv
 	if swap_item and is_server and want_to_swap_item then
 		local position = Unit.world_position(pickup_unit, 1)
 		local rotation = Unit.world_rotation(pickup_unit, 1)
-		local spawned_unit = _drop_pickup(item_name, position, rotation)
+		local spawned_unit = _drop_pickup(item_name, position, rotation, player_unit)
 		local pickup_animation_system = Managers.state.extension:system("pickup_animation_system")
 
 		if spawned_unit and pickup_animation_system then
@@ -99,7 +99,7 @@ end
 local TRAINING_GROUNDS_GAME_MODE_NAME = "training_grounds"
 local SHOOTING_RANGE_GAME_MODE_NAME = "shooting_range"
 
-function _drop_pickup(item_name, spawn_pos, spawn_rot)
+function _drop_pickup(item_name, spawn_pos, spawn_rot, interactor_unit)
 	local item_definitions = MasterItems.get_cached()
 	local item = item_definitions[item_name]
 	local weapon_template = WeaponTemplate.weapon_template_from_item(item)
@@ -118,8 +118,10 @@ function _drop_pickup(item_name, spawn_pos, spawn_rot)
 		local equipped_pickup_data = Pickups.by_name[swap_pickup_name]
 
 		if equipped_pickup_data and equipped_pickup_data.on_drop_func then
-			equipped_pickup_data.on_drop_func(spawned_unit)
+			equipped_pickup_data.on_drop_func(spawned_unit, interactor_unit)
 		end
+
+		pickup_system:dropped(spawned_unit)
 
 		return spawned_unit, swap_pickup_name
 	end

@@ -25,13 +25,23 @@ function WeaponMaterialVariables:destroy(unit)
 end
 
 function WeaponMaterialVariables:set_start_time(t, unit)
-	Unit.set_scalar_for_material(unit, self._material_slot_name, self._start_time_variable_name, t)
-	Unit.set_scalar_for_material(unit, self._material_slot_name, self._on_off_variable_name, 1)
+	if self._start_time_variable_name then
+		Unit.set_scalar_for_material(unit, self._material_slot_name, self._start_time_variable_name, t)
+	end
+
+	if self._on_off_variable_name then
+		Unit.set_scalar_for_material(unit, self._material_slot_name, self._on_off_variable_name, 1)
+	end
 end
 
 function WeaponMaterialVariables:set_stop_time(t, unit)
-	Unit.set_scalar_for_material(unit, self._material_slot_name, self._stop_time_variable_name, t)
-	Unit.set_scalar_for_material(unit, self._material_slot_name, self._on_off_variable_name, 0)
+	if self._stop_time_variable_name then
+		Unit.set_scalar_for_material(unit, self._material_slot_name, self._stop_time_variable_name, t)
+	end
+
+	if self._on_off_variable_name then
+		Unit.set_scalar_for_material(unit, self._material_slot_name, self._on_off_variable_name, 0)
+	end
 end
 
 function WeaponMaterialVariables:set_intensity(intensity, unit)

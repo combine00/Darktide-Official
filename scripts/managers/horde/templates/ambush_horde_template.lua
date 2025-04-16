@@ -129,7 +129,7 @@ function horde_template.execute(physics_world, nav_world, side, target_side, com
 
 		for i = 1, #minion_spawner_radius_checks do
 			local radius = minion_spawner_radius_checks[i]
-			local occluded_positions, num_occluded_positions = SpawnPointQueries.get_occluded_positions(nav_world, nav_spawn_points, navmesh_position, side, radius, num_groups, MIN_DISTANCE_FROM_PLAYERS, MAX_DISTANCE_FROM_PLAYERS, INITIAL_GROUP_OFFSET)
+			local occluded_positions, num_occluded_positions = SpawnPointQueries.get_occluded_positions(nav_world, nav_spawn_points, navmesh_position, side.valid_enemy_player_units_positions, radius, num_groups, MIN_DISTANCE_FROM_PLAYERS, MAX_DISTANCE_FROM_PLAYERS, INITIAL_GROUP_OFFSET)
 
 			if occluded_positions then
 				for j = 1, num_occluded_positions do
@@ -147,7 +147,7 @@ function horde_template.execute(physics_world, nav_world, side, target_side, com
 	end
 
 	if num_spawn_locations == 0 then
-		Log.info("AmbushHorde", "\t\tFound no spawn locations for ambush horde! Failed")
+		Log.info("AmbushHorde", "\t\t for ambush horde! Failed")
 
 		return
 	end
@@ -170,7 +170,11 @@ function horde_template.execute(physics_world, nav_world, side, target_side, com
 				breed_list[#breed_list + 1] = breed_name
 			end
 
-			spawner:add_spawns(breed_list, side_id, target_side_id, nil, nil, group_id)
+			local param_table = spawner:request_param_table()
+			param_table.target_side_id = target_side_id
+			param_table.group_id = group_id
+
+			spawner:add_spawns(breed_list, side_id, param_table)
 		end
 	end
 
@@ -185,9 +189,10 @@ function horde_template.execute(physics_world, nav_world, side, target_side, com
 
 			if spawn_position then
 				local breed_name = spawn_list[i]
-
-				minion_spawn_manager:queue_minion_to_spawn(breed_name, spawn_position, spawn_rotation, side_id, aggro_states.aggroed, target_unit, nil, group_id)
-
+				local queue_parameters = minion_spawn_manager:queue_minion_to_spawn(breed_name, spawn_position, spawn_rotation, side_id)
+				queue_parameters.optional_aggro_state = aggro_states.aggroed
+				queue_parameters.optional_target_unit = target_unit
+				queue_parameters.optional_group_id = group_id
 				num_spawned = num_spawned + 1
 			end
 		end

@@ -260,6 +260,10 @@ function ToxicGasFog:editor_destroy(unit)
 		self._volume_registered = false
 	end
 
+	if ToxicGasFog._nav_info ~= nil then
+		SharedNav.destroy(ToxicGasFog._nav_info)
+	end
+
 	local world = self._world
 	local line_object = self._line_object
 

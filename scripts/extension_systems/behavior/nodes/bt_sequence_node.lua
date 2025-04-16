@@ -1,5 +1,6 @@
 require("scripts/extension_systems/behavior/nodes/bt_node")
 
+local BtRunHooks = require("scripts/extension_systems/behavior/utilities/bt_run_hooks")
 local BtConditions = require("scripts/extension_systems/behavior/utilities/bt_conditions")
 local BtSequenceNode = class("BtSequenceNode", "BtNode")
 
@@ -50,7 +51,7 @@ function BtSequenceNode:evaluate(unit, blackboard, scratchpad, dt, t, evaluate_u
 	local child_is_running = last_leaf_node_running and last_running_node == child_node
 	local leaf_node = nil
 
-	if BtConditions[child_condition_name](unit, blackboard, scratchpad, child_tree_node.condition_args, child_tree_node.action_data, child_is_running) then
+	if BtConditions[child_condition_name](unit, blackboard, scratchpad, child_tree_node.condition_args, child_tree_node.action_data, child_is_running, dt) then
 		if child_node.evaluate then
 			leaf_node = child_node:evaluate(unit, blackboard, scratchpad, dt, t, evaluate_utility, node_data, old_running_child_nodes, new_running_child_nodes, last_leaf_node_running)
 		else
@@ -66,6 +67,10 @@ function BtSequenceNode:evaluate(unit, blackboard, scratchpad, dt, t, evaluate_u
 end
 
 function BtSequenceNode:run(unit, breed, blackboard, scratchpad, action_data, dt, t, node_data, running_child_nodes)
+	if self.run_hook then
+		BtRunHooks[self.run_hook.hook](unit, breed, blackboard, scratchpad, action_data, dt, t, node_data, self.run_hook.args)
+	end
+
 	local node_identifier = self.identifier
 	local running_node = running_child_nodes[node_identifier]
 	local running_tree_node = running_node.tree_node

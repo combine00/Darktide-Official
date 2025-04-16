@@ -563,6 +563,14 @@ local animations = {
 					params.description_grid:set_alpha_multiplier(anim_progress)
 				end
 			end
+		},
+		{
+			name = "reaction_time",
+			start_time = anim_start_delay + 0.4,
+			end_time = anim_start_delay + 0.45,
+			update = function (parent, ui_scenegraph, scenegraph_definition, widgets, progress, params)
+				return
+			end
 		}
 	},
 	on_exit = {

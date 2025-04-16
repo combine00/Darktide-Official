@@ -1,6 +1,7 @@
 local DamageProfileTemplates = require("scripts/settings/damage/damage_profile_templates")
 local MasterItems = require("scripts/backend/master_items")
 local MinionGibbing = require("scripts/managers/minion/minion_gibbing")
+local RegionConstants = require("scripts/settings/region/region_constants")
 local SideColor = require("scripts/utilities/side_color")
 local VisualLoadoutCustomization = require("scripts/extension_systems/visual_loadout/utilities/visual_loadout_customization")
 local VisualLoadoutLodGroup = require("scripts/extension_systems/visual_loadout/utilities/visual_loadout_lod_group")
@@ -21,10 +22,11 @@ local function _link_unit(world, item_unit, target_unit, attach_node_name, map_n
 	World.link_unit(world, item_unit, 1, target_unit, attach_node_index, map_nodes)
 end
 
-local attach_settings_temp = {
+local _attach_settings = {
 	spawn_with_extensions = false,
 	from_script_component = false,
-	is_minion = true
+	is_minion = true,
+	from_ui_profile_spawner = false
 }
 
 local function _create_slot_entry(unit, lod_group, lod_shadow_group, world, item_slot_data, random_seed, item_definitions)
@@ -48,23 +50,23 @@ local function _create_slot_entry(unit, lod_group, lod_shadow_group, world, item
 	if DEDICATED_SERVER and not item_slot_data.is_weapon then
 		item_unit, attachments = nil
 	else
-		attach_settings_temp.world = world
-		attach_settings_temp.unit_spawner = Managers.state.unit_spawner
-		attach_settings_temp.character_unit = unit
-		attach_settings_temp.item_definitions = item_definitions
-		attach_settings_temp.attach_pose = Unit.world_pose(unit, attach_node)
-		attach_settings_temp.lod_group = lod_group
-		attach_settings_temp.lod_shadow_group = lod_shadow_group
+		_attach_settings.world = world
+		_attach_settings.unit_spawner = Managers.state.unit_spawner
+		_attach_settings.character_unit = unit
+		_attach_settings.item_definitions = item_definitions
+		_attach_settings.attach_pose = Unit.world_pose(unit, attach_node)
+		_attach_settings.lod_group = lod_group
+		_attach_settings.lod_shadow_group = lod_shadow_group
 
 		if item_slot_data.spawn_with_extensions then
-			attach_settings_temp.extension_manager = Managers.state.extension
-			attach_settings_temp.spawn_with_extensions = true
+			_attach_settings.extension_manager = Managers.state.extension
+			_attach_settings.spawn_with_extensions = true
 		else
-			attach_settings_temp.extension_manager = nil
-			attach_settings_temp.spawn_with_extensions = nil
+			_attach_settings.extension_manager = nil
+			_attach_settings.spawn_with_extensions = nil
 		end
 
-		item_unit, attachments = VisualLoadoutCustomization.spawn_item(item_data, attach_settings_temp, unit, nil, extract_attachment_units_bind_poses, nil)
+		item_unit, attachments = VisualLoadoutCustomization.spawn_item(item_data, _attach_settings, unit, nil, extract_attachment_units_bind_poses, nil)
 	end
 
 	local drop_on_death = item_slot_data.drop_on_death
@@ -79,6 +81,17 @@ local function _create_slot_entry(unit, lod_group, lod_shadow_group, world, item
 	}
 
 	return slot_entry, new_seed
+end
+
+function MinionVisualLoadoutExtension:create_slot_entry(unit, item_slot_data)
+	local lod_group = VisualLoadoutLodGroup.try_init_and_fetch_lod_group(unit, "lod")
+	local lod_shadow_group = VisualLoadoutLodGroup.try_init_and_fetch_lod_group(unit, "lod_shadow")
+	local item_definitions = MasterItems.get_cached()
+	local seed = math.random_seed()
+	local world = self._world
+	local newly_equipped = _create_slot_entry(unit, lod_group, lod_shadow_group, world, item_slot_data, seed, item_definitions)
+
+	return newly_equipped
 end
 
 local function _create_material_override_slot_entry(unit, item_slot_data, random_seed, item_definitions)
@@ -456,13 +469,16 @@ function MinionVisualLoadoutExtension:_attach_slot_to_gib(slot_name, gib_unit)
 	World.unlink_unit(world, item_unit, true)
 	World.link_unit(world, item_unit, 1, gib_unit, 1, true)
 
-	local lod_group = Unit.has_lod_group(self._unit, "lod") and Unit.lod_group(self._unit, "lod")
 	local gib_lod_group = Unit.has_lod_group(gib_unit, "lod") and Unit.lod_group(gib_unit, "lod")
 
-	if lod_group and gib_lod_group and Unit.has_lod_object(item_unit, "lod") then
+	if gib_lod_group and Unit.has_lod_object(item_unit, "lod") then
 		local item_lod_object = Unit.lod_object(item_unit, "lod")
+		local item_lod_group = LODObject.lod_group(item_lod_object)
 
-		LODGroup.remove_lod_object(lod_group, item_lod_object)
+		if item_lod_group then
+			LODGroup.remove_lod_object(item_lod_group, item_lod_object)
+		end
+
 		LODGroup.add_lod_object(gib_lod_group, item_lod_object)
 
 		local attachments = slot_data.attachments
@@ -473,8 +489,12 @@ function MinionVisualLoadoutExtension:_attach_slot_to_gib(slot_name, gib_unit)
 
 				if Unit.has_lod_object(attachment_unit, "lod") then
 					local attachment_lod_object = Unit.lod_object(attachment_unit, "lod")
+					local attachment_lod_group = LODObject.lod_group(attachment_lod_object)
 
-					LODGroup.remove_lod_object(lod_group, attachment_lod_object)
+					if attachment_lod_group then
+						LODGroup.remove_lod_object(attachment_lod_group, attachment_lod_object)
+					end
+
 					LODGroup.add_lod_object(gib_lod_group, attachment_lod_object)
 				end
 			end
@@ -512,6 +532,7 @@ function MinionVisualLoadoutExtension:_unequip_slot(slot_name)
 
 	if item_unit then
 		unit_spawner_manager:mark_for_deletion(item_unit)
+		Managers.state.out_of_bounds:unregister_soft_oob_unit(item_unit, self)
 	end
 
 	table.clear(slot_data)
@@ -713,6 +734,10 @@ function MinionVisualLoadoutExtension:ailment_effect()
 	return self._ailment_effect_template
 end
 
+function MinionVisualLoadoutExtension:inventory()
+	return self._inventory
+end
+
 function MinionVisualLoadoutExtension:slot_material_override(slot_name)
 	local slot_data = self._slots[slot_name] or self._material_override_slots[slot_name]
 	local item_data = slot_data and slot_data.item_data
@@ -731,6 +756,7 @@ function MinionVisualLoadoutExtension:gib(hit_zone_name_or_nil, attack_direction
 		gibbing_enabled_locally = GameParameters.gibbing_enabled
 	end
 
+	gibbing_enabled_locally = gibbing_enabled_locally and not Managers.account:region_has_restriction(RegionConstants.restrictions.gibbing)
 	local spawned_gibs = nil
 
 	if not DEDICATED_SERVER and gibbing_enabled_locally then

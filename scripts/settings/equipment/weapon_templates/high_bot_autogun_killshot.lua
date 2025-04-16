@@ -1,3 +1,4 @@
+local ActionInputHierarchy = require("scripts/utilities/weapon/action_input_hierarchy")
 local AimAssistTemplates = require("scripts/settings/equipment/aim_assist_templates")
 local BaseTemplateSettings = require("scripts/settings/equipment/weapon_templates/base_template_settings")
 local BuffSettings = require("scripts/settings/buff/buff_settings")
@@ -157,32 +158,95 @@ local weapon_template = {
 table.add_missing(weapon_template.action_inputs, BaseTemplateSettings.action_inputs)
 
 weapon_template.action_input_hierarchy = {
-	wield = "stay",
-	shoot = "stay",
-	special_action = "stay",
-	reload = "stay",
-	zoom = {
-		special_action = "base",
-		wield = "base",
-		zoom_shoot = "stay",
-		grenade_ability = "base",
-		zoom_release = "base",
-		reload = "base",
-		combat_ability = "base"
+	{
+		transition = "stay",
+		input = "shoot"
 	},
-	special_action_hold = {
-		special_action = "base",
-		special_action_light = "base",
-		special_action_heavy = "base",
-		zoom = "base",
-		wield = "base",
-		reload = "base",
-		combat_ability = "base",
-		grenade_ability = "base"
+	{
+		input = "zoom",
+		transition = {
+			{
+				transition = "base",
+				input = "zoom_release"
+			},
+			{
+				transition = "stay",
+				input = "zoom_shoot"
+			},
+			{
+				transition = "base",
+				input = "reload"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "grenade_ability"
+			},
+			{
+				transition = "base",
+				input = "special_action"
+			}
+		}
+	},
+	{
+		transition = "stay",
+		input = "wield"
+	},
+	{
+		transition = "stay",
+		input = "reload"
+	},
+	{
+		transition = "stay",
+		input = "special_action"
+	},
+	{
+		input = "special_action_hold",
+		transition = {
+			{
+				transition = "base",
+				input = "zoom"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "special_action"
+			},
+			{
+				transition = "base",
+				input = "special_action_light"
+			},
+			{
+				transition = "base",
+				input = "special_action_heavy"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "grenade_ability"
+			},
+			{
+				transition = "base",
+				input = "reload"
+			}
+		}
 	}
 }
 
-table.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
+ActionInputHierarchy.add_missing_ordered(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
 
 weapon_template.actions = {
 	action_unwield = {
@@ -789,6 +853,7 @@ weapon_template.conditional_state_to_action_input = {
 weapon_template.no_ammo_delay = 0.25
 weapon_template.hud_configuration = {
 	uses_overheat = false,
+	uses_weapon_special_charges = false,
 	uses_ammunition = true
 }
 weapon_template.sprint_ready_up_time = 0.1

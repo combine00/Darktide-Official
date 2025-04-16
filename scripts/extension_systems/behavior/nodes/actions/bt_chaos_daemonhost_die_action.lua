@@ -62,7 +62,7 @@ function BtChaosDaemonhostDieAction:_set_dead(unit, scratchpad, action_data)
 	if action_data.despawn_on_done then
 		local minion_spawn_manager = Managers.state.minion_spawn
 
-		minion_spawn_manager:despawn(unit)
+		minion_spawn_manager:despawn_minion(unit)
 	else
 		local death_component = scratchpad.death_component
 		local attack_direction = death_component.attack_direction:unbox()

@@ -11,7 +11,10 @@ local ability_template = {
 		}
 	},
 	action_input_hierarchy = {
-		stance_pressed = "stay"
+		{
+			transition = "stay",
+			input = "stance_pressed"
+		}
 	},
 	actions = {
 		action_stance_change = {

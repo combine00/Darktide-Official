@@ -640,8 +640,8 @@ function InventoryWeaponDetailsView:_draw_weapon_stats(ui_renderer, input_servic
 	local font_type = "proxima_nova_bold"
 	local text_options = {
 		line_spacing = 1.2,
-		horizontal_alignemt = 1,
 		vertical_alignemnt = 1,
+		horizontal_alignment = 1,
 		shaodw = true
 	}
 	local box_size = {

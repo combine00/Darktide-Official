@@ -78,7 +78,7 @@ function MissionObjectiveZone:update_progression()
 		progression_percent = zone_progression / num_zones_in_mission_objective
 	end
 
-	if current_progression < progression then
+	if zone_type == ZONE_TYPES.scan and current_progression < progression then
 		local increment = progression - current_progression
 
 		self:update_increment(increment)

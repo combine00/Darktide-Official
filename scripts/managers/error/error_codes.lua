@@ -48,6 +48,9 @@ local ErrorCodesLookup = {
 		code = 1015,
 		title = false
 	},
+	loading_host_sync_error = {
+		code = 1016
+	},
 	nonexisting_channel = {
 		code = 2001
 	},

@@ -1,4 +1,4 @@
-local Action = require("scripts/utilities/weapon/action")
+local Action = require("scripts/utilities/action/action")
 local WieldableSlotScriptInterface = require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/wieldable_slot_script_interface")
 local PsykerSingleTargetEffects = class("PsykerSingleTargetEffects")
 local SPAWN_POS = Vector3Box(400, 400, 400)

@@ -7,15 +7,14 @@ local UISoundEvents = require("scripts/settings/ui/ui_sound_events")
 local color_terminal_icon = Color.terminal_text_header(255, true)
 local color_terminal_text_header = Color.terminal_text_header(255, true)
 local StepperPassTemplates = {}
-local color_lerp = ColorUtilities.color_lerp
 local color_copy = ColorUtilities.color_copy
-local service_type = "View"
-local gamepad_action_navigate_primary_left = "navigate_primary_left_pressed"
-local alias_key_navigate_primary_left = Managers.ui:get_input_alias_key(gamepad_action_navigate_primary_left, service_type)
-local input_text_navigate_primary_left = InputUtils.input_text_for_current_input_device(service_type, alias_key_navigate_primary_left)
-local gamepad_action_navigate_primary_right = "navigate_primary_right_pressed"
-local alias_key_navigate_primary_right = Managers.ui:get_input_alias_key(gamepad_action_navigate_primary_right, service_type)
-local input_text_navigate_primary_right = InputUtils.input_text_for_current_input_device(service_type, alias_key_navigate_primary_right)
+
+local function _get_input_text(action)
+	local service_type = "View"
+	local alias_key = Managers.ui:get_input_alias_key(action, service_type)
+
+	return InputUtils.input_text_for_current_input_device(service_type, alias_key)
+end
 
 local function terminal_button_change_function(content, style, hotspot_id)
 	local hotspot = hotspot_id and content[hotspot_id] or content.hotspot
@@ -77,7 +76,7 @@ local function _make_difficulty_picker_rect_change_function(index)
 		local min_danger = content.min_danger or MIN_DANGER
 		local max_danger = content.max_danger or MAX_DANGER
 		local current_danger = content.hover_danger or content.danger
-		local danger_color = DangerSettings.by_index[current_danger] and DangerSettings.by_index[current_danger].color or DangerSettings.by_index[1].color
+		local danger_color = DangerSettings[current_danger] and DangerSettings[current_danger].color or DangerSettings[1].color
 
 		ColorUtilities.color_copy(danger_color, style.color, true)
 
@@ -136,7 +135,7 @@ StepperPassTemplates.difficulty_stepper = {
 				end
 
 				if content.last_danger ~= danger then
-					local danger_settings = DangerSettings.by_index[danger]
+					local danger_settings = DangerSettings[danger]
 					content.difficulty_text = Localize(danger_settings.display_name)
 					content.last_danger = danger
 					content.danger = danger
@@ -154,8 +153,8 @@ StepperPassTemplates.difficulty_stepper = {
 
 				if content.was_gamepad_active ~= gamepad_active then
 					content.was_gamepad_active = gamepad_active
-					content.stepper_left = gamepad_active and input_text_navigate_primary_left or "<"
-					content.stepper_right = gamepad_active and input_text_navigate_primary_right or ">"
+					content.stepper_left_text = gamepad_active and _get_input_text("navigate_primary_left_pressed") or "<"
+					content.stepper_right_text = gamepad_active and _get_input_text("navigate_primary_right_pressed") or ">"
 				end
 			end
 		end
@@ -217,7 +216,7 @@ StepperPassTemplates.difficulty_stepper = {
 	{
 		value_id = "stepper_left_text",
 		pass_type = "text",
-		value = input_text_navigate_primary_left,
+		value = "<",
 		style = {
 			vertical_alignment = "center",
 			horizontal_alignment = "center",
@@ -242,7 +241,7 @@ StepperPassTemplates.difficulty_stepper = {
 	{
 		value_id = "stepper_right_text",
 		pass_type = "text",
-		value = input_text_navigate_primary_right,
+		value = ">",
 		style = {
 			vertical_alignment = "center",
 			horizontal_alignment = "center",
@@ -517,6 +516,153 @@ StepperPassTemplates.difficulty_stepper = {
 		}
 	}
 }
+local MIN_HAVOC_RANK = 1
+local MAX_HAVOC_RANK = 40
+StepperPassTemplates.havoc_stepper = {
+	{
+		pass_type = "logic",
+		value = function (pass, ui_renderer, logic_style, content, position, size)
+			if not content.disabled then
+				local min_level = math.clamp(content.min_level or MIN_HAVOC_RANK, MIN_HAVOC_RANK, MAX_HAVOC_RANK)
+				local max_level = math.clamp(content.max_level or MAX_HAVOC_RANK, MAX_HAVOC_RANK, MAX_HAVOC_RANK)
+				min_level = min_level <= max_level and min_level or max_level
+				content.min_level = min_level
+				content.max_level = max_level
+				content.level = min_level <= content.level and content.level <= max_level and content.level or min_level
+				local level = content.level
+				local input_service = ui_renderer.input_service
+
+				if (content.hotspot_left.on_released or input_service:get("navigate_primary_left_pressed")) and min_level < level then
+					level = level - 1
+				elseif (content.hotspot_right.on_released or input_service:get("navigate_primary_right_pressed")) and level < max_level then
+					level = level + 1
+				end
+
+				local hover_index = content.level
+
+				if content.last_level ~= level then
+					content.difficulty_text = tostring(level)
+					content.last_level = level
+					content.level = level
+					local cb = content.on_changed_callback
+
+					if cb then
+						cb()
+					end
+				end
+
+				content._hover_index_1 = math.min(hover_index, level)
+				content._hover_index_2 = math.max(hover_index, level)
+				local gamepad_active = InputDevice.gamepad_active
+
+				if content.was_gamepad_active ~= gamepad_active then
+					content.was_gamepad_active = gamepad_active
+					content.stepper_left = gamepad_active and _get_input_text("navigate_primary_left_pressed") or "<"
+					content.stepper_right = gamepad_active and _get_input_text("navigate_primary_right_pressed") or ">"
+				end
+			end
+		end
+	},
+	{
+		value = "<",
+		value_id = "stepper_left",
+		pass_type = "text",
+		style = {
+			font_size = 32,
+			text_vertical_alignment = "center",
+			horizontal_alignment = "center",
+			text_horizontal_alignment = "center",
+			vertical_alignment = "center",
+			font_type = "proxima_nova_bold",
+			text_color = color_terminal_text_header,
+			size = {
+				75,
+				75
+			},
+			offset = {
+				-120,
+				30,
+				1
+			}
+		}
+	},
+	{
+		value = ">",
+		value_id = "stepper_right",
+		pass_type = "text",
+		style = {
+			font_size = 32,
+			text_vertical_alignment = "center",
+			horizontal_alignment = "center",
+			text_horizontal_alignment = "center",
+			vertical_alignment = "center",
+			font_type = "proxima_nova_bold",
+			text_color = color_terminal_text_header,
+			size = {
+				75,
+				75
+			},
+			offset = {
+				120,
+				30,
+				1
+			}
+		}
+	},
+	{
+		pass_type = "hotspot",
+		content_id = "hotspot_left",
+		content = difficulty_picker_stepper_hotspot_content,
+		style = {
+			vertical_alignment = "center",
+			horizontal_alignment = "center",
+			size = {
+				75,
+				75
+			},
+			offset = {
+				-140,
+				30,
+				1
+			}
+		}
+	},
+	{
+		pass_type = "hotspot",
+		content_id = "hotspot_right",
+		content = difficulty_picker_stepper_hotspot_content,
+		style = {
+			vertical_alignment = "center",
+			horizontal_alignment = "center",
+			size = {
+				75,
+				75
+			},
+			offset = {
+				140,
+				30,
+				1
+			}
+		}
+	},
+	{
+		value = "difficulty_text",
+		value_id = "difficulty_text",
+		pass_type = "text",
+		style = {
+			font_type = "proxima_nova_bold",
+			font_size = 45,
+			text_vertical_alignment = "center",
+			text_horizontal_alignment = "center",
+			text_color = color_terminal_text_header,
+			offset = {
+				0,
+				20,
+				3
+			}
+		}
+	}
+}
 local terminal_button_text_style = table.clone(UIFontSettings.button_primary)
 terminal_button_text_style.offset = {
 	0,
@@ -644,7 +790,7 @@ StepperPassTemplates.terminal_stepper = {
 	{
 		value_id = "stepper_left_text",
 		pass_type = "text",
-		value = input_text_navigate_primary_left,
+		value = "<",
 		style = {
 			vertical_alignment = "center",
 			horizontal_alignment = "center",
@@ -669,7 +815,7 @@ StepperPassTemplates.terminal_stepper = {
 	{
 		value_id = "stepper_right_text",
 		pass_type = "text",
-		value = input_text_navigate_primary_right,
+		value = ">",
 		style = {
 			vertical_alignment = "center",
 			horizontal_alignment = "center",
@@ -995,6 +1141,14 @@ StepperPassTemplates.terminal_stepper = {
 					content.pressed_delay_time = pressed_delay
 				end
 			end
+		end
+
+		local gamepad_active = InputDevice.gamepad_active
+
+		if content.was_gamepad_active ~= gamepad_active then
+			content.was_gamepad_active = gamepad_active
+			content.stepper_left_text = gamepad_active and _get_input_text("navigate_primary_left_pressed") or "<"
+			content.stepper_right_text = gamepad_active and _get_input_text("navigate_primary_right_pressed") or ">"
 		end
 	end
 }

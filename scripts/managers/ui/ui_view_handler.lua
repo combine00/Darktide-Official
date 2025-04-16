@@ -365,7 +365,7 @@ end
 
 function UIViewHandler:active_top_view()
 	local active_views_array = self._active_views_array
-	local active_view = active_views_array[#active_views_array]
+	local active_view = active_views_array[self._num_active_views]
 
 	return active_view
 end
@@ -377,14 +377,11 @@ function UIViewHandler:active_views()
 end
 
 function UIViewHandler:using_input()
-	local active_views_array = self._active_views_array
-
-	return #active_views_array > 0 and self._any_view_using_input
+	return self._num_active_views > 0 and self._any_view_using_input
 end
 
 function UIViewHandler:render_scale()
 	local view_scale_multiplier = 1
-	local render_settings = self._render_settings
 	local scale = RESOLUTION_LOOKUP.scale
 	local new_scale = scale * view_scale_multiplier
 
@@ -655,14 +652,9 @@ function UIViewHandler:_force_close(view_name)
 
 	view_data.instance = nil
 	active_views_data[view_name] = nil
+	local index = table.index_of(active_views_array, view_name)
 
-	for i = 1, self._num_active_views do
-		if active_views_array[i] == view_name then
-			table.remove(active_views_array, i)
-
-			break
-		end
-	end
+	table.remove(active_views_array, index)
 
 	self._num_active_views = self._num_active_views - 1
 
@@ -681,7 +673,6 @@ function UIViewHandler:_open(view_name, opening_duration, context, settings_over
 	local active_views_array = self._active_views_array
 	local active_views_data = self._active_views_data
 	local t = self:_get_time()
-	local index = #active_views_array + 1
 	local view_list = self._view_list
 	local view_settings = view_list[view_name]
 
@@ -717,13 +708,14 @@ function UIViewHandler:_open(view_name, opening_duration, context, settings_over
 		use_transition_ui = view_settings.use_transition_ui,
 		parent_transition_view = view_settings.parent_transition_view
 	}
-	active_views_data[view_name] = view_data
+	self._num_active_views = self._num_active_views + 1
+	local index = self._num_active_views
 	active_views_array[index] = view_name
+	active_views_data[view_name] = view_data
 	local path = view_settings.path
 	local class = require(path)
 	local instance = class:new(view_settings, context)
 	view_data.instance = instance
-	self._num_active_views = self._num_active_views + 1
 end
 
 function UIViewHandler:_set_game_world_blur(enabled, blur_intese_multiplier)

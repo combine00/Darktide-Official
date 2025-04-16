@@ -56,6 +56,8 @@ function LegacyV2ProximitySystem:init(extension_system_creation_context, ...)
 end
 
 function LegacyV2ProximitySystem:destroy()
+	self._raycast_object = nil
+
 	if not DEDICATED_SERVER then
 		FxProximityCulling.destroy()
 	end
@@ -172,10 +174,8 @@ end
 
 function LegacyV2ProximitySystem:on_remove_extension(unit, extension_name)
 	local extension = self._unit_to_extension_map[unit]
-
-	if self._player_unit_extensions_map[unit] then
-		self._player_unit_extensions_map[unit] = nil
-	end
+	self._player_unit_component_map[unit] = nil
+	self._player_unit_extensions_map[unit] = nil
 
 	if extension.trigger_heard_vo or extension.trigger_seen_vo then
 		self._num_units_that_support_proximity_driven_vo = self._num_units_that_support_proximity_driven_vo - 1

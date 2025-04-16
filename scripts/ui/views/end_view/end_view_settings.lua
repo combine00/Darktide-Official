@@ -1,6 +1,6 @@
 local end_view_settings = {
-	level_name = "content/levels/ui/end_of_round/ui_eor_background",
 	viewport_name = "ui_end_world_viewport",
+	back_row_additional_spacing_width = 0.3,
 	total_blur_duration = 0.5,
 	stay_in_party_vote_button = "hotkey_menu_special_1",
 	viewport_type = "default",
@@ -9,7 +9,6 @@ local end_view_settings = {
 	overlay_draw_layer = 300,
 	character_spacing_width = 1.6,
 	skip_grace_time = 0.5,
-	shading_environment = "content/shading_environments/ui/ui_eor_background",
 	back_row_additional_spacing_depth = 1.2,
 	delay_before_summary = 5,
 	timer_name = "ui",
@@ -18,9 +17,18 @@ local end_view_settings = {
 	delay_after_summary = 10,
 	alpha_fade_time = 0.15,
 	viewport_layer = 1,
-	back_row_additional_spacing_width = 0.3,
 	stay_in_party_vote_text = "loc_eor_stay_in_party_vote_text",
 	world_name = "ui_end_world",
+	levels_by_id = {
+		default = {
+			shading_environment = "content/shading_environments/ui/ui_eor_background",
+			level_name = "content/levels/ui/end_of_round/ui_eor_background"
+		},
+		horde = {
+			shading_environment = "content/shading_environments/ui/ui_eor_background",
+			level_name = "content/levels/ui/horde_end_of_round/horde_end_of_round"
+		}
+	},
 	ignored_slots = {
 		"slot_pocketable",
 		"slot_pocketable_small",

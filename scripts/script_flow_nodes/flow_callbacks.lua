@@ -54,6 +54,12 @@ function FlowCallbacks.call_anim_event(params)
 	end
 end
 
+function FlowCallbacks.disable_animation_statemachine(params)
+	local unit = params.unit
+
+	Unit.disable_animation_state_machine(unit)
+end
+
 function FlowCallbacks.play_npc_foley(params)
 	local unit = params.unit
 	local event_resource = params.event_resource
@@ -1101,16 +1107,18 @@ function FlowCallbacks.cutscene_fade_in(params)
 	local duration = params.duration
 	local easing_function = params.easing_function and math[params.easing_function]
 	local local_player = Managers.player:local_player(1)
+	local fade_color = params.fade_color
 
-	Managers.event:trigger("event_cutscene_fade_in", local_player, duration, easing_function)
+	Managers.event:trigger("event_cutscene_fade_in", local_player, duration, easing_function, fade_color)
 end
 
 function FlowCallbacks.cutscene_fade_out(params)
 	local duration = params.duration
 	local easing_function = params.easing_function and math[params.easing_function]
 	local local_player = Managers.player:local_player(1)
+	local fade_color = params.fade_color
 
-	Managers.event:trigger("event_cutscene_fade_out", local_player, duration, easing_function)
+	Managers.event:trigger("event_cutscene_fade_out", local_player, duration, easing_function, fade_color)
 end
 
 function FlowCallbacks.tutorial_display_popup_message(params)
@@ -1335,7 +1343,7 @@ end
 function FlowCallbacks.is_difficulty(params)
 	local wanted_difficulty = params.wanted_difficulty
 
-	if Managers.state.difficulty:get_difficulty() == wanted_difficulty then
+	if Managers.state.difficulty:get_initial_challenge() == wanted_difficulty then
 		flow_return_table.is_difficulty = true
 
 		return flow_return_table
@@ -1358,6 +1366,15 @@ function FlowCallbacks.open_view(params)
 	end
 end
 
+function FlowCallbacks.trigger_lua_event(params)
+	local event = params.event
+	local event_manager = Managers.event
+
+	if event_manager then
+		event_manager:trigger(event)
+	end
+end
+
 function FlowCallbacks.trigger_lua_unit_event(params)
 	local event = params.event
 	local unit = params.unit
@@ -1365,6 +1382,17 @@ function FlowCallbacks.trigger_lua_unit_event(params)
 
 	if event_manager then
 		event_manager:trigger(event, unit)
+	end
+end
+
+function FlowCallbacks.trigger_lua_level_and_unit_event(params)
+	local event = params.event
+	local level = params.level
+	local unit = params.unit
+	local event_manager = Managers.event
+
+	if event_manager then
+		event_manager:trigger(event, level, unit)
 	end
 end
 
@@ -1524,6 +1552,49 @@ function FlowCallbacks.trigger_mission_giver_mission_info_vo(params)
 
 		Vo.mission_giver_mission_info_vo(voice_selection, selected_voice, trigger_id)
 	end
+end
+
+function FlowCallbacks.trigger_mission_giver_mission_info_backend_vo(params)
+	local is_server = Managers.state.game_session:is_server()
+
+	if is_server then
+		local backend_group_id = params.backend_group_id
+
+		Vo.backend_vo_event(backend_group_id)
+	end
+end
+
+function FlowCallbacks.trigger_save_backend_vo(params)
+	local is_server = Managers.state.game_session:is_server()
+
+	if is_server then
+		Vo.save_backend_vo()
+	end
+end
+
+function FlowCallbacks.play_next_backend_vo(params)
+	local backend_group_id = params.backend_group_id
+	local optional_substring = params.optional_substring
+	local last_line = Vo.play_next_backend_vo(backend_group_id, optional_substring)
+	flow_return_table.last_line = last_line
+
+	return flow_return_table
+end
+
+function FlowCallbacks.substring_exists_in_backend_vo(params)
+	local backend_group_id = params.backend_group_id
+	local substring = params.substring
+	local exists = Vo.substring_exists_in_backend_vo(backend_group_id, substring)
+
+	if exists then
+		flow_return_table.exists = true
+		flow_return_table.not_exists = false
+	else
+		flow_return_table.exists = false
+		flow_return_table.not_exists = true
+	end
+
+	return flow_return_table
 end
 
 function FlowCallbacks.trigger_confessional_vo_event(params)
@@ -1842,8 +1913,8 @@ function FlowCallbacks.switchcase(params)
 
 	if params.case ~= "" then
 		for k, v in pairs(params) do
-			if k ~= "case" and params.case == v then
-				ret[outStr .. string.sub(k, -1)] = true
+			if k ~= "case" and k ~= "node_id" and params.case == v then
+				ret[outStr .. string.sub(k, 6, -1)] = true
 			end
 		end
 	end
@@ -1861,6 +1932,42 @@ function FlowCallbacks.camera_shake(params)
 	local position = Unit.local_position(source_unit, 1)
 
 	CameraShake.camera_shake_by_distance(params.shake_name, position, params.near_distance, params.far_distance, params.near_shake_scale, params.far_shake_scale)
+end
+
+function FlowCallbacks.add_timed_mood_to_players(params)
+	local mood_type = params.mood_type
+	local t = Managers.time:time("gameplay")
+	local player_manager = Managers.player
+	local players = player_manager:human_players()
+
+	if mood_type then
+		for unique_id, player in pairs(players) do
+			local unit = player.player_unit
+			local mood_extension = ScriptUnit.has_extension(unit, "mood_system")
+
+			if mood_extension then
+				mood_extension:add_timed_mood(t, mood_type)
+			end
+		end
+	end
+end
+
+function FlowCallbacks.remove_mood_from_players(params)
+	local mood_type = params.mood_type
+	local t = Managers.time:time("gameplay")
+	local player_manager = Managers.player
+	local players = player_manager:human_players()
+
+	if mood_type then
+		for unique_id, player in pairs(players) do
+			local unit = player.player_unit
+			local mood_extension = ScriptUnit.has_extension(unit, "mood_system")
+
+			if mood_extension then
+				mood_extension:remove_mood(t, mood_type)
+			end
+		end
+	end
 end
 
 function FlowCallbacks.script_data_set_unit(params)
@@ -1882,7 +1989,7 @@ function FlowCallbacks.script_data_set_unit(params)
 end
 
 function FlowCallbacks.register_objective_unit(params)
-	local is_server = Managers.state.game_session:is_server()
+	local is_server = Managers.state.game_session and Managers.state.game_session:is_server()
 
 	if is_server then
 		local mission_objective_system = Managers.state.extension:system("mission_objective_system")
@@ -1908,7 +2015,7 @@ function FlowCallbacks.teleport_payload(params)
 end
 
 function FlowCallbacks.start_mission_objective(params)
-	local is_server = Managers.state.game_session:is_server()
+	local is_server = Managers.state.game_session and Managers.state.game_session:is_server()
 
 	if is_server then
 		local mission_objective_system = Managers.state.extension:system("mission_objective_system")
@@ -1918,7 +2025,7 @@ function FlowCallbacks.start_mission_objective(params)
 end
 
 function FlowCallbacks.update_mission_objective(params)
-	local is_server = Managers.state.game_session:is_server()
+	local is_server = Managers.state.game_session and Managers.state.game_session:is_server()
 
 	if is_server then
 		local mission_objective_system = Managers.state.extension:system("mission_objective_system")
@@ -1928,7 +2035,7 @@ function FlowCallbacks.update_mission_objective(params)
 end
 
 function FlowCallbacks.end_mission_objective(params)
-	local is_server = Managers.state.game_session:is_server()
+	local is_server = Managers.state.game_session and Managers.state.game_session:is_server()
 
 	if is_server then
 		local mission_objective_system = Managers.state.extension:system("mission_objective_system")
@@ -1938,7 +2045,7 @@ function FlowCallbacks.end_mission_objective(params)
 end
 
 function FlowCallbacks.start_side_mission_objective(params)
-	local is_server = Managers.state.game_session:is_server()
+	local is_server = Managers.state.game_session and Managers.state.game_session:is_server()
 
 	if is_server then
 		local side_mission = Managers.state.mission:side_mission()
@@ -1955,7 +2062,7 @@ function FlowCallbacks.start_side_mission_objective(params)
 end
 
 function FlowCallbacks.mission_objective_override_ui_string(params)
-	local is_server = Managers.state.game_session:is_server()
+	local is_server = Managers.state.game_session and Managers.state.game_session:is_server()
 
 	if is_server then
 		local objective_name = params.mission_objective_name
@@ -1968,7 +2075,7 @@ function FlowCallbacks.mission_objective_override_ui_string(params)
 end
 
 function FlowCallbacks.mission_objective_reset_override_ui_string(params)
-	local is_server = Managers.state.game_session:is_server()
+	local is_server = Managers.state.game_session and Managers.state.game_session:is_server()
 
 	if is_server then
 		local objective_name = params.mission_objective_name
@@ -1979,7 +2086,7 @@ function FlowCallbacks.mission_objective_reset_override_ui_string(params)
 end
 
 function FlowCallbacks.mission_objective_show_ui(params)
-	local is_server = Managers.state.game_session:is_server()
+	local is_server = Managers.state.game_session and Managers.state.game_session:is_server()
 
 	if is_server then
 		local objective_name = params.mission_objective_name
@@ -1991,7 +2098,7 @@ function FlowCallbacks.mission_objective_show_ui(params)
 end
 
 function FlowCallbacks.mission_objective_set_ui_state(params)
-	local is_server = Managers.state.game_session:is_server()
+	local is_server = Managers.state.game_session and Managers.state.game_session:is_server()
 
 	if is_server then
 		local objective_name = params.mission_objective_name
@@ -2003,7 +2110,7 @@ function FlowCallbacks.mission_objective_set_ui_state(params)
 end
 
 function FlowCallbacks.mission_objective_increment(params)
-	local is_server = Managers.state.game_session:is_server()
+	local is_server = Managers.state.game_session and Managers.state.game_session:is_server()
 
 	if is_server then
 		local objective_name = params.mission_objective_name
@@ -2015,7 +2122,7 @@ function FlowCallbacks.mission_objective_increment(params)
 end
 
 function FlowCallbacks.mission_objective_show_counter(params)
-	local is_server = Managers.state.game_session:is_server()
+	local is_server = Managers.state.game_session and Managers.state.game_session:is_server()
 
 	if is_server then
 		local objective_name = params.mission_objective_name
@@ -2027,7 +2134,7 @@ function FlowCallbacks.mission_objective_show_counter(params)
 end
 
 function FlowCallbacks.mission_objective_show_bar(params)
-	local is_server = Managers.state.game_session:is_server()
+	local is_server = Managers.state.game_session and Managers.state.game_session:is_server()
 
 	if is_server then
 		local objective_name = params.mission_objective_name
@@ -2039,7 +2146,7 @@ function FlowCallbacks.mission_objective_show_bar(params)
 end
 
 function FlowCallbacks.mission_objective_show_timer(params)
-	local is_server = Managers.state.game_session:is_server()
+	local is_server = Managers.state.game_session and Managers.state.game_session:is_server()
 
 	if is_server then
 		local objective_name = params.mission_objective_name
@@ -2065,17 +2172,36 @@ function FlowCallbacks.teleport_team_to_locations(params)
 
 	local num_destinations = #destination_units
 	local player_manager = Managers.player
-	local players = player_manager:players()
+	local players = player_manager:human_players()
 	local index = 0
+	local local_player = player_manager:local_player(1)
 
 	for unique_id, player in pairs(players) do
 		if player and player.player_unit then
 			index = index % num_destinations + 1
 			local unit = destination_units[index]
 			local position = Unit.world_position(unit, 1)
-			local rotation = Unit.world_rotation(unit, 1)
+			local local_rotation = Unit.local_rotation(unit, 1)
+			local look_direction_flat_forward = Vector3.normalize(Vector3.flat(Quaternion.forward(local_rotation)))
 
-			PlayerMovement.teleport(player, position, rotation)
+			if Vector3.length_squared(look_direction_flat_forward) == 0 then
+				look_direction_flat_forward = Vector3.forward()
+			end
+
+			local target_rotation = Quaternion.look(look_direction_flat_forward, Vector3.up())
+
+			PlayerMovement.teleport(player, position, target_rotation)
+
+			local channel_id = player:channel_id()
+			local pitch = Quaternion.pitch(target_rotation)
+			local yaw = Quaternion.yaw(target_rotation)
+			local roll = 0
+
+			if (DEDICATED_SERVER or local_player:peer_id() ~= player:peer_id()) and channel_id then
+				RPC.rpc_client_set_local_player_orientation(channel_id, yaw, pitch, roll)
+			elseif local_player:peer_id() == player:peer_id() then
+				local_player:set_orientation(yaw, pitch, roll)
+			end
 		end
 	end
 
@@ -2656,6 +2782,77 @@ function FlowCallbacks.aggro_all_within_radius(params)
 	local radius = params.radius
 
 	pacing_manager:aggro_all_within_radius(position, radius)
+end
+
+function FlowCallbacks.mission_buffs_send_family_selection(params)
+	local is_server = Managers.state.game_session and Managers.state.game_session:is_server()
+
+	if not is_server then
+		return
+	end
+
+	local num_choices = params.num_choices > 0 and params.num_choices or 3
+
+	Managers.event:trigger("mission_buffs_event_request_family_buff_choice", num_choices)
+end
+
+function FlowCallbacks.mission_buffs_send_family_buff_to_all(params)
+	local is_server = Managers.state.game_session and Managers.state.game_session:is_server()
+
+	if not is_server then
+		return
+	end
+end
+
+function FlowCallbacks.mission_buffs_send_legendary_buff_selection(params)
+	local is_server = Managers.state.game_session and Managers.state.game_session:is_server()
+
+	if not is_server then
+		return
+	end
+end
+
+function FlowCallbacks.hordes_mode_wave_start(params)
+	local is_server = Managers.state.game_session and Managers.state.game_session:is_server()
+
+	Managers.event:trigger("hordes_mode_on_wave_started", params.wave_num)
+end
+
+function FlowCallbacks.hordes_mode_objective_completed(params)
+	local is_server = Managers.state.game_session and Managers.state.game_session:is_server()
+
+	if not is_server then
+		return
+	end
+
+	Managers.event:trigger("hordes_mode_on_objective_completed", params.wave_num)
+end
+
+function FlowCallbacks.hordes_mode_wave_completed(params)
+	local is_server = Managers.state.game_session and Managers.state.game_session:is_server()
+
+	Managers.event:trigger("hordes_mode_on_wave_completed", params.wave_num > 0 and params.wave_num or 1)
+end
+
+function FlowCallbacks.hordes_mode_island_entered(params)
+	Managers.event:trigger("hordes_mode_on_island_entered", params.island_id)
+end
+
+function FlowCallbacks.hordes_mode_island_completed(params)
+	Managers.event:trigger("hordes_mode_on_island_completed")
+end
+
+function FlowCallbacks.hordes_mode_on_mcguffin_returned(params)
+	Managers.event:trigger("hordes_mode_on_mcguffin_returned")
+end
+
+function FlowCallbacks.set_unit_material_scalar(params)
+	local unit = params.unit
+	local material_name = params.material_name
+	local material_variable_name = params.variable_name
+	local material_scalar = params.scalar or 1
+
+	Unit.set_scalar_for_material(unit, material_name, material_variable_name, material_scalar)
 end
 
 return FlowCallbacks

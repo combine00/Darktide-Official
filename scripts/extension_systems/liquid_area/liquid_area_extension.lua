@@ -65,6 +65,8 @@ function LiquidAreaExtension:init(extension_init_context, unit, extension_init_d
 		end
 	end
 
+	self._area_template_name = template.name
+	self._source_side_name = source_side_name
 	self._sides = side_system:sides()
 	self._side_names = side_names or side_system:side_names()
 	local broadphase_system = extension_manager:system("broadphase_system")
@@ -416,6 +418,14 @@ function LiquidAreaExtension:destroy()
 			end
 		end
 	end
+end
+
+function LiquidAreaExtension:source_side_name()
+	return self._source_side_name
+end
+
+function LiquidAreaExtension:area_template_name()
+	return self._area_template_name
 end
 
 function LiquidAreaExtension:is_position_inside(position)

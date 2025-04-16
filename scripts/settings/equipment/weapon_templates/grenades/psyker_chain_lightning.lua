@@ -304,37 +304,115 @@ weapon_template.action_inputs = {
 	}
 }
 weapon_template.action_input_hierarchy = {
-	wield = "stay",
-	combat_ability = "base",
-	charge_heavy = {
-		charge_heavy_cancel = "base",
-		wield = "base",
-		combat_ability = "base",
-		shoot_heavy_hold = {
-			wield = "base",
-			shoot_heavy_hold_release = "base",
-			combat_ability = "base",
-			force_vent = "base"
+	{
+		input = "charge_heavy",
+		transition = {
+			{
+				input = "shoot_heavy_hold",
+				transition = {
+					{
+						transition = "base",
+						input = "shoot_heavy_hold_release"
+					},
+					{
+						transition = "base",
+						input = "wield"
+					},
+					{
+						transition = "base",
+						input = "combat_ability"
+					},
+					{
+						transition = "base",
+						input = "force_vent"
+					}
+				}
+			},
+			{
+				transition = "base",
+				input = "charge_heavy_cancel"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			}
 		}
 	},
-	shoot_light_pressed = {
-		shoot_light_hold_release = "base",
-		wield = "base",
-		combat_ability = "base",
-		force_vent = "base"
+	{
+		input = "shoot_light_pressed",
+		transition = {
+			{
+				transition = "base",
+				input = "shoot_light_hold_release"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "force_vent"
+			}
+		}
 	},
-	vent = {
-		wield = "base",
-		vent_release = "base",
-		combat_ability = "base"
+	{
+		input = "vent",
+		transition = {
+			{
+				transition = "base",
+				input = "vent_release"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			}
+		}
 	},
-	force_vent = {
-		wield = "base",
-		combat_ability = "base",
-		force_vent_release = "base"
+	{
+		input = "force_vent",
+		transition = {
+			{
+				transition = "base",
+				input = "force_vent_release"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			}
+		}
 	},
-	inspect_start = {
-		inspect_stop = "base"
+	{
+		input = "inspect_start",
+		transition = {
+			{
+				transition = "base",
+				input = "inspect_stop"
+			}
+		}
+	},
+	{
+		transition = "stay",
+		input = "wield"
+	},
+	{
+		transition = "base",
+		input = "combat_ability"
 	}
 }
 weapon_template.actions = {

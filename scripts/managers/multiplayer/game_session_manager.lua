@@ -259,6 +259,13 @@ function GameSessionManager:game_object_created(game_object_id, owner_peer_id)
 
 			unit_data_extension:on_server_data_state_game_object_created(self._engine_game_session, game_object_id)
 		end
+	elseif game_object_type == "unit_template" then
+		local unit = unit_spawner:unit(game_object_id)
+		local minigame_extension = ScriptUnit.has_extension(unit, "minigame_system")
+
+		if minigame_extension then
+			minigame_extension:on_game_object_created(game_object_id)
+		end
 	elseif game_object_type == "server_husk_data_state" or game_object_type == "server_husk_hud_data_state" then
 		local unit_game_object_id = GameSession.game_object_field(self._engine_game_session, game_object_id, "unit_game_object_id")
 		local unit = unit_spawner:unit(unit_game_object_id)
@@ -463,6 +470,7 @@ function GameSessionManager:_client_joined(channel_id, peer_id)
 	local player = Managers.player:player(peer_id, local_player_id)
 
 	player:create_input_handler(self.fixed_time_step)
+	Managers.state.unit_spawner:hot_join_sync(peer_id, channel_id)
 	Managers.state.game_mode:hot_join_sync(peer_id, channel_id)
 	Managers.state.extension:hot_join_sync(peer_id, channel_id)
 	Managers.state.nav_mesh:hot_join_sync(peer_id, channel_id)
@@ -470,6 +478,7 @@ function GameSessionManager:_client_joined(channel_id, peer_id)
 	Managers.state.networked_flow_state:hot_join_sync(peer_id, channel_id)
 	Managers.state.mutator:hot_join_sync(peer_id, channel_id)
 	Managers.state.cinematic:hot_join_sync(peer_id, channel_id)
+	Managers.stats:hot_join_sync(peer_id, channel_id)
 	RPC.rpc_is_fully_hot_join_synced(channel_id)
 	Managers.event:trigger("host_game_session_manager_player_joined", peer_id, player)
 
@@ -523,7 +532,7 @@ function GameSessionManager:_client_left(channel_id, peer_id, game_reason, engin
 				end
 			end
 
-			player_unit_spawn_manager:despawn(player)
+			player_unit_spawn_manager:despawn_player(player)
 
 			if player.input_handler then
 				player:destroy_input_handler()

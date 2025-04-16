@@ -1,3 +1,4 @@
+local LoadingStateData = require("scripts/ui/loading_state_data")
 local LoadMissionError = require("scripts/managers/error/errors/load_mission_error")
 local Missions = require("scripts/settings/mission/mission_templates")
 
@@ -7,10 +8,12 @@ end
 
 local StateLoading = class("StateLoading")
 local STATES = table.enum("waiting_for_network", "waiting_for_despawn", "loading")
+local LOADING_STATES = table.enum("loading_global_packages", "loading_mission")
 
 function StateLoading:init()
 	self._creation_context = nil
 	self._state = nil
+	self._loading_state = nil
 	self._failed_clients = nil
 	self._needs_load_level = false
 	self._level_name = nil
@@ -52,20 +55,32 @@ function StateLoading:on_enter(parent, params, creation_context)
 	}
 
 	Managers.player:on_game_state_enter(self, player_game_state_mapping, game_state_context)
-	Managers.event:register(self, "on_pre_suspend", "_on_pre_suspend")
 end
 
-function StateLoading:_start_loading()
+function StateLoading:_start_loading_mission()
 	_info("[_start_loading] needs_load_level(%s), mission_name(%s), circumstance_name(%s), side_mission(%s)", self._needs_load_level, self._mission_name, self._circumstance_name, self._side_mission)
 
 	if self._needs_load_level then
-		Managers.loading:load_mission(self._mission_name, self._level_name, self._circumstance_name)
+		local mechanism_data = Managers.mechanism:mechanism_data()
+		local loading_context = mechanism_data
+
+		Managers.loading:load_mission(loading_context, self._level_name)
 		Managers.event:trigger("event_loading_resources_started", self._mission_name)
 	else
 		Managers.loading:no_level_needed()
 	end
+end
 
-	self:_load_global_packages()
+function StateLoading:_start_loading()
+	if self:_global_packages_loaded() then
+		self:_start_loading_mission()
+
+		self._loading_state = LOADING_STATES.loading_mission
+	else
+		self:_load_global_packages()
+
+		self._loading_state = LOADING_STATES.loading_global_packages
+	end
 end
 
 function StateLoading:_setup_loading_data(params)
@@ -80,6 +95,7 @@ function StateLoading:_setup_loading_data(params)
 	self._mission_giver_vo = params.mission_giver_vo or "none"
 	self._next_state = params.next_state
 	self._next_state_params = params.next_state_params
+	self._havoc_data = params.havoc_data
 end
 
 function StateLoading:_reset_player_game_state(mission_name, mission_giver_vo)
@@ -98,7 +114,6 @@ end
 function StateLoading:on_exit()
 	Managers.localization:reset_cache()
 	Managers.player:on_game_state_exit(self)
-	Managers.event:unregister(self, "on_pre_suspend")
 end
 
 function StateLoading:_reset_state_loading(params)
@@ -115,6 +130,8 @@ function StateLoading:_reset_state_loading(params)
 end
 
 function StateLoading:update(main_dt, main_t)
+	Managers.event:trigger("event_set_waiting_state", LoadingStateData.WAIT_REASON.read_disk)
+
 	local context = self._creation_context
 
 	context.network_receive_function(main_dt)
@@ -267,30 +284,38 @@ function StateLoading:_global_packages_loaded()
 end
 
 function StateLoading:_update_loading()
-	local loading_manager = Managers.loading
+	if self._loading_state == LOADING_STATES.loading_global_packages and self:_global_packages_loaded() then
+		self:_start_loading_mission()
 
-	if loading_manager:load_finished() and self:_global_packages_loaded() then
-		local is_host = loading_manager:is_host()
-		local parameters = {
-			level_name = self:_current_level(),
-			mission_name = self._mission_name,
-			is_host = is_host,
-			spawn_group_id = loading_manager:spawn_group_id()
-		}
+		self._loading_state = LOADING_STATES.loading_mission
+	end
 
-		if self._needs_load_level then
-			local world, level, themes, world_name = loading_manager:take_ownership_of_level()
-			parameters.world = world
-			parameters.level = level
-			parameters.themes = themes
-			parameters.world_name = world_name
+	if self._loading_state == LOADING_STATES.loading_mission then
+		local loading_manager = Managers.loading
+
+		if self:_global_packages_loaded() and loading_manager:load_finished() then
+			local is_host = loading_manager:is_host()
+			local parameters = {
+				level_name = self:_current_level(),
+				mission_name = self._mission_name,
+				is_host = is_host,
+				spawn_group_id = loading_manager:spawn_group_id()
+			}
+
+			if self._needs_load_level then
+				local world, level, themes, world_name = loading_manager:take_ownership_of_level()
+				parameters.world = world
+				parameters.level = level
+				parameters.themes = themes
+				parameters.world_name = world_name
+			end
+
+			if self._next_state_params then
+				table.merge(parameters, self._next_state_params)
+			end
+
+			return true, parameters
 		end
-
-		if self._next_state_params then
-			table.merge(parameters, self._next_state_params)
-		end
-
-		return true, parameters
 	end
 end
 
@@ -302,10 +327,6 @@ function StateLoading:_current_level()
 
 		return Missions[mission_name].level
 	end
-end
-
-function StateLoading:_on_pre_suspend()
-	Managers.loading:cleanup()
 end
 
 return StateLoading

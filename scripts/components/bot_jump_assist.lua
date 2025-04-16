@@ -87,6 +87,10 @@ function BotJumpAssist:editor_destroy(unit)
 		return
 	end
 
+	if BotJumpAssist._nav_info ~= nil then
+		SharedNav.destroy(BotJumpAssist._nav_info)
+	end
+
 	local world = self._world
 	local line_object = self._line_object
 

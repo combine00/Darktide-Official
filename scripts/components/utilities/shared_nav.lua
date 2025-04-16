@@ -93,4 +93,8 @@ function SharedNav.check_new_navmesh_generated(nav_info, component_nav_guid, wit
 	end
 end
 
+function SharedNav.destroy(nav_info)
+	_clear_nav_info(nav_info)
+end
+
 return SharedNav

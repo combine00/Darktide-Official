@@ -28,6 +28,15 @@ function Luggable.drop_luggable(t, unit, inventory_component, visual_loadout_ext
 	PlayerUnitVisualLoadout.unequip_item_from_slot(unit, SLOT_LUGGABLE, t)
 
 	if existing_unit and Managers.state.game_session:is_server() then
+		local pickup_name = Unit.get_data(existing_unit, "pickup_type")
+		local pickup_data = pickup_name and Pickups.by_name[pickup_name]
+
+		if pickup_data and pickup_data.on_drop_func then
+			pickup_data.on_drop_func(existing_unit, unit)
+		end
+
+		Managers.state.extension:system("pickup_system"):dropped(existing_unit)
+
 		local first_person_component = unit_data_extension:read_component("first_person")
 		local locomotion_component = unit_data_extension:read_component("locomotion")
 
@@ -61,7 +70,7 @@ function Luggable.enable_physics(first_person_component, locomotion_component, e
 	local new_velocity = player_velocity_contribution + throw_velocity
 	local angular_velocity = Vector3.zero()
 
-	locomotion_extension:switch_to_engine(position, look_rotation, new_velocity, angular_velocity)
+	locomotion_extension:switch_to_engine_physics(position, look_rotation, new_velocity, angular_velocity)
 end
 
 function Luggable.equip_to_player_unit(player_unit, luggable_unit, t)

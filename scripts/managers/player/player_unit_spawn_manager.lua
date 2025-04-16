@@ -90,7 +90,7 @@ function PlayerUnitSpawnManager:process_queued_despawns()
 	for unique_id, _ in pairs(queued_despawns) do
 		local player = player_manager:player_from_unique_id(unique_id)
 
-		self:despawn(player)
+		self:despawn_player(player)
 
 		queued_despawns[unique_id] = nil
 	end
@@ -220,15 +220,15 @@ function PlayerUnitSpawnManager:_spawn(player, position, rotation, parent, optio
 	return player_unit
 end
 
-function PlayerUnitSpawnManager:despawn_safe(player)
+function PlayerUnitSpawnManager:despawn_player_safe(player)
 	if Managers.state.unit_spawner:deletion_state() == DELETION_STATES.during_extension_update then
 		self._queued_despawns[player:unique_id()] = true
 	else
-		self:despawn(player)
+		self:despawn_player(player)
 	end
 end
 
-function PlayerUnitSpawnManager:despawn(player)
+function PlayerUnitSpawnManager:despawn_player(player)
 	local game_mode_manager = Managers.state.game_mode
 
 	game_mode_manager:on_player_unit_despawn(player)
@@ -339,7 +339,7 @@ function PlayerUnitSpawnManager:_on_player_soft_oob(unit)
 		Managers.state.out_of_bounds:unregister_soft_oob_unit(unit, self)
 		Managers.state.unit_spawner:mark_for_deletion(unit)
 	else
-		self:despawn_safe(unit_owner)
+		self:despawn_player_safe(unit_owner)
 	end
 end
 

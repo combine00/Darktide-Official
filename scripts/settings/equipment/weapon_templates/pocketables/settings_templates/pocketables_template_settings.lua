@@ -1,3 +1,4 @@
+local ActionInputHierarchy = require("scripts/utilities/action/action_input_hierarchy")
 local BaseTemplateSettings = require("scripts/settings/equipment/weapon_templates/base_template_settings")
 local DamageProfileTemplates = require("scripts/settings/damage/damage_profile_templates")
 local DamageSettings = require("scripts/settings/damage/damage_settings")
@@ -64,18 +65,42 @@ local pocketables_template_settings = {
 table.add_missing(pocketables_template_settings.action_inputs, BaseTemplateSettings.action_inputs)
 
 pocketables_template_settings.action_input_hierarchy = {
-	place = "base",
-	wield = "base",
-	push = "stay",
-	aim_give = {
-		wield = "base",
-		aim_give_release = "previous",
-		combat_ability = "base",
-		grenade_ability = "base"
+	{
+		transition = "stay",
+		input = "push"
+	},
+	{
+		transition = "base",
+		input = "place"
+	},
+	{
+		transition = "base",
+		input = "wield"
+	},
+	{
+		input = "aim_give",
+		transition = {
+			{
+				transition = "previous",
+				input = "aim_give_release"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "grenade_ability"
+			}
+		}
 	}
 }
 
-table.add_missing(pocketables_template_settings.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
+ActionInputHierarchy.add_missing(pocketables_template_settings.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
 
 pocketables_template_settings.actions = {
 	action_unwield = {

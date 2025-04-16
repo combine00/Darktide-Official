@@ -6,6 +6,19 @@ table.make_unique(templates)
 local stat_buffs = BuffSettings.stat_buffs
 local proc_events = BuffSettings.proc_events
 templates.weapon_trait_bespoke_lasgun_p1_increased_zoom = {
+	format_values = {
+		fov_multiplier = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_lasgun_p1_increased_zoom",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.fov_multiplier
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_lasgun_p1_increased_zoom = {
 			{
@@ -32,6 +45,22 @@ templates.weapon_trait_bespoke_lasgun_p1_increased_zoom = {
 	}
 }
 templates.weapon_trait_bespoke_lasgun_p1_first_shot_ammo_cost_reduction = {
+	format_values = {
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_lasgun_p1_first_shot_ammo_cost_reduction",
+				find_value_type = "trait_override",
+				path = {
+					"cooldown_duration"
+				}
+			}
+		},
+		ammo = {
+			value = "33%",
+			format_type = "string"
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_lasgun_p1_first_shot_ammo_cost_reduction = {
 			{
@@ -62,6 +91,18 @@ templates.weapon_trait_bespoke_lasgun_p1_first_shot_ammo_cost_reduction = {
 	}
 }
 templates.weapon_trait_bespoke_lasgun_p1_suppression_negation_on_weakspot = {
+	format_values = {
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_lasgun_p1_suppression_negation_on_weakspot",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_lasgun_p1_suppression_negation_on_weakspot = {
 			{
@@ -80,6 +121,30 @@ templates.weapon_trait_bespoke_lasgun_p1_suppression_negation_on_weakspot = {
 	}
 }
 templates.weapon_trait_bespoke_lasgun_p1_stacking_crit_chance_on_weakspot = {
+	format_values = {
+		crit_chance = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_lasgun_p1_stacking_crit_chance_on_weakspot_parent",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.critical_strike_chance
+				}
+			}
+		},
+		stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_lasgun_p1_stacking_crit_chance_on_weakspot_parent",
+				find_value_type = "trait_override",
+				path = {
+					"max_stacks"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_lasgun_p1_stacking_crit_chance_on_weakspot_parent = {
 			{
@@ -110,6 +175,18 @@ templates.weapon_trait_bespoke_lasgun_p1_stacking_crit_chance_on_weakspot = {
 	}
 }
 templates.weapon_trait_bespoke_lasgun_p1_count_as_dodge_vs_ranged_on_weakspot = {
+	format_values = {
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_lasgun_p1_count_as_dodge_vs_ranged_on_weakspot",
+				find_value_type = "trait_override",
+				path = {
+					"active_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_lasgun_p1_count_as_dodge_vs_ranged_on_weakspot = {
 			{
@@ -128,6 +205,36 @@ templates.weapon_trait_bespoke_lasgun_p1_count_as_dodge_vs_ranged_on_weakspot = 
 	}
 }
 templates.weapon_trait_bespoke_lasgun_p1_negate_stagger_reduction_on_weakspot = {
+	format_values = {
+		stagger = {
+			prefix = "+",
+			num_decimals = 0,
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_lasgun_p1_negate_stagger_reduction_on_weakspot",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.stagger_weakspot_reduction_modifier
+				}
+			},
+			value_manipulation = function (value)
+				return 100 - math.round(value * 100)
+			end
+		},
+		ranged_stagger = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_lasgun_p1_negate_stagger_reduction_on_weakspot",
+				find_value_type = "buff_template",
+				path = {
+					"conditional_stat_buffs",
+					stat_buffs.ranged_impact_modifier
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_lasgun_p1_negate_stagger_reduction_on_weakspot = {
 			{
@@ -154,6 +261,20 @@ templates.weapon_trait_bespoke_lasgun_p1_negate_stagger_reduction_on_weakspot = 
 	}
 }
 templates.weapon_trait_bespoke_lasgun_p1_stagger_count_bonus_damage = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_lasgun_p1_stagger_count_bonus_damage",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.stagger_count_damage
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_lasgun_p1_stagger_count_bonus_damage = {
 			{
@@ -180,6 +301,30 @@ templates.weapon_trait_bespoke_lasgun_p1_stagger_count_bonus_damage = {
 	}
 }
 templates.weapon_trait_bespoke_lasgun_p1_burninating_on_crit = {
+	format_values = {
+		stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_lasgun_p1_burninating_on_crit",
+				find_value_type = "trait_override",
+				path = {
+					"target_buff_data",
+					"num_stacks_on_proc"
+				}
+			}
+		},
+		max_stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_lasgun_p1_burninating_on_crit",
+				find_value_type = "trait_override",
+				path = {
+					"target_buff_data",
+					"max_stacks"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_lasgun_p1_burninating_on_crit = {
 			{
@@ -210,6 +355,20 @@ templates.weapon_trait_bespoke_lasgun_p1_burninating_on_crit = {
 	}
 }
 templates.weapon_trait_bespoke_lasgun_p1_crit_weakspot_finesse = {
+	format_values = {
+		crit_weakspot_damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_lasgun_p1_crit_weakspot_finesse",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.critical_strike_weakspot_damage
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_lasgun_p1_crit_weakspot_finesse = {
 			{
@@ -236,6 +395,20 @@ templates.weapon_trait_bespoke_lasgun_p1_crit_weakspot_finesse = {
 	}
 }
 templates.weapon_trait_bespoke_lasgun_p1_power_bonus_on_first_shot = {
+	format_values = {
+		power_level = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_autogun_p3_power_bonus_on_first_shot",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.ranged_power_level_modifier
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_autogun_p3_power_bonus_on_first_shot = {
 			{

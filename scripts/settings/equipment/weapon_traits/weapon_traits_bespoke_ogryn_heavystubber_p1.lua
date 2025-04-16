@@ -5,6 +5,27 @@ local templates = {}
 table.make_unique(templates)
 
 templates.weapon_trait_bespoke_ogryn_heavystubber_p1_toughness_on_continuous_fire = {
+	format_values = {
+		toughness = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_heavystubber_p1_toughness_on_continuous_fire",
+				find_value_type = "trait_override",
+				path = {
+					"toughness_fixed_percentage"
+				}
+			}
+		},
+		ammo = {
+			value = "10%",
+			format_type = "string"
+		},
+		stacks = {
+			value = "5",
+			format_type = "string"
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_heavystubber_p1_toughness_on_continuous_fire = {
 			{
@@ -23,6 +44,28 @@ templates.weapon_trait_bespoke_ogryn_heavystubber_p1_toughness_on_continuous_fir
 	}
 }
 templates.weapon_trait_bespoke_ogryn_heavystubber_p1_power_bonus_on_continuous_fire = {
+	format_values = {
+		power_level = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_heavystubber_p1_power_bonus_on_continuous_fire",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.power_level_modifier
+				}
+			}
+		},
+		ammo = {
+			value = "10%",
+			format_type = "string"
+		},
+		stacks = {
+			value = "5",
+			format_type = "string"
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_heavystubber_p1_power_bonus_on_continuous_fire = {
 			{
@@ -49,6 +92,40 @@ templates.weapon_trait_bespoke_ogryn_heavystubber_p1_power_bonus_on_continuous_f
 	}
 }
 templates.weapon_trait_bespoke_ogryn_heavystubber_p1_increased_suppression_on_continuous_fire = {
+	format_values = {
+		suppression = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_heavystubber_p1_increased_suppression_on_continuous_fire",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.suppression_dealt
+				}
+			}
+		},
+		damage_vs_suppressed = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_heavystubber_p1_increased_suppression_on_continuous_fire",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.damage_vs_suppressed
+				}
+			}
+		},
+		ammo = {
+			value = "2.5%",
+			format_type = "string"
+		},
+		stacks = {
+			value = "5",
+			format_type = "string"
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_heavystubber_p1_increased_suppression_on_continuous_fire = {
 			{
@@ -79,6 +156,32 @@ templates.weapon_trait_bespoke_ogryn_heavystubber_p1_increased_suppression_on_co
 	}
 }
 templates.weapon_trait_bespoke_ogryn_heavystubber_p1_movement_speed_on_continous_fire = {
+	format_values = {
+		movement_speed = {
+			prefix = "-",
+			num_decimals = 0,
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_heavystubber_p1_movement_speed_on_continous_fire",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.alternate_fire_movement_speed_reduction_modifier
+				}
+			},
+			value_manipulation = function (value)
+				return 100 - math.round(value * 100)
+			end
+		},
+		ammo = {
+			value = "5%",
+			format_type = "string"
+		},
+		stacks = {
+			value = "5",
+			format_type = "string"
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_heavystubber_p1_movement_speed_on_continous_fire = {
 			{
@@ -109,6 +212,40 @@ templates.weapon_trait_bespoke_ogryn_heavystubber_p1_movement_speed_on_continous
 	}
 }
 templates.weapon_trait_bespoke_ogryn_heavystubber_p1_increase_power_on_close_kill = {
+	format_values = {
+		power_level = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_heavystubber_p1_increase_power_on_close_kill_parent",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.power_level_modifier
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_heavystubber_p1_increase_power_on_close_kill_parent",
+				find_value_type = "trait_override",
+				path = {
+					"child_duration"
+				}
+			}
+		},
+		stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_heavystubber_p1_increase_power_on_close_kill_child",
+				find_value_type = "buff_template",
+				path = {
+					"max_stacks"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_heavystubber_p1_increase_power_on_close_kill_parent = {
 			{
@@ -139,6 +276,50 @@ templates.weapon_trait_bespoke_ogryn_heavystubber_p1_increase_power_on_close_kil
 	}
 }
 templates.weapon_trait_bespoke_ogryn_heavystubber_p1_consecutive_hits_increases_ranged_power = {
+	format_values = {
+		power = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_heavystubber_p1_consecutive_hits_increases_ranged_power_parent",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.ranged_power_level_modifier
+				}
+			}
+		},
+		hit = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_heavystubber_p1_consecutive_hits_increases_ranged_power_parent",
+				find_value_type = "trait_override",
+				path = {
+					"number_of_hits_per_stack"
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_heavystubber_p1_consecutive_hits_increases_ranged_power_parent",
+				find_value_type = "trait_override",
+				path = {
+					"child_duration"
+				}
+			}
+		},
+		stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_heavystubber_p1_consecutive_hits_increases_ranged_power_parent",
+				find_value_type = "trait_override",
+				path = {
+					"child_max_stacks"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_heavystubber_p1_consecutive_hits_increases_ranged_power_parent = {
 			{
@@ -177,6 +358,18 @@ templates.weapon_trait_bespoke_ogryn_heavystubber_p1_consecutive_hits_increases_
 	}
 }
 templates.weapon_trait_bespoke_ogryn_heavystubber_p1_ammo_from_reserve_on_crit = {
+	format_values = {
+		bullet_amount = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_heavystubber_p1_ammo_from_reserve_on_crit",
+				find_value_type = "trait_override",
+				path = {
+					"num_ammmo_to_move"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_heavystubber_p1_ammo_from_reserve_on_crit = {
 			{
@@ -195,6 +388,20 @@ templates.weapon_trait_bespoke_ogryn_heavystubber_p1_ammo_from_reserve_on_crit =
 	}
 }
 templates.weapon_trait_bespoke_heavystubber_p1_suppression_on_close_kill = {
+	format_values = {
+		range = {
+			format_type = "string",
+			find_value = {
+				find_value_type = "rarity_value",
+				trait_value = {
+					"5m",
+					"6m",
+					"7m",
+					"8m"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_heavystubber_p1_suppression_on_close_kill = {
 			{
@@ -233,6 +440,40 @@ templates.weapon_trait_bespoke_heavystubber_p1_suppression_on_close_kill = {
 	}
 }
 templates.weapon_trait_bespoke_heavystubber_p1_increase_close_damage_on_close_kill = {
+	format_values = {
+		close_damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_heavystubber_p1_increase_close_damage_on_close_kill_parent",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.damage_near
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_heavystubber_p1_increase_close_damage_on_close_kill_parent",
+				find_value_type = "trait_override",
+				path = {
+					"child_duration"
+				}
+			}
+		},
+		stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_heavystubber_p1_increase_close_damage_on_close_kill_child",
+				find_value_type = "buff_template",
+				path = {
+					"max_stacks"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_heavystubber_p1_increase_close_damage_on_close_kill_parent = {
 			{

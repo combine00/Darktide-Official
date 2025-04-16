@@ -169,6 +169,10 @@ function InteracteeExtension:show_marker(interactor_unit)
 	return interaction:interactee_show_marker_func(interactor_unit, self._unit)
 end
 
+function InteracteeExtension:disable_active_hotjoin_sync()
+	self._disable_active_hotjoin_sync = true
+end
+
 function InteracteeExtension:set_active(is_active)
 	if self._is_server then
 		local unit_id = self._unit_id
@@ -177,9 +181,11 @@ function InteracteeExtension:set_active(is_active)
 		Managers.state.game_session:send_rpc_clients("rpc_interaction_set_active", unit_id, is_level_unit, is_active)
 	end
 
-	self._active = not not is_active
+	if not self._disable_active_hotjoin_sync then
+		self._active = not not is_active
 
-	self:update_light()
+		self:update_light()
+	end
 end
 
 function InteracteeExtension:set_emissive_material_name(material_name)
@@ -262,7 +268,9 @@ end
 
 function InteracteeExtension:set_missing_players(is_missing)
 	if is_missing then
-		self:set_block_text("loc_action_interaction_generic_missing_players")
+		local target_text = self:missing_players_text()
+
+		self:set_block_text(target_text)
 	else
 		self:set_block_text(nil)
 	end
@@ -372,13 +380,25 @@ function InteracteeExtension:action_text()
 	return override_context.action_text or interaction:action_text()
 end
 
-function InteracteeExtension:set_description(description)
+function InteracteeExtension:set_missing_players_text(text)
 	local active_interaction_type = self._active_interaction_type
 
 	if active_interaction_type then
 		local override_context = self._override_contexts[active_interaction_type]
-		override_context.description = description
+		override_context.missing_players_text = text
 	end
+end
+
+function InteracteeExtension:missing_players_text()
+	local active_interaction_type = self._active_interaction_type
+
+	if not active_interaction_type then
+		return
+	end
+
+	local override_context = self._override_contexts[active_interaction_type]
+
+	return override_context.missing_players_text or "loc_action_interaction_generic_missing_players"
 end
 
 function InteracteeExtension:set_duration(duration)
@@ -390,6 +410,16 @@ function InteracteeExtension:set_duration(duration)
 	end
 end
 
+function InteracteeExtension:set_description(description, description_context)
+	local active_interaction_type = self._active_interaction_type
+
+	if active_interaction_type then
+		local override_context = self._override_contexts[active_interaction_type]
+		override_context.description = description
+		override_context.description_context = description_context
+	end
+end
+
 function InteracteeExtension:description()
 	local active_interaction_type = self._active_interaction_type
 
@@ -398,9 +428,16 @@ function InteracteeExtension:description()
 	end
 
 	local override_context = self._override_contexts[active_interaction_type]
+	local description = override_context.description
+	local description_context = override_context.description_context
+
+	if description then
+		return description, description_context
+	end
+
 	local interaction = self._interactions[active_interaction_type]
 
-	return override_context.description or interaction:description()
+	return interaction:description()
 end
 
 function InteracteeExtension:set_block_text(text, block_text_context)

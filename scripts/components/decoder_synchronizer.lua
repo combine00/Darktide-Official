@@ -14,9 +14,8 @@ function DecoderSynchronizer:init(unit, is_server)
 		local stall_once_per_device = self:get_data(unit, "stall_once_per_device")
 		local setup_only = self:get_data(unit, "setup_only")
 		local progress_in_minigame = self:get_data(unit, "progress_in_minigame")
-		local auto_open_auspex = self:get_data(unit, "auto_open_auspex")
 
-		decoder_synchronizer_extension:setup_from_component(objective_name, auto_start, min_time_until_stalling, max_time_until_stalling, num_active_units, stall_once_per_device, setup_only, progress_in_minigame, auto_open_auspex)
+		decoder_synchronizer_extension:setup_from_component(objective_name, auto_start, min_time_until_stalling, max_time_until_stalling, num_active_units, stall_once_per_device, setup_only, progress_in_minigame)
 
 		self._decoder_synchronizer_extension = decoder_synchronizer_extension
 	end
@@ -89,14 +88,19 @@ DecoderSynchronizer.component_data = {
 		ui_name = "Setup Only"
 	},
 	progress_in_minigame = {
-		ui_type = "check_box",
 		value = false,
-		ui_name = "Progress In Minigame"
-	},
-	auto_open_auspex = {
-		ui_type = "check_box",
-		value = false,
-		ui_name = "Open Auspex On Placement"
+		ui_type = "combo_box",
+		ui_name = "Progress In Minigame",
+		options_keys = {
+			"true",
+			"On Stall",
+			"false"
+		},
+		options_values = {
+			true,
+			"On Stall",
+			false
+		}
 	},
 	inputs = {
 		start_decoding_event = {

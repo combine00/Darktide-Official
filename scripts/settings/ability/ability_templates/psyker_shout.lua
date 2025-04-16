@@ -38,9 +38,18 @@ local ability_template = {
 		}
 	},
 	action_input_hierarchy = {
-		shout_pressed = {
-			shout_released = "base",
-			block_cancel = "base"
+		{
+			input = "shout_pressed",
+			transition = {
+				{
+					transition = "base",
+					input = "shout_released"
+				},
+				{
+					transition = "base",
+					input = "block_cancel"
+				}
+			}
 		}
 	},
 	actions = {
@@ -70,12 +79,13 @@ local ability_template = {
 			allowed_during_sprint = true,
 			ability_type = "combat_ability",
 			anim = "ability_shout",
+			target_allies = true,
 			shout_shape = "cone",
 			use_charge_at_start = true,
 			vfx = "content/fx/particles/abilities/psyker_warp_charge_shout",
-			uninterruptible = true,
 			allowed_during_explode = true,
 			sound_source = "head",
+			uninterruptible = true,
 			use_ability_charge = true,
 			total_time = 0.75,
 			vo_tag = {

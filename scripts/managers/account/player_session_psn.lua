@@ -1,7 +1,7 @@
 local Promise = require("scripts/foundation/utilities/promise")
 local PlayerSessionPSN = class("PlayerSessionPSN")
 
-function PlayerSessionPSN.create_session(web_api, user_id, max_players, join_disabled, is_private)
+function PlayerSessionPSN.create_session(web_api, user_id, max_players, join_disabled, is_private, has_crossplay_restriction)
 	return Managers.party_immaterium:get_your_standing_invite_code():next(function (party_id_with_invite_code)
 		local push_context_id = WebApi.create_push_context(user_id)
 		local invite_code_base64 = string.encode_base64(party_id_with_invite_code)
@@ -9,7 +9,6 @@ function PlayerSessionPSN.create_session(web_api, user_id, max_players, join_dis
 		local content = cjson.encode({
 			playerSessions = {
 				{
-					nonPsnSupported = false,
 					maxSpectators = 0,
 					swapSupported = false,
 					invitableUserType = "MEMBER",
@@ -44,7 +43,9 @@ function PlayerSessionPSN.create_session(web_api, user_id, max_players, join_dis
 								customData1 = invite_code_base64
 							}
 						}
-					}
+					},
+					expirationTime = not has_crossplay_restriction and 86400 or nil,
+					nonPsnSupported = not has_crossplay_restriction
 				}
 			}
 		})

@@ -83,7 +83,8 @@ local talent_settings = {
 			duration = 8
 		},
 		toughness_3 = {
-			toughness = 0.005,
+			cooldown = 5,
+			toughness = 0.05,
 			time = 0.1,
 			range = DamageSettings.in_melee_range
 		},
@@ -116,7 +117,7 @@ local talent_settings = {
 			duration = 3,
 			range = 5,
 			toughness_percent = 0.15,
-			damage = 0.1
+			damage = 0.2
 		},
 		offensive_2_1 = {
 			stacks = 6
@@ -127,7 +128,7 @@ local talent_settings = {
 			recoil_modifier = -0.12,
 			stamina_per_second = 0.75,
 			sway_modifier = 0.4,
-			shot_stamina = 0.25
+			shot_stamina = 0.1
 		},
 		offensive_2_3 = {
 			reload_speed = 0.3
@@ -138,16 +139,16 @@ local talent_settings = {
 		},
 		combat_ability_3 = {
 			damage_vs_ogryn_and_monsters = 0.75
+		},
+		veteran_ranged_power_out_of_melee = {
+			cooldown = 8
 		}
 	},
 	veteran_3 = {
 		combat_ability = {
-			cone_dot = 0.95,
-			radius = 9,
-			cone_range = 30,
-			toughness_replenish_percent = 0.5,
 			cooldown = 30,
-			power_level = 500,
+			radius = 9,
+			toughness_replenish_percent = 0.5,
 			max_charges = 1
 		},
 		grenade = {

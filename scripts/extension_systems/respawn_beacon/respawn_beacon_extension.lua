@@ -26,10 +26,10 @@ function RespawnBeaconExtension:setup_from_component(side, debug_ignore_check_di
 	local max_player_radius, max_player_height = _player_max_radius_height()
 	local valid_spawn_positions, _, _, _ = RespawnBeaconQueries.spawn_locations(self._nav_world, self._physics_world, self._unit, max_player_radius, max_player_height)
 	local num_valid_spawn_positions = #valid_spawn_positions
-	self._valid_spawn_positions = {}
+	self._valid_spawn_positions = Script.new_array(num_valid_spawn_positions)
 
 	for i = 1, num_valid_spawn_positions do
-		self._valid_spawn_positions[#self._valid_spawn_positions + 1] = {
+		self._valid_spawn_positions[i] = {
 			position = Vector3Box(valid_spawn_positions[i])
 		}
 	end
@@ -81,7 +81,7 @@ end
 function RespawnBeaconExtension:respawn_players()
 	local player_unit_spawn_manager = self._player_unit_spawn_manager
 	local players_to_spawn = player_unit_spawn_manager:players_to_spawn()
-	local valid_spawn_positions = self:best_respawn_positions()
+	local valid_spawn_positions = self._valid_spawn_positions
 	local beacon_unit = self._unit
 	local beacon_position = Unit.world_position(beacon_unit, Unit.node(beacon_unit, "aim_target"))
 	local side = self._side
@@ -97,25 +97,23 @@ function RespawnBeaconExtension:respawn_players()
 			if not valid_position.occupied_unit then
 				local spawn_position = valid_position.position:unbox()
 
-				if spawn_position then
-					self:_try_spawn_guards(spawn_position, beacon_unit, valid_spawn_positions)
+				self:_try_spawn_guards(spawn_position, beacon_unit, valid_spawn_positions)
 
-					local spawn_parent = nil
-					local spawn_rotation = Quaternion.look(beacon_position - spawn_position, Vector3.up())
+				local spawn_parent = nil
+				local spawn_rotation = Quaternion.look(beacon_position - spawn_position, Vector3.up())
 
-					player_unit_spawn_manager:spawn_player(player, spawn_position, spawn_rotation, spawn_parent, force_spawn, side, nil, "hogtied", is_respawn)
+				player_unit_spawn_manager:spawn_player(player, spawn_position, spawn_rotation, spawn_parent, force_spawn, side, nil, "hogtied", is_respawn)
 
-					valid_position.occupied_unit = player.player_unit
+				valid_position.occupied_unit = player.player_unit
 
-					break
-				end
+				break
 			end
 		end
 	end
 end
 
 function RespawnBeaconExtension:move_hogtied_players(players)
-	local valid_spawn_positions = self:best_respawn_positions()
+	local valid_spawn_positions = self._valid_spawn_positions
 
 	for i = 1, #players do
 		repeat
@@ -187,7 +185,8 @@ function RespawnBeaconExtension:_try_spawn_guards(spawn_position, beacon_unit, v
 
 	local settings = Managers.state.difficulty:get_table_entry_by_challenge(RespawnBeaconGuardSettings)
 	local nav_spawn_points = main_path_manager:nav_spawn_points()
-	local spawn_point_group_index = SpawnPointQueries.group_from_position(self._nav_world, nav_spawn_points, spawn_position)
+	local nav_world = self._nav_world
+	local spawn_point_group_index = SpawnPointQueries.group_from_position(nav_world, nav_spawn_points, spawn_position)
 	local start_index = Managers.state.main_path:node_index_by_nav_group_index(spawn_point_group_index or 1)
 	local end_index = start_index + 1
 	local _, travel_distance, _, _, _ = MainPathQueries.closest_position_between_nodes(spawn_position, start_index, end_index)
@@ -218,7 +217,7 @@ function RespawnBeaconExtension:_try_spawn_guards(spawn_position, beacon_unit, v
 		local wanted_rotation = Quaternion.multiply(beacon_unit_rotation, rotation)
 		local wanted_direction = Quaternion.forward(wanted_rotation)
 		local offseted_position = spawn_position + wanted_direction * position_offset
-		local navmesh_position = NavQueries.position_on_mesh(self._nav_world, offseted_position, NAV_ABOVE, NAV_BELOW)
+		local navmesh_position = NavQueries.position_on_mesh(nav_world, offseted_position, NAV_ABOVE, NAV_BELOW)
 
 		if navmesh_position then
 			local too_close_to_spawn_position = false
@@ -251,7 +250,7 @@ function RespawnBeaconExtension:despawn_guards()
 	for i = 1, #self._guards do
 		local guard_unit = self._guards[i]
 
-		minion_spawn_manager:despawn(guard_unit)
+		minion_spawn_manager:despawn_minion(guard_unit)
 	end
 end
 

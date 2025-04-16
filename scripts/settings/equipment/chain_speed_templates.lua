@@ -22,6 +22,10 @@ local chain_speed_templates = {
 			activated = 0.2,
 			idle = 0.05,
 			activated_sawing = 0.2
+		},
+		haptic_vibration_intensity = {
+			max = 35,
+			min = 0
 		}
 	},
 	chainsword = {
@@ -47,6 +51,10 @@ local chain_speed_templates = {
 			activated = 0.2,
 			idle = 0.05,
 			activated_sawing = 0.2
+		},
+		haptic_vibration_intensity = {
+			max = 40,
+			min = 0
 		}
 	},
 	chainsword_2h = {
@@ -72,6 +80,10 @@ local chain_speed_templates = {
 			activated = 0.2,
 			idle = 0.05,
 			activated_sawing = 0.2
+		},
+		haptic_vibration_intensity = {
+			max = 30,
+			min = 0
 		}
 	}
 }

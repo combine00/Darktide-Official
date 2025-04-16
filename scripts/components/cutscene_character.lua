@@ -1,11 +1,10 @@
+local Breed = require("scripts/utilities/breed")
 local CutsceneCharacter = component("CutsceneCharacter")
 
 function CutsceneCharacter:init(unit)
 	if DEDICATED_SERVER then
 		return false
 	end
-
-	self:enable(unit)
 
 	self._unit = unit
 	local cinematic_name = self:get_data(unit, "cinematic_name")
@@ -25,10 +24,12 @@ function CutsceneCharacter:init(unit)
 
 		cutscene_character_extension:setup_from_component(cinematic_name, character_type, breed_name, prop_items, cinematic_slot, animation_event, equip_slot_on_loadout_assign)
 	end
-end
 
-function CutsceneCharacter:editor_init(unit)
-	self:enable(unit)
+	if self:get_data(unit, "materialize") ~= "disabled" then
+		self.run_update_on_enable = true
+
+		self:init_materialize()
+	end
 end
 
 function CutsceneCharacter:editor_validate(unit)
@@ -77,6 +78,167 @@ function CutsceneCharacter:start_inventory_specific_walk_animation()
 	local cutscene_character_extension = ScriptUnit.extension(self._unit, "cutscene_character_system")
 
 	cutscene_character_extension:start_inventory_specific_walk_animation()
+end
+
+local function set_eye_visibility(unit, state)
+	local size = state and Vector3(1, 1, 1) or Vector3(0, 0, 0)
+	local children = Unit.get_child_units(unit)
+
+	if children ~= nil then
+		for _, child in pairs(children) do
+			if Unit.has_node(child, "j_lefteye") then
+				local node = Unit.node(child, "j_lefteye")
+
+				Unit.set_local_scale(child, node, size)
+			end
+
+			if Unit.has_node(child, "j_righteye") then
+				local node = Unit.node(child, "j_righteye")
+
+				Unit.set_local_scale(child, node, size)
+			end
+		end
+	end
+end
+
+function CutsceneCharacter:update(unit, dt, t)
+	local data = self._materialize_data
+
+	if data then
+		local lerp_t = math.clamp01(data.current_t / data.duration)
+		local value = math.lerp(data.from, data.to, lerp_t)
+		data.current_t = data.current_t + dt
+
+		Unit.set_scalar_for_materials(unit, "materialize_data", value, true)
+
+		if lerp_t >= 1 then
+			self._should_update = false
+		end
+
+		if not data.eyes_set and data.eyes_per < lerp_t then
+			data.eyes_set = true
+
+			set_eye_visibility(unit, data.visible)
+		end
+
+		if not data.wielded_set and data.wielded_per <= lerp_t then
+			data.wielded_set = true
+			local cutscene_character_extension = ScriptUnit.extension(unit, "cutscene_character_system")
+
+			cutscene_character_extension:wield_slot_set_visibility(data.wielded_vis)
+		end
+
+		if not data.visible_set and data.visible_per <= lerp_t then
+			data.visible_set = true
+			local cutscene_character_extension = ScriptUnit.extension(unit, "cutscene_character_system")
+
+			cutscene_character_extension:set_visibility(data.visible)
+		end
+	end
+
+	return self._should_update
+end
+
+function CutsceneCharacter:editor_update(unit, dt, t)
+	return self:update(unit, dt, t)
+end
+
+local function get_min(unit)
+	local pos = Unit.world_position(unit, 1)
+
+	return -0.1 + pos.z
+end
+
+local function get_max(unit, breed_name)
+	local pos = Unit.world_position(unit, 1)
+	local cutscene_character_extension = ScriptUnit.extension(unit, "cutscene_character_system")
+	local breed = cutscene_character_extension:breed()
+	local z_scale = Unit.local_scale(unit, 1).z
+	local height = Breed.height(unit, breed) * 1.2 * z_scale
+
+	return height + pos.z + 0.1
+end
+
+function CutsceneCharacter:init_materialize()
+	if DEDICATED_SERVER then
+		return false
+	end
+
+	local unit = self._unit
+
+	if self:get_data(unit, "materialize") == "enabled_visible" then
+		Unit.set_permutation_for_materials(unit, "HAS_DEMATERIALIZE", true, true)
+		Unit.set_scalar_for_materials(unit, "materialize_data", get_max(unit), true)
+	else
+		Unit.set_permutation_for_materials(unit, "HAS_DEMATERIALIZE", true, true)
+		Unit.set_scalar_for_materials(unit, "materialize_data", get_min(unit), true)
+		set_eye_visibility(unit, false)
+
+		local cutscene_character_extension = ScriptUnit.extension(unit, "cutscene_character_system")
+
+		cutscene_character_extension:wield_slot_set_visibility(false)
+		cutscene_character_extension:set_visibility(false)
+	end
+end
+
+function CutsceneCharacter:start_materialize()
+	if DEDICATED_SERVER then
+		return false
+	end
+
+	self:init_materialize()
+
+	local unit = self._unit
+	self._materialize_data = {
+		duration = 2.7,
+		wielded_vis = true,
+		wielded_per = 0.6,
+		current_t = 0,
+		eyes_per = 0.9,
+		visible_per = 0.01,
+		eyes_set = false,
+		visible = true,
+		wielded_set = false,
+		visible_set = false,
+		from = get_min(unit),
+		to = get_max(unit, self._breed_name)
+	}
+	self._should_update = true
+
+	return true
+end
+
+function CutsceneCharacter:start_dematerialize()
+	if DEDICATED_SERVER then
+		return false
+	end
+
+	self:init_materialize()
+
+	local unit = self._unit
+	local eyes_percentage = 0.65
+
+	if self._cinematic_name == "outro_win" then
+		eyes_percentage = 0.1
+	end
+
+	self._materialize_data = {
+		duration = 2.7,
+		wielded_vis = false,
+		wielded_per = 0.5,
+		current_t = 0,
+		visible_per = 0.99,
+		eyes_set = false,
+		visible = false,
+		wielded_set = false,
+		visible_set = false,
+		from = get_max(unit, self._breed_name),
+		to = get_min(unit),
+		eyes_per = eyes_percentage
+	}
+	self._should_update = true
+
+	return true
 end
 
 CutsceneCharacter.component_data = {
@@ -230,12 +392,36 @@ CutsceneCharacter.component_data = {
 		ui_name = "Equip Slot on Loadout Assignment",
 		category = "Attachments"
 	},
+	materialize = {
+		ui_type = "combo_box",
+		category = "Materialize",
+		value = "disabled",
+		ui_name = "Materialize",
+		options_keys = {
+			"Disabled",
+			"Enabled (Start Visible)",
+			"Enabled (Start Hidden)"
+		},
+		options_values = {
+			"disabled",
+			"enabled_visible",
+			"enabled_hidden"
+		}
+	},
 	inputs = {
 		start_weapon_specific_walk_animation = {
 			accessibility = "public",
 			type = "event"
 		},
 		start_inventory_specific_walk_animation = {
+			accessibility = "public",
+			type = "event"
+		},
+		start_materialize = {
+			accessibility = "public",
+			type = "event"
+		},
+		start_dematerialize = {
 			accessibility = "public",
 			type = "event"
 		}

@@ -240,6 +240,11 @@ function WeaponIconUI:_spawn_weapon(item, render_context)
 	end
 
 	local item_base_unit_name = item.base_unit
+
+	if render_context and render_context.alignment_key_value then
+		item_base_unit_name = render_context.alignment_key_value
+	end
+
 	local item_level_link_unit = self:_get_unit_by_value_key(alignment_key, item_base_unit_name)
 	local spawn_point_unit = item_level_link_unit or self._spawn_point_unit
 	local spawn_position = Unit.world_position(spawn_point_unit, 1)

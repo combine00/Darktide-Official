@@ -43,17 +43,6 @@ local function _format_progress(current_progress, goal)
 	return Localize("loc_achievement_progress", true, params)
 end
 
-local function _penance_reward_item_to_gear(item)
-	local gear = table.clone(item)
-	local gear_id = gear.uuid
-	gear.overrides = nil
-	gear.id = nil
-	gear.uuid = nil
-	gear.gear_id = nil
-
-	return gear_id, gear
-end
-
 local RESULT_TYPES = table.enum("wintrack", "penance")
 local PENANCE_TRACK_ID = "dec942ce-b6ba-439c-95e2-022c5d71394d"
 local PenanceOverviewView = class("PenanceOverviewView", "BaseView")
@@ -1881,19 +1870,25 @@ function PenanceOverviewView:_set_handle_navigation()
 	if self._penance_grid then
 		local should_disable_navigation = result_active or self._wintracks_focused
 
-		self._penance_grid:disable_input(should_disable_navigation)
+		if self._penance_grid:input_disabled() ~= should_disable_navigation then
+			self._penance_grid:disable_input(should_disable_navigation)
+		end
 	end
 
 	if self._categories_tab_bar then
 		local should_use_navigation = not result_active and self._selected_top_option_key == "browser" and not self._wintracks_focused
 
-		self._categories_tab_bar:set_is_handling_navigation_input(should_use_navigation)
+		if self._categories_tab_bar:is_handling_navigation_input() ~= should_use_navigation then
+			self._categories_tab_bar:set_is_handling_navigation_input(should_use_navigation)
+		end
 	end
 
 	if self._top_panel then
 		local should_use_navigation = not result_active and not self._wintracks_focused
 
-		self._top_panel:set_is_handling_navigation_input(should_use_navigation)
+		if self._top_panel:is_handling_navigation_input() ~= should_use_navigation then
+			self._top_panel:set_is_handling_navigation_input(should_use_navigation)
+		end
 	end
 end
 
@@ -2091,26 +2086,7 @@ function PenanceOverviewView:_claim_wintrack_reward(index)
 
 			for reward_name, claimed_reward in pairs(claimed_rewards) do
 				if claimed_reward.type == "item" then
-					local item_id = claimed_reward.id
-					local reward_id = claimed_reward.gearId
-					local rewarded_master_item = MasterItems.get_item(item_id)
-					rewarded_master_item.uuid = reward_id
-					rewarded_master_item.masterDataInstance = {
-						id = item_id,
-						overrides = {},
-						slots = rewarded_master_item.slots
-					}
-					local gear_id, gear = _penance_reward_item_to_gear(rewarded_master_item)
-
-					Managers.data_service.gear:on_gear_created(gear_id, gear)
-
-					local item = MasterItems.get_item_instance(gear, gear_id)
-
-					if item then
-						local skip_notification = true
-
-						ItemUtils.mark_item_id_as_new(item, skip_notification)
-					end
+					ItemUtils.register_track_reward(claimed_reward)
 				end
 			end
 
@@ -2410,7 +2386,7 @@ function PenanceOverviewView:_claim_penance(reward_bundle)
 						overrides = {},
 						slots = rewarded_master_item.slots
 					}
-					local gear_id, gear = _penance_reward_item_to_gear(rewarded_master_item)
+					local gear_id, gear = ItemUtils.track_reward_item_to_gear(rewarded_master_item)
 
 					Managers.data_service.gear:on_gear_created(gear_id, gear)
 

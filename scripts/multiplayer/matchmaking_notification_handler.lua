@@ -1,4 +1,4 @@
-local DangerSettings = require("scripts/settings/difficulty/danger_settings")
+local Danger = require("scripts/utilities/danger")
 local InputUtils = require("scripts/managers/input/input_utils")
 local MissionTemplates = require("scripts/settings/mission/mission_templates")
 local PartyConstants = require("scripts/settings/network/party_constants")
@@ -6,46 +6,87 @@ local MatchmakingNotificationHandler = class("MatchmakingNotificationHandler")
 local INPUT_SERVICE_TYPE = "View"
 local CANCEL_INPUT_ALIAS = "cancel_matchmaking"
 
-local function _danger_display_name(challenge, resistance)
-	local danger = DangerSettings.calculate_danger(challenge, resistance)
-	local danger_settings = DangerSettings.by_index[danger]
-	local danger_string = danger_settings and Localize(danger_settings.display_name)
+local function _get_havoc_rank(mission_data)
+	local min_havoc_rank = 1
+	local max_havoc_rank = 100
+	local havoc_rank_string = "havoc-rank-"
 
-	return danger_string
+	for i = min_havoc_rank, max_havoc_rank do
+		if mission_data.mission.flags[havoc_rank_string .. tostring(i)] then
+			return i
+		end
+	end
+
+	Log.error("Matchmaking Notification Handler", "Unable to get havoc rank")
+
+	return nil
+end
+
+local function _get_quick_play_values(qp_code)
+	local danger_settings = Danger.danger_by_qp_code(qp_code)
+	local danger_string = danger_settings and danger_settings.display_name
+
+	return Localize("loc_mission_board_quickplay_header"), danger_string and Localize(danger_string)
+end
+
+local function _mission_name(mission_data)
+	local mission_key = mission_data.mission.map
+	local mission_template = MissionTemplates[mission_key]
+	local mission_name = mission_template and mission_template.mission_name
+
+	return mission_name and Localize(mission_name)
+end
+
+local function _get_havoc_values(mission_data)
+	local mission_name = _mission_name(mission_data)
+	local havoc_rank = _get_havoc_rank(mission_data)
+	local havoc_string = Localize("loc_havoc_order_info_overlay")
+
+	if havoc_rank then
+		havoc_string = string.format("%s %s", havoc_string, havoc_rank)
+	end
+
+	return mission_name, havoc_string
+end
+
+local function _get_mission_values(mission_data)
+	local mission_name = _mission_name(mission_data)
+	local danger_settings = Danger.danger_by_mission(mission_data.mission)
+	local danger_string = danger_settings and danger_settings.display_name
+
+	return mission_name, danger_string and Localize(danger_string)
 end
 
 local function _try_get_mission_text()
 	local game_state = Managers.party_immaterium:party_game_state()
 	local quickplay = game_state.params.qp == "true"
+	local first_value, second_value = nil
 
 	if quickplay then
 		local mission_id = game_state.params.backend_mission_id
-		local danger = nil
-
-		if mission_id then
-			local _, index = string.find(mission_id, "challenge=")
-			local challenge = index and tonumber(string.sub(mission_id, index + 1, index + 2))
-			danger = challenge and _danger_display_name(challenge, nil)
-		end
-
-		local mission_name = Localize("loc_mission_board_quickplay_header")
-
-		return danger and string.format("%s - %s", mission_name, danger) or mission_name
-	else
+		first_value, second_value = _get_quick_play_values(mission_id)
+	elseif game_state.params.mission_data then
 		local mission_data_json = game_state.params.mission_data
+		local mission_data = cjson.decode(mission_data_json)
+		local is_havoc = mission_data.mission.category == "havoc"
 
-		if mission_data_json then
-			local mission_data = cjson.decode(mission_data_json)
-			local mission_key = mission_data.mission.map
-			local mission_template = MissionTemplates[mission_key]
-			local mission_name = Localize(mission_template.mission_name)
-			local challenge = mission_data.mission.challenge
-			local resistance = mission_data.mission.resistance
-			local danger = _danger_display_name(challenge, resistance)
-
-			return string.format("%s - %s", mission_name, danger)
+		if is_havoc then
+			first_value, second_value = _get_havoc_values(mission_data)
+		else
+			first_value, second_value = _get_mission_values(mission_data)
 		end
 	end
+
+	if not first_value then
+		first_value = second_value
+		second_value = nil
+	end
+
+	if second_value then
+		return string.format("%s - %s", first_value, second_value)
+	end
+
+	return first_value or ""
 end
 
 local function _cancel_matchmaking_text()

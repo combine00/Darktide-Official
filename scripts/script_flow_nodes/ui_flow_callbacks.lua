@@ -97,4 +97,10 @@ function UIFlowCallbacks.unspawn_unit(params)
 	return
 end
 
+function UIFlowCallbacks.is_dedicated_server(params)
+	flow_return_table.is_dedicated_server = DEDICATED_SERVER
+
+	return flow_return_table
+end
+
 return UIFlowCallbacks

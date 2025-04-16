@@ -57,6 +57,8 @@ function MinionNavigationExtension:init(extension_init_context, unit, extension_
 	local blackboard = BLACKBOARDS[unit]
 
 	self:_init_blackboard_components(blackboard)
+
+	self._blackboard = blackboard
 end
 
 local DEFAULT_RANDOMIZED_NAV_TAG_COSTS = {
@@ -303,7 +305,7 @@ function MinionNavigationExtension:_update_destination(unit, nav_bot, t)
 					local debug_position = self._debug_position_when_starting_search:unbox()
 
 					Log.warning("MINION STUCK DESPAWN", "Minion %s is totally stuck when trying to navigate from %s to %s, despawning it. MUST FIX.", breed_name, debug_position, current_destination)
-					Managers.state.minion_spawn:despawn(unit)
+					Managers.state.minion_spawn:despawn_minion(unit)
 
 					return
 				elseif failed_move_attempts == DEBUG_NUM_FAILED_PATHINGS_FOR_DRAW then
@@ -695,7 +697,7 @@ function MinionNavigationExtension:use_smart_object(do_use)
 				TOTAL_NUM_SMART_OBJECT_DESPAWNS = TOTAL_NUM_SMART_OBJECT_DESPAWNS + 1
 
 				Log.warning("MINION STUCK DESPAWN", "Minion %s is stuck when trying to get smartobject %s to %s, despawning it. %d has despawned this session", breed_name, entrance_position, exit_position, TOTAL_NUM_SMART_OBJECT_DESPAWNS)
-				Managers.state.minion_spawn:despawn(unit)
+				Managers.state.minion_spawn:despawn_minion(unit)
 				Managers.server_metrics:add_annotation("minion_got_stuck_using_smartobject")
 			end
 		end
@@ -726,7 +728,7 @@ function MinionNavigationExtension:use_smart_object(do_use)
 				TOTAL_NUM_SMART_OBJECT_DESPAWNS = TOTAL_NUM_SMART_OBJECT_DESPAWNS + 1
 
 				Log.warning("MINION STUCK DESPAWN", "Minion %s is stuck when trying to release smartobject %s to %s, despawning it. %d has despawned this session", breed_name, entrance_position, exit_position, TOTAL_NUM_SMART_OBJECT_DESPAWNS)
-				Managers.state.minion_spawn:despawn(unit)
+				Managers.state.minion_spawn:despawn_minion(unit)
 				Managers.server_metrics:add_annotation("minion_got_stuck_using_smartobject")
 			end
 		end

@@ -4,7 +4,7 @@ local ArchetypeStaminaTemplates = require("scripts/settings/stamina/archetype_st
 local ArchetypeTalents = require("scripts/settings/ability/archetype_talents/archetype_talents")
 local ArchetypeToughnessTemplates = require("scripts/settings/toughness/archetype_toughness_templates")
 local ArchetypeWarpChargeTemplates = require("scripts/settings/warp_charge/archetype_warp_charge_templates")
-local UISoundEvents = require("scripts/settings/ui/ui_sound_events")
+local UiSoundEvents = require("scripts/settings/ui/ui_sound_events")
 local archetype_data = {
 	archetype_description = "loc_class_ogryn_description",
 	name = "ogryn",
@@ -21,7 +21,6 @@ local archetype_data = {
 	ui_selection_order = 4,
 	talents_package_path = "packages/ui/views/talent_builder_view/ogryn",
 	archetype_name = "loc_class_ogryn_name",
-	string_symbol = "",
 	archetype_icon_selection_large = "content/ui/materials/icons/classes/ogryn_terminal",
 	archetype_icon_large = "content/ui/materials/icons/classes/ogryn",
 	health = 300,
@@ -32,21 +31,16 @@ local archetype_data = {
 	sprint = ArchetypeSprintTemplates.ogryn,
 	stamina = ArchetypeStaminaTemplates.ogryn,
 	warp_charge = ArchetypeWarpChargeTemplates.default,
-	specializations = {
-		ogryn_2 = {
-			archetype = "ogryn",
-			name = "ogryn_2"
-		}
-	},
 	talents = ArchetypeTalents.ogryn,
 	base_talents = {
 		ogryn_melee_damage_coherency = 1,
+		ogryn_dodge_stagger = 1,
 		ogryn_charge = 1,
 		ogryn_grenade_box = 1,
 		ogryn_helping_hand = 1,
 		ogryn_base_tank_passive = 1
 	},
-	selection_sound_event = UISoundEvents.character_create_archetype_ogryn,
+	selection_sound_event = UiSoundEvents.character_create_archetype_ogryn,
 	unique_weapons = {
 		{
 			item = "content/items/weapons/player/melee/ogryn_powermaul_slabshield_p1_m1",

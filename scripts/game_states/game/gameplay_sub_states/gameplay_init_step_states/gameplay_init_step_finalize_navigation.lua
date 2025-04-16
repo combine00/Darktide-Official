@@ -1,5 +1,5 @@
 local GameplayInitStepInterface = require("scripts/game_states/game/gameplay_sub_states/gameplay_init_step_states/gameplay_init_step_state_interface")
-local GameplayInitStepPlayerEnterGame = require("scripts/game_states/game/gameplay_sub_states/gameplay_init_step_states/gameplay_init_step_player_enter_game")
+local GameplayInitGameModeDependencies = require("scripts/game_states/game/gameplay_sub_states/gameplay_init_step_states/gameplay_init_step_game_mode_dependencies")
 local GameplayInitStepFinalizeNavigation = class("GameplayInitStepFinalizeNavigation")
 
 function GameplayInitStepFinalizeNavigation:on_enter(parent, params)
@@ -17,7 +17,7 @@ function GameplayInitStepFinalizeNavigation:update(main_dt, main_t)
 		shared_state = self._shared_state
 	}
 
-	return GameplayInitStepPlayerEnterGame, next_step_params
+	return GameplayInitGameModeDependencies, next_step_params
 end
 
 function GameplayInitStepFinalizeNavigation:_navigation_post_init(is_server, level_name)

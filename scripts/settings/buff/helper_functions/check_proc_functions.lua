@@ -1,4 +1,6 @@
 local AttackSettings = require("scripts/settings/damage/attack_settings")
+local Breed = require("scripts/utilities/breed")
+local Breeds = require("scripts/settings/breed/breeds")
 local ConditionalFunctions = require("scripts/settings/buff/helper_functions/conditional_functions")
 local DamageSettings = require("scripts/settings/damage/damage_settings")
 local MinionState = require("scripts/utilities/minion_state")
@@ -8,7 +10,6 @@ local attack_types = AttackSettings.attack_types
 local damage_types = DamageSettings.damage_types
 local CLOSE_RANGE_RANGED = DamageSettings.ranged_close
 local CLOSE_RANGE_RANGED_SQUARED = CLOSE_RANGE_RANGED * CLOSE_RANGE_RANGED
-local ON_SHOOT_HIT_MULTIPLE_THRESHOLD = 2
 local CheckProcFunctions = {}
 local _is_within_close_distance = nil
 
@@ -181,11 +182,9 @@ function CheckProcFunctions.on_ranged_kill(params, template_data, template_conte
 		return false
 	end
 
-	if params.attack_type ~= attack_types.ranged then
-		return false
-	end
+	local is_ranged_attack = params.attack_type == attack_types.ranged or params.damage_profile and params.damage_profile.count_as_ranged_attack
 
-	return true
+	return is_ranged_attack
 end
 
 function CheckProcFunctions.on_melee_kill(params, template_data, template_context, t)
@@ -288,7 +287,9 @@ function CheckProcFunctions.on_ranged_close_kill(params, template_data, template
 		return false
 	end
 
-	if params.attack_type ~= attack_types.ranged then
+	local is_ranged_attack = params.attack_type == attack_types.ranged or params.damage_profile and params.damage_profile.count_as_ranged_attack
+
+	if not is_ranged_attack then
 		return false
 	end
 
@@ -316,7 +317,9 @@ function CheckProcFunctions.on_crit(params, template_data, template_context, t)
 end
 
 function CheckProcFunctions.on_crit_ranged(params, template_data, template_context, t)
-	return params.is_critical_strike and params.attack_type == attack_types.ranged
+	local is_ranged_attack = params.attack_type == attack_types.ranged or params.damage_profile and params.damage_profile.count_as_ranged_attack
+
+	return params.is_critical_strike and is_ranged_attack
 end
 
 function CheckProcFunctions.on_crit_kills(params, template_data, template_context, t)
@@ -324,7 +327,9 @@ function CheckProcFunctions.on_crit_kills(params, template_data, template_contex
 end
 
 function CheckProcFunctions.on_ranged_hit(params, template_data, template_context, t)
-	return params.attack_type == attack_types.ranged
+	local is_ranged_attack = params.attack_type == attack_types.ranged or params.damage_profile and params.damage_profile.count_as_ranged_attack
+
+	return is_ranged_attack
 end
 
 function CheckProcFunctions.on_melee_hit(params, template_data, template_context, t)
@@ -349,6 +354,14 @@ end
 
 function CheckProcFunctions.on_melee_crit_hit(params, template_data, template_context, t)
 	return params.is_critical_strike and params.attack_type == attack_types.melee
+end
+
+function CheckProcFunctions.on_shout_hit(params, template_data, template_context, t)
+	return params.attack_type == attack_types.shout
+end
+
+function CheckProcFunctions.on_shout_crit_hit(params, template_data, template_context, t)
+	return params.is_critical_strike and params.attack_type == attack_types.shout
 end
 
 function CheckProcFunctions.on_first_target_melee_hit(params, template_data, template_context, t)
@@ -376,7 +389,9 @@ function CheckProcFunctions.on_multiple_melee_hit(params, template_data, templat
 end
 
 function CheckProcFunctions.on_ranged_crit_hit(params, template_data, template_context, t)
-	return params.is_critical_strike and params.attack_type == attack_types.ranged
+	local is_ranged_attack = params.attack_type == attack_types.ranged or params.damage_profile and params.damage_profile.count_as_ranged_attack
+
+	return params.is_critical_strike and is_ranged_attack
 end
 
 function CheckProcFunctions.on_explosion_hit(params, template_data, template_context, t)
@@ -410,7 +425,19 @@ function CheckProcFunctions.on_non_weakspot_hit_melee(params, template_data, tem
 end
 
 function CheckProcFunctions.on_non_weakspot_hit_ranged(params, template_data, template_context, t)
-	return not params.hit_weakspot and params.attack_type == attack_types.ranged
+	local is_ranged_attack = params.attack_type == attack_types.ranged or params.damage_profile and params.damage_profile.count_as_ranged_attack
+
+	return not params.hit_weakspot and is_ranged_attack
+end
+
+function CheckProcFunctions.on_weakspot_hit_melee(params, template_data, template_context, t)
+	return params.hit_weakspot and params.attack_type == attack_types.melee
+end
+
+function CheckProcFunctions.on_weakspot_hit_ranged(params, template_data, template_context, t)
+	local is_ranged_attack = params.attack_type == attack_types.ranged or params.damage_profile and params.damage_profile.count_as_ranged_attack
+
+	return params.hit_weakspot and is_ranged_attack
 end
 
 function CheckProcFunctions.on_weakspot_crit(params, template_data, template_context, t)
@@ -430,7 +457,9 @@ function CheckProcFunctions.on_alternative_fire_hit(params, template_data, templ
 end
 
 function CheckProcFunctions.on_ranged_hit_weakspot(params, template_data, template_context, t)
-	return params.hit_weakspot and params.attack_type == attack_types.ranged
+	local is_ranged_attack = params.attack_type == attack_types.ranged or params.damage_profile and params.damage_profile.count_as_ranged_attack
+
+	return params.hit_weakspot and is_ranged_attack
 end
 
 function CheckProcFunctions.on_stagger_hit(params, template_data, template_context, t)
@@ -445,8 +474,8 @@ function CheckProcFunctions.on_staggering_hit(params, template_data, template_co
 	return stagger_result == stagger_results.stagger
 end
 
-function CheckProcFunctions.on_meelee_stagger_hit(params, template_data, template_context, t)
-	return CheckProcFunctions.on_melee_hit and CheckProcFunctions.on_stagger_hit
+function CheckProcFunctions.on_melee_stagger_hit(params, template_data, template_context, t)
+	return CheckProcFunctions.on_melee_hit(params, template_data, template_context, t) and CheckProcFunctions.on_stagger_hit(params, template_data, template_context, t)
 end
 
 function CheckProcFunctions.on_weapon_special_kill(params, template_data, template_context, t)
@@ -466,11 +495,21 @@ function CheckProcFunctions.on_chain_lightning_hit(params, template_data, templa
 end
 
 function CheckProcFunctions.on_shoot_hit_multiple(params, template_data, template_context, t)
-	return ON_SHOOT_HIT_MULTIPLE_THRESHOLD < params.num_hit_units
+	local template_override_data = template_context.template_override_data
+	local template = template_context.template
+	local buff_data = template_override_data and template_override_data.buff_data or template_data.buff_data or template.buff_data
+	local required_num_hits = buff_data.required_num_hits
+
+	return required_num_hits <= params.num_hit_units
 end
 
 function CheckProcFunctions.on_explosion_hit_multiple(params, template_data, template_context, t)
-	return ON_SHOOT_HIT_MULTIPLE_THRESHOLD < params.number_of_hit_units
+	local template_override_data = template_context.template_override_data
+	local template = template_context.template
+	local buff_data = template_override_data and template_override_data.buff_data or template_data.buff_data or template.buff_data
+	local required_num_hits = buff_data.required_num_hits
+
+	return required_num_hits <= params.number_of_hit_units
 end
 
 function CheckProcFunctions.on_hit_all_pellets_on_same(params, template_data, template_context, t)
@@ -535,7 +574,7 @@ function CheckProcFunctions.check_item_slot(params, template_data, template_cont
 		return ConditionalFunctions.is_item_slot_wielded(template_data, template_context)
 	end
 
-	local projectile_origin_item_slot = projectile_damage_extension:get_origin_item_slot()
+	local projectile_origin_item_slot = projectile_damage_extension:origin_item_slot()
 	local is_slot_active = projectile_origin_item_slot == item_slot_name
 
 	return is_slot_active
@@ -551,6 +590,10 @@ end
 
 function CheckProcFunctions.on_explosion_and_check_item_slot(params, template_data, template_context, t)
 	return CheckProcFunctions.on_explosion_hit(params, template_data, template_context, t) and CheckProcFunctions.check_item_slot(params, template_data, template_context, t)
+end
+
+function CheckProcFunctions.is_weapon_special_active(params, template_data, template_context, t)
+	return params.is_weapon_special_active
 end
 
 function CheckProcFunctions.on_continues_fire_full_auto(params, template_data, template_context, t)

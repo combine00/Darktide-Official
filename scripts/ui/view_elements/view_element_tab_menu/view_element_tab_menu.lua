@@ -343,6 +343,10 @@ function ViewElementTabMenu:set_input_actions(input_action_left, input_action_ri
 	self:_update_input_action_texts()
 end
 
+function ViewElementTabMenu:is_handling_navigation_input()
+	return self._is_handling_navigation_input
+end
+
 function ViewElementTabMenu:set_is_handling_navigation_input(is_enabled)
 	self._is_handling_navigation_input = is_enabled
 end

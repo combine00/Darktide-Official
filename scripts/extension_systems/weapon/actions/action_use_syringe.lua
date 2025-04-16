@@ -4,9 +4,9 @@ local ActionUtility = require("scripts/extension_systems/weapon/actions/utilitie
 local PlayerAssistNotifications = require("scripts/utilities/player_assist_notifications")
 local PlayerUnitStatus = require("scripts/utilities/attack/player_unit_status")
 local PlayerUnitVisualLoadout = require("scripts/extension_systems/visual_loadout/utilities/player_unit_visual_loadout")
-local SpecialRulesSetting = require("scripts/settings/ability/special_rules_settings")
+local SpecialRulesSettings = require("scripts/settings/ability/special_rules_settings")
 local Vo = require("scripts/utilities/vo")
-local special_rules = SpecialRulesSetting.special_rules
+local special_rules = SpecialRulesSettings.special_rules
 local ActionUseSyringe = class("ActionUseSyringe", "ActionWeaponBase")
 
 function ActionUseSyringe:init(action_context, action_params, action_settings)
@@ -84,6 +84,12 @@ function ActionUseSyringe:fixed_update(dt, t, time_in_action)
 			local target_buff_extension = ScriptUnit.has_extension(target_unit, "buff_system")
 
 			if target_buff_extension then
+				if buff_name == "syringe_heal_corruption_buff" then
+					local player = Managers.player:player_by_unit(self._player_unit)
+
+					target_buff_extension:add_inherited_buff_owner(player)
+				end
+
 				target_buff_extension:add_internally_controlled_buff(buff_name, t)
 
 				local assist_notification_type = action_settings.assist_notification_type
@@ -120,6 +126,8 @@ function ActionUseSyringe:fixed_update(dt, t, time_in_action)
 				Managers.telemetry_events:player_used_stimm(player, data)
 			end
 		end
+
+		self:_report_use_to_stat_system(target_unit)
 
 		if self._is_server or target_unit == self._player_unit then
 			self:_play_hit_react_anim(action_settings, target_unit)
@@ -185,6 +193,25 @@ function ActionUseSyringe:_target_unit()
 	end
 
 	return target
+end
+
+function ActionUseSyringe:_report_use_to_stat_system(target)
+	local syringe_data = {}
+	local action_settings = self._action_settings
+	local player = Managers.player:player_by_unit(self._player_unit)
+
+	if player then
+		local visual_loadout_extension = ScriptUnit.has_extension(self._player_unit, "visual_loadout_system")
+		local weapon_template = visual_loadout_extension and visual_loadout_extension:weapon_template_from_slot("slot_pocketable_small")
+		local pickup_name = weapon_template and weapon_template.name
+		local used_on_ally = not action_settings.self_use
+		local target_player = Managers.player:player_by_unit(target)
+		syringe_data.target_player = target_player
+		syringe_data.pickup_name = pickup_name
+		syringe_data.used_on_ally = used_on_ally
+
+		Managers.stats:record_private("hook_on_syringe_use", player, syringe_data)
+	end
 end
 
 return ActionUseSyringe

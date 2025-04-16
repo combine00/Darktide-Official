@@ -236,10 +236,9 @@ function Trajectory.ballistic_raycast(physics_world, collision_filter, original_
 	return false, SEGMENTS, total_length
 end
 
-function Trajectory.test_throw_trajectory(unit, hit_unit_breed_name, physics_world, force, z_force, test_direction, to, gravity, offset_up_human, offset_up_ogryn, max_steps, max_time)
+function Trajectory.test_throw_trajectory(unit, physics_world, force, z_force, test_direction, to, gravity, offset_up, max_steps, max_time)
 	local unit_position = POSITION_LOOKUP[unit]
-	local is_human = hit_unit_breed_name == "human"
-	local up = Vector3.up() * (is_human and offset_up_human or offset_up_ogryn)
+	local up = Vector3.up() * offset_up
 	local from = unit_position + test_direction + up
 	local direction = Vector3.normalize(test_direction)
 	local catapult_velocity = direction * force

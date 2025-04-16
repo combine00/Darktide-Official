@@ -60,7 +60,7 @@ local scenegraph_definition = {
 		horizontal_alignment = "right",
 		size = LobbyViewSettings.grid_size,
 		position = {
-			-275,
+			-29,
 			-170,
 			1
 		}
@@ -68,7 +68,7 @@ local scenegraph_definition = {
 	grid_start = {
 		vertical_alignment = "top",
 		parent = "grid_background",
-		horizontal_alignment = "center",
+		horizontal_alignment = "left",
 		size = {
 			0,
 			0
@@ -104,6 +104,20 @@ local scenegraph_definition = {
 		position = {
 			100,
 			65,
+			1
+		}
+	},
+	havoc_title = {
+		vertical_alignment = "bottom",
+		parent = "screen",
+		horizontal_alignment = "right",
+		size = {
+			425,
+			550
+		},
+		position = {
+			-62,
+			-287,
 			1
 		}
 	},
@@ -449,6 +463,166 @@ local widget_definitions = {
 			style = LobbyViewFontStyle.sub_title_text_style
 		}
 	}, "mission_title"),
+	havoc_title = UIWidget.create_definition({
+		{
+			value = "content/ui/materials/icons/generic/havoc",
+			style_id = "havoc_icon",
+			pass_type = "texture",
+			style = {
+				vertical_alignment = "top",
+				horizontal_alignment = "center",
+				color = Color.golden_rod(255, true),
+				offset = {
+					-53,
+					16,
+					11
+				},
+				size = {
+					50,
+					50
+				}
+			}
+		},
+		{
+			value = "content/ui/materials/icons/generic/havoc",
+			style_id = "havoc_icon_drop_shadow",
+			pass_type = "texture",
+			style = {
+				vertical_alignment = "top",
+				horizontal_alignment = "center",
+				color = Color.black(255, true),
+				offset = {
+					-52,
+					16,
+					10
+				},
+				size = {
+					50,
+					50
+				}
+			}
+		},
+		{
+			value_id = "havoc_rank",
+			style_id = "havoc_rank",
+			pass_type = "text",
+			value = "~",
+			style = {
+				vertical_alignment = "top",
+				font_size = 40,
+				text_vertical_alignment = "top",
+				horizontal_alignment = "center",
+				text_horizontal_alignment = "center",
+				offset = {
+					0,
+					21,
+					10
+				},
+				text_color = Color.golden_rod(255, true)
+			}
+		},
+		{
+			value = "content/ui/materials/dividers/horizontal_dynamic_upper",
+			style_id = "divider",
+			pass_type = "texture",
+			style = {
+				vertical_alignment = "top",
+				horizontal_alignment = "center",
+				size = {
+					437,
+					20
+				},
+				offset = {
+					0,
+					-4,
+					3
+				}
+			}
+		},
+		{
+			value = "content/ui/materials/dividers/skull_rendered_center_01",
+			style_id = "divider_02",
+			pass_type = "texture",
+			style = {
+				vertical_alignment = "top",
+				horizontal_alignment = "center",
+				size = {
+					200,
+					30
+				},
+				offset = {
+					0,
+					-8,
+					4
+				}
+			}
+		},
+		{
+			value = "content/ui/materials/backgrounds/terminal_basic",
+			style_id = "divider_03",
+			pass_type = "texture",
+			style = {
+				vertical_alignment = "top",
+				scale_to_material = true,
+				horizontal_alignment = "left",
+				color = Color.terminal_grid_background_gradient(255, true),
+				size = {
+					441,
+					570
+				},
+				offset = {
+					-8,
+					-8,
+					2
+				}
+			}
+		},
+		{
+			value = "content/ui/materials/frames/dropshadow_heavy",
+			style_id = "divider_04",
+			pass_type = "texture",
+			style = {
+				vertical_alignment = "top",
+				scale_to_material = true,
+				horizontal_alignment = "left",
+				color = {
+					255,
+					169,
+					191,
+					153
+				},
+				size = {
+					425,
+					550
+				},
+				offset = {
+					0,
+					0,
+					2
+				}
+			}
+		},
+		{
+			pass_type = "rect",
+			style = {
+				color = {
+					84,
+					169,
+					191,
+					153
+				},
+				offset = {
+					5,
+					5,
+					1
+				},
+				size = {
+					415,
+					540
+				}
+			}
+		}
+	}, "havoc_title"),
 	grid_interaction = UIWidget.create_definition({
 		{
 			pass_type = "hotspot",
@@ -548,6 +722,82 @@ local widget_definitions = {
 		}
 	}, "screen")
 }
+
+for i = 1, 4 do
+	local name = "havoc_circumstance_0" .. i
+	widget_definitions[name] = UIWidget.create_definition({
+		{
+			value_id = "icon",
+			style_id = "icon",
+			pass_type = "texture",
+			value = "content/ui/materials/icons/generic/danger",
+			style = {
+				vertical_alignment = "top",
+				horizontal_alignment = "left",
+				color = Color.golden_rod(255, true),
+				offset = {
+					16,
+					82,
+					5
+				},
+				size = {
+					30,
+					30
+				}
+			}
+		},
+		{
+			style_id = "circumstance_name",
+			value_id = "circumstance_name",
+			pass_type = "text",
+			style = {
+				vertical_alignment = "top",
+				horizontal_alignment = "left",
+				text_vertical_alignment = "top",
+				font_size = 20,
+				text_horizontal_alignment = "left",
+				size = {
+					355,
+					20
+				},
+				offset = {
+					54,
+					87,
+					10
+				},
+				text_color = Color.golden_rod(255, true)
+			}
+		},
+		{
+			style_id = "circumstance_description",
+			value_id = "circumstance_description",
+			pass_type = "text",
+			style = {
+				vertical_alignment = "top",
+				horizontal_alignment = "left",
+				text_vertical_alignment = "top",
+				font_size = 17,
+				text_horizontal_alignment = "left",
+				size = {
+					393,
+					51
+				},
+				offset = {
+					16,
+					120,
+					10
+				},
+				text_color = {
+					255,
+					169,
+					191,
+					153
+				}
+			}
+		}
+	}, "havoc_title")
+end
+
 local panel_definition = UIWidget.create_definition({
 	{
 		pass_type = "hotspot",
@@ -876,5 +1126,6 @@ return {
 	panel_definition = panel_definition,
 	widget_definitions = widget_definitions,
 	scenegraph_definition = scenegraph_definition,
-	item_stats_grid_settings = item_stats_grid_settings
+	item_stats_grid_settings = item_stats_grid_settings,
+	havoc_circumstance = widget_definitions.havoc_circumstance
 }

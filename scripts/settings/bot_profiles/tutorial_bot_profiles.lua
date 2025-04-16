@@ -3,12 +3,11 @@ local behavior_gestalts = BotSettings.behavior_gestalts
 
 local function tutorial_bot_profiles(all_profiles)
 	all_profiles.tutorial_guide = {
+		current_level = 1,
 		selected_voice = "explicator_a",
 		display_name = "Zola",
 		gender = "female",
 		archetype = "veteran",
-		current_level = 1,
-		specialization = "none",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/hair_medium_undercut_a",
 			slot_body_skin_color = "content/items/characters/player/skin_colors/skin_color_hispanic_02",
@@ -35,12 +34,11 @@ local function tutorial_bot_profiles(all_profiles)
 		talents = {}
 	}
 	all_profiles.tutorial_guide_zealot = {
+		current_level = 1,
 		selected_voice = "zealot_female_a",
 		display_name = "Jilande",
 		gender = "female",
 		archetype = "zealot",
-		current_level = 1,
-		specialization = "none",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/hair_short_bobcut_a",
 			slot_body_skin_color = "content/items/characters/player/skin_colors/skin_color_asian_01",
@@ -67,12 +65,11 @@ local function tutorial_bot_profiles(all_profiles)
 		talents = {}
 	}
 	all_profiles.tutorial_guide_ogryn = {
+		current_level = 1,
 		selected_voice = "ogryn_a",
 		display_name = "Kreft",
 		gender = "male",
 		archetype = "ogryn",
-		current_level = 1,
-		specialization = "none",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/empty_hair",
 			slot_body_skin_color = "content/items/characters/player/skin_colors/skin_color_caucasian_02",

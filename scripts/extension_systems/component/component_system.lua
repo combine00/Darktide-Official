@@ -107,7 +107,11 @@ end
 function ComponentSystem:flow_call_component(unit, guid, function_name, ...)
 	local extension = self._unit_to_extension_map[unit]
 
-	extension:flow_call_component(guid, function_name, ...)
+	if extension then
+		extension:flow_call_component(guid, function_name, ...)
+	else
+		Log.warning("ComponentSystem", "[flow_call_component] call failed. unit: %s, guid: %s, function: %s", unit, guid, function_name)
+	end
 end
 
 function ComponentSystem:get_components(unit, component_name)
@@ -121,6 +125,21 @@ function ComponentSystem:get_components(unit, component_name)
 			if components[i]:name() == component_name then
 				result[#result + 1] = components[i]
 			end
+		end
+	end
+
+	return result
+end
+
+function ComponentSystem:get_all_components(unit)
+	local result = {}
+	local extension = self._unit_to_extension_map[unit]
+
+	if extension then
+		local components = extension:components()
+
+		for i = 1, #components do
+			result[#result + 1] = components[i]
 		end
 	end
 

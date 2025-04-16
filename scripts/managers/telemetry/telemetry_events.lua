@@ -54,6 +54,10 @@ function TelemetryEvents:destroy()
 	end
 
 	self:game_shutdown()
+
+	local batch_size, time_since_last_post, event_types = Managers.telemetry:batch_info()
+
+	self:post_batch(batch_size, time_since_last_post, event_types, true)
 end
 
 function TelemetryEvents:on_wwise_starvation(event_name, object_name, error_code)
@@ -383,6 +387,22 @@ function TelemetryEvents:player_terminate_enemy_report(reports)
 		event:set_data(entries)
 		self._manager:register_event(event)
 	end
+end
+
+function TelemetryEvents:equip_item(slot_name, item)
+	local item_name = item and item.name
+
+	if not item_name then
+		return
+	end
+
+	local event = self:_create_event("equip_item")
+
+	event:set_data({
+		slot_name = slot_name,
+		item_name = item_name
+	})
+	self._manager:register_event(event)
 end
 
 function TelemetryEvents:mispredict_report(entries, count)
@@ -1082,6 +1102,40 @@ function TelemetryEvents:collectible_collected(plasteel_collected)
 	self._manager:register_event(event)
 end
 
+function TelemetryEvents:hordes_player_choice_completed(is_family_choice, options, choice_index, is_random_timeout_choice)
+	local event = self:_create_event("hordes_player_choice_completed")
+	local chosen_buff_name = options[choice_index]
+	local data = {
+		is_random_timeout_choice = is_random_timeout_choice,
+		is_family_choice = is_family_choice,
+		chosen_buff_name = chosen_buff_name
+	}
+
+	for i, option in ipairs(options) do
+		local key = "option_" .. i
+		data[key] = option
+	end
+
+	event:set_data(data)
+	self._manager:register_event(event)
+end
+
+function TelemetryEvents:player_hordes_mode_ended(player, game_won, time, current_island, waves_completed)
+	local event = TelemetryEvent:new(SOURCE, player:telemetry_subject(), "player_hordes_mode_ended", {
+		game = player:telemetry_game_session(),
+		gameplay = self._session.gameplay
+	})
+	local data = {
+		game_won = game_won,
+		time = time,
+		waves_completed = waves_completed,
+		island = current_island
+	}
+
+	event:set_data(data)
+	self._manager:register_event(event)
+end
+
 function TelemetryEvents:fixed_update_missed_inputs_report(reports)
 	for player, report in pairs(reports) do
 		local entries = report.entries
@@ -1139,6 +1193,18 @@ function TelemetryEvents:player_kicked(peer_id, reason, option_details)
 		})
 		self._manager:register_event(event)
 	end
+end
+
+function TelemetryEvents:post_batch(batch_size, time_since_last_post, event_types, is_shutdown)
+	local event = self:_create_event("post_batch")
+
+	event:set_data({
+		batch_size = batch_size,
+		time_since_last_post = time_since_last_post,
+		event_types = event_types,
+		is_shutdown = is_shutdown
+	})
+	self._manager:register_event(event)
 end
 
 function TelemetryEvents:crashify_properties()

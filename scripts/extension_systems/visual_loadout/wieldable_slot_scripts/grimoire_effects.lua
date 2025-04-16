@@ -1,4 +1,4 @@
-local Action = require("scripts/utilities/weapon/action")
+local Action = require("scripts/utilities/action/action")
 local WieldableSlotScriptInterface = require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/wieldable_slot_script_interface")
 local EQUIPPED_LOOPING_SOUND_ALIAS = "equipped_item_passive_loop"
 local EQUIPPED_LOOPING_PARTICLE_ALIAS = "equipped_item_passive"

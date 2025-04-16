@@ -178,12 +178,6 @@ end
 
 function VendorInteractionViewBase:_handle_input(input_service)
 	local tab_bar_menu = self._elements.tab_bar
-	local can_navigate = self._can_navigate
-
-	if tab_bar_menu then
-		tab_bar_menu:set_is_handling_navigation_input(can_navigate)
-	end
-
 	input_service = self._presenting_options and input_service or input_service:null_service()
 	local is_mouse = self._using_cursor_navigation
 	local button_widgets = self._button_widgets
@@ -203,7 +197,7 @@ function VendorInteractionViewBase:_handle_input(input_service)
 
 		local button_input_actions = self._button_input_actions
 
-		if num_buttons > 0 then
+		if num_buttons > 0 and focused_index then
 			local next_index = nil
 
 			if input_service:get(button_input_actions[1]) and focused_index < num_buttons then
@@ -277,35 +271,109 @@ function VendorInteractionViewBase:_handle_back_pressed()
 	end
 end
 
+function VendorInteractionViewBase:_present_options()
+	if self._on_option_enter_anim_id and self:_is_animation_active(self._on_option_enter_anim_id) then
+		self:_complete_animation(self._on_option_enter_anim_id)
+	end
+
+	self._on_option_enter_anim_id = nil
+
+	if not self._on_option_exit_anim_id then
+		local widgets_by_name = self._widgets_by_name
+		local widget_list = {
+			widgets_by_name.title_text,
+			widgets_by_name.description_text,
+			widgets_by_name.button_divider,
+			widgets_by_name.title_text
+		}
+		local button_widgets = self._button_widgets
+
+		if button_widgets then
+			for i = 1, #button_widgets do
+				widget_list[#widget_list + 1] = button_widgets[i]
+			end
+		end
+
+		self._on_option_exit_anim_id = self:_start_animation("on_option_exit", widget_list, self)
+	end
+
+	self._presenting_options = true
+end
+
 function VendorInteractionViewBase:_setup_option_buttons(options)
+	if self._button_widgets then
+		for i = 1, #self._button_widgets do
+			local widget = self._button_widgets[i]
+
+			self:_unregister_widget_name(widget.name)
+		end
+
+		table.clear(self._button_widgets)
+	end
+
 	local option_button_settings = self._option_button_settings
-	local scenegraph_id = "button_pivot"
-	local button_definition = UIWidget.create_definition(table.clone(option_button_settings.button_template), scenegraph_id)
 	local button_widgets = {}
+	local scenegraph_id = "button_pivot"
 	local definitions = self._definitions
 	local default_scenegraph_definition = definitions.scenegraph_definition
 	local button_scenegraph_definition = default_scenegraph_definition[scenegraph_id]
-	local grow_vertically = option_button_settings.grow_vertically
-	local spacing = option_button_settings.spacing or 10
-	local button_width = button_scenegraph_definition.size[1]
-	local button_height = button_scenegraph_definition.size[2]
 
 	for i = 1, #options do
 		local option = options[i]
-		local widget = self:_create_widget("option_button_" .. i, button_definition)
-		local content = widget.content
-		local hotspot = content.hotspot
-		hotspot.pressed_callback = callback(self, "on_option_button_pressed", i, option)
-		hotspot.disabled = option.disabled
-		local display_name = option.display_name
-		local unlocalized_name = option.unlocalized_name
-		content.text = unlocalized_name and not display_name and unlocalized_name or Localize(display_name)
-		content.icon = option.icon
+		local template = option.button_template
+		local widget = nil
+		local spacing = option.spacing or option_button_settings.spacing or 10
+		local grow_vertically = option_button_settings.grow_vertically
+		local size = {
+			button_scenegraph_definition.size[1],
+			button_scenegraph_definition.size[2]
+		}
+
+		if template then
+			local config = option.button_data_function and option.button_data_function(self) or option.button_data or {}
+			local size_template = template.size_function and template.size_function(self) or template.size and table.clone(template.size) or {}
+
+			if not size_template[1] then
+				size_template[1] = size[1]
+			end
+
+			if not size_template[2] then
+				size_template[2] = button_scenegraph_definition.size[2]
+			end
+
+			local pass_template = template.pass_template_function and template.pass_template_function(self) or template.pass_template
+			local button_definition = UIWidget.create_definition(pass_template, scenegraph_id, nil, size_template)
+			local definitions = self._definitions
+			local default_scenegraph_definition = definitions.scenegraph_definition
+			local button_scenegraph_definition = default_scenegraph_definition[scenegraph_id]
+			widget = self:_create_widget("option_button_" .. i, button_definition)
+
+			if template and template.init then
+				template.init(self, widget, config, callback(self, "on_option_button_pressed", i, option))
+			end
+		else
+			local button_definition = UIWidget.create_definition(option_button_settings.button_template, scenegraph_id, nil, size)
+			widget = self:_create_widget("option_button_" .. i, button_definition)
+			local content = widget.content
+			local hotspot = content.hotspot
+			hotspot.pressed_callback = callback(self, "on_option_button_pressed", i, option)
+			hotspot.disabled = option.disabled
+			local display_name = option.display_name
+			local unlocalized_name = option.unlocalized_name
+			content.text = unlocalized_name and not display_name and unlocalized_name or Localize(display_name)
+			content.icon = option.icon
+		end
+
+		local prev_widget = button_widgets[#button_widgets]
 
 		if grow_vertically then
-			widget.offset[2] = (i - 1) * (button_height + spacing)
+			local prev_offset = prev_widget and prev_widget.offset and prev_widget.offset[2] or 0
+			local prev_size = prev_widget and prev_widget.content.size and prev_widget.content.size[2] or 0
+			widget.offset[2] = prev_offset + prev_size + spacing
 		else
-			widget.offset[1] = (i - 1) * (button_width + spacing)
+			local prev_offset = prev_widget and prev_widget.offset and prev_widget.offset[1] or 0
+			local prev_size = prev_widget and prev_widget.content.size and prev_widget.content.size[1] or 0
+			widget.offset[1] = prev_offset + prev_size + spacing
 		end
 
 		button_widgets[#button_widgets + 1] = widget
@@ -507,6 +575,8 @@ function VendorInteractionViewBase:_update_wallets_presentation(wallets_data)
 	self:_set_wallet_background_width(total_width)
 
 	self._wallet_widgets = widgets
+
+	Managers.event:trigger("vendor_wallet_updated", wallets_data)
 end
 
 function VendorInteractionViewBase:_set_wallet_background_width(total_width)
@@ -611,7 +681,7 @@ function VendorInteractionViewBase:dialogue_system()
 end
 
 function VendorInteractionViewBase:cb_switch_tab(index)
-	TabbedMenuViewBase.cb_switch_tab(self, index)
+	VendorInteractionViewBase.super.cb_switch_tab(self, index)
 
 	if not self._using_cursor_navigation then
 		self:_play_sound(UISoundEvents.tab_button_pressed)

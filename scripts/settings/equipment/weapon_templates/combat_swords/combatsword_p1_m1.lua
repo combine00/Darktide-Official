@@ -5,6 +5,7 @@ local BuffSettings = require("scripts/settings/buff/buff_settings")
 local DamageProfileTemplates = require("scripts/settings/damage/damage_profile_templates")
 local DamageSettings = require("scripts/settings/damage/damage_settings")
 local FootstepIntervalsTemplates = require("scripts/settings/equipment/footstep/footstep_intervals_templates")
+local HapticTriggerTemplates = require("scripts/settings/equipment/haptic_trigger_templates")
 local HitZone = require("scripts/utilities/attack/hit_zone")
 local MeleeActionInputSetupMid = require("scripts/settings/equipment/weapon_templates/melee_action_input_setup_mid")
 local PlayerCharacterConstants = require("scripts/settings/player_character/player_character_constants")
@@ -41,7 +42,10 @@ combat_sword_action_inputs.parry = {
 	buffer_time = 0
 }
 local combat_sword_action_input_hierarchy = table.clone(MeleeActionInputSetupMid.action_input_hierarchy)
-combat_sword_action_input_hierarchy.parry = "base"
+combat_sword_action_input_hierarchy[#combat_sword_action_input_hierarchy + 1] = {
+	transition = "base",
+	input = "parry"
+}
 weapon_template.action_inputs = combat_sword_action_inputs
 weapon_template.action_input_hierarchy = combat_sword_action_input_hierarchy
 weapon_template.action_inputs.block.buffer_time = 0.1
@@ -165,7 +169,7 @@ weapon_template.actions = {
 			},
 			heavy_attack = {
 				action_name = "action_left_heavy",
-				chain_time = 0.75
+				chain_time = 0.65
 			},
 			block = {
 				action_name = "action_block"
@@ -920,13 +924,14 @@ weapon_template.actions = {
 	},
 	action_attack_special = {
 		damage_window_start = 0.15,
+		hit_armor_anim = "attack_hit_shield",
 		range_mod = 1.25,
+		block_duration = 0.5,
 		kind = "sweep",
-		block_duration = 0.2,
-		weapon_handling_template = "time_scale_1_3",
 		max_num_saved_entries = 20,
-		attack_direction_override = "push",
+		weapon_handling_template = "time_scale_1_3",
 		num_frames_before_process = 4,
+		attack_direction_override = "push",
 		damage_window_end = 0.3,
 		anim_end_event = "attack_finished",
 		anim_event = "attack_special",
@@ -961,6 +966,10 @@ weapon_template.actions = {
 			block = {
 				action_name = "action_block",
 				chain_time = 0.45
+			},
+			special_action = {
+				action_name = "action_parry_special",
+				chain_time = 0.45
 			}
 		},
 		anim_end_event_condition_func = function (unit, data, end_reason)
@@ -982,6 +991,7 @@ weapon_template.actions = {
 		},
 		damage_profile = DamageProfileTemplates.combatsword_parry_special,
 		damage_type = damage_types.metal_slashing_light,
+		wounds_shape = wounds_shapes.right_45_slash,
 		time_scale_stat_buffs = {
 			buff_stat_buffs.attack_speed,
 			buff_stat_buffs.melee_attack_speed
@@ -1119,7 +1129,8 @@ weapon_template.actions = {
 		inner_damage_profile = DamageProfileTemplates.default_push,
 		inner_damage_type = damage_types.punch,
 		outer_damage_profile = DamageProfileTemplates.light_push,
-		outer_damage_type = damage_types.punch
+		outer_damage_type = damage_types.punch,
+		haptic_trigger_template = HapticTriggerTemplates.melee.push
 	},
 	action_inspect = {
 		skip_3p_anims = false,
@@ -1167,13 +1178,14 @@ weapon_template.keywords = {
 	"combat_sword",
 	"p1"
 }
-weapon_template.smart_targeting_template = SmartTargetingTemplates.default_melee
 weapon_template.dodge_template = "default"
 weapon_template.sprint_template = "default"
 weapon_template.stamina_template = "linesman"
 weapon_template.toughness_template = "default"
 weapon_template.movement_curve_modifier_template = "chainsword_p1_m1"
 weapon_template.footstep_intervals = FootstepIntervalsTemplates.default
+weapon_template.smart_targeting_template = SmartTargetingTemplates.default_melee
+weapon_template.haptic_trigger_template = HapticTriggerTemplates.melee.medium
 weapon_template.overclocks = {
 	cleave_damage_up_dps_down = {
 		combatsword_p1_m1_cleave_damage_stat = 0.1,

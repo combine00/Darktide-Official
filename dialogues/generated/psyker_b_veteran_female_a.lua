@@ -130,6 +130,19 @@ local psyker_b_veteran_female_a = {
 		},
 		randomize_indexes = {}
 	},
+	combat_pause_quirk_heights_b = {
+		randomize_indexes_n = 0,
+		sound_events_n = 2,
+		sound_events = {
+			[1.0] = "loc_veteran_female_a__combat_pause_quirk_heights_b_01",
+			[2.0] = "loc_veteran_female_a__combat_pause_quirk_heights_b_02"
+		},
+		sound_events_duration = {
+			[1.0] = 4.022573,
+			[2.0] = 2.432344
+		},
+		randomize_indexes = {}
+	},
 	combat_pause_quirk_lonely_b = {
 		randomize_indexes_n = 0,
 		sound_events_n = 2,

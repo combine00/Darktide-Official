@@ -2,6 +2,7 @@ local GameplayInitStepFrameRate = require("scripts/game_states/game/gameplay_sub
 local GameplayStateInterface = require("scripts/game_states/game/gameplay_sub_states/gameplay_state_interface")
 local GameplayStateRun = require("scripts/game_states/game/gameplay_sub_states/gameplay_state_run")
 local GameStateMachine = require("scripts/foundation/utilities/game_state_machine")
+local LoadingStateData = require("scripts/ui/loading_state_data")
 local MissionCleanupUtilies = require("scripts/game_states/game/gameplay_sub_states/utilities/mission_cleanup_utilities")
 local PositionLookupManager = require("scripts/managers/position_lookup/position_lookup_manager")
 local GameplayStateInit = class("GameplayStateInit")
@@ -11,7 +12,7 @@ function GameplayStateInit:on_enter(parent, params)
 	local start_params = {
 		shared_state = shared_state
 	}
-	local state_machine = GameStateMachine:new(self, GameplayInitStepFrameRate, start_params, nil, nil, "GamePlayInit")
+	local state_machine = GameStateMachine:new(self, GameplayInitStepFrameRate, start_params, nil, nil, "GamePlay", "GamePlayInit")
 	self._gameplay_state = parent
 	self._state_machine = state_machine
 	self._shared_state = shared_state
@@ -20,7 +21,7 @@ function GameplayStateInit:on_enter(parent, params)
 	Managers.state.position_lookup = PositionLookupManager:new()
 end
 
-function GameplayStateInit:on_exit(on_shutdown)
+function GameplayStateInit:on_exit(exit_params)
 	local initialized_steps = self._shared_state.initialized_steps
 
 	if not initialized_steps.GameplayInitStepStateLast then
@@ -31,8 +32,9 @@ function GameplayStateInit:on_exit(on_shutdown)
 	local shared_state = self._shared_state
 	local world = shared_state.world
 	local is_server = shared_state.is_server
+	local can_cleanup_suspend = initialized_steps.GameplayInitStepStateLastChecks or initialized_steps.GameplayInitStepStateLast
 
-	if on_shutdown then
+	if exit_params and (exit_params.on_shutdown or exit_params.on_suspend and can_cleanup_suspend) then
 		MissionCleanupUtilies.cleanup(shared_state, self._gameplay_state, initialized_steps)
 	end
 
@@ -41,6 +43,8 @@ function GameplayStateInit:on_exit(on_shutdown)
 end
 
 function GameplayStateInit:update(main_dt, main_t)
+	Managers.event:trigger("event_set_waiting_state", LoadingStateData.WAIT_REASON.dedicated_server)
+
 	local shared_state = self._shared_state
 
 	shared_state.network_receive_function(main_dt)

@@ -5,9 +5,9 @@ SaveData.default_account_data = {
 	crossplay_accepted = false,
 	profile_preset_intro_presented = false,
 	input_settings = {
-		rumble_intensity_gameplay = 100,
 		rumble_intensity = 50,
 		controller_response_curve_strength_ranged = 50,
+		rumble_intensity_combat_melee = 100,
 		controller_aim_assist = "new_full",
 		mouse_look_scale_ranged_alternate_fire = 1,
 		mouse_look_scale_ranged = 1,
@@ -20,16 +20,23 @@ SaveData.default_account_data = {
 		controller_response_curve_ranged = "linear",
 		controller_invert_look_y = false,
 		controller_response_curve_strength = 50,
-		rumble_intensity_immersive = 100,
+		rumble_intensity_combat_ranged = 100,
 		controller_look_scale_ranged_alternate_fire = 1,
+		rumble_intensity_gameplay = 100,
 		controller_response_curve = "linear",
 		controller_enable_acceleration = true,
 		controller_look_scale_vertical_ranged_alternate_fire = 1,
 		mouse_invert_look_y = false,
+		rumble_intensity_immersive = 100,
+		haptic_trigger_effects_enabled = true,
+		haptic_trigger_melee_resistance_strength = "strong",
+		haptic_trigger_ranged_vibration_strength = "strong",
 		toggle_ads = false,
+		haptic_trigger_melee_vibration_strength = "strong",
 		stationary_dodge = false,
 		weapon_switch_scroll_wrap = true,
 		controller_look_scale = 1,
+		haptic_trigger_ranged_resistance_strength = "strong",
 		rumble_enabled = true,
 		controller_layout = "default",
 		com_wheel_delay = 0.3,
@@ -64,6 +71,7 @@ SaveData.default_account_data = {
 		warp_charge_effects_intensity = 100,
 		subtitle_enabled = true,
 		character_titles_color_type = "rarity_colors",
+		voice_chat_visible_all_time = true,
 		penance_list_setting_show_list_view = false,
 		crosshair_type_override = "weapon",
 		secondary_subtitle_enabled = true,
@@ -85,6 +93,7 @@ SaveData.default_account_data = {
 	selected_sort_options = {}
 }
 SaveData.default_character_data = {
+	training_grounds_danger = 3,
 	new_items = {},
 	new_items_by_type = {},
 	new_item_notifications = {},
@@ -94,7 +103,11 @@ SaveData.default_character_data = {
 		profile_presets_version = 1
 	},
 	favorite_items = {},
-	group_finder_search_tags = {}
+	group_finder_search_tags = {},
+	mission_board = {
+		page = 1,
+		private_match = false
+	}
 }
 
 function SaveData:init()
@@ -125,9 +138,11 @@ function SaveData:populate(save_data)
 						local default_character_data = SaveData.default_character_data
 
 						for character_id, character_id_data in pairs(character_data) do
-							if not character_id_data.view_settings then
-								character_id_data.view_settings = table.clone_instance(default_character_data.view_settings)
-							end
+							local new_character_data = table.clone_instance(default_character_data)
+
+							table.merge_recursive(new_character_data, character_id_data)
+
+							character_data[character_id] = new_character_data
 
 							if not character_id_data.group_finder_search_tags then
 								character_id_data.group_finder_search_tags = table.clone_instance(default_character_data.group_finder_search_tags)

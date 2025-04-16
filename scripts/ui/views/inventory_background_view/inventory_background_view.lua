@@ -1,9 +1,10 @@
 local Breeds = require("scripts/settings/breed/breeds")
 local Definitions = require("scripts/ui/views/inventory_background_view/inventory_background_view_definitions")
 local InventoryBackgroundViewSettings = require("scripts/ui/views/inventory_background_view/inventory_background_view_settings")
+local Items = require("scripts/utilities/items")
 local ItemSlotSettings = require("scripts/settings/item/item_slot_settings")
-local ItemUtils = require("scripts/utilities/items")
 local MasterItems = require("scripts/backend/master_items")
+local Mastery = require("scripts/utilities/mastery")
 local PlayerProgressionUnlocks = require("scripts/settings/player/player_progression_unlocks")
 local ProfileUtils = require("scripts/utilities/profile_utils")
 local Promise = require("scripts/foundation/utilities/promise")
@@ -20,7 +21,7 @@ local ViewElementInputLegend = require("scripts/ui/view_elements/view_element_in
 local ViewElementMenuPanel = require("scripts/ui/view_elements/view_element_menu_panel/view_element_menu_panel")
 local ViewElementProfilePresets = require("scripts/ui/view_elements/view_element_profile_presets/view_element_profile_presets")
 local Views = require("scripts/ui/views/views")
-local MasteryUtils = require("scripts/utilities/mastery")
+local ITEM_TYPES = UISettings.ITEM_TYPES
 local InventoryBackgroundView = class("InventoryBackgroundView", "BaseView")
 
 function InventoryBackgroundView:init(settings, context)
@@ -49,7 +50,6 @@ end
 function InventoryBackgroundView:on_enter()
 	InventoryBackgroundView.super.on_enter(self)
 
-	local context = self._context
 	local player = self._preview_player
 	local profile = player:profile()
 	local player_unit = player.player_unit
@@ -64,6 +64,7 @@ function InventoryBackgroundView:on_enter()
 
 	self:_register_event("event_inventory_view_equip_item", "event_inventory_view_equip_item")
 	self:_register_event("event_equip_local_changes", "event_equip_local_changes")
+	self:_register_event("event_force_refresh_inventory", "event_force_refresh_inventory")
 	self:_register_event("event_change_wield_slot", "event_change_wield_slot")
 	self:_register_event("event_discard_item", "event_discard_item")
 	self:_register_event("event_discard_items", "event_discard_items")
@@ -244,14 +245,14 @@ function InventoryBackgroundView:_cb_set_player_icon(grid_index, rows, columns, 
 end
 
 function InventoryBackgroundView:_cb_unset_player_icon(widget)
-	local widget = self._widgets_by_name.character_portrait
-	local material_values = widget.style.texture_portrait.material_values
+	local portrait_widget = self._widgets_by_name.character_portrait
+	local material_values = portrait_widget.style.texture_portrait.material_values
 	material_values.use_placeholder_texture = nil
 	material_values.rows = nil
 	material_values.columns = nil
 	material_values.grid_index = nil
 	material_values.texture_icon = nil
-	widget.content.texture = "content/ui/materials/base/ui_portrait_frame_base_no_render"
+	portrait_widget.content.texture = "content/ui/materials/base/ui_portrait_frame_base_no_render"
 end
 
 function InventoryBackgroundView:_request_player_frame(item, ui_renderer)
@@ -294,7 +295,6 @@ function InventoryBackgroundView:_unload_portrait_frame(ui_renderer)
 end
 
 function InventoryBackgroundView:_cb_set_player_frame(item)
-	local profile = self._presentation_profile
 	local icon = nil
 
 	if item.icon then
@@ -351,8 +351,6 @@ end
 
 function InventoryBackgroundView:_cb_set_player_insignia(item)
 	local widget = self._widgets_by_name.character_insigna
-	local profile = self._presentation_profile
-	local loadout = profile and profile.loadout
 	local icon_style = widget.style.texture_insignia
 	local material_values = icon_style.material_values
 
@@ -380,8 +378,9 @@ function InventoryBackgroundView:_fetch_character_progression(player)
 	self._fetching_character_progression = true
 	local profiles_promise = nil
 	local character_id = player:character_id()
+	local authenticated = Managers.backend:authenticated()
 
-	if Managers.backend:authenticated() then
+	if authenticated then
 		local backend_interface = Managers.backend.interfaces
 		profiles_promise = backend_interface.progression:get_progression("character", character_id):next(function (results)
 			local progression_data = results
@@ -421,19 +420,19 @@ end
 
 function InventoryBackgroundView:_set_experience_bar(experience_fraction, duration)
 	local is_nan = experience_fraction ~= experience_fraction
-	local experience_fraction = not is_nan and experience_fraction or 0
+	local experience_fraction_number = not is_nan and experience_fraction or 0
 
 	if duration then
 		self._experience_fraction_duration_time = 0
 		self._experience_fraction_duration_delay = duration
-		self._target_experience_fraction = experience_fraction
-		experience_fraction = 0
+		self._target_experience_fraction = experience_fraction_number
+		experience_fraction_number = 0
 	end
 
 	local widgets_by_name = self._widgets_by_name
 	local widget = widgets_by_name.character_experience
-	widget.content.progress = experience_fraction
-	self._current_experience_fraction = experience_fraction
+	widget.content.progress = experience_fraction_number
+	self._current_experience_fraction = experience_fraction_number
 end
 
 function InventoryBackgroundView:_update_experience_bar_fill_animation(dt)
@@ -529,28 +528,28 @@ function InventoryBackgroundView:event_discard_item(item)
 	end)
 end
 
-function InventoryBackgroundView:event_discard_items(items)
+function InventoryBackgroundView:event_discard_items(gear_ids)
 	local local_changes_promise = self:_equip_local_changes()
 	local delete_promise = nil
 
 	if local_changes_promise then
 		delete_promise = local_changes_promise:next(function ()
-			return Managers.data_service.gear:delete_gear_batch(items)
+			return Managers.data_service.gear:delete_gear_batch(gear_ids)
 		end)
 	else
-		delete_promise = Managers.data_service.gear:delete_gear_batch(items)
+		delete_promise = Managers.data_service.gear:delete_gear_batch(gear_ids)
 	end
 
 	delete_promise:next(function (result)
 		local total_rewards = {}
 
 		if result then
-			for i = 1, #result do
-				local operation = result[i]
+			for ii = 1, #result do
+				local operation = result[ii]
 				local rewards = operation.rewards
 
-				for i = 1, #rewards do
-					local reward = rewards[i]
+				for jj = 1, #rewards do
+					local reward = rewards[jj]
 					local reward_type = reward.type
 					total_rewards[reward_type] = (total_rewards[reward_type] or 0) + reward.amount
 				end
@@ -669,15 +668,15 @@ function InventoryBackgroundView:_equip_local_changes()
 	local promises = {}
 
 	if equip_items and not table.is_empty(equip_items_by_slot) then
-		promises[#promises + 1] = ItemUtils.equip_slot_items(equip_items_by_slot)
+		promises[#promises + 1] = Items.equip_slot_items(equip_items_by_slot)
 	end
 
 	if equip_items and not table.is_empty(equip_local_items_by_slot) then
-		promises[#promises + 1] = ItemUtils.equip_slot_master_items(equip_local_items_by_slot)
+		promises[#promises + 1] = Items.equip_slot_master_items(equip_local_items_by_slot)
 	end
 
 	if equip_items and not table.is_empty(unequip_slots) then
-		promises[#promises + 1] = ItemUtils.unequip_slots(unequip_slots)
+		promises[#promises + 1] = Items.unequip_slots(unequip_slots)
 	end
 
 	if #promises > 0 then
@@ -775,7 +774,6 @@ function InventoryBackgroundView:_setup_top_panel()
 					return false
 				end
 
-				local ITEM_TYPES = UISettings.ITEM_TYPES
 				local has_new_items = false
 
 				if self:has_new_items_by_type(ITEM_TYPES.WEAPON_MELEE) then
@@ -787,6 +785,8 @@ function InventoryBackgroundView:_setup_top_panel()
 				end
 
 				content.show_alert = has_new_items
+				content.show_warning = self:_has_loadout_slot(self._invalid_slots)
+				content.show_modified = self:_has_loadout_slot(self._modified_slots)
 			end,
 			view_context = {
 				tabs = {
@@ -855,7 +855,7 @@ function InventoryBackgroundView:_setup_top_panel()
 									1,
 									1
 								},
-								item_type = UISettings.ITEM_TYPES.WEAPON_MELEE,
+								item_type = ITEM_TYPES.WEAPON_MELEE,
 								has_new_items_update_callback = function (item_type)
 									return self:has_new_items_by_type(item_type)
 								end
@@ -871,7 +871,7 @@ function InventoryBackgroundView:_setup_top_panel()
 									2,
 									1
 								},
-								item_type = UISettings.ITEM_TYPES.WEAPON_RANGED,
+								item_type = ITEM_TYPES.WEAPON_RANGED,
 								has_new_items_update_callback = function (item_type)
 									return self:has_new_items_by_type(item_type)
 								end
@@ -880,7 +880,7 @@ function InventoryBackgroundView:_setup_top_panel()
 								scenegraph_id = "slot_attachments_header",
 								display_name = "loc_inventory_loadout_group_attachments",
 								widget_type = "item_sub_header",
-								item_type = UISettings.ITEM_TYPES.GADGET,
+								item_type = ITEM_TYPES.GADGET,
 								size = {
 									840,
 									50
@@ -906,7 +906,7 @@ function InventoryBackgroundView:_setup_top_panel()
 									3,
 									1
 								},
-								item_type = UISettings.ITEM_TYPES.GADGET,
+								item_type = ITEM_TYPES.GADGET,
 								has_new_items_update_callback = function (item_type)
 									return self:has_new_items_by_type(item_type)
 								end
@@ -923,7 +923,7 @@ function InventoryBackgroundView:_setup_top_panel()
 									3,
 									2
 								},
-								item_type = UISettings.ITEM_TYPES.GADGET,
+								item_type = ITEM_TYPES.GADGET,
 								has_new_items_update_callback = function (item_type)
 									return self:has_new_items_by_type(item_type)
 								end
@@ -940,7 +940,7 @@ function InventoryBackgroundView:_setup_top_panel()
 									3,
 									3
 								},
-								item_type = UISettings.ITEM_TYPES.GADGET,
+								item_type = ITEM_TYPES.GADGET,
 								has_new_items_update_callback = function (item_type)
 									return self:has_new_items_by_type(item_type)
 								end
@@ -949,7 +949,7 @@ function InventoryBackgroundView:_setup_top_panel()
 								scenegraph_id = "slot_primary_header",
 								display_name = "loc_inventory_loadout_group_primary_weapon",
 								widget_type = "item_sub_header",
-								item_type = UISettings.ITEM_TYPES.WEAPON_MELEE,
+								item_type = ITEM_TYPES.WEAPON_MELEE,
 								size = {
 									840,
 									50
@@ -967,7 +967,7 @@ function InventoryBackgroundView:_setup_top_panel()
 								scenegraph_id = "slot_secondary_header",
 								display_name = "loc_inventory_loadout_group_secondary_weapon",
 								widget_type = "item_sub_header",
-								item_type = UISettings.ITEM_TYPES.WEAPON_RANGED,
+								item_type = ITEM_TYPES.WEAPON_RANGED,
 								size = {
 									840,
 									50
@@ -1025,7 +1025,6 @@ function InventoryBackgroundView:_setup_top_panel()
 					return false
 				end
 
-				local ITEM_TYPES = UISettings.ITEM_TYPES
 				local has_new_items = false
 
 				if self:has_new_items_by_type(ITEM_TYPES.GEAR_HEAD) then
@@ -1036,9 +1035,21 @@ function InventoryBackgroundView:_setup_top_panel()
 					has_new_items = true
 				elseif self:has_new_items_by_type(ITEM_TYPES.GEAR_EXTRA_COSMETIC) then
 					has_new_items = true
+				elseif self:has_new_items_by_type(ITEM_TYPES.PORTRAIT_FRAME) then
+					has_new_items = true
+				elseif self:has_new_items_by_type(ITEM_TYPES.CHARACTER_INSIGNIA) then
+					has_new_items = true
+				elseif self:has_new_items_by_type(ITEM_TYPES.CHARACTER_TITLE) then
+					has_new_items = true
+				elseif self:has_new_items_by_type(ITEM_TYPES.EMOTE) then
+					has_new_items = true
+				elseif self:has_new_items_by_type(ITEM_TYPES.END_OF_ROUND) then
+					has_new_items = true
 				end
 
 				content.show_alert = has_new_items
+				content.show_warning = self:_has_cosmetic_slot(self._invalid_slots)
+				content.show_modified = self:_has_cosmetic_slot(self._modified_slots)
 			end,
 			view_context = {
 				tabs = {
@@ -1113,7 +1124,7 @@ function InventoryBackgroundView:_setup_top_panel()
 									4,
 									1
 								},
-								item_type = UISettings.ITEM_TYPES.CHARACTER_TITLE,
+								item_type = ITEM_TYPES.CHARACTER_TITLE,
 								has_new_items_update_callback = function (item_type)
 									return self:has_new_items_by_type(item_type)
 								end
@@ -1130,7 +1141,7 @@ function InventoryBackgroundView:_setup_top_panel()
 									1,
 									1
 								},
-								item_type = UISettings.ITEM_TYPES.GEAR_HEAD,
+								item_type = ITEM_TYPES.GEAR_HEAD,
 								has_new_items_update_callback = function (item_type)
 									return self:has_new_items_by_type(item_type)
 								end
@@ -1147,7 +1158,7 @@ function InventoryBackgroundView:_setup_top_panel()
 									2,
 									1
 								},
-								item_type = UISettings.ITEM_TYPES.GEAR_UPPERBODY,
+								item_type = ITEM_TYPES.GEAR_UPPERBODY,
 								has_new_items_update_callback = function (item_type)
 									return self:has_new_items_by_type(item_type)
 								end
@@ -1164,7 +1175,7 @@ function InventoryBackgroundView:_setup_top_panel()
 									3,
 									1
 								},
-								item_type = UISettings.ITEM_TYPES.GEAR_LOWERBODY,
+								item_type = ITEM_TYPES.GEAR_LOWERBODY,
 								has_new_items_update_callback = function (item_type)
 									return self:has_new_items_by_type(item_type)
 								end
@@ -1182,7 +1193,7 @@ function InventoryBackgroundView:_setup_top_panel()
 									2
 								},
 								initial_rotation = math.pi,
-								item_type = UISettings.ITEM_TYPES.GEAR_EXTRA_COSMETIC,
+								item_type = ITEM_TYPES.GEAR_EXTRA_COSMETIC,
 								has_new_items_update_callback = function (item_type)
 									return self:has_new_items_by_type(item_type)
 								end
@@ -1198,7 +1209,7 @@ function InventoryBackgroundView:_setup_top_panel()
 									2,
 									2
 								},
-								item_type = UISettings.ITEM_TYPES.PORTRAIT_FRAME,
+								item_type = ITEM_TYPES.PORTRAIT_FRAME,
 								has_new_items_update_callback = function (item_type)
 									return self:has_new_items_by_type(item_type)
 								end
@@ -1214,7 +1225,7 @@ function InventoryBackgroundView:_setup_top_panel()
 									3,
 									2
 								},
-								item_type = UISettings.ITEM_TYPES.CHARACTER_INSIGNIA,
+								item_type = ITEM_TYPES.CHARACTER_INSIGNIA,
 								has_new_items_update_callback = function (item_type)
 									return self:has_new_items_by_type(item_type)
 								end
@@ -1235,7 +1246,7 @@ function InventoryBackgroundView:_setup_top_panel()
 									6,
 									3
 								},
-								item_type = UISettings.ITEM_TYPES.END_OF_ROUND,
+								item_type = ITEM_TYPES.END_OF_ROUND,
 								has_new_items_update_callback = function (item_type)
 									return self:has_new_items_by_type(item_type)
 								end
@@ -1262,7 +1273,7 @@ function InventoryBackgroundView:_setup_top_panel()
 									index = "in_menu",
 									value = 1
 								},
-								item_type = UISettings.ITEM_TYPES.EMOTE,
+								item_type = ITEM_TYPES.EMOTE,
 								has_new_items_update_callback = function (item_type)
 									return self:has_new_items_by_type(item_type)
 								end
@@ -1289,7 +1300,7 @@ function InventoryBackgroundView:_setup_top_panel()
 									index = "in_menu",
 									value = 1
 								},
-								item_type = UISettings.ITEM_TYPES.EMOTE,
+								item_type = ITEM_TYPES.EMOTE,
 								has_new_items_update_callback = function (item_type)
 									return self:has_new_items_by_type(item_type)
 								end
@@ -1316,7 +1327,7 @@ function InventoryBackgroundView:_setup_top_panel()
 									index = "in_menu",
 									value = 1
 								},
-								item_type = UISettings.ITEM_TYPES.EMOTE,
+								item_type = ITEM_TYPES.EMOTE,
 								has_new_items_update_callback = function (item_type)
 									return self:has_new_items_by_type(item_type)
 								end
@@ -1343,7 +1354,7 @@ function InventoryBackgroundView:_setup_top_panel()
 									index = "in_menu",
 									value = 1
 								},
-								item_type = UISettings.ITEM_TYPES.EMOTE,
+								item_type = ITEM_TYPES.EMOTE,
 								has_new_items_update_callback = function (item_type)
 									return self:has_new_items_by_type(item_type)
 								end
@@ -1370,7 +1381,7 @@ function InventoryBackgroundView:_setup_top_panel()
 									index = "in_menu",
 									value = 1
 								},
-								item_type = UISettings.ITEM_TYPES.EMOTE,
+								item_type = ITEM_TYPES.EMOTE,
 								has_new_items_update_callback = function (item_type)
 									return self:has_new_items_by_type(item_type)
 								end
@@ -1437,6 +1448,7 @@ function InventoryBackgroundView:_setup_top_panel()
 			end
 
 			content.show_alert = self._has_empty_talent_nodes
+			content.show_warning = self._warning_talent
 		end,
 		context = {
 			can_exit = true,
@@ -1775,6 +1787,26 @@ function InventoryBackgroundView:event_on_profile_preset_changed(profile_preset,
 	end
 end
 
+function InventoryBackgroundView:_has_loadout_slot(slots)
+	local has_loadout_slot = false
+
+	if slots.slot_primary or slots.slot_secondary or slots.slot_attachment_1 or slots.slot_attachment_2 or slots.slot_attachment_3 then
+		has_loadout_slot = true
+	end
+
+	return has_loadout_slot
+end
+
+function InventoryBackgroundView:_has_cosmetic_slot(slots)
+	local has_cosmetic_slot = false
+
+	if slots.slot_gear_head or slots.slot_gear_upperbody or slots.slot_gear_lowerbody or slots.slot_gear_extra_cosmetic or slots.slot_insignia or slots.slot_portrait_frame or slots.slot_character_title or slots.slot_animation_emote_1 or slots.slot_animation_emote_2 or slots.slot_animation_emote_3 or slots.slot_animation_emote_4 or slots.slot_animation_emote_5 or slots.slot_animation_emote_5 or slots.slot_animation_end_of_round then
+		has_cosmetic_slot = true
+	end
+
+	return has_cosmetic_slot
+end
+
 function InventoryBackgroundView:_update_presets_missing_warning_marker()
 	local presets = ProfileUtils.get_profile_presets()
 
@@ -1798,15 +1830,21 @@ function InventoryBackgroundView:_update_presets_missing_warning_marker()
 				local invalid_slots, modified_slots, duplicated_slots = self:_validate_loadout(loadout, is_read_only)
 				local show_warning = not table.is_empty(invalid_slots) or not table.is_empty(duplicated_slots)
 				local show_modified = not table.is_empty(modified_slots)
+				local warning_talent = false
 				local preset_talents_version = preset.talents_version
 
 				if not preset_talents_version or active_talent_version ~= preset_talents_version then
 					show_warning = true
+					warning_talent = true
 				end
 
 				self._profile_presets_element:show_profile_preset_missing_items_warning(show_warning, show_modified, preset.id)
 
 				if active_preset then
+					self._invalid_slots = table.merge(table.merge({}, invalid_slots), duplicated_slots)
+					self._modified_slots = modified_slots
+					self._warning_talent = warning_talent
+
 					self._profile_presets_element:set_current_profile_loadout_status(show_warning, show_modified)
 				end
 			end
@@ -1818,7 +1856,7 @@ function InventoryBackgroundView:remove_new_item_mark(item)
 	local gear_id = item.gear_id
 	local item_type = item.item_type
 
-	ItemUtils.unmark_item_id_as_new(gear_id)
+	Items.unmark_item_id_as_new(gear_id)
 
 	if item_type then
 		self._new_items_gear_ids_by_type[item_type][gear_id] = nil
@@ -1865,12 +1903,18 @@ function InventoryBackgroundView:_load_profile(profile)
 	camera_position_default_offset[3] = is_ogryn and 0.5 or 0
 end
 
+local BREED_TO_EVENT_SUFFIX = {
+	human = "human",
+	ogryn = "ogryn"
+}
+
 function InventoryBackgroundView:_setup_background_world()
 	local player = self._preview_player
 	local player_profile = player:profile()
 	local archetype = player_profile.archetype
 	local breed_name = archetype.breed
-	local default_camera_event_id = "event_register_inventory_default_camera_" .. breed_name
+	local event_suffix = BREED_TO_EVENT_SUFFIX[breed_name] or breed_name
+	local default_camera_event_id = "event_register_inventory_default_camera_" .. event_suffix
 
 	self[default_camera_event_id] = function (self, camera_unit)
 		if self._context then
@@ -1903,7 +1947,7 @@ function InventoryBackgroundView:_setup_background_world()
 
 	for slot_name, slot in pairs(ItemSlotSettings) do
 		if slot.slot_type == "gear" then
-			local item_camera_event_id = "event_register_inventory_item_camera_" .. breed_name .. "_" .. slot_name
+			local item_camera_event_id = "event_register_inventory_item_camera_" .. event_suffix .. "_" .. slot_name
 
 			self[item_camera_event_id] = function (self, camera_unit)
 				self._item_camera_by_slot_id[slot_name] = camera_unit
@@ -2389,8 +2433,10 @@ function InventoryBackgroundView:_setup_inventory()
 end
 
 function InventoryBackgroundView:_spawn_profile(profile)
-	if self._profile_spawner then
-		self._profile_spawner:destroy()
+	local profile_spawner = self._profile_spawner
+
+	if profile_spawner then
+		profile_spawner:destroy()
 
 		self._profile_spawner = nil
 	end
@@ -2398,26 +2444,28 @@ function InventoryBackgroundView:_spawn_profile(profile)
 	local world = self._world_spawner:world()
 	local camera = self._world_spawner:camera()
 	local unit_spawner = self._world_spawner:unit_spawner()
-	self._profile_spawner = UIProfileSpawner:new("InventoryBackgroundView", world, camera, unit_spawner)
+	profile_spawner = UIProfileSpawner:new("InventoryBackgroundView", world, camera, unit_spawner)
 	local ignored_slots = InventoryBackgroundViewSettings.ignored_slots
 
-	for i = 1, #ignored_slots do
-		local slot_name = ignored_slots[i]
+	for ii = 1, #ignored_slots do
+		local slot_name = ignored_slots[ii]
 
-		self._profile_spawner:ignore_slot(slot_name)
+		profile_spawner:ignore_slot(slot_name)
 	end
 
 	local camera_position = ScriptCamera.position(camera)
-	local spawn_position = Unit.world_position(self._spawn_point_unit, 1)
-	local spawn_rotation = Unit.world_rotation(self._spawn_point_unit, 1)
+	local spawn_point_unit = self._spawn_point_unit
+	local spawn_position = Unit.world_position(spawn_point_unit, 1)
+	local spawn_rotation = Unit.world_rotation(spawn_point_unit, 1)
 	camera_position.z = 0
 	local selected_archetype = profile.archetype
 	local breed_name = selected_archetype and selected_archetype.breed or profile.breed
 	local breed_settings = Breeds[breed_name]
 	local inventory_state_machine = breed_settings.inventory_state_machine
 
-	self._profile_spawner:spawn_profile(profile, spawn_position, spawn_rotation, nil, inventory_state_machine)
+	profile_spawner:spawn_profile(profile, spawn_position, spawn_rotation, nil, inventory_state_machine)
 
+	self._profile_spawner = profile_spawner
 	self._spawned_profile = profile
 
 	self:_update_presentation_wield_item()
@@ -2491,6 +2539,19 @@ function InventoryBackgroundView:set_item_position(position)
 	end
 end
 
+function InventoryBackgroundView:event_force_refresh_inventory()
+	local player = self._preview_player
+	local character_id = player:character_id()
+
+	Managers.data_service.gear:fetch_inventory(character_id):next(function (items)
+		if self._destroyed then
+			return
+		end
+
+		self._inventory_items = items
+	end)
+end
+
 function InventoryBackgroundView:_fetch_inventory_items()
 	local player = self._preview_player
 	local character_id = player:character_id()
@@ -2509,6 +2570,10 @@ function InventoryBackgroundView:_fetch_inventory_items()
 		self._mastery_traits = Managers.data_service.mastery:get_all_traits_data(masteries_data)
 
 		Managers.data_service.mastery:check_and_claim_all_masteries_levels(masteries_data):next(function (data)
+			if self._destroyed then
+				return
+			end
+
 			for id, mastery_data in pairs(data) do
 				self.masteries_data[id] = mastery_data
 			end
@@ -2517,10 +2582,10 @@ function InventoryBackgroundView:_fetch_inventory_items()
 				self._syncing_mastery[id] = nil
 			end
 
-			self._has_mastery_points_available = MasteryUtils.has_available_points(self.masteries_data, self._mastery_traits)
+			self._has_mastery_points_available = Mastery.has_available_points(self.masteries_data, self._mastery_traits)
 		end)
 
-		self._has_mastery_points_available = MasteryUtils.has_available_points(self.masteries_data, self._mastery_traits)
+		self._has_mastery_points_available = Mastery.has_available_points(self.masteries_data, self._mastery_traits)
 		self._inventory_synced = true
 
 		for id, mastery_data in pairs(masteries_data) do
@@ -2553,7 +2618,7 @@ function InventoryBackgroundView:event_mastery_traits_update(mastery_id, traits_
 			end
 		end
 
-		self._has_mastery_points_available = MasteryUtils.has_available_points(self.masteries_data, self._mastery_traits)
+		self._has_mastery_points_available = Mastery.has_available_points(self.masteries_data, self._mastery_traits)
 	end
 end
 
@@ -2578,6 +2643,14 @@ function InventoryBackgroundView:_check_mastery_sync_status()
 		self._mastery_previous_state = nil
 	end
 end
+
+local ALLOWED_DUPLICATE_SLOTS = {
+	slot_animation_emote_3 = true,
+	slot_animation_emote_5 = true,
+	slot_animation_emote_4 = true,
+	slot_animation_emote_1 = true,
+	slot_animation_emote_2 = true
+}
 
 function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
@@ -2867,6 +2940,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 	-- Decompilation error in this vicinity:
 	--- BLOCK #24 82-84, warpins: 1 ---
 	invalid_slots[slot_name] = true
+
 	--- END OF BLOCK #24 ---
 
 	UNCONDITIONAL JUMP; TARGET BLOCK #51
@@ -2874,15 +2948,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #25 85-89, warpins: 4 ---
-	local allowed_duplicates = {
-		slot_animation_emote_3 = true,
-		slot_animation_emote_5 = true,
-		slot_animation_emote_4 = true,
-		slot_animation_emote_1 = true,
-		slot_animation_emote_2 = true
-	}
-
+	--- BLOCK #25 85-88, warpins: 4 ---
 	--- END OF BLOCK #25 ---
 
 	FLOW; TARGET BLOCK #26
@@ -2890,7 +2956,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #26 90-94, warpins: 1 ---
+	--- BLOCK #26 89-93, warpins: 1 ---
 	--- END OF BLOCK #26 ---
 
 	if type(checked_load_data)
@@ -2903,10 +2969,10 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #27 95-97, warpins: 1 ---
+	--- BLOCK #27 94-96, warpins: 1 ---
 	--- END OF BLOCK #27 ---
 
-	slot21 = if not checked_load_data.gear_id then
+	slot20 = if not checked_load_data.gear_id then
 	JUMP TO BLOCK #28
 	else
 	JUMP TO BLOCK #32
@@ -2915,7 +2981,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #28 98-102, warpins: 2 ---
+	--- BLOCK #28 97-101, warpins: 2 ---
 	--- END OF BLOCK #28 ---
 
 	if type(checked_load_data)
@@ -2929,8 +2995,8 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #29 103-104, warpins: 1 ---
-	slot21 = checked_load_data
+	--- BLOCK #29 102-103, warpins: 1 ---
+	slot20 = checked_load_data
 	--- END OF BLOCK #29 ---
 
 	UNCONDITIONAL JUMP; TARGET BLOCK #32
@@ -2938,8 +3004,8 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #30 105-106, warpins: 1 ---
-	slot21 = false
+	--- BLOCK #30 104-105, warpins: 1 ---
+	slot20 = false
 	--- END OF BLOCK #30 ---
 
 	UNCONDITIONAL JUMP; TARGET BLOCK #32
@@ -2947,7 +3013,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #31 107-107, warpins: 0 ---
+	--- BLOCK #31 106-106, warpins: 0 ---
 	local checked_gear_id = true
 
 	--- END OF BLOCK #31 ---
@@ -2957,7 +3023,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #32 108-112, warpins: 4 ---
+	--- BLOCK #32 107-111, warpins: 4 ---
 	--- END OF BLOCK #32 ---
 
 	if type(item_data)
@@ -2970,10 +3036,10 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #33 113-115, warpins: 1 ---
+	--- BLOCK #33 112-114, warpins: 1 ---
 	--- END OF BLOCK #33 ---
 
-	slot22 = if not item_data.gear_id then
+	slot21 = if not item_data.gear_id then
 	JUMP TO BLOCK #34
 	else
 	JUMP TO BLOCK #38
@@ -2982,7 +3048,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #34 116-120, warpins: 2 ---
+	--- BLOCK #34 115-119, warpins: 2 ---
 	--- END OF BLOCK #34 ---
 
 	if type(item_data)
@@ -2996,8 +3062,8 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #35 121-122, warpins: 1 ---
-	slot22 = item_data
+	--- BLOCK #35 120-121, warpins: 1 ---
+	slot21 = item_data
 	--- END OF BLOCK #35 ---
 
 	UNCONDITIONAL JUMP; TARGET BLOCK #38
@@ -3005,8 +3071,8 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #36 123-124, warpins: 1 ---
-	slot22 = false
+	--- BLOCK #36 122-123, warpins: 1 ---
+	slot21 = false
 	--- END OF BLOCK #36 ---
 
 	UNCONDITIONAL JUMP; TARGET BLOCK #38
@@ -3014,7 +3080,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #37 125-125, warpins: 0 ---
+	--- BLOCK #37 124-124, warpins: 0 ---
 	local item_gear_id = true
 	--- END OF BLOCK #37 ---
 
@@ -3023,7 +3089,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #38 126-127, warpins: 4 ---
+	--- BLOCK #38 125-126, warpins: 4 ---
 	--- END OF BLOCK #38 ---
 
 	if checked_gear_id == item_gear_id then
@@ -3035,7 +3101,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #39 128-129, warpins: 1 ---
+	--- BLOCK #39 127-128, warpins: 1 ---
 	--- END OF BLOCK #39 ---
 
 	if checked_slot_name ~= slot_name then
@@ -3047,10 +3113,10 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #40 130-132, warpins: 1 ---
+	--- BLOCK #40 129-131, warpins: 1 ---
 	--- END OF BLOCK #40 ---
 
-	slot23 = if not invalid_slots[slot_name] then
+	slot22 = if not invalid_slots[slot_name] then
 	JUMP TO BLOCK #41
 	else
 	JUMP TO BLOCK #44
@@ -3059,10 +3125,10 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #41 133-135, warpins: 1 ---
+	--- BLOCK #41 132-135, warpins: 1 ---
 	--- END OF BLOCK #41 ---
 
-	slot23 = if allowed_duplicates[checked_slot_name] then
+	slot22 = if ALLOWED_DUPLICATE_SLOTS[checked_slot_name] then
 	JUMP TO BLOCK #42
 	else
 	JUMP TO BLOCK #43
@@ -3071,10 +3137,10 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #42 136-138, warpins: 1 ---
+	--- BLOCK #42 136-139, warpins: 1 ---
 	--- END OF BLOCK #42 ---
 
-	slot23 = if not allowed_duplicates[slot_name] then
+	slot22 = if not ALLOWED_DUPLICATE_SLOTS[slot_name] then
 	JUMP TO BLOCK #43
 	else
 	JUMP TO BLOCK #44
@@ -3083,7 +3149,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #43 139-141, warpins: 2 ---
+	--- BLOCK #43 140-142, warpins: 2 ---
 	duplicated_slots[checked_slot_name] = true
 	--- END OF BLOCK #43 ---
 
@@ -3092,14 +3158,14 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #44 142-143, warpins: 5 ---
+	--- BLOCK #44 143-144, warpins: 5 ---
 	--- END OF BLOCK #44 ---
 
 
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #45 144-152, warpins: 1 ---
+	--- BLOCK #45 145-153, warpins: 1 ---
 	local player = self._preview_player
 	local profile = player:profile()
 
@@ -3115,10 +3181,10 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #46 153-158, warpins: 1 ---
+	--- BLOCK #46 154-159, warpins: 1 ---
 	--- END OF BLOCK #46 ---
 
-	slot18 = if not self:_get_inventory_item_by_id(gear_id)
+	slot17 = if not self:_get_inventory_item_by_id(gear_id)
 
 	 then
 	JUMP TO BLOCK #47
@@ -3129,8 +3195,8 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #47 159-162, warpins: 2 ---
-	local item = self:_get_inventory_item_by_id(item_data)
+	--- BLOCK #47 160-163, warpins: 2 ---
+	local item_or_nil = self:_get_inventory_item_by_id(item_data)
 	--- END OF BLOCK #47 ---
 
 	FLOW; TARGET BLOCK #48
@@ -3138,10 +3204,10 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #48 163-164, warpins: 2 ---
+	--- BLOCK #48 164-165, warpins: 2 ---
 	--- END OF BLOCK #48 ---
 
-	slot18 = if item then
+	slot17 = if item_or_nil then
 	JUMP TO BLOCK #49
 	else
 	JUMP TO BLOCK #51
@@ -3150,11 +3216,11 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #49 165-171, warpins: 1 ---
-	local compatible_profile = ItemUtils.is_item_compatible_with_profile(item, profile)
+	--- BLOCK #49 166-172, warpins: 1 ---
+	local compatible_profile = Items.is_item_compatible_with_profile(item_or_nil, profile)
 	--- END OF BLOCK #49 ---
 
-	slot19 = if not compatible_profile then
+	slot18 = if not compatible_profile then
 	JUMP TO BLOCK #50
 	else
 	JUMP TO BLOCK #51
@@ -3163,7 +3229,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #50 172-176, warpins: 1 ---
+	--- BLOCK #50 173-177, warpins: 1 ---
 	only_show_slot_as_invalid[slot_name] = true
 	invalid_slots[slot_name] = true
 	--- END OF BLOCK #50 ---
@@ -3173,7 +3239,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #51 177-178, warpins: 9 ---
+	--- BLOCK #51 178-179, warpins: 9 ---
 	--- END OF BLOCK #51 ---
 
 	UNCONDITIONAL JUMP; TARGET BLOCK #3
@@ -3181,7 +3247,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #52 179-182, warpins: 1 ---
+	--- BLOCK #52 180-183, warpins: 1 ---
 	--- END OF BLOCK #52 ---
 
 	FLOW; TARGET BLOCK #53
@@ -3189,7 +3255,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #53 183-185, warpins: 1 ---
+	--- BLOCK #53 184-186, warpins: 1 ---
 	--- END OF BLOCK #53 ---
 
 	slot12 = if not only_show_slot_as_invalid[removed_slot_id] then
@@ -3201,7 +3267,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #54 186-188, warpins: 1 ---
+	--- BLOCK #54 187-189, warpins: 1 ---
 	--- END OF BLOCK #54 ---
 
 	slot12 = if self._starting_profile_equipped_items then
@@ -3213,7 +3279,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #55 189-190, warpins: 1 ---
+	--- BLOCK #55 190-191, warpins: 1 ---
 	local starting_item = self._starting_profile_equipped_items[removed_slot_id]
 	--- END OF BLOCK #55 ---
 
@@ -3222,7 +3288,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #56 191-193, warpins: 2 ---
+	--- BLOCK #56 192-194, warpins: 2 ---
 	--- END OF BLOCK #56 ---
 
 	slot13 = if self._valid_profile_equipped_items then
@@ -3234,7 +3300,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #57 194-195, warpins: 1 ---
+	--- BLOCK #57 195-196, warpins: 1 ---
 	local valid_stored_item = self._valid_profile_equipped_items[removed_slot_id]
 	--- END OF BLOCK #57 ---
 
@@ -3243,7 +3309,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #58 196-197, warpins: 2 ---
+	--- BLOCK #58 197-198, warpins: 2 ---
 	--- END OF BLOCK #58 ---
 
 	slot12 = if starting_item then
@@ -3255,7 +3321,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #59 198-202, warpins: 1 ---
+	--- BLOCK #59 199-203, warpins: 1 ---
 	starting_item = self:_get_inventory_item_by_id(starting_item.gear_id)
 	--- END OF BLOCK #59 ---
 
@@ -3264,7 +3330,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #60 203-204, warpins: 2 ---
+	--- BLOCK #60 204-205, warpins: 2 ---
 	--- END OF BLOCK #60 ---
 
 	slot13 = if valid_stored_item then
@@ -3276,7 +3342,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #61 205-209, warpins: 1 ---
+	--- BLOCK #61 206-210, warpins: 1 ---
 	valid_stored_item = self:_get_inventory_item_by_id(valid_stored_item.gear_id)
 	--- END OF BLOCK #61 ---
 
@@ -3285,7 +3351,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #62 210-215, warpins: 2 ---
+	--- BLOCK #62 211-216, warpins: 2 ---
 	local fallback_item = MasterItems.find_fallback_item(removed_slot_id)
 	--- END OF BLOCK #62 ---
 
@@ -3298,7 +3364,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #63 216-218, warpins: 1 ---
+	--- BLOCK #63 217-219, warpins: 1 ---
 	--- END OF BLOCK #63 ---
 
 	slot15 = if not starting_item.always_owned then
@@ -3310,7 +3376,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #64 219-220, warpins: 1 ---
+	--- BLOCK #64 220-221, warpins: 1 ---
 	--- END OF BLOCK #64 ---
 
 	slot15 = if fallback_item then
@@ -3322,7 +3388,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #65 221-224, warpins: 1 ---
+	--- BLOCK #65 222-225, warpins: 1 ---
 	--- END OF BLOCK #65 ---
 
 	if fallback_item.name == starting_item.name then
@@ -3334,7 +3400,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #66 225-226, warpins: 1 ---
+	--- BLOCK #66 226-227, warpins: 1 ---
 	slot15 = false
 	--- END OF BLOCK #66 ---
 
@@ -3343,7 +3409,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #67 227-227, warpins: 1 ---
+	--- BLOCK #67 228-228, warpins: 1 ---
 	local starting_item_valid = true
 	--- END OF BLOCK #67 ---
 
@@ -3352,7 +3418,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #68 228-229, warpins: 5 ---
+	--- BLOCK #68 229-230, warpins: 5 ---
 	--- END OF BLOCK #68 ---
 
 	slot16 = if valid_stored_item then
@@ -3364,7 +3430,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #69 230-232, warpins: 1 ---
+	--- BLOCK #69 231-233, warpins: 1 ---
 	--- END OF BLOCK #69 ---
 
 	slot16 = if not valid_stored_item.always_owned then
@@ -3376,7 +3442,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #70 233-234, warpins: 1 ---
+	--- BLOCK #70 234-235, warpins: 1 ---
 	--- END OF BLOCK #70 ---
 
 	slot16 = if fallback_item then
@@ -3388,7 +3454,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #71 235-238, warpins: 1 ---
+	--- BLOCK #71 236-239, warpins: 1 ---
 	--- END OF BLOCK #71 ---
 
 	if fallback_item.name == valid_stored_item.name then
@@ -3400,7 +3466,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #72 239-240, warpins: 1 ---
+	--- BLOCK #72 240-241, warpins: 1 ---
 	slot16 = false
 	--- END OF BLOCK #72 ---
 
@@ -3409,7 +3475,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #73 241-241, warpins: 1 ---
+	--- BLOCK #73 242-242, warpins: 1 ---
 	local valid_stored_item_valid = true
 
 	--- END OF BLOCK #73 ---
@@ -3419,7 +3485,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #74 242-243, warpins: 5 ---
+	--- BLOCK #74 243-244, warpins: 5 ---
 	--- END OF BLOCK #74 ---
 
 	slot2 = if not read_only then
@@ -3431,7 +3497,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #75 244-245, warpins: 1 ---
+	--- BLOCK #75 245-246, warpins: 1 ---
 	--- END OF BLOCK #75 ---
 
 	slot15 = if starting_item_valid then
@@ -3443,7 +3509,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #76 246-252, warpins: 1 ---
+	--- BLOCK #76 247-253, warpins: 1 ---
 	self:_equip_slot_item(removed_slot_id, starting_item, true)
 	--- END OF BLOCK #76 ---
 
@@ -3452,7 +3518,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #77 253-254, warpins: 1 ---
+	--- BLOCK #77 254-255, warpins: 1 ---
 	--- END OF BLOCK #77 ---
 
 	slot16 = if valid_stored_item_valid then
@@ -3464,7 +3530,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #78 255-260, warpins: 1 ---
+	--- BLOCK #78 256-261, warpins: 1 ---
 	self:_equip_slot_item(removed_slot_id, valid_stored_item, true)
 
 	--- END OF BLOCK #78 ---
@@ -3474,7 +3540,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #79 261-262, warpins: 4 ---
+	--- BLOCK #79 262-263, warpins: 4 ---
 	--- END OF BLOCK #79 ---
 
 	slot15 = if not starting_item_valid then
@@ -3486,7 +3552,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #80 263-264, warpins: 1 ---
+	--- BLOCK #80 264-265, warpins: 1 ---
 	--- END OF BLOCK #80 ---
 
 	slot16 = if valid_stored_item_valid then
@@ -3498,7 +3564,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #81 265-269, warpins: 2 ---
+	--- BLOCK #81 266-270, warpins: 2 ---
 	invalid_slots[removed_slot_id] = nil
 	modified_slots[removed_slot_id] = true
 
@@ -3509,7 +3575,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #82 270-271, warpins: 1 ---
+	--- BLOCK #82 271-272, warpins: 1 ---
 	--- END OF BLOCK #82 ---
 
 	slot14 = if fallback_item then
@@ -3521,7 +3587,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #83 272-273, warpins: 1 ---
+	--- BLOCK #83 273-274, warpins: 1 ---
 	--- END OF BLOCK #83 ---
 
 	slot2 = if not read_only then
@@ -3533,7 +3599,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #84 274-279, warpins: 1 ---
+	--- BLOCK #84 275-280, warpins: 1 ---
 	self:_equip_slot_item(removed_slot_id, fallback_item, true)
 
 	--- END OF BLOCK #84 ---
@@ -3543,7 +3609,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #85 280-282, warpins: 2 ---
+	--- BLOCK #85 281-283, warpins: 2 ---
 	--- END OF BLOCK #85 ---
 
 	slot17 = if fallback_item.always_owned then
@@ -3555,7 +3621,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #86 283-287, warpins: 1 ---
+	--- BLOCK #86 284-288, warpins: 1 ---
 	invalid_slots[removed_slot_id] = nil
 	modified_slots[removed_slot_id] = true
 
@@ -3566,7 +3632,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #87 288-294, warpins: 1 ---
+	--- BLOCK #87 289-295, warpins: 1 ---
 	--- END OF BLOCK #87 ---
 
 	slot17 = if string.find(removed_slot_id, "slot_attachment")
@@ -3580,7 +3646,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #88 295-298, warpins: 1 ---
+	--- BLOCK #88 296-299, warpins: 1 ---
 	invalid_slots[removed_slot_id] = nil
 	modified_slots[removed_slot_id] = true
 
@@ -3591,7 +3657,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #89 299-300, warpins: 2 ---
+	--- BLOCK #89 300-301, warpins: 2 ---
 	--- END OF BLOCK #89 ---
 
 	slot2 = if not read_only then
@@ -3603,7 +3669,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #90 301-306, warpins: 1 ---
+	--- BLOCK #90 302-307, warpins: 1 ---
 	self:_equip_slot_item(removed_slot_id, nil, true)
 
 	--- END OF BLOCK #90 ---
@@ -3613,14 +3679,14 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #91 307-308, warpins: 7 ---
+	--- BLOCK #91 308-309, warpins: 7 ---
 	--- END OF BLOCK #91 ---
 
 
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #92 309-310, warpins: 1 ---
+	--- BLOCK #92 310-311, warpins: 1 ---
 	--- END OF BLOCK #92 ---
 
 	slot2 = if not read_only then
@@ -3632,7 +3698,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #93 311-313, warpins: 1 ---
+	--- BLOCK #93 312-314, warpins: 1 ---
 	self._invalid_slots = invalid_slots
 	self._modified_slots = modified_slots
 	self._duplicated_slots = duplicated_slots
@@ -3644,7 +3710,7 @@ function InventoryBackgroundView:_validate_loadout(loadout, read_only)
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #94 314-317, warpins: 2 ---
+	--- BLOCK #94 315-318, warpins: 2 ---
 	return invalid_slots, modified_slots, duplicated_slots
 	--- END OF BLOCK #94 ---
 
@@ -3818,7 +3884,7 @@ function InventoryBackgroundView:_get_valid_new_items(inventory_items)
 
 	-- Decompilation error in this vicinity:
 	--- BLOCK #13 62-66, warpins: 1 ---
-	ItemUtils.unmark_item_id_as_new(gear_id)
+	Items.unmark_item_id_as_new(gear_id)
 
 	--- END OF BLOCK #13 ---
 
@@ -3828,7 +3894,7 @@ function InventoryBackgroundView:_get_valid_new_items(inventory_items)
 
 	-- Decompilation error in this vicinity:
 	--- BLOCK #14 67-73, warpins: 1 ---
-	local compatible_profile = ItemUtils.is_item_compatible_with_profile(item, profile)
+	local compatible_profile = Items.is_item_compatible_with_profile(item, profile)
 	--- END OF BLOCK #14 ---
 
 	slot23 = if compatible_profile then
@@ -3899,7 +3965,7 @@ function InventoryBackgroundView:_get_valid_new_items(inventory_items)
 
 	-- Decompilation error in this vicinity:
 	--- BLOCK #20 91-94, warpins: 1 ---
-	ItemUtils.unmark_item_id_as_new(gear_id)
+	Items.unmark_item_id_as_new(gear_id)
 
 	--- END OF BLOCK #20 ---
 

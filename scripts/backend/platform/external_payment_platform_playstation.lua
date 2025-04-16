@@ -7,10 +7,24 @@ function ExternalPaymentPlatformPlaystation:_get_payment_platform()
 	return "psn"
 end
 
-function ExternalPaymentPlatformPlaystation:_get_platform_token()
-	local request_id = nil
+function ExternalPaymentPlatformPlaystation:_get_platform_token(retry_delay)
+	local request_id, start_time = nil
+
+	if retry_delay then
+		start_time = Managers.time:time("main")
+	end
 
 	return Promise.until_value_is_true(function ()
+		if retry_delay then
+			local current_time = Managers.time:time("main")
+
+			if current_time < start_time + retry_delay then
+				return false
+			else
+				retry_delay = nil
+			end
+		end
+
 		if not request_id then
 			request_id = Playstation.request_auth_code()
 
@@ -22,7 +36,9 @@ function ExternalPaymentPlatformPlaystation:_get_platform_token()
 		if err then
 			Log.error("ExternalPayment", "get_auth_code_results() " .. "%s", err)
 
-			return err
+			return nil, {
+				message = err
+			}
 		end
 
 		if result then
@@ -82,8 +98,8 @@ function ExternalPaymentPlatformPlaystation:payment_options()
 	end)
 end
 
-function ExternalPaymentPlatformPlaystation:reconcile_pending_txns()
-	return self:_get_platform_token():next(function (token)
+function ExternalPaymentPlatformPlaystation:reconcile_pending_txns(retry_delay)
+	return self:_get_platform_token(retry_delay):next(function (token)
 		return Managers.backend:authenticate():next(function (account)
 			local builder = BackendUtilities.url_builder():path("/store/"):path(account.sub):path("/payments/reconcile"):query("platform", self:_get_payment_platform())
 
@@ -96,6 +112,24 @@ function ExternalPaymentPlatformPlaystation:reconcile_pending_txns()
 				return response.body
 			end)
 		end)
+	end):catch(function (error)
+		if type(error) == "table" and error.message then
+			error = error.message
+		end
+
+		if not retry_delay then
+			local retry_delay = 2
+
+			Log.error("ExternalPayment", "Failed to reconcile pending transactions, error: %s, retrying again with a %s seconds delay", tostring(error), retry_delay)
+
+			return self:reconcile_pending_txns(retry_delay)
+		else
+			Log.exception("ExternalPayment", "Failed to reconcile pending transactions, error: %s", tostring(error))
+
+			return Promise.rejected({
+				error
+			})
+		end
 	end)
 end
 
@@ -205,6 +239,14 @@ function ExternalPaymentPlatformPlaystation:_get_entitlements()
 		if status == web_api.COMPLETED then
 			local response = web_api.request_result(id, web_api.STRING)
 			local parsed = cjson.decode(response)
+
+			if parsed[1] == nil then
+				return {
+					success = false
+				}
+			end
+
+			local item_count = 0
 			local result_by_id = {}
 
 			for i, v in ipairs(parsed[1].children) do
@@ -212,6 +254,13 @@ function ExternalPaymentPlatformPlaystation:_get_entitlements()
 					displayPrice = v.skus[1].displayPrice
 				}
 				result_by_id[v.label] = product
+				item_count = item_count + 1
+			end
+
+			if item_count == 0 then
+				return {
+					success = false
+				}
 			end
 
 			self._platform_entitlements = result_by_id
@@ -347,6 +396,12 @@ function ExternalPaymentPlatformPlaystation:get_options()
 	entitlement_promise = self:_get_entitlements()
 
 	return entitlement_promise:next(function (platform_entitlements)
+		if platform_entitlements.success == false then
+			return Promise.rejected({
+				error = "empty_store"
+			})
+		end
+
 		return self:payment_options():next(function (body)
 			local options = body.options
 
@@ -371,6 +426,34 @@ function ExternalPaymentPlatformPlaystation:get_options()
 				return result
 			end
 		end)
+	end)
+end
+
+function ExternalPaymentPlatformPlaystation:show_empty_store_error()
+	return Promise.until_value_is_true(function ()
+		local status = MsgDialog.update()
+
+		if status == MsgDialog.NONE then
+			MsgDialog.initialize()
+
+			return false
+		end
+
+		if status == MsgDialog.INITIALIZED then
+			MsgDialog.open(MsgDialog.SYSTEM_MSG_EMPTY_STORE, PS5.initial_user_id())
+
+			return false
+		end
+
+		if status == MsgDialog.RUNNING then
+			return false
+		end
+
+		MsgDialog.terminate()
+
+		return {
+			success = true
+		}
 	end)
 end
 

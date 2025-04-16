@@ -1,4 +1,3 @@
-local InputDevice = require("scripts/managers/input/input_device")
 local FreeFlightDefaultInput = require("scripts/foundation/managers/free_flight/free_flight_default_input")
 local FreeFlightFollowPath = require("scripts/foundation/managers/free_flight/utilities/free_flight_follow_path")
 local FreeFlightManagerTestify = GameParameters.testify and require("scripts/foundation/managers/free_flight/free_flight_manager_testify")
@@ -39,6 +38,14 @@ function FreeFlightManager:init()
 
 	self._look_input_enabled = true
 	self._follow_path = FreeFlightFollowPath:new()
+	self._camera_bounds = nil
+end
+
+function FreeFlightManager:set_camera_bounds(min, max)
+	self._camera_bounds = {
+		min = min,
+		max = max
+	}
 end
 
 function FreeFlightManager:_create_global_camera()
@@ -370,6 +377,10 @@ function FreeFlightManager:_update_camera(input, dt, camera_data)
 
 	if DevParameters.allow_character_input_in_free_flight then
 		Debug:colored_text(Color.orange_red(), "FREE FLIGHT INPUT ENABLED,     Keybind: L-CTRL + SPACE")
+	end
+
+	if self._camera_bounds then
+		Matrix4x4.set_translation(cm, Vector3.clamp(Matrix4x4.translation(cm), self._camera_bounds.min, self._camera_bounds.max))
 	end
 
 	ScriptCamera.set_local_pose(cam, cm)

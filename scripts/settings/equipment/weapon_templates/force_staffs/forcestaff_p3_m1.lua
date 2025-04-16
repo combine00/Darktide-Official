@@ -1,8 +1,10 @@
+local ActionInputHierarchy = require("scripts/utilities/action/action_input_hierarchy")
 local BaseTemplateSettings = require("scripts/settings/equipment/weapon_templates/base_template_settings")
 local BuffSettings = require("scripts/settings/buff/buff_settings")
 local DamageProfileTemplates = require("scripts/settings/damage/damage_profile_templates")
 local DamageSettings = require("scripts/settings/damage/damage_settings")
 local FootstepIntervalsTemplates = require("scripts/settings/equipment/footstep/footstep_intervals_templates")
+local HapticTriggerTemplates = require("scripts/settings/equipment/haptic_trigger_templates")
 local PlayerCharacterConstants = require("scripts/settings/player_character/player_character_constants")
 local ProjectileTemplates = require("scripts/settings/projectile/projectile_templates")
 local SmartTargetingTemplates = require("scripts/settings/equipment/smart_targeting_templates")
@@ -37,7 +39,6 @@ local chain_settings_charged_targeting = table.clone(chain_settings_charged)
 chain_settings_charged_targeting.radius = 20
 chain_settings_charged_targeting.max_angle = math.pi * 0.25
 chain_settings_charged_targeting.close_max_angle = math.pi * 0.5
-weapon_template.smart_targeting_template = SmartTargetingTemplates.force_staff_p1_single_target
 weapon_template.action_inputs = {
 	shoot_pressed = {
 		buffer_time = 0.15,
@@ -111,7 +112,7 @@ weapon_template.action_inputs = {
 		}
 	},
 	vent_release = {
-		buffer_time = 0.1,
+		buffer_time = 0.261,
 		input_sequence = {
 			{
 				value = false,
@@ -172,39 +173,117 @@ weapon_template.action_inputs = {
 table.add_missing(weapon_template.action_inputs, BaseTemplateSettings.action_inputs)
 
 weapon_template.action_input_hierarchy = {
-	wield = "stay",
-	shoot_pressed = "stay",
-	charge = {
-		charge_release = "base",
-		wield = "base",
-		grenade_ability = "base",
-		vent = "base",
-		combat_ability = "base",
-		shoot_charged = {
-			keep_charging = "previous",
-			wield = "base",
-			grenade_ability = "base",
-			shoot_charged_release = "base",
-			combat_ability = "base"
+	{
+		transition = "stay",
+		input = "wield"
+	},
+	{
+		transition = "stay",
+		input = "shoot_pressed"
+	},
+	{
+		input = "charge",
+		transition = {
+			{
+				transition = "base",
+				input = "charge_release"
+			},
+			{
+				input = "shoot_charged",
+				transition = {
+					{
+						transition = "base",
+						input = "shoot_charged_release"
+					},
+					{
+						transition = "previous",
+						input = "keep_charging"
+					},
+					{
+						transition = "base",
+						input = "wield"
+					},
+					{
+						transition = "base",
+						input = "combat_ability"
+					},
+					{
+						transition = "base",
+						input = "grenade_ability"
+					}
+				}
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "grenade_ability"
+			},
+			{
+				transition = "base",
+				input = "vent"
+			}
 		}
 	},
-	vent = {
-		wield = "base",
-		vent_release = "base",
-		combat_ability = "base",
-		grenade_ability = "base"
+	{
+		input = "vent",
+		transition = {
+			{
+				transition = "base",
+				input = "vent_release"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "grenade_ability"
+			}
+		}
 	},
-	special_action_hold = {
-		special_action = "base",
-		special_action_light = "base",
-		special_action_heavy = "base",
-		wield = "base",
-		grenade_ability = "base",
-		combat_ability = "base"
+	{
+		input = "special_action_hold",
+		transition = {
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "special_action"
+			},
+			{
+				transition = "base",
+				input = "special_action_light"
+			},
+			{
+				transition = "base",
+				input = "special_action_heavy"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "grenade_ability"
+			}
+		}
 	}
 }
 
-table.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
+ActionInputHierarchy.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
 
 weapon_template.actions = {
 	action_unwield = {
@@ -307,7 +386,7 @@ weapon_template.actions = {
 			},
 			vent = {
 				action_name = "action_vent",
-				chain_time = 0.2
+				chain_time = 0.29
 			}
 		},
 		fx = {
@@ -580,7 +659,8 @@ weapon_template.actions = {
 		},
 		anim_end_event_condition_func = function (unit, data, end_reason)
 			return end_reason ~= "new_interrupting_action" and end_reason ~= "action_complete"
-		end
+		end,
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_swipe_start = {
 		anim_end_event = "attack_finished",
@@ -636,7 +716,8 @@ weapon_template.actions = {
 		},
 		anim_end_event_condition_func = function (unit, data, end_reason)
 			return end_reason ~= "new_interrupting_action" and end_reason ~= "action_complete"
-		end
+		end,
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_stab = {
 		damage_window_start = 0.11666666666666667,
@@ -738,7 +819,8 @@ weapon_template.actions = {
 		time_scale_stat_buffs = {
 			buff_stat_buffs.attack_speed,
 			buff_stat_buffs.melee_attack_speed
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_stab_heavy = {
 		damage_window_start = 0.13333333333333333,
@@ -841,7 +923,8 @@ weapon_template.actions = {
 		time_scale_stat_buffs = {
 			buff_stat_buffs.attack_speed,
 			buff_stat_buffs.melee_attack_speed
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_swipe = {
 		damage_window_start = 0.6333333333333333,
@@ -945,7 +1028,8 @@ weapon_template.actions = {
 		time_scale_stat_buffs = {
 			buff_stat_buffs.attack_speed,
 			buff_stat_buffs.melee_attack_speed
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_swipe_heavy = {
 		damage_window_start = 0.31666666666666665,
@@ -1048,15 +1132,17 @@ weapon_template.actions = {
 		time_scale_stat_buffs = {
 			buff_stat_buffs.attack_speed,
 			buff_stat_buffs.melee_attack_speed
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_vent = {
-		prevent_sprint = true,
+		allowed_during_sprint = true,
 		start_input = "vent",
 		vent_source_name = "fx_left_hand",
 		kind = "vent_warp_charge",
+		prevent_sprint = true,
 		vent_vfx = "content/fx/particles/abilities/psyker_venting",
-		allowed_during_sprint = true,
+		minimum_hold_time = 0.26,
 		anim_end_event = "vent_end",
 		vo_tag = "ability_venting",
 		abort_sprint = true,
@@ -1114,7 +1200,8 @@ weapon_template.actions = {
 		},
 		time_scale_stat_buffs = {
 			buff_stat_buffs.vent_warp_charge_multiplier
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_inspect = {
 		skip_3p_anims = false,
@@ -1127,7 +1214,8 @@ weapon_template.actions = {
 		total_time = math.huge,
 		crosshair = {
 			crosshair_type = "inspect"
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	}
 }
 
@@ -1170,6 +1258,8 @@ weapon_template.stamina_template = "default"
 weapon_template.toughness_template = "default"
 weapon_template.warp_charge_template = "forcestaff_p3_m1"
 weapon_template.footstep_intervals = FootstepIntervalsTemplates.default
+weapon_template.smart_targeting_template = SmartTargetingTemplates.force_staff_p1_single_target
+weapon_template.haptic_trigger_template = HapticTriggerTemplates.ranged.forcestaff
 weapon_template.charge_effects = {
 	sfx_parameter = "charge_level",
 	sfx_source_name = "_left"
@@ -1300,7 +1390,12 @@ weapon_template.base_stats = {
 				display_data = {
 					prefix = "loc_ingame_action_one",
 					display_stats = {
-						__all_basic_stats = true
+						__all_basic_stats = true,
+						critical_strike = {
+							chance_modifier = {
+								display_name = "loc_weapon_stats_display_crit_chance_ranged"
+							}
+						}
 					}
 				}
 			},
@@ -1309,7 +1404,12 @@ weapon_template.base_stats = {
 				display_data = {
 					prefix = "loc_ingame_action_two",
 					display_stats = {
-						__all_basic_stats = true
+						__all_basic_stats = true,
+						critical_strike = {
+							chance_modifier = {
+								display_name = "loc_weapon_stats_display_crit_chance_ranged"
+							}
+						}
 					}
 				}
 			}

@@ -270,6 +270,9 @@ local action_data = {
 			jump_up_1m = 0.1
 		}
 	},
+	disable = {
+		disable_anims = {}
+	},
 	jump_across = {
 		stagger_immune = true,
 		rotation_duration = 0.1,
@@ -422,21 +425,27 @@ local action_data = {
 		}
 	},
 	shoot_spray_n_pray = {
+		strafe_extra_spread_multiplier = 0.3,
+		can_strafe_shoot = true,
+		strafe_shoot_combat_vector = true,
+		rotation_speed = 2,
+		randomized_direction_degree_range = 180,
+		degree_per_direction = 10,
+		move_to_cooldown = 0.25,
+		strafe_end_anim_event = "aim_standing",
+		out_of_aim_anim_event = "out_of_aim",
+		move_to_fail_cooldown = 1,
+		attack_intensity_type = "elite_ranged",
+		inventory_slot = "slot_ranged_weapon",
 		max_distance_to_target = 14,
+		strafe_speed = 1.6,
 		utility_weight = 10,
 		vo_event = "start_shooting",
 		suppressive_fire_spread_multiplier = 3,
-		rotation_speed = 2,
-		min_distance_to_target = 6,
-		randomized_direction_degree_range = 180,
-		degree_per_direction = 10,
-		out_of_aim_anim_event = "out_of_aim",
-		move_to_fail_cooldown = 1,
-		move_to_cooldown = 0.25,
+		strafe_shoot_distance = 3,
 		suppressive_fire = true,
-		attack_intensity_type = "elite_ranged",
 		clear_shot_line_of_sight_id = "gun",
-		inventory_slot = "slot_ranged_weapon",
+		min_distance_to_target = 6,
 		fx_source_name = "muzzle",
 		considerations = UtilityConsiderations.shoot_spray_n_pray,
 		aim_anim_events = {
@@ -496,6 +505,12 @@ local action_data = {
 		stagger_type_reduction = {
 			ranged = 60,
 			killshot = 60
+		},
+		strafe_anim_events = {
+			bwd = "move_bwd_walk_aim",
+			fwd = "move_fwd_walk_aim",
+			left = "move_left_walk_aim",
+			right = "move_right_walk_aim"
 		}
 	},
 	in_cover = {

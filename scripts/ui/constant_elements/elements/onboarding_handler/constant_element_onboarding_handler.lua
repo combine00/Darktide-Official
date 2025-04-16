@@ -94,7 +94,9 @@ function ConstantElementOnboardingHandler:_sync_state_settings(on_destroy)
 
 			if close_condition then
 				if settings.on_deactivation then
-					settings:on_deactivation()
+					local close_condition_met = not on_destroy
+
+					settings:on_deactivation(close_condition_met)
 				end
 
 				settings.active = false
@@ -118,7 +120,9 @@ function ConstantElementOnboardingHandler:_sync_state_settings(on_destroy)
 			end
 
 			if settings.on_deactivation then
-				settings:on_deactivation()
+				local close_condition_met = false
+
+				settings:on_deactivation(close_condition_met)
 			end
 
 			settings.active = false

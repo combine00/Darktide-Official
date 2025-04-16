@@ -237,9 +237,10 @@ function WeaponSystem:_update_queued_explosions(dt, t)
 						MinionDeath.attack_ragdoll(hit_unit, direction, explosion_template.damage_profile, nil, hit_zone_name_or_nil, nil, nil)
 					end
 				elseif has_health then
+					local is_prop = breed_or_nil == nil or Breed.is_prop(breed_or_nil)
 					local intervening_cover = false
 					local cover_actor, _ = nil
-					local do_cover_check = not ignore_cover and not is_sticking_to_unit
+					local do_cover_check = not ignore_cover and not is_sticking_to_unit and not is_prop
 
 					if do_cover_check and HIT_DISTANCE_EPSILON < hit_distance then
 						intervening_cover, _, _, _, cover_actor = PhysicsWorld.raycast(physics_world, hit_position, -direction, 0.95 * hit_distance, "closest", "types", "statics", "collision_filter", "filter_explosion_cover")
@@ -252,10 +253,6 @@ function WeaponSystem:_update_queued_explosions(dt, t)
 					end
 
 					local valid_target = true
-
-					if Breed.is_prop(breed_or_nil) then
-						valid_target = close_hit
-					end
 
 					if valid_target and not intervening_cover then
 						local damage_profile, damage_type = nil
@@ -281,7 +278,7 @@ function WeaponSystem:_update_queued_explosions(dt, t)
 							attack_power_level = attack_power_level * explosion_template.boss_power_level_modifier
 						end
 
-						local _, attack_result = Attack.execute(hit_unit, damage_profile, "power_level", attack_power_level, "charge_level", charge_level, "attack_direction", direction, "dropoff_scalar", dropoff_scalar, "hit_zone_name", hit_zone_name_or_nil, "hit_actor", hit_actor, "attack_type", attack_type, "attacking_unit", attacking_unit, "damage_type", damage_type, "is_critical_strike", is_critical_strike, "item", item_or_nil, "hit_world_position", source_position, "attacking_unit_owner_unit", optional_attacking_unit_owner_unit, "apply_owner_buffs", optional_apply_owner_buffs)
+						local _, attack_result = Attack.execute(hit_unit, damage_profile, "power_level", attack_power_level, "charge_level", charge_level, "attack_direction", direction, "dropoff_scalar", dropoff_scalar, "hit_zone_name", hit_zone_name_or_nil, "hit_actor", hit_actor, "attack_type", attack_type, "attacking_unit", attacking_unit, "damage_type", damage_type, "is_critical_strike", is_critical_strike, "item", item_or_nil, "hit_world_position", source_position, "attacking_unit_owner_unit", optional_attacking_unit_owner_unit, "apply_owner_buffs", optional_apply_owner_buffs, "close_explosion_hit", close_hit)
 						local on_hit_buff_template_name = explosion_template.on_hit_buff_template_name
 
 						if on_hit_buff_template_name and HEALTH_ALIVE[hit_unit] and ALIVE[attacking_unit_owner_unit] then
@@ -390,7 +387,8 @@ function WeaponSystem:give_ammo_carryover_percentages(unit, weapon_slot_configur
 end
 
 function WeaponSystem:queue_perils_of_the_warp_elite_kills_achievement(player, explosion_queue_index)
-	local difficulty = Managers.state.difficulty:get_difficulty()
+	local danger_settings = Managers.state.difficulty:get_danger_settings()
+	local difficulty = danger_settings and danger_settings.difficulty or 0
 
 	if difficulty < 3 then
 		return

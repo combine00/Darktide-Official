@@ -882,8 +882,6 @@ function CameraManager:_update_camera_properties(camera, shadow_cull_camera, cam
 			pos = self:_smooth_camera_collision(camera_data.position, safe_pos, 0.35, 0.25)
 		end
 
-		camera_data.boxed_position = Vector3Box(camera_data.position)
-
 		ScriptCamera.set_local_position(camera, pos)
 		Unit.set_local_position(self._rtxgi_volume, 1, pos)
 		ScatterSystem.move_observer(self._scatter_system, self._scatter_system_observers[viewport_name], pos, camera_data.rotation)
@@ -944,7 +942,8 @@ function CameraManager:_update_angular_velocity(dt, viewport_name)
 	if Quaternion.is_valid(camera_rot) and Quaternion.is_valid(last_rot) then
 		local rotation_delta = Quaternion.multiply(Quaternion.inverse(camera_rot), last_rot)
 		local angular_velocity_vector, angular_delta = Quaternion.decompose(rotation_delta)
-		self._angular_velocity = Vector3Box(angular_velocity_vector * angular_delta / dt)
+
+		Vector3Box.store(self._angular_velocity, angular_velocity_vector * angular_delta / dt)
 	end
 
 	QuaternionBox.store(self._last_rotation, camera_rot)

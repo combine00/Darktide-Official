@@ -72,11 +72,15 @@ function PlayerCharacterStateBase:game_object_initialized(game_session, game_obj
 end
 
 function PlayerCharacterStateBase:on_enter(unit, dt, t, previous_state, params)
-	return
+	if IS_PLAYSTATION then
+		Managers.input.haptic_trigger_effects:on_character_state_enter(self._character_state_component)
+	end
 end
 
 function PlayerCharacterStateBase:on_exit(unit, t, next_state)
-	return
+	if IS_PLAYSTATION then
+		Managers.input.haptic_trigger_effects:on_character_state_exit()
+	end
 end
 
 function PlayerCharacterStateBase:_air_movement(velocity_current, x, y, rotation, move_speed, player_speed_scale, dt)
@@ -253,19 +257,14 @@ function PlayerCharacterStateBase:_should_hang_on_ledge(unit, t)
 	return true, hang_ledge_unit
 end
 
-local DEVICE_SLOT_NAME = "slot_device"
-
 function PlayerCharacterStateBase:_is_wielding_minigame_device()
-	local inventory_component = self._inventory_component
-	local wielded_slot = inventory_component.wielded_slot
+	local wielded_slot = self._inventory_component.wielded_slot
+	local pocketable_device_active = self._minigame_character_state_component.pocketable_device_active
 
-	if wielded_slot == DEVICE_SLOT_NAME then
-		local visual_loadout_extension = self._visual_loadout_extension
-		local weapon_template = visual_loadout_extension:weapon_template_from_slot(DEVICE_SLOT_NAME)
+	if wielded_slot == "slot_device" or wielded_slot == "slot_pocketable_small" and pocketable_device_active then
+		local weapon_template = self._visual_loadout_extension:weapon_template_from_slot(wielded_slot)
 
-		if weapon_template and weapon_template.require_minigame then
-			return true
-		end
+		return weapon_template and weapon_template.require_minigame or false
 	end
 
 	return false

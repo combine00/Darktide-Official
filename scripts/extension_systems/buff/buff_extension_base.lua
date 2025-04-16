@@ -270,6 +270,7 @@ function BuffExtensionBase:_update_stat_buffs_and_keywords(t, on_remove_buff)
 		if buff then
 			buff:update_stat_buffs(current_stat_buffs, t)
 			buff:update_keywords(keywords, t)
+			buff:post_update_keywords_and_stats_func(t)
 		end
 	end
 end

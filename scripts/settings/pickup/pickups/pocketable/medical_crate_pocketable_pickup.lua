@@ -4,14 +4,11 @@ local pickup_data = {
 	look_at_tag = "pocketable",
 	smart_tag_target_type = "pickup",
 	group = "pocketable",
-	game_object_type = "pickup",
-	spawn_weighting = 1,
+	interaction_type = "pocketable",
+	unit_name = "content/pickups/pocketables/medical_crate/pickup_medical_crate",
 	inventory_slot_name = "slot_pocketable",
 	pickup_sound = "wwise/events/player/play_pick_up_box",
 	interaction_icon = "content/ui/materials/hud/interactions/icons/pocketable_medkit",
-	unit_name = "content/pickups/pocketables/medical_crate/pickup_medical_crate",
-	unit_template_name = "pickup",
-	interaction_type = "pocketable",
 	inventory_item = "content/items/pocketable/med_crate_pocketable"
 }
 

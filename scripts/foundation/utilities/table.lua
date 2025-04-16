@@ -887,6 +887,8 @@ function table.swap_delete(t, index)
 	local table_length = #t
 	t[index] = t[table_length]
 	t[table_length] = nil
+
+	return table_length
 end
 
 function table.set_readonly(t)
@@ -985,9 +987,10 @@ function table.make_strict(t, name, optional_error_message__index, optional_erro
 end
 
 function table.make_strict_with_interface(t, name, interface)
-	local valid_keys = {}
+	local num_fields = #interface
+	local valid_keys = Script.new_map(num_fields)
 
-	for i = 1, #interface do
+	for i = 1, num_fields do
 		local field_name = interface[i]
 		valid_keys[field_name] = true
 	end
@@ -1298,4 +1301,15 @@ function table.is_array(t)
 	end
 
 	return true
+end
+
+function table.concat_arrays(...)
+	local append = table.append
+	local t = {}
+
+	for i = 1, select("#", ...) do
+		append(t, select(i, ...))
+	end
+
+	return t
 end

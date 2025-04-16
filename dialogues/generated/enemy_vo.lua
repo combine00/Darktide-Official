@@ -1118,7 +1118,7 @@ return function ()
 			{
 				"user_memory",
 				"enemy_memory_cultist_captain_taunt",
-				OP.TIMEDIFF,
+				OP.GTEQ,
 				OP.GT,
 				0
 			}

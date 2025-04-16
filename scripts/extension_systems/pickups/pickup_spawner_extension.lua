@@ -81,6 +81,7 @@ function PickupSpawnerExtension:setup_from_component(component, spawn_method, ig
 	data.last_item_index_spawned = 0
 
 	if self._is_server then
+		data.spawned_items = {}
 		local new_seed, rnd_index = math.next_random(self._seed, 1, #spawn_nodes)
 		self._seed = new_seed
 		data.target_node = spawn_nodes[rnd_index]
@@ -89,11 +90,17 @@ function PickupSpawnerExtension:setup_from_component(component, spawn_method, ig
 	components[num_components + 1] = data
 end
 
-function PickupSpawnerExtension:on_gameplay_post_init(level)
+function PickupSpawnerExtension:on_gameplay_post_init()
 	self._chest_extension = ScriptUnit.has_extension(self._unit, "chest_system")
+
+	self:calculate_percentage_through_level()
 end
 
 function PickupSpawnerExtension:calculate_percentage_through_level()
+	if not Managers.state.main_path:is_main_path_available() then
+		return
+	end
+
 	local unit_position = POSITION_LOOKUP[self._unit]
 	local _, _, percentage, _, _ = MainPathQueries.closest_position(unit_position)
 	self._percentage_through_level = percentage
@@ -233,14 +240,57 @@ function PickupSpawnerExtension:spawn_specific_item(component_index, pickup_name
 
 	Unit.flow_event(self._unit, "lua_item_spawned")
 
+	local component_spawn_list = self._components[component_index].spawned_items
+	component_spawn_list[#component_spawn_list + 1] = unit_item
+
 	return unit_item, unit_item_id
 end
 
 function PickupSpawnerExtension:spawned_item_picked_up(unit_item)
 	Unit.flow_event(self._unit, "lua_item_picked_up")
+
+	local components = self._components
+	local num_components = #self._components
+
+	for i = 1, num_components do
+		local items = components[i].spawned_items
+
+		for p = 1, #items do
+			local item = items[p]
+
+			if unit_item == item then
+				table.remove(items, p)
+
+				return
+			end
+		end
+	end
 end
 
-function PickupSpawnerExtension:unspawn_item(item_unit)
+function PickupSpawnerExtension:despawn_items()
+	if not self._is_server then
+		return
+	end
+
+	local components = self._components
+	local num_components = #self._components
+
+	for i = 1, num_components do
+		local items = components[i].spawned_items
+
+		for p = 1, #items do
+			local item = items[p]
+
+			if ALIVE[item] then
+				self:despawn_item(item)
+			end
+		end
+
+		table.clear(items)
+	end
+end
+
+function PickupSpawnerExtension:despawn_item(item_unit)
 	local pickup_system = self._pickup_system
 
 	pickup_system:despawn_pickup(item_unit)

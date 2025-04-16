@@ -13,6 +13,7 @@ local StaggerSettings = require("scripts/settings/damage/stagger_settings")
 local TargetSelectionTemplates = require("scripts/extension_systems/perception/target_selection_templates")
 local TargetSelectionWeights = require("scripts/settings/minion_target_selection/minion_target_selection_weights")
 local WeakspotSettings = require("scripts/settings/damage/weakspot_settings")
+local DamageProfileTemplates = require("scripts/settings/damage/damage_profile_templates")
 local armor_types = ArmorSettings.types
 local breed_types = BreedSettings.types
 local hit_zone_names = HitZone.hit_zone_names
@@ -386,6 +387,10 @@ local breed_data = {
 	},
 	hit_zone_weakspot_types = {
 		[hit_zone_names.head] = weakspot_types.headshot
+	},
+	hitzone_armor_override = {
+		[hit_zone_names.center_mass] = armor_types.super_armor,
+		[hit_zone_names.torso] = armor_types.super_armor
 	},
 	hitzone_damage_multiplier = {
 		ranged = {

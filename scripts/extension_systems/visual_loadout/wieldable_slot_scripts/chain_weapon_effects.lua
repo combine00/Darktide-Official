@@ -1,7 +1,9 @@
+require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/melee_idling_effects")
+
 local WieldableSlotScriptInterface = require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/wieldable_slot_script_interface")
 local _vfx_external_properties = {}
 local _sfx_external_properties = {}
-local ChainWeaponEffects = class("ChainWeaponEffects")
+local ChainWeaponEffects = class("ChainWeaponEffects", "MeleeIdlingEffects")
 local SPECIAL_ACTIVE_LOOPING_VFX_ALIAS = "weapon_special_loop"
 local SPECIAL_OFF_SOUND_ALIAS = "weapon_special_end"
 local INTENSITY_DECAY_SPEED = 1
@@ -37,36 +39,62 @@ function ChainWeaponEffects:init(context, slot, weapon_template, fx_sources)
 	self._special_active_start_t = nil
 	self._special_active_end_t = nil
 	self._force_update = true
+
+	ChainWeaponEffects.super.init(self, context, slot, weapon_template, fx_sources)
 end
 
 function ChainWeaponEffects:destroy()
+	local wwise_world = self._wwise_world
+	local melee_idling_source = self._fx_extension:sound_source(self._melee_idling_fx_source_name)
+
+	WwiseWorld.set_source_parameter(wwise_world, melee_idling_source, "combat_chainsword_throttle", 0)
+	WwiseWorld.set_source_parameter(wwise_world, melee_idling_source, "combat_chainsword_cut", 0)
 	self:_stop_vfx_loop(true)
+	ChainWeaponEffects.super.destroy(self)
 end
 
 function ChainWeaponEffects:wield()
-	return
+	local wwise_world = self._wwise_world
+	local melee_idling_source = self._fx_extension:sound_source(self._melee_idling_fx_source_name)
+
+	WwiseWorld.set_source_parameter(wwise_world, melee_idling_source, "combat_chainsword_throttle", 0)
+	WwiseWorld.set_source_parameter(wwise_world, melee_idling_source, "combat_chainsword_cut", 0)
+	ChainWeaponEffects.super.wield(self)
 end
 
 function ChainWeaponEffects:unwield()
+	local wwise_world = self._wwise_world
+	local melee_idling_source = self._fx_extension:sound_source(self._melee_idling_fx_source_name)
+
+	WwiseWorld.set_source_parameter(wwise_world, melee_idling_source, "combat_chainsword_throttle", 0)
+	WwiseWorld.set_source_parameter(wwise_world, melee_idling_source, "combat_chainsword_cut", 0)
+
 	if self._inventory_slot_component.special_active then
 		self:_play_single_sfx(SPECIAL_OFF_SOUND_ALIAS, self._special_active_fx_source_name)
 	end
 
 	self:_stop_vfx_loop(true)
+	ChainWeaponEffects.super.unwield(self)
 end
 
 function ChainWeaponEffects:fixed_update(unit, dt, t, frame)
-	return
+	ChainWeaponEffects.super.fixed_update(self, unit, dt, t, frame)
 end
 
 function ChainWeaponEffects:update(unit, dt, t)
 	self:_update_active()
 	self:_update_base_intensity(dt, t)
 	self:_update_intensity(dt, t)
+	ChainWeaponEffects.super.update(self, unit, dt, t)
 end
 
 function ChainWeaponEffects:update_first_person_mode(first_person_mode)
-	return
+	local wwise_world = self._wwise_world
+	local melee_idling_source = self._fx_extension:sound_source(self._melee_idling_fx_source_name)
+
+	WwiseWorld.set_source_parameter(wwise_world, melee_idling_source, "combat_chainsword_throttle", 0)
+	WwiseWorld.set_source_parameter(wwise_world, melee_idling_source, "combat_chainsword_cut", 0)
+	ChainWeaponEffects.super.update_first_person_mode(self, first_person_mode)
 end
 
 function ChainWeaponEffects:_play_single_sfx(sound_alias, fx_source_name)
@@ -222,6 +250,13 @@ function ChainWeaponEffects:_update_intensity(dt, t)
 		self._equipment_component.send_component_event(self._slot, "set_speed", anim_speed)
 
 		self._force_update = false
+	end
+
+	if IS_PLAYSTATION and self._is_local_unit then
+		local vibration_intensity = speed_settings.haptic_vibration_intensity
+		local frequency = math.lerp(vibration_intensity.min, vibration_intensity.max, intensity)
+
+		Managers.input.haptic_trigger_effects:trigger_vibration(frequency)
 	end
 
 	local resistance = is_sawing and 1 - math.random() * 0.1 or 0

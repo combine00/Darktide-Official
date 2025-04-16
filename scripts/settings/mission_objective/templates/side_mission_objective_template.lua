@@ -17,7 +17,7 @@ local mission_objective_templates = {
 			side_mission_consumable = {
 				description = "loc_objective_side_mission_consumable_desc",
 				side_objective_type = "collect",
-				collect_amount = 9,
+				collect_amount = 6,
 				header = "loc_objective_side_mission_consumable_header",
 				evaluate_at_level_end = true,
 				is_testable = true,
@@ -60,6 +60,18 @@ local mission_objective_templates = {
 				icon = "content/ui/materials/icons/mission_types/mission_type_side",
 				mission_objective_type = "side",
 				is_testable = false
+			},
+			side_mission_hack_communications = {
+				description = "loc_objective_side_mission_communications_hack_desc",
+				side_objective_type = "collect",
+				collect_amount = 3,
+				header = "loc_objective_side_mission_communications_hack",
+				evaluate_at_level_end = true,
+				is_testable = true,
+				mission_objective_type = "side",
+				unit_name = "communications_hack_device",
+				objective_category = "side_mission",
+				icon = "content/ui/materials/icons/mission_types/mission_type_side"
 			}
 		}
 	}

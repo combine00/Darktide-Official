@@ -338,7 +338,6 @@ return function ()
 				"player_voice_profiles",
 				OP.SET_INTERSECTS,
 				args = {
-					"ogryn_d",
 					"veteran_female_a",
 					"veteran_male_a",
 					"zealot_female_a",
@@ -415,7 +414,6 @@ return function ()
 				"voice_template",
 				OP.SET_INCLUDES,
 				args = {
-					"ogryn_d",
 					"veteran_female_a",
 					"veteran_male_a",
 					"zealot_female_a",
@@ -2072,7 +2070,6 @@ return function ()
 				"player_voice_profiles",
 				OP.SET_INTERSECTS,
 				args = {
-					"ogryn_d",
 					"veteran_female_a",
 					"veteran_male_a"
 				}
@@ -2147,7 +2144,6 @@ return function ()
 				"voice_template",
 				OP.SET_INCLUDES,
 				args = {
-					"ogryn_d",
 					"psyker_female_a",
 					"psyker_male_a",
 					"veteran_female_a",
@@ -2645,7 +2641,6 @@ return function ()
 				"player_voice_profiles",
 				OP.SET_INTERSECTS,
 				args = {
-					"ogryn_d",
 					"zealot_female_a",
 					"zealot_male_a"
 				}
@@ -2720,7 +2715,6 @@ return function ()
 				"voice_template",
 				OP.SET_INCLUDES,
 				args = {
-					"ogryn_d",
 					"zealot_female_a",
 					"zealot_male_a",
 					"psyker_female_a",
@@ -2934,7 +2928,6 @@ return function ()
 					"ogryn_a",
 					"ogryn_b",
 					"ogryn_c",
-					"ogryn_d",
 					"psyker_female_a",
 					"psyker_male_a",
 					"psyker_female_b",
@@ -3085,7 +3078,6 @@ return function ()
 					"ogryn_a",
 					"ogryn_b",
 					"ogryn_c",
-					"ogryn_d",
 					"psyker_female_a",
 					"psyker_male_a",
 					"psyker_female_b",
@@ -3233,7 +3225,6 @@ return function ()
 					"ogryn_a",
 					"ogryn_b",
 					"ogryn_c",
-					"ogryn_d",
 					"psyker_female_a",
 					"psyker_male_a",
 					"psyker_female_b",
@@ -3388,7 +3379,6 @@ return function ()
 					"ogryn_a",
 					"ogryn_b",
 					"ogryn_c",
-					"ogryn_d",
 					"psyker_female_a",
 					"psyker_male_a",
 					"psyker_female_b",
@@ -3539,7 +3529,6 @@ return function ()
 					"ogryn_a",
 					"ogryn_b",
 					"ogryn_c",
-					"ogryn_d",
 					"psyker_female_a",
 					"psyker_male_a",
 					"psyker_female_b",
@@ -3585,7 +3574,7 @@ return function ()
 				"last_heard_horde",
 				OP.TIMEDIFF,
 				OP.LT,
-				90
+				110
 			}
 		},
 		on_done = {
@@ -3613,10 +3602,10 @@ return function ()
 	})
 	define_rule({
 		name = "combat_pause_quirk_hates_poxwalkers_b",
-		category = "conversations_prio_1",
 		wwise_route = 0,
 		response = "combat_pause_quirk_hates_poxwalkers_b",
 		database = "psyker_a",
+		category = "conversations_prio_1",
 		criterias = {
 			{
 				"query_context",
@@ -3634,6 +3623,9 @@ return function ()
 			}
 		},
 		on_done = {},
+		heard_speak_routing = {
+			target = "players"
+		},
 		on_pre_rule_execution = {
 			delay_vo = {
 				duration = 0.2
@@ -3694,7 +3686,6 @@ return function ()
 					"ogryn_a",
 					"ogryn_b",
 					"ogryn_c",
-					"ogryn_d",
 					"psyker_female_a",
 					"psyker_male_a",
 					"psyker_female_b",
@@ -3845,7 +3836,6 @@ return function ()
 					"ogryn_a",
 					"ogryn_b",
 					"ogryn_c",
-					"ogryn_d",
 					"psyker_female_a",
 					"psyker_male_a",
 					"psyker_female_b",
@@ -3996,7 +3986,6 @@ return function ()
 					"ogryn_a",
 					"ogryn_b",
 					"ogryn_c",
-					"ogryn_d",
 					"psyker_female_a",
 					"psyker_male_a",
 					"psyker_female_b",
@@ -4063,10 +4052,10 @@ return function ()
 	})
 	define_rule({
 		name = "combat_pause_quirk_stealth_b",
-		category = "conversations_prio_1",
 		wwise_route = 0,
 		response = "combat_pause_quirk_stealth_b",
 		database = "psyker_a",
+		category = "conversations_prio_1",
 		criterias = {
 			{
 				"query_context",
@@ -4084,6 +4073,9 @@ return function ()
 			}
 		},
 		on_done = {},
+		heard_speak_routing = {
+			target = "players"
+		},
 		on_pre_rule_execution = {
 			delay_vo = {
 				duration = 0.2
@@ -4369,7 +4361,6 @@ return function ()
 					"ogryn_a",
 					"ogryn_b",
 					"ogryn_c",
-					"ogryn_d",
 					"veteran_female_a",
 					"veteran_female_b",
 					"veteran_female_c",
@@ -4623,7 +4614,6 @@ return function ()
 					"ogryn_a",
 					"ogryn_b",
 					"ogryn_c",
-					"ogryn_d",
 					"veteran_female_a",
 					"veteran_female_b",
 					"veteran_female_c",
@@ -4877,7 +4867,6 @@ return function ()
 					"ogryn_a",
 					"ogryn_b",
 					"ogryn_c",
-					"ogryn_d",
 					"veteran_female_a",
 					"veteran_female_b",
 					"veteran_female_c",

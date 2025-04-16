@@ -191,6 +191,19 @@ function NetworkedFlowStateManager:flow_cb_has_played_networked_story(node_id, s
 	story.length = self._storyteller:length(story_id)
 end
 
+function NetworkedFlowStateManager:unregister_level(level)
+	local story_data = self._playing_stories[level]
+	self._playing_stories[level] = nil
+
+	if story_data then
+		local level_index = story_data.level_index
+
+		if level_index then
+			self._story_lookup[level_index] = nil
+		end
+	end
+end
+
 function NetworkedFlowStateManager:hot_join_sync(peer, channel)
 	self:_sync_states(peer, channel)
 	self:_sync_stories(peer, channel)
@@ -220,18 +233,22 @@ end
 
 function NetworkedFlowStateManager:_sync_states(peer, channel)
 	for unit, unit_states in pairs(self._object_states) do
-		local is_level_index, unit_id = Managers.state.unit_spawner:game_object_id_or_level_index(unit)
+		if unit_alive(unit) then
+			local is_level_index, unit_id = Managers.state.unit_spawner:game_object_id_or_level_index(unit)
 
-		for state_name, state_table in pairs(unit_states.states) do
-			local value = state_table.value
+			for state_name, state_table in pairs(unit_states.states) do
+				local value = state_table.value
 
-			if value ~= state_table.default_value then
-				local state_network_id = unit_states.lookup[state_name]
-				local type_data = FLOW_STATE_TYPES[type(value)]
-				value = self:_clamp_state(state_name, type_data, value)
+				if value ~= state_table.default_value then
+					local state_network_id = unit_states.lookup[state_name]
+					local type_data = FLOW_STATE_TYPES[type(value)]
+					value = self:_clamp_state(state_name, type_data, value)
 
-				RPC[type_data.rpcs.change](channel, unit_id, state_network_id, value, true, not is_level_index)
+					RPC[type_data.rpcs.change](channel, unit_id, state_network_id, value, true, not is_level_index)
+				end
 			end
+		else
+			Log.warning("[NetworkedFlowStateManager] Trying to hot join sync state variable for destroyed unit.")
 		end
 	end
 end

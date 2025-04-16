@@ -197,7 +197,7 @@ WorldTestCases = {
 								Testify:make_request("set_active_testify_camera", camera.unit)
 								TestifySnippets.wait(wait_time)
 
-								screenshot_settings.filename = mission .. "-" .. i
+								screenshot_settings.filename = camera.name
 
 								Testify:make_request("take_a_screenshot", screenshot_settings)
 							end

@@ -796,7 +796,7 @@ local volume_data = {
 	{
 		height = 2,
 		type = "content/volume_types/nav_tag_volumes/generic_002",
-		name = "volume_001",
+		name = "volume_nospawnbridge",
 		alt_max_vector = {
 			244.0869140625,
 			-338.0267028808594,
@@ -836,9 +836,9 @@ local volume_data = {
 			255
 		},
 		up_vector = {
-			0,
-			0,
-			1
+			[1.0] = 0,
+			[3.0] = 1,
+			[2] = -0
 		}
 	},
 	{

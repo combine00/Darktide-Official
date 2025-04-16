@@ -1,7 +1,8 @@
+local Items = require("scripts/utilities/items")
+local LiveEvents = require("scripts/settings/live_event/live_events")
 local MasterItems = require("scripts/backend/master_items")
 local Promise = require("scripts/foundation/utilities/promise")
 local UISoundEvents = require("scripts/settings/ui/ui_sound_events")
-local LiveEvents = require("scripts/settings/live_event/live_events")
 local LiveEventManager = class("LiveEventManager")
 local REFRESH_TIMER_SUCCESS = 300
 local REFRESH_TIMER_FAILURE = 60
@@ -42,14 +43,21 @@ function LiveEventManager:remove_player(id)
 	local event_id = self:active_event_id()
 	local account_id = player_data.account_id
 	local is_host = self._is_host
+	local has_data = player_data.progress[event_id] ~= nil
 
-	if is_host and event_id and account_id then
+	if is_host and event_id and account_id and has_data then
 		self:_update_player_xp(id, event_id)
 
 		local active_event_xp = table.nested_get(player_data, "progress", event_id, "xp")
 
-		if active_event_xp then
-			promise = Managers.backend.interfaces.tracks:modify_track_account_state(account_id, event_id, active_event_xp)
+		if active_event_xp and active_event_xp ~= 0 then
+			promise = Managers.backend.interfaces.tracks:modify_track_account_state(account_id, event_id, active_event_xp):catch(function (error)
+				if type(error) == "string" then
+					Log.error("LiveEventManager", "Failed to modify track account state:\n%s\n-------", error)
+				else
+					Log.error("LiveEventManager", "Failed to modify track account state:\n%s\n-------", table.tostring(error, 5))
+				end
+			end)
 		end
 	end
 
@@ -62,7 +70,11 @@ function LiveEventManager:remove_all()
 	local promises = {}
 
 	for id, _ in pairs(self._players) do
-		promises[#promises + 1] = self:remove_player(id)
+		local promise = self:remove_player(id)
+
+		if promise then
+			promises[#promises + 1] = promise
+		end
 	end
 
 	if #promises == 0 then
@@ -86,17 +98,10 @@ function LiveEventManager:_on_tier_claimed_success(id, event_id, completed_tier,
 		return Promise.resolved()
 	end
 
-	local tier = progress_data.tier
-	local tier_data = event_data.tiers[tier + 2]
-	local rewards = tier_data and tier_data.rewards
-	local reward_count = rewards and #rewards
+	local rewards = result.body.rewards
 
-	for i = 1, reward_count do
-		local reward = rewards[i]
-		local reward_type = reward and reward.type
-		local is_currency = reward_type == "currency"
-
-		if is_currency then
+	for _, reward in pairs(rewards) do
+		if reward.type == "currency" then
 			local reason = Localize("loc_event_tier_completed")
 
 			Managers.event:trigger("event_add_notification_message", "currency", {
@@ -104,28 +109,19 @@ function LiveEventManager:_on_tier_claimed_success(id, event_id, completed_tier,
 				currency = reward.currency,
 				amount = reward.amount
 			})
-		end
+		elseif reward.type == "item" then
+			local rewarded_master_item = Items.register_track_reward(reward)
+			local sound_event = UISoundEvents.character_news_feed_new_item
+			local reason = Localize("loc_item_rewarded_from_live_event")
 
-		local is_item = reward_type == "item"
-
-		if is_item then
-			local master_item_id = reward.id
-
-			if MasterItems.item_exists(master_item_id) then
-				local rewarded_master_item = MasterItems.get_item(master_item_id)
-				local sound_event = UISoundEvents.character_news_feed_new_item
-
-				Managers.event:trigger("event_add_notification_message", "item_granted", {
-					reason = Localize("loc_item_rewarded_from_live_event"),
-					item = rewarded_master_item
-				}, nil, sound_event)
-			else
-				Log.warning("LiveEventsManager", "Received invalid item %s as reward from backend.", master_item_id)
-			end
+			Managers.event:trigger("event_add_notification_message", "item_granted", {
+				reason = reason,
+				item = rewarded_master_item
+			}, nil, sound_event)
 		end
 	end
 
-	progress_data.tier = tier + 1
+	progress_data.tier = progress_data.tier + 1
 
 	return Managers.data_service.store:on_event_tier_completed(result):next(callback(self, "_claim_next_tier", id, event_id))
 end
@@ -193,6 +189,12 @@ function LiveEventManager:_on_track_state_success(id, event_id, backend_data)
 	progress_data.promise = nil
 	progress_data.backend_data = backend_data
 	local backend_state = backend_data.state
+
+	if not backend_state.rewarded then
+		Log.warning("LiveEventManager", "on_track_state_success bad data")
+		table.dump(backend_data, "backend_data", 10)
+	end
+
 	progress_data.value = backend_state.xpTracked
 	progress_data.tier = backend_state.rewarded
 	progress_data.update_timer = nil
@@ -340,6 +342,8 @@ function LiveEventManager:_add_event(backend_data)
 		Log.warning("LiveEventManager", "No template for event '%s' with category '%s'.", id, category)
 
 		return
+	else
+		Log.info("LiveEventManager", "Added live event '%s', id '%s' with category '%s'.", template_name, id, category)
 	end
 
 	local tiers = {}
@@ -461,7 +465,7 @@ function LiveEventManager:active_time_left(optional_t)
 	local event_data = self:_active_event()
 
 	if not event_data or not event_data.ends_at then
-		return false
+		return -math.huge
 	end
 
 	local t = Managers.backend:get_server_time(optional_t or Managers.time:time("main"))

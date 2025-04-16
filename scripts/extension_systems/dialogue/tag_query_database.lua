@@ -87,6 +87,7 @@ function TagQueryDatabase:define_rule(rule_definition)
 	local num_criterias = #criterias
 	local context_indexes = context_indexes
 	rule_definition.n_criterias = num_criterias
+	local add_rule = true
 
 	for i = 1, num_criterias do
 		local criteria = criterias[i]
@@ -126,22 +127,31 @@ function TagQueryDatabase:define_rule(rule_definition)
 			criteria[4] = value
 		elseif value_type == "table" then
 			criteria[4] = value
+
+			if table.is_empty(value) then
+				add_rule = false
+			end
 		end
 	end
 
-	local rule_id = RuleDatabase.add_rule(self._database, dialogue_name, num_criterias, criterias)
-	self._rule_id_mapping[rule_id] = rule_definition
-	self._rule_id_mapping[rule_definition.name] = rule_id
-	self._rules_n = self._rules_n + 1
+	if add_rule then
+		local rule_id = RuleDatabase.add_rule(self._database, dialogue_name, num_criterias, criterias)
+		self._rule_id_mapping[rule_id] = rule_definition
+		self._rule_id_mapping[rule_definition.name] = rule_id
+		self._rules_n = self._rules_n + 1
+	end
 end
 
 function TagQueryDatabase:remove_rule(rule_name)
 	local rule_id = self._rule_id_mapping[rule_name]
-	self._rule_id_mapping[rule_id] = nil
-	self._rule_id_mapping[rule_name] = nil
-	self._rules_n = self._rules_n - 1
 
-	RuleDatabase.remove_rule(self._database, rule_id)
+	if rule_id then
+		self._rule_id_mapping[rule_id] = nil
+		self._rule_id_mapping[rule_name] = nil
+		self._rules_n = self._rules_n - 1
+
+		RuleDatabase.remove_rule(self._database, rule_id)
+	end
 end
 
 function TagQueryDatabase:num_rules()

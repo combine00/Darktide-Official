@@ -40,7 +40,7 @@ local footstep_intervals_templates = {
 		sprinting = 0.35
 	},
 	combat_axe = {
-		crouch_walking = 0.4,
+		crouch_walking = 0.61,
 		walking = 0.4,
 		sprinting = 0.37
 	},

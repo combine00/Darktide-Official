@@ -111,14 +111,15 @@ function MinionMovement.set_anim_rotation(unit, scratchpad)
 	locomotion_extension:set_wanted_rotation(rotation)
 end
 
-function MinionMovement.set_anim_driven(scratchpad, anim_driven, optional_script_driven_rotation)
+function MinionMovement.set_anim_driven(scratchpad, anim_driven, optional_script_driven_rotation, optional_affected_by_gravity)
 	local locomotion_extension = scratchpad.locomotion_extension
 
 	if anim_driven then
 		local script_driven_rotation = optional_script_driven_rotation or false
+		local affected_by_gravity = optional_affected_by_gravity or false
 
 		locomotion_extension:use_lerp_rotation(false)
-		locomotion_extension:set_anim_driven(true, false, script_driven_rotation)
+		locomotion_extension:set_anim_driven(true, affected_by_gravity, script_driven_rotation)
 	else
 		locomotion_extension:use_lerp_rotation(true)
 		locomotion_extension:set_anim_driven(false)
@@ -615,6 +616,24 @@ function MinionMovement.rotate_towards_target_unit(unit, scratchpad)
 		local locomotion_extension = scratchpad.locomotion_extension
 
 		locomotion_extension:set_wanted_rotation(flat_rotation)
+	end
+end
+
+function MinionMovement.smooth_speed_based_on_distance(unit, scratchpad, dt, action_data)
+	local self_position = POSITION_LOOKUP[unit]
+	local move_to_position = scratchpad.move_to_position:unbox()
+	local speed_timer = action_data.adapt_speed.speed_timer
+	scratchpad.current_speed_timer = math.clamp(scratchpad.current_speed_timer + dt, 0, speed_timer)
+
+	if speed_timer <= scratchpad.current_speed_timer then
+		local length = Vector3.length(move_to_position - self_position)
+		local adapt_speed = action_data.adapt_speed
+		local speed_multiplier = math.clamp(length * adapt_speed.length_multiplier, adapt_speed.min_speed_multiplier, adapt_speed.max_speed_multiplier)
+		local new_speed = action_data.speed * speed_multiplier
+		scratchpad.old_max_speed = scratchpad.navigation_extension:max_speed()
+		scratchpad.current_speed_timer = 0
+
+		scratchpad.navigation_extension:set_max_speed(new_speed)
 	end
 end
 

@@ -1,5 +1,3 @@
-local WeaponTweakTemplateSettings = require("scripts/settings/equipment/weapon_templates/weapon_tweak_template_settings")
-local DEFAULT_LERP_VALUE = WeaponTweakTemplateSettings.DEFAULT_LERP_VALUE
 local movement_curve_modifier_trait_templates = {
 	default_movement_curve_modifier_stat = {
 		{

@@ -1,6 +1,6 @@
-local OptionsUtilities = {}
+local Options = {}
 
-function OptionsUtilities.create_percent_slider_template(params)
+function Options.create_percent_slider_template(params)
 	local normalized_step_size = params.normalized_step_size or (params.step_size_value or 1) / 100
 	local default_value = params.default_value or 0
 
@@ -28,13 +28,14 @@ function OptionsUtilities.create_percent_slider_template(params)
 		normalized_step_size = normalized_step_size,
 		apply_on_drag = params.apply_on_drag,
 		tooltip_text = params.tooltip_text,
-		id = params.id
+		id = params.id,
+		is_sub_setting = params.is_sub_setting
 	}
 
 	return slider_template
 end
 
-function OptionsUtilities.create_value_slider_template(params)
+function Options.create_value_slider_template(params)
 	local min_value = params.min_value
 	local max_value = params.max_value
 	local value_range = max_value - min_value
@@ -78,13 +79,14 @@ function OptionsUtilities.create_value_slider_template(params)
 		normalized_step_size = normalized_step_size,
 		apply_on_drag = params.apply_on_drag,
 		tooltip_text = params.tooltip_text,
-		id = params.id
+		id = params.id,
+		is_sub_setting = params.is_sub_setting
 	}
 
 	return slider_template
 end
 
-function OptionsUtilities.keybind_value_to_string(value)
+function Options.keybind_value_to_string(value)
 	if not value then
 		return
 	end
@@ -106,7 +108,7 @@ function OptionsUtilities.keybind_value_to_string(value)
 
 		for k, v in pairs(value) do
 			if type(v) == "table" then
-				v = OptionsUtilities.keybind_value_to_string(v)
+				v = Options.keybind_value_to_string(v)
 			end
 
 			if not out then
@@ -122,4 +124,4 @@ function OptionsUtilities.keybind_value_to_string(value)
 	return tostring(value)
 end
 
-return OptionsUtilities
+return Options

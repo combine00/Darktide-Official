@@ -41,7 +41,7 @@ shotshell_templates.default_rippergun_snp = {
 	min_num_hits = {
 		[armor_types.unarmored] = 5,
 		[armor_types.armored] = 5,
-		[armor_types.resistant] = 4,
+		[armor_types.resistant] = 5,
 		[armor_types.player] = 1,
 		[armor_types.berserker] = 5,
 		[armor_types.super_armor] = 2,
@@ -85,13 +85,13 @@ shotshell_templates.rippergun_p1_m2_snp = {
 	bullseye = true,
 	num_spread_circles = 2,
 	min_num_hits = {
-		[armor_types.unarmored] = 3,
-		[armor_types.armored] = 3,
-		[armor_types.resistant] = 2,
+		[armor_types.unarmored] = 5,
+		[armor_types.armored] = 5,
+		[armor_types.resistant] = 5,
 		[armor_types.player] = 1,
-		[armor_types.berserker] = 3,
+		[armor_types.berserker] = 5,
 		[armor_types.super_armor] = 2,
-		[armor_types.disgustingly_resilient] = 3
+		[armor_types.disgustingly_resilient] = 5
 	},
 	damage = {
 		impact = {
@@ -105,47 +105,47 @@ shotshell_templates.rippergun_p1_m3_assault = {
 	pellets_per_frame = 10,
 	spread_pitch = 1.5,
 	roll_offset = 0.125,
-	num_pellets = 5,
+	num_pellets = 7,
 	bullseye = true,
 	num_spread_circles = 1,
 	min_num_hits = {
-		[armor_types.unarmored] = 2,
-		[armor_types.armored] = 2,
-		[armor_types.resistant] = 2,
+		[armor_types.unarmored] = 3,
+		[armor_types.armored] = 3,
+		[armor_types.resistant] = 3,
 		[armor_types.player] = 1,
-		[armor_types.berserker] = 2,
+		[armor_types.berserker] = 3,
 		[armor_types.super_armor] = 2,
-		[armor_types.disgustingly_resilient] = 2
+		[armor_types.disgustingly_resilient] = 3
 	},
 	damage = {
 		impact = {
-			damage_profile = DamageProfileTemplates.rippergun_p1_m2_assault
+			damage_profile = DamageProfileTemplates.rippergun_p1_m3_assault
 		}
 	}
 }
 shotshell_templates.rippergun_p1_m3_snp = {
-	spread_yaw = 3,
+	spread_yaw = 2,
 	range = 100,
 	pellets_per_frame = 10,
 	no_random_roll = true,
-	scatter_range = 0.075,
-	spread_pitch = 3,
+	scatter_range = 0.045,
+	spread_pitch = 2,
 	roll_offset = 0.25,
-	num_pellets = 5,
+	num_pellets = 7,
 	bullseye = true,
-	num_spread_circles = 2,
+	num_spread_circles = 3,
 	min_num_hits = {
-		[armor_types.unarmored] = 2,
-		[armor_types.armored] = 2,
-		[armor_types.resistant] = 2,
+		[armor_types.unarmored] = 3,
+		[armor_types.armored] = 3,
+		[armor_types.resistant] = 3,
 		[armor_types.player] = 1,
-		[armor_types.berserker] = 2,
+		[armor_types.berserker] = 3,
 		[armor_types.super_armor] = 2,
-		[armor_types.disgustingly_resilient] = 2
+		[armor_types.disgustingly_resilient] = 3
 	},
 	damage = {
 		impact = {
-			damage_profile = DamageProfileTemplates.rippergun_p1_m2_assault
+			damage_profile = DamageProfileTemplates.rippergun_p1_m3_assault
 		}
 	}
 }

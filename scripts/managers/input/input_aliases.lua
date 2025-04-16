@@ -38,9 +38,7 @@ function InputAliases:overrides()
 	local aliases = self._aliases
 
 	for alias_name, alias_info in pairs(aliases) do
-		local max_index = 3
 		local default = default_aliases[alias_name]
-		alias_info[max_index + 1] = nil
 
 		for index, value in ipairs(alias_info) do
 			if value ~= default[index] then

@@ -101,6 +101,10 @@ function CutsceneCharacterExtension:breed_name()
 	return self._breed_name
 end
 
+function CutsceneCharacterExtension:breed()
+	return Breeds[self._breed_name]
+end
+
 function CutsceneCharacterExtension:slot()
 	return self._slot
 end
@@ -223,8 +227,16 @@ function CutsceneCharacterExtension:_load_props()
 end
 
 function CutsceneCharacterExtension:unassign_player_loadout()
-	self._profile_spawner:reset()
+	if self._current_state_machine ~= AnimationType.None then
+		local unit = self._unit
+
+		Unit.disable_animation_state_machine(unit)
+
+		self._current_state_machine = AnimationType.None
+	end
+
 	self:_clear_loadout()
+	self._profile_spawner:reset()
 
 	self._player_unique_id = nil
 end
@@ -235,6 +247,20 @@ end
 
 function CutsceneCharacterExtension:wield_slot(slot_name)
 	self._profile_spawner:wield_slot(slot_name)
+end
+
+function CutsceneCharacterExtension:wield_slot_set_visibility(state)
+	if self._profile_spawner._character_spawn_data ~= nil then
+		local slot = self._profile_spawner._character_spawn_data.wielded_slot
+		slot.wants_hidden_by_gameplay_1p = not state
+		slot.wants_hidden_by_gameplay_3p = not state
+
+		self._profile_spawner:_update_items_visibility()
+	end
+end
+
+function CutsceneCharacterExtension:set_visibility(state)
+	self._profile_spawner:set_visibility(state)
 end
 
 function CutsceneCharacterExtension:set_weapon_animation_event(animation_event)
@@ -266,7 +292,6 @@ function CutsceneCharacterExtension:_start_weapon_specific_walk_animation()
 		local state_machine_3p, _ = WeaponTemplate.state_machines(weapon_template, self._breed_name)
 
 		Unit.set_animation_state_machine(unit, state_machine_3p)
-		Unit.enable_animation_state_machine(unit)
 
 		self._current_state_machine = AnimationType.Weapon
 	end

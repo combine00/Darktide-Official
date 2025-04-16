@@ -1,8 +1,8 @@
-local SpecialRulesSetting = require("scripts/settings/ability/special_rules_settings")
 local HealthExtensionInterface = require("scripts/extension_systems/health/health_extension_interface")
+local SpecialRulesSettings = require("scripts/settings/ability/special_rules_settings")
 local TalentSettings = require("scripts/settings/talent/talent_settings")
 local ForceFieldHealthExtension = class("ForceFieldHealthExtension")
-local special_rules = SpecialRulesSetting.special_rules
+local special_rules = SpecialRulesSettings.special_rules
 local talent_settings = TalentSettings.psyker_3.combat_ability
 
 function ForceFieldHealthExtension:init(extension_init_context, unit, extension_init_data)

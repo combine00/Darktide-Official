@@ -15,7 +15,7 @@ local DROPDOWN_BUTTON_SIZE = {
 local DROPDOWN_BUTTON_MARGIN = 30
 local DROPDOWN_BUTTON_CLEARANCE = DROPDOWN_BUTTON_SIZE[1] + 2 * DROPDOWN_BUTTON_MARGIN
 
-function DropdownPassTemplates.settings_dropdown(width, height, settings_area_width, num_options, use_is_focused)
+function DropdownPassTemplates.settings_dropdown(width, height, settings_area_width, num_options, use_is_focused, is_sub_setting)
 	local value_font_style = table.clone(UIFontSettings.list_button)
 	value_font_style.size = {
 		settings_area_width - (DROPDOWN_BUTTON_CLEARANCE + DROPDOWN_BUTTON_MARGIN),
@@ -34,7 +34,7 @@ function DropdownPassTemplates.settings_dropdown(width, height, settings_area_wi
 	local scrollbar_horizontal_offset = 0
 	local scrollbar_height = height * num_options
 	local header_width = width - settings_area_width
-	local header_passes = ListHeaderPassTemplates.list_header(header_width, height, use_is_focused)
+	local header_passes = ListHeaderPassTemplates.list_header(header_width, height, use_is_focused, is_sub_setting)
 
 	for i = 1, #header_passes do
 		local pass = header_passes[i]
@@ -422,89 +422,89 @@ function DropdownPassTemplates.settings_dropdown(width, height, settings_area_wi
 				local percentage = current_position / end_position
 				content.scroll_percentage = percentage
 			end
-		},
-		{
-			pass_type = "logic",
-			visibility_function = scrollbar_visibility_function,
-			value = function (pass, renderer, style, content, position, size)
-				local scroll_length = content.scroll_length or 0
-
-				if scroll_length <= 0 then
-					return
-				end
-
-				local axis = content.axis or 2
-				local style_parent = style.parent
-				local scrollbar_track_style = style_parent.scrollbar_track
-				local scrollbar_track_height = scrollbar_track_style.size[axis]
-				local scrollbar_length = scrollbar_track_height
-				local style_parent = style.parent
-				local track_style = style_parent.scrollbar_track
-				local hotspot_style = style_parent.scrollbar_hotspot
-				local track_axis_offset = track_style.offset[axis]
-				local thumb_length = hotspot_style.size[axis]
-				local hotspot_offset = hotspot_style.offset
-				local end_position = scrollbar_length - thumb_length
-				local scroll_percentage = content.scroll_percentage or 0
-				local current_position = end_position * scroll_percentage
-				hotspot_offset[2] = track_axis_offset + current_position
-			end
-		},
-		{
-			style_id = "dropdown_background",
-			pass_type = "logic",
-			visibility_function = scrollbar_visibility_function,
-			value = function (pass, renderer, style, content, position, size)
-				if content.drag_active then
-					return
-				end
-
-				local scroll_length = content.scroll_length or 0
-
-				if scroll_length <= 0 then
-					return
-				end
-
-				local dt = renderer.dt
-				local input_service = renderer.input_service
-				local scroll_action = content.scroll_action or "scroll_axis"
-				local scroll_axis = input_service:get(scroll_action)
-				local axis = content.axis or 2
-				local axis_input = scroll_axis[axis] * -1
-				local scroll_amount = content.scroll_amount or 0.1
-				local inverse_scale = renderer.inverse_scale
-				local cursor = input_service:get("cursor")
-				local cursor_position = (IS_XBS or IS_PLAYSTATION) and cursor or UIResolution.inverse_scale_vector(cursor, inverse_scale)
-				local is_hover = math.point_is_inside_2d_box(cursor_position, position, size)
-
-				if axis_input ~= 0 and is_hover then
-					content.axis_input = axis_input
-					local previous_scroll_add = content.scroll_add or 0
-					content.scroll_add = previous_scroll_add + axis_input * scroll_amount
-				end
-
-				local scroll_add = content.scroll_add
-
-				if scroll_add then
-					local speed = content.scroll_speed or 5
-					local step = scroll_add * dt * speed
-
-					if math.abs(scroll_add) > scroll_amount / 500 then
-						content.scroll_add = scroll_add - step
-					else
-						content.scroll_add = nil
-					end
-
-					local current_scroll_value = content.scroll_value or content.scroll_percentage or 0
-
-					if current_scroll_value then
-						content.scroll_value = math.clamp(current_scroll_value + step, 0, 1)
-					end
-
-					content.scroll_percentage = content.scroll_value or content.scroll_percentage or 0
-				end
-			end
 		}
+	}
+	scrollbar_passes[6] = {
+		pass_type = "logic",
+		visibility_function = scrollbar_visibility_function,
+		value = function (pass, renderer, style, content, position, size)
+			local scroll_length = content.scroll_length or 0
+
+			if scroll_length <= 0 then
+				return
+			end
+
+			local axis = content.axis or 2
+			local style_parent = style.parent
+			local scrollbar_track_style = style_parent.scrollbar_track
+			local scrollbar_track_height = scrollbar_track_style.size[axis]
+			local scrollbar_length = scrollbar_track_height
+			local style_parent = style.parent
+			local track_style = style_parent.scrollbar_track
+			local hotspot_style = style_parent.scrollbar_hotspot
+			local track_axis_offset = track_style.offset[axis]
+			local thumb_length = hotspot_style.size[axis]
+			local hotspot_offset = hotspot_style.offset
+			local end_position = scrollbar_length - thumb_length
+			local scroll_percentage = content.scroll_percentage or 0
+			local current_position = end_position * scroll_percentage
+			hotspot_offset[2] = track_axis_offset + current_position
+		end
+	}
+	scrollbar_passes[7] = {
+		style_id = "dropdown_background",
+		pass_type = "logic",
+		visibility_function = scrollbar_visibility_function,
+		value = function (pass, renderer, style, content, position, size)
+			if content.drag_active then
+				return
+			end
+
+			local scroll_length = content.scroll_length or 0
+
+			if scroll_length <= 0 then
+				return
+			end
+
+			local dt = renderer.dt
+			local input_service = renderer.input_service
+			local scroll_action = content.scroll_action or "scroll_axis"
+			local scroll_axis = input_service:get(scroll_action)
+			local axis = content.axis or 2
+			local axis_input = scroll_axis[axis] * -1
+			local scroll_amount = content.scroll_amount or 0.1
+			local inverse_scale = renderer.inverse_scale
+			local cursor = input_service:get("cursor")
+			local cursor_position = (IS_XBS or IS_PLAYSTATION) and cursor or UIResolution.inverse_scale_vector(cursor, inverse_scale)
+			local is_hover = math.point_is_inside_2d_box(cursor_position, position, size)
+
+			if axis_input ~= 0 and is_hover then
+				content.axis_input = axis_input
+				local previous_scroll_add = content.scroll_add or 0
+				content.scroll_add = previous_scroll_add + axis_input * scroll_amount
+			end
+
+			local scroll_add = content.scroll_add
+
+			if scroll_add then
+				local speed = content.scroll_speed or 5
+				local step = scroll_add * dt * speed
+
+				if math.abs(scroll_add) > scroll_amount / 500 then
+					content.scroll_add = scroll_add - step
+				else
+					content.scroll_add = nil
+				end
+
+				local current_scroll_value = content.scroll_value or content.scroll_percentage or 0
+
+				if current_scroll_value then
+					content.scroll_value = math.clamp(current_scroll_value + step, 0, 1)
+				end
+
+				content.scroll_percentage = content.scroll_value or content.scroll_percentage or 0
+			end
+		end
 	}
 	local option_fraction = 1 / num_options
 	local options_passes = {
@@ -616,7 +616,11 @@ function DropdownPassTemplates.settings_dropdown(width, height, settings_area_wi
 				offset[2] = offset_y - size_addition
 				style.hdr = focus_alpha == 255
 			end,
-			visibility_function = content_visibility_function
+			visibility_function = function (content, style)
+				local hotspot = content[hotspot_id]
+
+				return content_visibility_function(content) and not hotspot.is_disabled
+			end
 		}
 		options_passes[#options_passes + 1] = {
 			pass_type = "texture",
@@ -668,13 +672,20 @@ function DropdownPassTemplates.settings_dropdown(width, height, settings_area_wi
 				local hover_color = style.hover_color
 				local text_color = style.text_color
 				local hotspot = content[hotspot_id]
-				local focus_progress = math.easeCubic(content.anim_exclusive_focus_progress)
-				local alpha_progress = math.clamp((focus_progress - current_fraction) / option_fraction, 0, 1)
-				text_color[1] = 255 * math.easeCubic(alpha_progress)
-				local highlight_progress = math.max(hotspot.anim_select_progress, hotspot.anim_hover_progress)
-				local exclude_alpha = true
+				local is_disabled = hotspot.is_disabled
 
-				ColorUtilities.color_lerp(default_color, hover_color, highlight_progress, text_color, exclude_alpha)
+				if is_disabled then
+					style.text_color = table.clone(default_color)
+					style.text_color[1] = style.text_color[1] * 0.5
+				else
+					local focus_progress = math.easeCubic(content.anim_exclusive_focus_progress)
+					local alpha_progress = math.clamp((focus_progress - current_fraction) / option_fraction, 0, 1)
+					text_color[1] = 255 * math.easeCubic(alpha_progress)
+					local highlight_progress = math.max(hotspot.anim_select_progress, hotspot.anim_hover_progress)
+					local exclude_alpha = true
+
+					ColorUtilities.color_lerp(default_color, hover_color, highlight_progress, text_color, exclude_alpha)
+				end
 			end,
 			visibility_function = content_visibility_function
 		}

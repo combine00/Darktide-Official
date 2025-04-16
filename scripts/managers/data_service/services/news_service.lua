@@ -27,7 +27,7 @@ local function filter_news(news)
 		local news_item = news[i]
 		local platform = news_item.platform
 
-		if not platform or platform == "xbox" and IS_XBS or platform == "pc" and IS_WINDOWS then
+		if not platform or platform == "xbox" and IS_XBS or platform == "pc" and IS_WINDOWS or platform == "ps5" and IS_PLAYSTATION then
 			table.insert(filtered_news, news_item)
 		end
 	end
@@ -74,9 +74,10 @@ function NewsService:_get_category(category, use_cache)
 		return {}
 	end):next(function (news)
 		self._cached_promise[category] = nil
-		self._cached_data[category] = news
+		local filtered = filter_news(news)
+		self._cached_data[category] = filtered
 
-		return filter_news(news)
+		return filtered
 	end)
 	self._cached_promise[category] = promise
 

@@ -912,7 +912,7 @@ local function team_member_definition(scenegraph_id)
 					120,
 					120
 				},
-				default_color = Color.terminal_text_body_dark(nil, true),
+				default_color = Color.terminal_text_body(nil, true),
 				hover_color = Color.terminal_text_body_sub_header(nil, true),
 				size = {
 					nil,
@@ -1945,7 +1945,7 @@ local grid_blueprints = {
 						120,
 						120
 					},
-					default_color = Color.terminal_text_body_dark(nil, true),
+					default_color = Color.terminal_text_body(nil, true),
 					hover_color = Color.terminal_text_body_sub_header(nil, true),
 					size = {
 						nil,
@@ -2398,8 +2398,24 @@ local grid_blueprints = {
 			if profile and player_info then
 				local character_archetype_title = ProfileUtils.character_archetype_title(profile)
 				local character_level = tostring(profile.current_level) .. " "
-				content.character_archetype_title = string.format("%s %s", character_archetype_title, character_level)
-				content.character_name = player_info:character_name()
+				local havoc_rank_cadence_high = presence_info.havoc_rank_cadence_high
+
+				if havoc_rank_cadence_high ~= nil and profile.current_level ~= nil and profile.current_level >= 30 then
+					local havoc_prefix_text = Localize("loc_havoc_highest_order_reached")
+					local havoc_highest_cadence_rank = "- " .. havoc_prefix_text .. " " .. tostring(havoc_rank_cadence_high) .. " "
+					content.character_archetype_title = string.format("%s %s", character_archetype_title, havoc_highest_cadence_rank)
+				else
+					content.character_archetype_title = string.format("%s %s", character_archetype_title, character_level)
+				end
+
+				local platform = player_info:platform()
+
+				if IS_PLAYSTATION and (platform == "psn" or platform == "ps5") then
+					content.character_name = player_info:user_display_name()
+				else
+					content.character_name = player_info:character_name()
+				end
+
 				local archetype = profile.archetype
 				content.archetype_icon = archetype.archetype_icon_selection_large_unselected
 				local player_title = ProfileUtils.character_title(profile)

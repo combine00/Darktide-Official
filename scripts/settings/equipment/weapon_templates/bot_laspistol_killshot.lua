@@ -1,3 +1,4 @@
+local ActionInputHierarchy = require("scripts/utilities/weapon/action_input_hierarchy")
 local BaseTemplateSettings = require("scripts/settings/equipment/weapon_templates/base_template_settings")
 local BuffSettings = require("scripts/settings/buff/buff_settings")
 local DamageProfileTemplates = require("scripts/settings/damage/damage_profile_templates")
@@ -101,22 +102,58 @@ local weapon_template = {
 table.add_missing(weapon_template.action_inputs, BaseTemplateSettings.action_inputs)
 
 weapon_template.action_input_hierarchy = {
-	wield = "stay",
-	reload = "stay",
-	shoot_pressed = "stay",
-	special_action_push = "stay",
-	zoom = {
-		zoom_shoot = "stay",
-		wield = "base",
-		zoom_release = "previous",
-		grenade_ability = "base",
-		reload = "base",
-		combat_ability = "base",
-		special_action_push = "stay"
+	{
+		transition = "stay",
+		input = "shoot_pressed"
+	},
+	{
+		input = "zoom",
+		transition = {
+			{
+				transition = "previous",
+				input = "zoom_release"
+			},
+			{
+				transition = "stay",
+				input = "special_action_push"
+			},
+			{
+				transition = "stay",
+				input = "zoom_shoot"
+			},
+			{
+				transition = "base",
+				input = "reload"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "grenade_ability"
+			}
+		}
+	},
+	{
+		transition = "stay",
+		input = "special_action_push"
+	},
+	{
+		transition = "stay",
+		input = "wield"
+	},
+	{
+		transition = "stay",
+		input = "reload"
 	}
 }
 
-table.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
+ActionInputHierarchy.add_missing_ordered(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
 
 weapon_template.actions = {
 	action_unwield = {
@@ -687,6 +724,7 @@ weapon_template.conditional_state_to_action_input = {
 weapon_template.no_ammo_delay = 0.25
 weapon_template.hud_configuration = {
 	uses_overheat = false,
+	uses_weapon_special_charges = false,
 	uses_ammunition = true
 }
 weapon_template.sprint_ready_up_time = 0.1

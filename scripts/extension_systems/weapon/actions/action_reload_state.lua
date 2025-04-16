@@ -1,8 +1,8 @@
 require("scripts/extension_systems/weapon/actions/action_weapon_base")
 
+local BuffSettings = require("scripts/settings/buff/buff_settings")
 local Overheat = require("scripts/utilities/overheat")
 local ReloadStates = require("scripts/extension_systems/weapon/utilities/reload_states")
-local BuffSettings = require("scripts/settings/buff/buff_settings")
 local buff_proc_events = BuffSettings.proc_events
 local ActionReloadState = class("ActionReloadState", "ActionWeaponBase")
 
@@ -53,7 +53,9 @@ function ActionReloadState:_start_reload_state(reload_template, inventory_slot_c
 	action_reload_component.has_refilled_ammunition = false
 	action_reload_component.has_removed_ammunition = false
 	action_reload_component.has_cleared_overheat = false
-	local anim_1p, anim_3p, action_time_offset = ReloadStates.start_reload_state(reload_template, inventory_slot_component)
+	local wielded_slot = self._inventory_component.wielded_slot
+	local condition_func_params = self._weapon_extension:condition_func_params(wielded_slot)
+	local anim_1p, anim_3p, action_time_offset = ReloadStates.start_reload_state(reload_template, inventory_slot_component, condition_func_params)
 
 	self:trigger_anim_event(anim_1p, anim_3p, action_time_offset)
 end

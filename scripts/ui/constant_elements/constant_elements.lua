@@ -23,10 +23,12 @@ local elements = {
 			"in_hub",
 			"in_loading",
 			"skippable_cinematic",
+			"in_mission",
 			"default"
 		}
 	},
 	{
+		draw_layer = 50,
 		class_name = "ConstantElementSubtitles",
 		filename = "scripts/ui/constant_elements/elements/subtitles/constant_element_subtitles",
 		visibility_groups = {
@@ -39,6 +41,7 @@ local elements = {
 			"in_hub",
 			"in_loading",
 			"skippable_cinematic",
+			"in_mission",
 			"default"
 		}
 	},
@@ -47,6 +50,7 @@ local elements = {
 		class_name = "ConstantElementPopupHandler",
 		filename = "scripts/ui/constant_elements/elements/popup_handler/constant_element_popup_handler",
 		visibility_groups = {
+			"tactical_overlay",
 			"cutscene",
 			"mission_lobby",
 			"end_of_round",
@@ -55,8 +59,8 @@ local elements = {
 			"in_hub",
 			"in_loading",
 			"skippable_cinematic",
-			"default",
-			"tactical_overlay"
+			"in_mission",
+			"default"
 		}
 	},
 	{
@@ -71,6 +75,7 @@ local elements = {
 			"in_view",
 			"in_hub_view",
 			"in_hub",
+			"in_mission",
 			"default"
 		}
 	},
@@ -85,6 +90,7 @@ local elements = {
 			"in_view",
 			"in_hub_view",
 			"in_hub",
+			"in_mission",
 			"default"
 		}
 	},
@@ -99,6 +105,7 @@ local elements = {
 			"in_view",
 			"in_hub_view",
 			"in_hub",
+			"in_mission",
 			"default"
 		}
 	},
@@ -122,6 +129,7 @@ local elements = {
 			"in_view",
 			"in_hub_view",
 			"in_hub",
+			"in_mission",
 			"default"
 		}
 	},
@@ -137,6 +145,7 @@ local elements = {
 			"cutscene",
 			"in_hub_view",
 			"in_hub",
+			"in_mission",
 			"default"
 		},
 		visibility_group_parameters = {
@@ -161,6 +170,13 @@ local elements = {
 		}
 	},
 	{
+		class_name = "ConstantElementHavocStatus",
+		filename = "scripts/ui/constant_elements/elements/havoc/constant_element_havoc_status",
+		visibility_groups = {
+			"in_hub"
+		}
+	},
+	{
 		class_name = "ConstantElementLoading",
 		filename = "scripts/ui/constant_elements/elements/loading/constant_element_loading",
 		visibility_groups = {
@@ -170,6 +186,7 @@ local elements = {
 			"in_view",
 			"in_hub_view",
 			"in_hub",
+			"in_mission",
 			"default"
 		}
 	},
@@ -183,7 +200,34 @@ local elements = {
 			"in_view",
 			"in_hub_view",
 			"in_hub",
+			"in_mission",
 			"default"
+		}
+	},
+	{
+		package = "packages/ui/constant_elements/voice_chat/voice_chat",
+		use_hud_scale = true,
+		class_name = "ConstantElementVoiceChat",
+		filename = "scripts/ui/constant_elements/elements/voice_chat/constant_element_voice_chat",
+		visibility_groups = {
+			"tactical_overlay",
+			"cutscene",
+			"mission_lobby",
+			"end_of_round",
+			"in_view",
+			"in_hub_view",
+			"in_loading",
+			"in_mission",
+			"skippable_cinematic"
+		}
+	},
+	{
+		package = "packages/ui/constant_elements/mission_buffs/mission_buffs",
+		use_hud_scale = true,
+		class_name = "ConstantElementMissionBuffs",
+		filename = "scripts/ui/constant_elements/elements/mission_buffs/constant_element_mission_buffs",
+		visibility_groups = {
+			"in_mission"
 		}
 	}
 }

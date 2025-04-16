@@ -1,3 +1,4 @@
+local ActionInputHierarchy = require("scripts/utilities/action/action_input_hierarchy")
 local ArmorSettings = require("scripts/settings/damage/armor_settings")
 local BaseTemplateSettings = require("scripts/settings/equipment/weapon_templates/base_template_settings")
 local BuffSettings = require("scripts/settings/buff/buff_settings")
@@ -5,6 +6,7 @@ local DamageProfileTemplates = require("scripts/settings/damage/damage_profile_t
 local DamageSettings = require("scripts/settings/damage/damage_settings")
 local ExplosionTemplates = require("scripts/settings/damage/explosion_templates")
 local FootstepIntervalsTemplates = require("scripts/settings/equipment/footstep/footstep_intervals_templates")
+local HapticTriggerTemplates = require("scripts/settings/equipment/haptic_trigger_templates")
 local HerdingTemplates = require("scripts/settings/damage/herding_templates")
 local PlayerCharacterConstants = require("scripts/settings/player_character/player_character_constants")
 local ProjectileTemplates = require("scripts/settings/projectile/projectile_templates")
@@ -165,34 +167,100 @@ local weapon_template = {
 table.add_missing(weapon_template.action_inputs, BaseTemplateSettings.action_inputs)
 
 weapon_template.action_input_hierarchy = {
-	wield = "stay",
-	reload = "stay",
-	zoom = {
-		zoom_release = "base",
-		wield = "base",
-		zoom_shoot = "stay",
-		grenade_ability = "base",
-		reload = "base",
-		combat_ability = "base"
+	{
+		transition = "stay",
+		input = "wield"
 	},
-	start_attack = {
-		attack_cancel = "base",
-		wield = "base",
-		heavy_attack = "base",
-		grenade_ability = "base",
-		combat_ability = "base",
-		light_attack = "base"
+	{
+		transition = "stay",
+		input = "reload"
 	},
-	special_action_start = {
-		attack_cancel = "base",
-		wield = "base",
-		grenade_ability = "base",
-		combat_ability = "base",
-		special_action_execute = "base"
+	{
+		input = "zoom",
+		transition = {
+			{
+				transition = "base",
+				input = "zoom_release"
+			},
+			{
+				transition = "stay",
+				input = "zoom_shoot"
+			},
+			{
+				transition = "base",
+				input = "reload"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "grenade_ability"
+			}
+		}
+	},
+	{
+		input = "start_attack",
+		transition = {
+			{
+				transition = "base",
+				input = "attack_cancel"
+			},
+			{
+				transition = "base",
+				input = "light_attack"
+			},
+			{
+				transition = "base",
+				input = "heavy_attack"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "grenade_ability"
+			}
+		}
+	},
+	{
+		input = "special_action_start",
+		transition = {
+			{
+				transition = "base",
+				input = "special_action_execute"
+			},
+			{
+				transition = "base",
+				input = "attack_cancel"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				transition = "base",
+				input = "combat_ability"
+			},
+			{
+				transition = "base",
+				input = "grenade_ability"
+			}
+		}
 	}
 }
 
-table.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
+ActionInputHierarchy.add_missing(weapon_template.action_input_hierarchy, BaseTemplateSettings.action_input_hierarchy)
 
 weapon_template.actions = {
 	action_wield = {
@@ -205,7 +273,7 @@ weapon_template.actions = {
 		allowed_chain_actions = {
 			start_attack = {
 				action_name = "action_melee_start_left",
-				chain_time = 0.9
+				chain_time = 0.8
 			},
 			reload = {
 				action_name = "action_reload",
@@ -279,7 +347,8 @@ weapon_template.actions = {
 		},
 		action_keywords = {
 			"braced"
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.gauntlet
 	},
 	action_unzoom = {
 		start_input = "zoom_release",
@@ -372,16 +441,18 @@ weapon_template.actions = {
 		time_scale_stat_buffs = {
 			buff_stat_buffs.attack_speed,
 			buff_stat_buffs.ranged_attack_speed
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.demolition
 	},
 	action_reload = {
-		kind = "reload_state",
-		start_input = "reload",
-		sprint_requires_press_to_interrupt = true,
-		stop_alternate_fire = true,
-		allowed_during_sprint = true,
-		abort_sprint = true,
 		uninterruptible = true,
+		start_input = "reload",
+		kind = "reload_state",
+		sprint_requires_press_to_interrupt = true,
+		weapon_handling_template = "time_scale_1_05",
+		stop_alternate_fire = true,
+		abort_sprint = true,
+		allowed_during_sprint = true,
 		total_time = 4.1666,
 		crosshair = {
 			crosshair_type = "none"
@@ -445,7 +516,8 @@ weapon_template.actions = {
 		},
 		time_scale_stat_buffs = {
 			buff_stat_buffs.reload_speed
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_melee_start_left = {
 		allowed_during_sprint = true,
@@ -514,13 +586,15 @@ weapon_template.actions = {
 		},
 		anim_end_event_condition_func = function (unit, data, end_reason)
 			return end_reason ~= "new_interrupting_action" and end_reason ~= "action_complete"
-		end
+		end,
+		haptic_trigger_template = HapticTriggerTemplates.melee.heavy
 	},
 	action_melee_start_right = {
-		first_person_hit_stop_anim = "attack_hit",
+		allowed_during_sprint = true,
 		anim_end_event = "attack_finished",
 		kind = "windup",
 		first_person_hit_anim = "attack_hit",
+		first_person_hit_stop_anim = "attack_hit",
 		uninterruptible = true,
 		anim_event = "attack_heavy_charge_right_diagonal_up",
 		hit_stop_anim = "attack_hit",
@@ -584,13 +658,15 @@ weapon_template.actions = {
 		},
 		anim_end_event_condition_func = function (unit, data, end_reason)
 			return end_reason ~= "new_interrupting_action" and end_reason ~= "action_complete"
-		end
+		end,
+		haptic_trigger_template = HapticTriggerTemplates.melee.heavy
 	},
 	action_melee_start_left_2 = {
-		first_person_hit_stop_anim = "attack_hit",
+		allowed_during_sprint = true,
 		anim_end_event = "attack_finished",
 		kind = "windup",
 		first_person_hit_anim = "attack_hit",
+		first_person_hit_stop_anim = "attack_hit",
 		uninterruptible = true,
 		anim_event = "attack_swing_charge_stab",
 		hit_stop_anim = "attack_hit",
@@ -654,7 +730,8 @@ weapon_template.actions = {
 		},
 		anim_end_event_condition_func = function (unit, data, end_reason)
 			return end_reason ~= "new_interrupting_action" and end_reason ~= "action_complete"
-		end
+		end,
+		haptic_trigger_template = HapticTriggerTemplates.melee.heavy
 	},
 	action_swing = {
 		damage_window_start = 0.23333333333333334,
@@ -869,7 +946,6 @@ weapon_template.actions = {
 		hit_armor_anim = "attack_hit",
 		weapon_handling_template = "time_scale_1_1",
 		kind = "sweep",
-		attack_direction_override = "up",
 		range_mod = 1.15,
 		allowed_during_sprint = true,
 		damage_window_end = 0.4,
@@ -1098,7 +1174,7 @@ weapon_template.actions = {
 				chain_time = 0.3
 			},
 			start_attack = {
-				action_name = "action_melee_start_left_2",
+				action_name = "action_melee_start_left",
 				chain_time = 1
 			},
 			special_action_start = {
@@ -1290,7 +1366,8 @@ weapon_template.actions = {
 		},
 		anim_end_event_condition_func = function (unit, data, end_reason)
 			return end_reason ~= "new_interrupting_action" and end_reason ~= "action_complete"
-		end
+		end,
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_execute_special = {
 		damage_window_start = 0.2,
@@ -1298,16 +1375,17 @@ weapon_template.actions = {
 		anim_end_event = "attack_finished",
 		kind = "melee_explosive",
 		range_mod = 1.15,
+		hit_stop_anim = "attack_hit",
 		hit_explosion_anim = "attack_hit_special",
 		allowed_during_sprint = true,
-		exploding_movement_speed_buff = "heavy_stun_movement_slow",
 		ammunition_usage = 1,
 		damage_window_end = 0.3,
 		allow_even_if_out_of_ammo = true,
 		explosion_delay = 0.3,
+		exploding_movement_speed_buff = "heavy_stun_movement_slow",
 		uninterruptible = true,
 		anim_event = "attack_swing_special",
-		hit_stop_anim = "attack_hit",
+		ignore_stagger_reduction = true,
 		total_time = 1.28,
 		action_movement_curve = {
 			{
@@ -1388,7 +1466,7 @@ weapon_template.actions = {
 			}
 		},
 		herding_template = HerdingTemplates.ogryn_punch,
-		damage_profile = DamageProfileTemplates.special_grenadier_gauntlet_tank,
+		damage_profile = DamageProfileTemplates.special_grenadier_gauntlet_smiter,
 		damage_type = damage_types.blunt_heavy,
 		explosion_template = ExplosionTemplates.special_gauntlet_grenade,
 		explosion_offset = Vector3Box(0, 2.25, 0)
@@ -1404,7 +1482,8 @@ weapon_template.actions = {
 		total_time = math.huge,
 		crosshair = {
 			crosshair_type = "inspect"
-		}
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	}
 }
 
@@ -1489,7 +1568,6 @@ weapon_template.keywords = {
 	"grenadier_gauntlet",
 	"p1"
 }
-weapon_template.smart_targeting_template = SmartTargetingTemplates.default_melee
 weapon_template.reload_template = ReloadTemplates.ogryn_gauntlet
 weapon_template.dodge_template = "default"
 weapon_template.sprint_template = "default"
@@ -1497,6 +1575,8 @@ weapon_template.stamina_template = "default"
 weapon_template.toughness_template = "default"
 weapon_template.combo_reset_duration = 0.5
 weapon_template.footstep_intervals = FootstepIntervalsTemplates.ogryn_gauntlet
+weapon_template.smart_targeting_template = SmartTargetingTemplates.default_melee
+weapon_template.haptic_trigger_template = HapticTriggerTemplates.melee.heavy
 weapon_template.overclocks = {}
 local WeaponBarUIDescriptionTemplates = require("scripts/settings/equipment/weapon_bar_ui_description_templates")
 weapon_template.base_stats = {
@@ -1547,6 +1627,9 @@ weapon_template.base_stats = {
 			action_shoot_zoomed = {
 				explosion_trait_templates.default_explosion_size_stat,
 				display_data = WeaponBarUIDescriptionTemplates.all_basic_stats
+			},
+			action_execute_special = {
+				explosion_trait_templates.default_explosion_size_stat
 			}
 		}
 	},

@@ -358,6 +358,8 @@ local blueprints = {
 					style.background_gradient.color = style.background_gradient.default_color
 				end
 			end
+
+			content.has_new_items_update_callback = element.has_new_items_update_callback
 		end,
 		update = function (parent, widget, input_service, dt, t, ui_renderer)
 			local content = widget.content
@@ -405,6 +407,10 @@ local blueprints = {
 					end
 				end
 			end
+
+			local item_type = element.item_type
+			local has_new_items = item_type and content.has_new_items_update_callback and content.has_new_items_update_callback(item_type) or false
+			content.has_new_items = has_new_items
 		end,
 		destroy = function (parent, widget, element, ui_renderer)
 			local content = widget.content
@@ -1166,12 +1172,9 @@ local blueprints = {
 
 				if updated_mark then
 					content.item = equipped_item
-					local display_name = equipped_item and equipped_item.display_name
-
-					if display_name then
-						content.display_name = ItemUtils.display_name(equipped_item)
-						content.sub_display_name = ItemUtils.sub_display_name(equipped_item)
-					end
+					content.display_name = ItemUtils.weapon_card_display_name(equipped_item)
+					content.sub_display_name = ItemUtils.weapon_card_sub_display_name(equipped_item)
+					content.rarity_name = ItemUtils.rarity_display_name(equipped_item)
 
 					Managers.ui:item_icon_updated(content.item)
 				end

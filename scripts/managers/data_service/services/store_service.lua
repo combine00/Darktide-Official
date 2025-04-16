@@ -1,6 +1,7 @@
 local DataServiceBackendCache = require("scripts/managers/data_service/data_service_backend_cache")
 local MasterItems = require("scripts/backend/master_items")
 local Promise = require("scripts/foundation/utilities/promise")
+local StoreNames = require("scripts/settings/backend/store_names")
 local StoreService = class("StoreService")
 
 local function _get_local_player()
@@ -15,7 +16,16 @@ local function _current_character_id()
 	return player:character_id()
 end
 
+local function _backend_time()
+	local current_time = Managers.time:time("main")
+	local backend_time = Managers.backend:get_server_time(current_time)
+
+	return backend_time
+end
+
+StoreService.max_cache_time = 3600000
 StoreService.FEATURE_KEY = "premium_store_featured"
+StoreService.GET_PREMIUM_STORE_TIMEOUT = 60
 
 function StoreService:init(backend_interface)
 	self._backend_interface = backend_interface
@@ -34,6 +44,8 @@ function StoreService:init(backend_interface)
 	self._current_store_id = nil
 	self._store_cache = {}
 	self._wallet_caps_backend_updated = false
+	self._block_aquila_acquisition = false
+	self._get_premium_store_last_call_time = nil
 end
 
 function StoreService:update_wallet_caps()
@@ -137,8 +149,18 @@ function StoreService:_get_cached_store(cache_key, logging_function)
 		return
 	end
 
-	local current_time = Managers.time:time("main")
-	local backend_time = Managers.backend:get_server_time(current_time)
+	local backend_time = _backend_time()
+	local cached_at = cache_data.cached_at
+	local cache_to = cached_at and cached_at + StoreService.max_cache_time
+
+	if cache_to == nil or cache_to < backend_time then
+		logging_function("StoreService", "Clearing cache for '%s'. Reason, passed max cache: '%s' < '%s'.", cache_key, cache_to, backend_time)
+
+		cache[cache_key] = nil
+
+		return
+	end
+
 	local valid_to = cache_data.valid_to
 
 	if valid_to == nil or valid_to < backend_time then
@@ -149,7 +171,7 @@ function StoreService:_get_cached_store(cache_key, logging_function)
 		return
 	end
 
-	logging_function("StoreService", "Use resolved promise for '%s'. '%s' >= '%s'.", cache_key, valid_to, backend_time)
+	logging_function("StoreService", "Use resolved promise for '%s'. '%s' / '%s' >= '%s'.", cache_key, valid_to, cache_to, backend_time)
 
 	return cache_promise
 end
@@ -168,8 +190,11 @@ function StoreService:_get_archetype_store_catalogue(store_by_archetype, catalog
 
 		if store_front then
 			local store_data = store_front.data
-			offers = store_data[catalogue_name]
-			current_rotation_end = store_data.currentRotationEnd
+
+			if store_data then
+				offers = store_data[catalogue_name]
+				current_rotation_end = store_data.currentRotationEnd
+			end
 		end
 
 		local event_manager = Managers.event
@@ -189,63 +214,28 @@ function StoreService:_get_archetype_store_catalogue(store_by_archetype, catalog
 	end)
 end
 
-StoreService.credit_store_archetypes = {
-	veteran = "get_veteran_credits_store",
-	psyker = "get_psyker_credits_store",
-	zealot = "get_zealot_credits_store",
-	ogryn = "get_ogryn_credits_store"
-}
-
 function StoreService:get_credits_store(ignore_event_trigger)
-	return self:_get_archetype_store_catalogue(StoreService.credit_store_archetypes, "personal", ignore_event_trigger ~= true and "event_credits_store_fetched" or nil, nil)
+	return self:_get_archetype_store_catalogue(StoreNames.by_archetype.credit, "personal", ignore_event_trigger ~= true and "event_credits_store_fetched" or nil, nil)
 end
-
-StoreService.credit_goods_store_archetypes = {
-	veteran = "get_veteran_credits_goods_store",
-	psyker = "get_psyker_credits_goods_store",
-	zealot = "get_zealot_credits_goods_store",
-	ogryn = "get_ogryn_credits_goods_store"
-}
 
 function StoreService:get_credits_goods_store(ignore_event_trigger)
-	return self:_get_archetype_store_catalogue(StoreService.credit_goods_store_archetypes, "public", ignore_event_trigger ~= true and "event_credits_store_fetched" or nil, nil)
+	return self:_get_archetype_store_catalogue(StoreNames.by_archetype.credit_goods, "public", ignore_event_trigger ~= true and "event_credits_store_fetched" or nil, nil)
 end
-
-StoreService.credit_cosmetics_store_archetypes = {
-	veteran = "get_veteran_credits_cosmetics_store",
-	psyker = "get_psyker_credits_cosmetics_store",
-	zealot = "get_zealot_credits_cosmetics_store",
-	ogryn = "get_ogryn_credits_cosmetics_store"
-}
 
 function StoreService:get_credits_cosmetics_store(archetype_name)
-	return self:_get_archetype_store_catalogue(StoreService.credit_cosmetics_store_archetypes, "public", nil, archetype_name)
+	return self:_get_archetype_store_catalogue(StoreNames.by_archetype.credit_cosmetics, "public", nil, archetype_name)
 end
-
-StoreService.credit_weapon_cosmetics_store_archetypes = {
-	veteran = "get_veteran_credits_weapon_cosmetics_store",
-	psyker = "get_psyker_credits_weapon_cosmetics_store",
-	zealot = "get_zealot_credits_weapon_cosmetics_store",
-	ogryn = "get_ogryn_credits_weapon_cosmetics_store"
-}
 
 function StoreService:get_credits_weapon_cosmetics_store(archetype_name)
-	return self:_get_archetype_store_catalogue(StoreService.credit_weapon_cosmetics_store_archetypes, "public", nil, archetype_name)
+	return self:_get_archetype_store_catalogue(StoreNames.by_archetype.credit_weapon_cosmetics, "public", nil, archetype_name)
 end
 
-StoreService.mark_store_archetypes = {
-	veteran = "get_veteran_marks_store",
-	psyker = "get_psyker_marks_store",
-	zealot = "get_zealot_marks_store",
-	ogryn = "get_ogryn_marks_store"
-}
-
 function StoreService:get_marks_store()
-	return self:_get_archetype_store_catalogue(StoreService.mark_store_archetypes, "public_filtered", nil, nil)
+	return self:_get_archetype_store_catalogue(StoreNames.by_archetype.mark, "public_filtered", nil, nil)
 end
 
 function StoreService:get_marks_store_temporary()
-	return self:_get_archetype_store_catalogue(StoreService.mark_store_archetypes, "personal", nil, nil)
+	return self:_get_archetype_store_catalogue(StoreNames.by_archetype.mark, "personal", nil, nil)
 end
 
 local function _purchased_item_to_gear(item)
@@ -553,10 +543,56 @@ function StoreService:on_crafting_done(costs)
 	end)
 end
 
+function StoreService:can_purchase_aquilas()
+	return self._block_aquila_acquisition
+end
+
+function StoreService:_character_premium_store_key(archetype_name)
+	if not archetype_name then
+		local player = _get_local_player()
+		archetype_name = player:archetype_name()
+	end
+
+	local storefront_key = StoreNames.by_archetype.premium[archetype_name]
+
+	return storefront_key
+end
+
+function StoreService:has_character_premium_store(archetype_name)
+	return self:_character_premium_store_key(archetype_name) ~= nil
+end
+
+function StoreService:get_character_premium_store(archetype_name)
+	local storefront_key = self:_character_premium_store_key(archetype_name)
+
+	return self:get_premium_store(storefront_key)
+end
+
 function StoreService:get_premium_store(storefront_key)
 	if storefront_key == "hard_currency_store" then
-		return Managers.backend.interfaces.external_payment:get_options():catch(function (error)
+		return Managers.backend.interfaces.external_payment:get_options():next(function (data)
+			self._block_aquila_acquisition = false
+
+			return data
+		end):catch(function (error)
 			Log.error("StoreService", "Failed to fetch external payment options %s", error)
+
+			if error.error and error.error == "empty_store" and Managers.backend.interfaces.external_payment.show_empty_store_error then
+				return Managers.backend.interfaces.external_payment:show_empty_store_error():next(function ()
+					self._block_aquila_acquisition = true
+
+					return Promise.rejected({
+						error = error.error
+					})
+				end)
+			end
+
+			local show_error = error and (not type(error) == "table" and {
+				error = error
+			} or error) or {}
+			self._block_aquila_acquisition = false
+
+			return Promise.rejected(show_error)
 		end)
 	end
 
@@ -595,6 +631,7 @@ function StoreService:get_premium_store(storefront_key)
 		store_front:set_interaction_callback(callback(self, "invalidate_store_cache", cache_key))
 
 		store_cache[cache_key].valid_to = store_front:cache_until("public_filtered")
+		store_cache[cache_key].cached_at = _backend_time()
 
 		if StoreService:is_featured_store(storefront_key) then
 			self._current_store_id = id
@@ -610,10 +647,14 @@ function StoreService:get_premium_store(storefront_key)
 		}
 	end):catch(function (error)
 		Log.error("StoreService", "Failed to fetch premium storefront %s %s", storefront_key, error)
+
+		return Promise.rejected(error)
 	end)
 
 	return store_cache[cache_key].promise:next(function (t)
 		return t and table.clone_instance(t)
+	end):catch(function (error)
+		return Promise.rejected(error)
 	end)
 end
 
@@ -627,6 +668,18 @@ end
 
 function StoreService:has_new_feature_store()
 	if not self:_get_cached_store(StoreService.FEATURE_KEY, nop) then
+		local time_since_launch = Application.time_since_launch()
+
+		if self._get_premium_store_last_call_time then
+			local time_since_last_call = time_since_launch - self._get_premium_store_last_call_time
+
+			if time_since_last_call < StoreService.GET_PREMIUM_STORE_TIMEOUT then
+				return
+			end
+		end
+
+		self._get_premium_store_last_call_time = time_since_launch
+
 		self:get_premium_store(StoreService.FEATURE_KEY)
 	end
 

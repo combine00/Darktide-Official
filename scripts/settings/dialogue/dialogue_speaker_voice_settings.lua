@@ -387,6 +387,13 @@ local dialogue_speaker_voice_settings = {
 		subtitles_enabled = false,
 		player_voice = false
 	},
+	enemy_ritualist_a = {
+		full_name = "loc_npc_full_name_enemy_ritualist_a",
+		short_name = "loc_npc_short_name_enemy_ritualist_a",
+		subtitles_enabled = true,
+		icon = "content/ui/textures/icons/npc_portraits/mission_givers/default",
+		player_voice = false
+	},
 	prologue_traitor_a = {
 		full_name = "loc_npc_full_name_prologue_traitor_a",
 		short_name = "loc_npc_short_name_prologue_traitor_a",
@@ -752,6 +759,162 @@ local dialogue_speaker_voice_settings = {
 	mourningstar_hadron_servitor_a = {
 		full_name = "loc_credits_view_hadron_servitor_title",
 		short_name = "loc_credits_view_hadron_servitor_title",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	steelhead_a = {
+		full_name = "loc_npc_full_name_steelhead_a",
+		short_name = "loc_npc_short_name_steelhead_a",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	steelhead_b = {
+		full_name = "loc_npc_full_name_steelhead_b",
+		short_name = "loc_npc_short_name_steelhead_b",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	past_armourer_a = {
+		full_name = "loc_npc_full_name_past_armourer_a",
+		short_name = "loc_npc_short_name_past_armourer_a",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	past_auspex_operator_a = {
+		full_name = "loc_npc_full_name_past_auspex_operator_a",
+		short_name = "loc_npc_short_name_past_auspex_operator_a",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	past_brother_a = {
+		full_name = "loc_npc_full_name_past_brother_a",
+		short_name = "loc_npc_short_name_past_brother_a",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	past_cartel_tough_a = {
+		full_name = "loc_npc_full_name_past_cartel_tough_a",
+		short_name = "loc_npc_short_name_past_cartel_tough_a",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	past_cartel_tough_c = {
+		full_name = "loc_npc_full_name_past_cartel_tough_c",
+		short_name = "loc_npc_short_name_past_cartel_tough_c",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	past_enemy_nemesis_wolfer_a = {
+		full_name = "loc_npc_full_name_past_enemy_nemesis_wolfer_a",
+		short_name = "loc_npc_short_name_past_enemy_nemesis_wolfer_a",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	past_explicator_a = {
+		full_name = "loc_npc_full_name_past_explicator_a",
+		short_name = "loc_npc_short_name_past_explicator_a",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	past_explicator_b = {
+		full_name = "loc_npc_full_name_past_explicator_b",
+		short_name = "loc_npc_short_name_past_explicator_b",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	past_interrogator_a = {
+		full_name = "loc_npc_full_name_past_interrogator_a",
+		short_name = "loc_npc_short_name_past_interrogator_a",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	past_interrogator_b = {
+		full_name = "loc_npc_full_name_past_interrogator_b",
+		short_name = "loc_npc_short_name_past_interrogator_b",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	past_legion_captain_a = {
+		full_name = "loc_npc_full_name_past_legion_captain_a",
+		short_name = "loc_npc_short_name_past_legion_captain_a",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	past_legion_commissar_a = {
+		full_name = "loc_npc_full_name_past_legion_commissar_a",
+		short_name = "loc_npc_short_name_past_legion_commissar_a",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	past_legion_trooper_a = {
+		full_name = "loc_npc_full_name_past_legion_trooper_a",
+		short_name = "loc_npc_short_name_past_legion_trooper_a",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	past_legion_trooper_b = {
+		full_name = "loc_npc_full_name_past_legion_trooper_b",
+		short_name = "loc_npc_short_name_past_legion_trooper_b",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	past_legion_trooper_c = {
+		full_name = "loc_npc_full_name_past_legion_trooper_c",
+		short_name = "loc_npc_short_name_past_legion_trooper_c",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	past_magos_biologis_a = {
+		full_name = "loc_npc_full_name_past_magos_biologis_a",
+		short_name = "loc_npc_short_name_past_magos_biologis_a",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	past_ragged_king_a = {
+		full_name = "loc_npc_full_name_past_ragged_king_a",
+		short_name = "loc_npc_short_name_past_ragged_king_a",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	past_sergeant_a = {
+		full_name = "loc_npc_full_name_past_sergeant_a",
+		short_name = "loc_npc_short_name_past_sergeant_a",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	past_tertium_enforcer_a = {
+		full_name = "loc_npc_full_name_past_tertium_enforcer_a",
+		short_name = "loc_npc_short_name_past_tertium_enforcer_a",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	past_tertium_enforcer_b = {
+		full_name = "loc_npc_full_name_past_tertium_enforcer_b",
+		short_name = "loc_npc_short_name_past_tertium_enforcer_b",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	past_world_eater_a = {
+		full_name = "loc_npc_full_name_past_world_eater_a",
+		short_name = "loc_npc_short_name_past_world_eater_a",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	past_young_explicator_a = {
+		full_name = "loc_npc_full_name_past_young_explicator_a",
+		short_name = "loc_npc_short_name_past_young_explicator_a",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	past_young_sergeant_a = {
+		full_name = "loc_npc_full_name_past_young_sergeant_a",
+		short_name = "loc_npc_short_name_past_young_sergeant_a",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	fx = {
+		full_name = "loc_npc_full_name_fx",
+		short_name = "loc_npc_short_name_fx",
 		subtitles_enabled = true,
 		player_voice = false
 	}

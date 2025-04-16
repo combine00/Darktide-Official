@@ -5,6 +5,7 @@ local BuffSettings = require("scripts/settings/buff/buff_settings")
 local DamageProfileTemplates = require("scripts/settings/damage/damage_profile_templates")
 local DamageSettings = require("scripts/settings/damage/damage_settings")
 local FootstepIntervalsTemplates = require("scripts/settings/equipment/footstep/footstep_intervals_templates")
+local HapticTriggerTemplates = require("scripts/settings/equipment/haptic_trigger_templates")
 local HitZone = require("scripts/utilities/attack/hit_zone")
 local MeleeActionInputSetupFast = require("scripts/settings/equipment/weapon_templates/melee_action_input_setup_fast")
 local PlayerCharacterConstants = require("scripts/settings/player_character/player_character_constants")
@@ -42,7 +43,10 @@ combat_sword_action_inputs.parry = {
 	buffer_time = 0
 }
 local combat_sword_action_input_hierarchy = table.clone(MeleeActionInputSetupFast.action_input_hierarchy)
-combat_sword_action_input_hierarchy.parry = "base"
+combat_sword_action_input_hierarchy[#combat_sword_action_input_hierarchy + 1] = {
+	transition = "base",
+	input = "parry"
+}
 weapon_template.action_inputs = combat_sword_action_inputs
 weapon_template.action_input_hierarchy = combat_sword_action_input_hierarchy
 local default_weapon_box = {
@@ -1037,7 +1041,7 @@ weapon_template.actions = {
 		}
 	},
 	action_attack_special = {
-		damage_window_start = 0.07,
+		damage_window_start = 0.13333333333333333,
 		hit_armor_anim = "attack_hit_shield",
 		start_input = "special_action",
 		kind = "sweep",
@@ -1046,7 +1050,7 @@ weapon_template.actions = {
 		weapon_handling_template = "time_scale_1",
 		attack_direction_override = "push",
 		allowed_during_sprint = true,
-		damage_window_end = 0.12,
+		damage_window_end = 0.18333333333333332,
 		power_level = 500,
 		anim_end_event = "attack_finished",
 		anim_event_3p = "attack_swing_stab",
@@ -1098,7 +1102,7 @@ weapon_template.actions = {
 			anchor_point_offset = {
 				0,
 				0,
-				-0.3
+				-0.1
 			}
 		},
 		damage_profile = DamageProfileTemplates.light_combatsword_p3_stab,
@@ -1237,7 +1241,8 @@ weapon_template.actions = {
 		inner_damage_profile = DamageProfileTemplates.ninja_push,
 		inner_damage_type = damage_types.physical,
 		outer_damage_profile = DamageProfileTemplates.light_push,
-		outer_damage_type = damage_types.physical
+		outer_damage_type = damage_types.physical,
+		haptic_trigger_template = HapticTriggerTemplates.melee.push
 	},
 	action_inspect = {
 		skip_3p_anims = false,
@@ -1281,13 +1286,14 @@ weapon_template.keywords = {
 	"combat_sword",
 	"p3"
 }
-weapon_template.smart_targeting_template = SmartTargetingTemplates.default_melee
 weapon_template.dodge_template = "ninjafencer"
 weapon_template.sprint_template = "ninja_l"
 weapon_template.stamina_template = "ninjafencer"
 weapon_template.toughness_template = "default"
 weapon_template.movement_curve_modifier_template = "combataxe_p1_m1"
 weapon_template.footstep_intervals = FootstepIntervalsTemplates.default
+weapon_template.smart_targeting_template = SmartTargetingTemplates.default_melee
+weapon_template.haptic_trigger_template = HapticTriggerTemplates.melee.light
 local WeaponBarUIDescriptionTemplates = require("scripts/settings/equipment/weapon_bar_ui_description_templates")
 weapon_template.base_stats = {
 	combatsword_p3_m1_dps_stat = {

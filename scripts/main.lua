@@ -6,6 +6,7 @@ require("scripts/foundation/utilities/patches")
 require("scripts/foundation/utilities/settings")
 require("scripts/foundation/utilities/table")
 
+local GameStateDebug = require("scripts/utilities/game_state_debug")
 local GameStateMachine = require("scripts/foundation/utilities/game_state_machine")
 local LocalizationManager = require("scripts/managers/localization/localization_manager")
 local PackageManager = require("scripts/foundation/managers/package/package_manager")
@@ -16,6 +17,8 @@ local StateLoadAudioSettings = require("scripts/game_states/boot/state_load_audi
 local StateLoadBootAssets = require("scripts/game_states/boot/state_load_boot_assets")
 local StateLoadRenderSettings = require("scripts/game_states/boot/state_load_render_settings")
 local StateRequireScripts = require("scripts/game_states/boot/state_require_scripts")
+local GameStateDebug = require("scripts/utilities/game_state_debug")
+local XboxLiveUtils = require("scripts/foundation/utilities/xbox_live_utils")
 local GAME_RESUME_COUNT = 0
 
 function Main:init()
@@ -28,7 +31,7 @@ function Main:init()
 
 	Application.set_time_step_policy("throttle", fps)
 
-	if type(GameParameters.window_title) == "string" and GameParameters.window_title ~= "" then
+	if IS_WINDOWS and type(GameParameters.window_title) == "string" and GameParameters.window_title ~= "" then
 		Window.set_title(GameParameters.window_title)
 	end
 
@@ -71,8 +74,10 @@ function Main:init()
 		Wwise.load_bank("wwise/world_sound_fx")
 	end
 
+	rawset(_G, "GameStateDebugInfo", GameStateDebug:new())
+
 	self._package_manager = package_manager
-	self._sm = GameStateMachine:new(nil, StateBoot, params, nil, nil, "Main", true)
+	self._sm = GameStateMachine:new(nil, StateBoot, params, nil, nil, "", "Main", true)
 end
 
 function Main:update(dt)
@@ -102,9 +107,11 @@ function Main:shutdown()
 		owns_package_manager = false
 	end
 
-	local on_shutdown = true
+	local exit_param = {
+		on_shutdown = true
+	}
 
-	self._sm:destroy(on_shutdown)
+	self._sm:destroy(exit_param)
 
 	if owns_package_manager then
 		self._package_manager:delete()
@@ -157,7 +164,6 @@ end
 
 function on_suspend()
 	if rawget(_G, "Managers") then
-		Managers.package:pause_unloading()
 		Managers.event:trigger("on_pre_suspend")
 		Managers.event:trigger("on_suspend")
 
@@ -188,22 +194,28 @@ end
 function on_resume()
 	GAME_RESUME_COUNT = GAME_RESUME_COUNT + 1
 
-	Crashify.print_property("game_resume_count", GAME_RESUME_COUNT)
-	Crashify.print_breadcrumb(string.format("on_resume: %s", GAME_RESUME_COUNT))
-
-	if rawget(_G, "Managers") and Managers.backend then
-		Managers.backend:time_sync_restart()
+	if rawget(_G, "Crashify") then
+		Crashify.print_property("game_resume_count", GAME_RESUME_COUNT)
+		Crashify.print_breadcrumb(string.format("on_resume: %s", GAME_RESUME_COUNT))
 	end
 
-	if Managers.telemetry_events then
-		Managers.telemetry_events:game_resumed()
+	if rawget(_G, "Managers") then
+		if Managers.backend then
+			Managers.backend:time_sync_restart()
+		end
+
+		if Managers.telemetry_events then
+			Managers.telemetry_events:game_resumed()
+		end
+
+		if Managers.telemetry then
+			Managers.telemetry:post_batch()
+		end
 	end
 
-	if Managers.telemetry then
-		Managers.telemetry:post_batch()
+	if IS_XBS then
+		XboxLiveUtils.close_user_context()
 	end
-
-	Managers.package:resume_unloading()
 end
 
 function shutdown()

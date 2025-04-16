@@ -243,10 +243,25 @@ local boss_name_templates = {
 	},
 	plague_ogryn = "loc_plague_ogryn_name",
 	daemonhost = "loc_daemonhost_name",
+	mutator_daemonhost = "loc_mutator_daemonhost_name",
 	beast_of_nurgle = "loc_breed_display_name_chaos_beast_of_nurgle",
 	chaos_spawn = "loc_breed_display_name_chaos_spawn",
 	renegade_twin_captain = "loc_breed_display_name_renegade_twin_captain",
-	renegade_twin_captain_two = "loc_breed_display_name_renegade_twin_captain_two"
+	havoc_renegade_twin_captain = {
+		"loc_havoc_male_twin_name_01",
+		"loc_havoc_male_twin_name_02",
+		"loc_havoc_male_twin_name_04",
+		"loc_havoc_male_twin_name_05",
+		"loc_havoc_male_twin_name_06"
+	},
+	renegade_twin_captain_two = "loc_breed_display_name_renegade_twin_captain_two",
+	havoc_renegade_twin_captain_two = {
+		"loc_havoc_female_twin_name_01",
+		"loc_havoc_female_twin_name_02",
+		"loc_havoc_female_twin_name_03",
+		"loc_havoc_female_twin_name_05",
+		"loc_havoc_female_twin_name_06"
+	}
 }
 
 return settings("BossNameTemplates", boss_name_templates)

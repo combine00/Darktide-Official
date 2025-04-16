@@ -34,7 +34,11 @@ local ALWAYS_TARGET_BREEDS = {
 
 function MinionFxExtension:game_object_initialized(game_session, game_object_id)
 	self._game_object_id = game_object_id
-	self._always_update_ranged_target = ALWAYS_TARGET_BREEDS[ScriptUnit.extension(self._unit, "unit_data_system"):breed().name]
+	local has_unit_data_system = ScriptUnit.has_extension(self._unit, "unit_data_system")
+
+	if has_unit_data_system then
+		self._always_update_ranged_target = ALWAYS_TARGET_BREEDS[ScriptUnit.extension(self._unit, "unit_data_system"):breed().name]
+	end
 end
 
 function MinionFxExtension:destroy()

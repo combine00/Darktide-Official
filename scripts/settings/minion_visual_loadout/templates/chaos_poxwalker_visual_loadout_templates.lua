@@ -6,6 +6,7 @@ local templates = {
 local basic_poxwalker_template = {
 	slots = {
 		slot_body = {
+			use_outline = true,
 			items = {
 				"content/items/characters/minions/chaos_poxwalker/attachments_base/body",
 				"content/items/characters/minions/chaos_poxwalker/attachments_base/body_skin_01",
@@ -15,8 +16,9 @@ local basic_poxwalker_template = {
 			}
 		},
 		slot_melee_weapon = {
-			drop_on_death = true,
+			use_outline = true,
 			is_weapon = true,
+			drop_on_death = true,
 			items = {
 				"content/items/weapons/minions/melee/renegade_melee_weapon_01",
 				"content/items/weapons/minions/melee/renegade_melee_weapon_02",
@@ -27,6 +29,7 @@ local basic_poxwalker_template = {
 			}
 		},
 		slot_upper_body_horn = {
+			use_outline = true,
 			items = {
 				"content/items/characters/minions/chaos_poxwalker/attachments_gear/horn_arm_left_02",
 				"content/items/characters/minions/chaos_poxwalker/attachments_gear/horn_arm_left_02",
@@ -56,6 +59,7 @@ local basic_poxwalker_template = {
 			}
 		},
 		slot_head = {
+			use_outline = true,
 			items = {
 				"content/items/characters/minions/chaos_poxwalker/attachments_base/hair_a",
 				"content/items/characters/minions/chaos_poxwalker/attachments_base/hair_b",
@@ -67,6 +71,7 @@ local basic_poxwalker_template = {
 			}
 		},
 		slot_horn = {
+			use_outline = true,
 			items = {
 				"content/items/characters/minions/chaos_poxwalker/attachments_gear/horn_arm_left_01",
 				"content/items/characters/minions/generic_items/empty_minion_item"
@@ -112,6 +117,7 @@ default_2.gib_variations = {
 	"lowerbody_a"
 }
 default_2.slots.slot_lower_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/lowerbody_a",
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/lowerbody_a_var_01",
@@ -123,6 +129,7 @@ default_2.slots.slot_lower_body = {
 	}
 }
 default_2.slots.slot_upper_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/upperbody_c",
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/upperbody_c_var_01",
@@ -145,6 +152,7 @@ default_3.slots.slot_upper_body_horn = {
 	}
 }
 default_3.slots.slot_lower_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/lowerbody_a",
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/lowerbody_a_var_01",
@@ -156,6 +164,7 @@ default_3.slots.slot_lower_body = {
 	}
 }
 default_3.slots.slot_upper_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/fullbody_a",
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/fullbody_a_var_01",
@@ -184,6 +193,7 @@ default_4.slots.slot_upper_body_horn = {
 	}
 }
 default_4.slots.slot_lower_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/lowerbody_a",
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/lowerbody_a_var_01",
@@ -195,6 +205,7 @@ default_4.slots.slot_lower_body = {
 	}
 }
 default_4.slots.slot_upper_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/upperbody_b",
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/upperbody_b_var_01",
@@ -221,6 +232,7 @@ default_5.slots.slot_upper_body_horn = {
 	}
 }
 default_5.slots.slot_lower_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/lowerbody_a",
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/lowerbody_a_var_01",
@@ -232,6 +244,7 @@ default_5.slots.slot_lower_body = {
 	}
 }
 default_5.slots.slot_upper_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/upperbody_d",
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/upperbody_d_var_01",
@@ -258,6 +271,7 @@ default_6.slots.slot_upper_body_horn = {
 	}
 }
 default_6.slots.slot_upper_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/fullbody_b",
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/fullbody_b_var_01",
@@ -281,6 +295,7 @@ default_7.slots.slot_upper_body_horn = {
 	}
 }
 default_7.slots.slot_lower_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/lowerbody_a",
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/lowerbody_a_var_01",
@@ -292,6 +307,7 @@ default_7.slots.slot_lower_body = {
 	}
 }
 default_7.slots.slot_upper_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/upperbody_a",
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/upperbody_a_var_01",
@@ -320,6 +336,7 @@ default_8.slots.slot_upper_body_horn = {
 	}
 }
 default_8.slots.slot_lower_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/lowerbody_a",
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/lowerbody_a_var_01",
@@ -331,6 +348,7 @@ default_8.slots.slot_lower_body = {
 	}
 }
 default_8.slots.slot_upper_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/upperbody_e",
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/upperbody_e_var_01",
@@ -353,6 +371,7 @@ default_9.gib_variations = {
 	"lowerbody_a"
 }
 default_9.slots.slot_lower_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/lowerbody_a",
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/lowerbody_a_var_01",
@@ -369,6 +388,7 @@ default_8.gib_variations = {
 	"upperbody_e"
 }
 default_10.slots.slot_lower_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/lowerbody_a_var_foundry_01",
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/lowerbody_a_var_foundry_02",
@@ -377,6 +397,7 @@ default_10.slots.slot_lower_body = {
 	}
 }
 default_10.slots.slot_upper_body = {
+	use_outline = true,
 	items = {
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/fullbody_a_var_foundry_01",
 		"content/items/characters/minions/chaos_poxwalker/attachments_gear/fullbody_a_var_foundry_02",

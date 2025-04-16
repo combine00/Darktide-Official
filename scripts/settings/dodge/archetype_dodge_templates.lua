@@ -142,7 +142,7 @@ archetype_dodge_templates.psyker = {
 }
 archetype_dodge_templates.ogryn = {
 	consecutive_dodges_reset = 0.85,
-	stop_threshold = 0.25,
+	stop_threshold = 0.15,
 	base_distance = 3,
 	dodge_cooldown = 0.25,
 	minimum_dodge_input = 0.25,

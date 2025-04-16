@@ -80,6 +80,7 @@ PropUnitData.component_data = {
 			"filtration_tank",
 			"hazard_prop",
 			"hazard_sphere",
+			"heresy_altar",
 			"ice_chunk",
 			"icicle",
 			"train_cogitator"
@@ -92,6 +93,7 @@ PropUnitData.component_data = {
 			"filtration_tank",
 			"hazard_prop",
 			"hazard_sphere",
+			"heresy_altar",
 			"ice_chunk",
 			"icicle",
 			"train_cogitator"

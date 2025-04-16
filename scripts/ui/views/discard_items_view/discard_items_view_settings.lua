@@ -19,8 +19,8 @@ local discard_items_view_settings = {
 		50
 	},
 	animation_event_by_archetype = {
-		veteran = "human_veteran_inspect_pose",
 		psyker = "human_psyker_inspect_pose",
+		veteran = "human_veteran_inspect_pose",
 		zealot = "human_zealot_inspect_pose",
 		ogryn = "ogryn_inspect_pose"
 	},

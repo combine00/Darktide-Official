@@ -4,25 +4,36 @@ local LoadingManager = class("LoadingManager")
 function LoadingManager:init()
 	self._loading_client = nil
 	self._loading_host = nil
-	self._shelved_loading_clients = {}
+	self._shelved_clients_loaders = {}
+
+	Managers.event:register(self, "on_suspend", "_on_suspend")
 end
 
 function LoadingManager:destroy()
+	Managers.event:unregister(self, "on_suspend")
 	self:cleanup()
-	self:_cleanup_shelved_loading_clients()
+	self:_cleanup_shelved_loaders()
 end
 
-function LoadingManager:_cleanup_shelved_loading_clients()
-	local loading_clients = self._shelved_loading_clients
+function LoadingManager:_cleanup_shelved_loaders()
+	local shelved_clients_loaders = self._shelved_clients_loaders
 
-	for i = 1, #loading_clients do
-		local loading_client = loading_clients[i]
+	if shelved_clients_loaders then
+		for i = 1, #shelved_clients_loaders do
+			local clients_loaders = shelved_clients_loaders[i]
 
-		loading_client:delete()
-		Log.info("LoadingManager", "Deleting shelved loading client")
+			for _, loader in ipairs(clients_loaders) do
+				if not loader:dont_destroy() then
+					loader:cleanup()
+					loader:delete()
+				end
+			end
+
+			Log.info("LoadingManager", "Deleting shelved loading client")
+		end
+
+		table.clear(shelved_clients_loaders)
 	end
-
-	table.clear(loading_clients)
 end
 
 function LoadingManager:update(dt)
@@ -37,7 +48,8 @@ end
 
 function LoadingManager:cleanup()
 	if self._loading_client then
-		self:_shelve_loading_client()
+		self:_shelve_loaders()
+		self._loading_client:delete()
 
 		self._loading_client = nil
 	end
@@ -49,10 +61,10 @@ function LoadingManager:cleanup()
 	end
 end
 
-function LoadingManager:_shelve_loading_client()
+function LoadingManager:_shelve_loaders()
 	local loading_client = self._loading_client
-	local loading_clients = self._shelved_loading_clients
-	loading_clients[#loading_clients + 1] = loading_client
+	local loaders = self._shelved_clients_loaders
+	loaders[#loaders + 1] = loading_client:take_ownership_of_loaders()
 end
 
 function LoadingManager:is_alive()
@@ -95,19 +107,15 @@ function LoadingManager:failed_clients(failed_clients)
 	self._loading_host:failed(failed_clients)
 end
 
-function LoadingManager:load_mission(mission_name, level_name, circumstance_name)
-	if mission_name then
-		level_name = level_name or Missions[mission_name].level
-	end
-
+function LoadingManager:load_mission(loading_context)
 	if self._loading_host then
-		self:_cleanup_shelved_loading_clients()
-		self._loading_host:load_mission(mission_name, level_name, circumstance_name)
+		self:_cleanup_shelved_loaders()
+		self._loading_host:load_mission(loading_context)
 	end
 
 	if self._loading_client then
-		self:_cleanup_shelved_loading_clients()
-		self._loading_client:load_mission(mission_name, level_name, circumstance_name)
+		self:_cleanup_shelved_loaders()
+		self._loading_client:load_mission(loading_context)
 	end
 end
 
@@ -167,24 +175,8 @@ function LoadingManager:spawn_group_id()
 	return nil
 end
 
-local function instant_easing_function()
-	return 1
-end
-
-function LoadingManager:show_instant_black_screen()
-	local local_player = Managers.player:local_player(1)
-
-	Managers.event:trigger("event_cutscene_fade_in", local_player, 0.1, instant_easing_function)
-
-	self.black_screen = true
-end
-
-function LoadingManager:hide_instant_black_screen()
-	local local_player = Managers.player:local_player(1)
-
-	Managers.event:trigger("event_cutscene_fade_out", local_player, 0.1, instant_easing_function)
-
-	self.black_screen = false
+function LoadingManager:_on_suspend()
+	self:cleanup()
 end
 
 return LoadingManager

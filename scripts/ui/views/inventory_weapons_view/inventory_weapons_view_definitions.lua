@@ -275,7 +275,7 @@ local legend_inputs = {
 		alignment = "right_alignment",
 		on_pressed_callback = "cb_on_discard_pressed",
 		visibility_function = function (parent)
-			return not parent._discard_items_element
+			return parent._offer_items_layout and table.size(parent._offer_items_layout) > 1 and not parent._discard_items_element
 		end
 	},
 	{

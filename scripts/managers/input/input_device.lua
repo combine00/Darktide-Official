@@ -74,8 +74,9 @@ function InputDevice:_any_analog_input()
 
 		if axis_index then
 			local value = input_device.axis(axis_index)
+			local threshold = axis_name ~= "mouse" and 0.24 or 0
 
-			if Vector3.length_squared(value) > 0 then
+			if threshold < Vector3.length_squared(value) then
 				return true
 			end
 		end

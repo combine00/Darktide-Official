@@ -510,7 +510,7 @@ torso_sever.gib_settings.attach_inventory_slots_to_gib = {
 	"slot_upper_body_horn",
 	"zone_decal"
 }
-torso_sever.gib_settings.vfx = SharedGibbingTemplates.vfx.poxwalker_gushing
+torso_sever.gib_settings.vfx = table.clone(SharedGibbingTemplates.vfx.poxwalker_gushing)
 torso_sever.gib_settings.vfx.node_name = torso_sever.gib_settings.gib_actor
 torso_sever.gib_settings.sfx = nil
 torso_sever.stump_settings.stump_unit = "content/characters/enemy/chaos_poxwalker/gibbing/upper_torso_gib_cap"
@@ -550,6 +550,9 @@ local torso_warp_shard = table.clone(torso_warp)
 torso_warp_shard.gib_settings.vfx = SharedGibbingTemplates.vfx.warp_gib_shard
 torso_warp_shard.gib_settings.vfx.node_name = nil
 torso_warp_shard.stump_settings.vfx = SharedGibbingTemplates.vfx.warp_stump_shard
+local torso_warp_wind_slash = table.clone(torso_warp)
+torso_warp_wind_slash.stump_settings.sfx = SharedGibbingTemplates.sfx.warp_wind_slash_large
+torso_warp_wind_slash.stump_settings.vfx = SharedGibbingTemplates.vfx.warp_wind_slash_large
 local center_mass_full = table.clone(torso_sever)
 center_mass_full.gib_settings.gib_unit = gib_units.torso_full
 center_mass_full.gib_settings.gib_flesh_unit = "content/characters/enemy/chaos_poxwalker/gibbing/flesh_upper_torso_gib"
@@ -846,6 +849,9 @@ local gibbing_template = {
 		},
 		warp_shard = {
 			center_mass_upper_warp_shard
+		},
+		warp_wind_slash_high = {
+			torso_warp_wind_slash
 		}
 	},
 	center_mass = {
@@ -884,6 +890,9 @@ local gibbing_template = {
 			center_mass_lower_warp_shard,
 			center_mass_left_warp_shard,
 			center_mass_right_warp_shard
+		},
+		warp_wind_slash_high = {
+			torso_warp_wind_slash
 		},
 		plasma = {
 			center_mass_full,

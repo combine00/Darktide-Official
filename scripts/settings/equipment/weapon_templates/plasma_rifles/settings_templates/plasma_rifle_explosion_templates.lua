@@ -11,8 +11,8 @@ explosion_templates.plasma_rifle = {
 	damage_falloff = true,
 	radius = 3,
 	min_radius = 2,
-	scalable_radius = true,
 	close_radius = 1.25,
+	scalable_radius = true,
 	collision_filter = "filter_player_character_explosion",
 	static_power_level = 500,
 	min_close_radius = 1.15,
@@ -20,6 +20,11 @@ explosion_templates.plasma_rifle = {
 	close_damage_type = damage_types.laser,
 	damage_profile = DamageProfileTemplates.light_plasma_demolition,
 	damage_type = damage_types.laser,
+	broadphase_explosion_filter = {
+		"heroes",
+		"villains",
+		"destructibles"
+	},
 	explosion_area_suppression = {
 		suppression_falloff = true,
 		instant_aggro = true,
@@ -46,8 +51,8 @@ explosion_templates.plasma_rifle_exit = {
 	damage_falloff = true,
 	radius = 2.5,
 	min_radius = 1.5,
-	scalable_radius = true,
 	close_radius = 0.5,
+	scalable_radius = true,
 	collision_filter = "filter_player_character_explosion",
 	static_power_level = 500,
 	min_close_radius = 0.1,
@@ -55,6 +60,11 @@ explosion_templates.plasma_rifle_exit = {
 	close_damage_type = damage_types.plasma,
 	damage_profile = DamageProfileTemplates.light_plasma_demolition,
 	damage_type = damage_types.plasma,
+	broadphase_explosion_filter = {
+		"heroes",
+		"villains",
+		"destructibles"
+	},
 	scalable_vfx = {}
 }
 

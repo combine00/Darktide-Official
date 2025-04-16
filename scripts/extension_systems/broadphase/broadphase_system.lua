@@ -8,7 +8,8 @@ local function _generate_broadphase_categories(system_init_data)
 	local side_names = system_init_data.side_names
 	local broadphase_categories = table.append({
 		"doors",
-		"pickups"
+		"pickups",
+		"destructibles"
 	}, side_names)
 	local pickup_groups = Pickups.by_group
 

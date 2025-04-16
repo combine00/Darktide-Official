@@ -56,12 +56,12 @@ function ConstantElementChat:init(parent, draw_layer, start_scale, definitions)
 	self._time_since_last_update = ChatSettings.inactivity_timeout
 	self._input_field_widget = nil
 	self._reported_left_channel_handles = {}
+	self._chat_world_marker_id_by_peer_id = {}
 	self._virtual_keyboard_promise = nil
 
 	self:_setup_input()
 
 	for channel_handle, channel in pairs(Managers.chat:connected_chat_channels()) do
-		self:cb_chat_manager_added_channel(channel_handle, channel)
 		self:_on_connect_to_channel(channel_handle)
 	end
 end
@@ -582,8 +582,6 @@ function ConstantElementChat:_handle_console_input(input_service, ui_renderer)
 		end
 	elseif IS_PLAYSTATION then
 		local content = input_widget.content
-
-		Log.info("ConstantElementChat", "send_chat_message(%s), confirm_pressed(%s), is_finished(%s), is_showing(%s), ", input_service:get("send_chat_message"), input_service:get("confirm_pressed"), PS5ImeDialog.is_finished(), PS5ImeDialog.is_showing())
 
 		if input_service:get("confirm_pressed") and not PS5ImeDialog.is_showing() then
 			local title = content.virtual_keyboard_title or content.placeholder_text
@@ -1262,7 +1260,8 @@ function ConstantElementChat:_participant_displayname(participant)
 	local player_info = self:_find_participant_player_info(participant)
 
 	if player_info then
-		local displayname = player_info:character_name()
+		local console = player_info:platform()
+		local displayname = IS_PLAYSTATION and (console == "psn" or console == "ps5") and player_info:user_display_name() or player_info:character_name()
 
 		if displayname and displayname ~= "" then
 			return displayname

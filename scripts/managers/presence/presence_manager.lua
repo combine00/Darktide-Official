@@ -190,6 +190,27 @@ function PresenceManager:set_psn_session_id(session_id)
 	})
 end
 
+function PresenceManager:set_havoc_status(value)
+	self._myself:set_havoc_status(value)
+	self:_update_my_presence({
+		havoc_status = true
+	})
+end
+
+function PresenceManager:set_havoc_rank_cadence_high(value)
+	self._myself:set_havoc_rank_cadence_high(value)
+	self:_update_my_presence({
+		havoc_rank_cadence_high = true
+	})
+end
+
+function PresenceManager:set_havoc_rank_all_time_high(value)
+	self._myself:set_havoc_rank_all_time_high(value)
+	self:_update_my_presence({
+		havoc_rank_all_time_high = true
+	})
+end
+
 function PresenceManager:get_presence(account_id)
 	if account_id == gRPC.get_account_id() then
 		local myself = self:presence_entry_myself()
@@ -481,6 +502,14 @@ function PresenceManager:update(dt, t)
 		self._last_request_platform_username = self._last_request_platform_username + dt
 
 		if self._last_request_platform_username > 0.2 then
+			if IS_PLAYSTATION then
+				local is_public_profiles_promise_pending = Managers.account:is_public_profiles_promise_pending()
+
+				if is_public_profiles_promise_pending then
+					return
+				end
+			end
+
 			local buffer = {}
 			self._load_buffer_in_flight = {}
 
@@ -519,7 +548,7 @@ function PresenceManager:update(dt, t)
 				end):catch(function (error)
 					self._load_buffer_in_flight = nil
 
-					_error("error when getting gamertags for xuids", table.tostring(buffer, 2))
+					_error("error when getting online_id for playstation", table.tostring(buffer, 2))
 
 					self._last_request_platform_username = -10
 				end)

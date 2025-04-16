@@ -5,6 +5,19 @@ local templates = {}
 table.make_unique(templates)
 
 templates.weapon_trait_bespoke_ogryn_thumper_p2_toughness_on_elite_kills = {
+	format_values = {
+		toughness = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_thumper_p2_toughness_on_elite_kills",
+				find_value_type = "trait_override",
+				path = {
+					"toughness_fixed_percentage"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_thumper_p2_toughness_on_elite_kills = {
 			{
@@ -23,6 +36,28 @@ templates.weapon_trait_bespoke_ogryn_thumper_p2_toughness_on_elite_kills = {
 	}
 }
 templates.weapon_trait_bespoke_ogryn_thumper_p2_power_bonus_on_continuous_fire = {
+	format_values = {
+		power_level = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_thumper_p2_power_bonus_on_continuous_fire",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.power_level_modifier
+				}
+			}
+		},
+		ammo = {
+			value = "10%",
+			format_type = "string"
+		},
+		stacks = {
+			value = "5",
+			format_type = "string"
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_thumper_p2_power_bonus_on_continuous_fire = {
 			{
@@ -49,6 +84,24 @@ templates.weapon_trait_bespoke_ogryn_thumper_p2_power_bonus_on_continuous_fire =
 	}
 }
 templates.weapon_trait_bespoke_ogryn_thumper_p2_explosion_radius_bonus_on_continuous_fire = {
+	format_values = {
+		radius = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_thumper_p2_explosion_radius_bonus_on_continuous_fire",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.explosion_radius_modifier
+				}
+			}
+		},
+		stacks = {
+			value = "5",
+			format_type = "string"
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_thumper_p2_explosion_radius_bonus_on_continuous_fire = {
 			{
@@ -75,6 +128,30 @@ templates.weapon_trait_bespoke_ogryn_thumper_p2_explosion_radius_bonus_on_contin
 	}
 }
 templates.weapon_trait_bespoke_ogryn_thumper_p2_weakspot_projectile_hit_increases_reload_speed = {
+	format_values = {
+		reload_speed = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_thumper_p2_weakspot_projectile_hit_increases_reload_speed",
+				find_value_type = "trait_override",
+				path = {
+					"proc_stat_buffs",
+					stat_buffs.reload_speed
+				}
+			}
+		},
+		duration = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_thumper_p2_weakspot_projectile_hit_increases_reload_speed",
+				find_value_type = "buff_template",
+				path = {
+					"active_duration"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_thumper_p2_weakspot_projectile_hit_increases_reload_speed = {
 			{
@@ -101,6 +178,20 @@ templates.weapon_trait_bespoke_ogryn_thumper_p2_weakspot_projectile_hit_increase
 	}
 }
 templates.weapon_trait_bespoke_ogryn_thumper_p2_pass_past_armor_on_weapon_special = {
+	format_values = {
+		stagger = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_thumper_p2_pass_past_armor_on_weapon_special",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.melee_impact_modifier
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_thumper_p2_pass_past_armor_on_weapon_special = {
 			{
@@ -127,6 +218,50 @@ templates.weapon_trait_bespoke_ogryn_thumper_p2_pass_past_armor_on_weapon_specia
 	}
 }
 templates.weapon_trait_bespoke_ogryn_thumper_p2_targets_receive_rending_debuff = {
+	format_values = {
+		stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_thumper_p2_targets_receive_rending_debuff",
+				find_value_type = "trait_override",
+				path = {
+					"target_buff_data",
+					"num_stacks_on_proc"
+				}
+			}
+		},
+		rending = {
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "rending_debuff",
+				find_value_type = "buff_template",
+				path = {
+					"stat_buffs",
+					stat_buffs.rending_multiplier
+				}
+			}
+		},
+		time = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "rending_debuff",
+				find_value_type = "buff_template",
+				path = {
+					"duration"
+				}
+			}
+		},
+		max_stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "rending_debuff",
+				find_value_type = "buff_template",
+				path = {
+					"max_stacks"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_thumper_p2_targets_receive_rending_debuff = {
 			{
@@ -153,6 +288,19 @@ templates.weapon_trait_bespoke_ogryn_thumper_p2_targets_receive_rending_debuff =
 	}
 }
 templates.weapon_trait_bespoke_ogryn_thumper_p2_close_explosion_applies_bleed = {
+	format_values = {
+		stacks = {
+			format_type = "number",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_thumper_p2_close_explosion_applies_bleed",
+				find_value_type = "trait_override",
+				path = {
+					"target_buff_data",
+					"num_stacks_on_proc"
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_thumper_p2_close_explosion_applies_bleed = {
 			{
@@ -179,6 +327,20 @@ templates.weapon_trait_bespoke_ogryn_thumper_p2_close_explosion_applies_bleed = 
 	}
 }
 templates.weapon_trait_bespoke_ogryn_thumper_p2_grenades_stick_to_monsters = {
+	format_values = {
+		dmg_vs_ogryn_monster = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_ogryn_thumper_p2_grenades_stick_to_monsters",
+				find_value_type = "trait_override",
+				path = {
+					"stat_buffs",
+					stat_buffs.damage_vs_ogryn_and_monsters
+				}
+			}
+		}
+	},
 	buffs = {
 		weapon_trait_bespoke_ogryn_thumper_p2_grenades_stick_to_monsters = {
 			{

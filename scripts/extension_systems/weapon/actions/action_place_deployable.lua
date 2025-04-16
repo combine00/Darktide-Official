@@ -11,8 +11,8 @@ function ActionPlaceDeployable:_place_unit(action_settings, position, rotation, 
 	local side_system = Managers.state.extension:system("side_system")
 	local side = side_system.side_by_unit[player_unit]
 	local side_id = side.side_id
-	local unit_name, material = nil
-	local placed_unit = Managers.state.unit_spawner:spawn_network_unit(unit_name, unit_template, position, rotation, material, side_id, deployable_settings, placed_on_unit, player_unit)
+	local unit_name, material, placed_unit = nil
+	placed_unit = Managers.state.unit_spawner:spawn_network_unit(unit_name, unit_template, position, rotation, material, side_id, deployable_settings, placed_on_unit, player_unit)
 	local game_mode_name = Managers.state.game_mode:game_mode_name()
 
 	if game_mode_name == TRAINING_GROUNDS_GAME_MODE_NAME then

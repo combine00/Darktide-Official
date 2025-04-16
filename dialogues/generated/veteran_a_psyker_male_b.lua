@@ -92,10 +92,6 @@ local veteran_a_psyker_male_b = {
 			[1.0] = 1.78925,
 			[2.0] = 2.099896
 		},
-		sound_event_weights = {
-			[1.0] = 0.5,
-			[2.0] = 0.5
-		},
 		randomize_indexes = {}
 	},
 	combat_pause_quirk_emperor_b = {
@@ -122,10 +118,6 @@ local veteran_a_psyker_male_b = {
 			[1.0] = 5.169854,
 			[2.0] = 6.105083
 		},
-		sound_event_weights = {
-			[1.0] = 0.5,
-			[2.0] = 0.5
-		},
 		randomize_indexes = {}
 	},
 	combat_pause_quirk_rations_b = {
@@ -138,10 +130,6 @@ local veteran_a_psyker_male_b = {
 		sound_events_duration = {
 			[1.0] = 3.071708,
 			[2.0] = 2.82725
-		},
-		sound_event_weights = {
-			[1.0] = 0.5,
-			[2.0] = 0.5
 		},
 		randomize_indexes = {}
 	},

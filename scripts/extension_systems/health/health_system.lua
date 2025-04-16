@@ -8,15 +8,26 @@ require("scripts/extension_systems/health/player_husk_health_extension")
 require("scripts/extension_systems/health/player_unit_health_extension")
 require("scripts/extension_systems/health/prop_health_extension")
 
+local CLIENT_RPCS = {
+	"rpc_kill_unit_health"
+}
 local HealthSystem = class("HealthSystem", "ExtensionSystemBase")
 
 function HealthSystem:init(...)
 	HealthSystem.super.init(self, ...)
 
 	self._husk_health_extensions = {}
+
+	if not self._is_server then
+		self._network_event_delegate:register_session_events(self, unpack(CLIENT_RPCS))
+	end
 end
 
 function HealthSystem:destroy()
+	if not self._is_server then
+		self._network_event_delegate:unregister_events(unpack(CLIENT_RPCS))
+	end
+
 	table.clear(HEALTH_ALIVE)
 end
 
@@ -65,6 +76,13 @@ function HealthSystem:_update_is_dead_status_husk(dt, t)
 			extension.is_dead = is_dead
 		end
 	end
+end
+
+function HealthSystem:rpc_kill_unit_health(channel_id, target_unit_id)
+	local target_unit = Managers.state.unit_spawner:unit(target_unit_id, false)
+	local extension = self._unit_to_extension_map[target_unit]
+
+	extension:kill()
 end
 
 return HealthSystem

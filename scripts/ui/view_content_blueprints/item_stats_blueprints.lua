@@ -1,4 +1,4 @@
-local Action = require("scripts/utilities/weapon/action")
+local Action = require("scripts/utilities/action/action")
 local DefaultViewInputSettings = require("scripts/settings/input/default_view_input_settings")
 local InputDevice = require("scripts/managers/input/input_device")
 local Items = require("scripts/utilities/items")
@@ -1455,6 +1455,8 @@ local function generate_blueprints_function(grid_size, optional_item)
 		local item = content.item
 		local weapon_template = WeaponTemplate.weapon_template_from_item(item)
 		local displayed_attacks = weapon_template.displayed_attacks
+		local min_desc_size = 20
+		local desc_size = 0
 
 		if displayed_attacks then
 			local statistics_template = weapon_template.displayed_weapon_stats and WeaponUIStatsTemplates[weapon_template.displayed_weapon_stats] or weapon_template.displayed_weapon_stats_table
@@ -1480,6 +1482,18 @@ local function generate_blueprints_function(grid_size, optional_item)
 					display_name = Localize(display_name)
 					local desc_id = UISettings.attack_type_desc_lookup[attack_type] or data.desc
 					local desc = desc_id and Localize(desc_id) or ""
+
+					if desc ~= "" then
+						local desc_style = style.extra_information
+						local text_options = UIFonts.get_font_options_by_style(desc_style)
+						local text_size = {
+							desc_style.size[1],
+							2000
+						}
+						local _, text_height = UIRenderer.text_size(ui_renderer, desc, desc_style.font_type, desc_style.font_size, text_size, text_options)
+						desc_size = math.max(min_desc_size, text_height) - min_desc_size
+					end
+
 					content.attack_type_icon = attack_type_icon
 					content.attack_type_name = display_name
 					content.attack_type_desc = desc
@@ -1496,6 +1510,14 @@ local function generate_blueprints_function(grid_size, optional_item)
 
 		content.current_attack_index = attack_index
 		content.current_chain_index = chain_index
+		local original_offset = 115
+		local original_bottom_size = 160
+		local original_top_size = 150
+		style.tile_top.size[2] = original_top_size + desc_size
+		style.corner_top.size[2] = original_top_size + desc_size
+		style.tile_bottom.offset[2] = original_offset + desc_size
+		style.corner_bottom.offset[2] = original_offset + desc_size
+		style.detailed_bottom.size[2] = original_bottom_size + desc_size
 	end
 
 	local function _update_connection_line(old_attack_index, old_chain_index, new_attack_index, new_chain_index, content, style)
@@ -1658,7 +1680,8 @@ local function generate_blueprints_function(grid_size, optional_item)
 						10 + base_offset_y,
 						3
 					},
-					text_color = Color.terminal_text_body(255, true)
+					text_color = Color.terminal_text_body(255, true),
+					preview_color = Color.ui_blue_light(255, true)
 				})
 			}
 			pass_templates[#pass_templates + 1] = {
@@ -2025,10 +2048,10 @@ local function generate_blueprints_function(grid_size, optional_item)
 		local start_preview_expertise = content.start_expertise_value
 		local current_preview_expertise = content.preview_expertise_value and math.max(content.preview_expertise_value - start_preview_expertise, 0) or 0
 		local max_preview_expertise = Items.max_expertise_level() - start_preview_expertise
-		local current_expertise = Items.expertise_level(item, true)
-		local is_preview = current_preview_expertise > 0
+		local disable_preview = content.disable_preview
+		local is_preview = current_preview_expertise > 0 and not disable_preview
 		content.show_glow = is_preview
-		local added_stats = Items.preview_stats_change(item, current_preview_expertise, comparing_stats)
+		local added_stats = Items.preview_stats_change(item, is_preview and current_preview_expertise or 0, comparing_stats)
 		local max_stats = Items.preview_stats_change(item, max_preview_expertise, comparing_stats)
 		local num_stats = #comparing_stats
 
@@ -2042,17 +2065,18 @@ local function generate_blueprints_function(grid_size, optional_item)
 			local divider_1_id = "divider_1_" .. ii
 			local divider_2_id = "divider_2_" .. ii
 			local percentage_id = "percentage_" .. ii
-			widget.content.text = Localize(stat_data.display_name)
+			local display_name = Localize(stat_data.display_name)
+			widget.content.text = display_name
 			local value_bar_width = math.round(bar_width * stat.fraction)
 			local bar_style = style[bar_id]
 			bar_style.size[1] = value_bar_width
 			bar_style.color = is_preview and bar_style.preview_color or bar_style.default_color
-			local display_name = Localize(stat_data.display_name)
 			content[text_id] = display_name
 			local stat_value_string = stat.value
+			local text_style = style[text_id]
 
 			if is_preview then
-				stat_value_string = Text.apply_color_to_text(stat_value_string, Color.ui_blue_light(255, true))
+				stat_value_string = Text.apply_color_to_text(stat_value_string, text_style.preview_color)
 			end
 
 			content[percentage_id] = string.format("[%s/%d]%%", stat_value_string, max_stat.value)
@@ -3306,7 +3330,11 @@ local function generate_blueprints_function(grid_size, optional_item)
 				local total_stats = content.element.show_base_rating and 6 or 5
 				local item = content.element.item
 
-				_apply_stat_bar_values(widget, item)
+				if content.preview_expertise_value ~= content.new_preview_expertise_value then
+					content.preview_expertise_value = content.new_preview_expertise_value
+
+					_apply_stat_bar_values(widget, item)
+				end
 
 				if not content.element.interactive then
 					return
@@ -3451,7 +3479,7 @@ local function generate_blueprints_function(grid_size, optional_item)
 				local perk_item = element.perk_item
 				local perk_value = element.perk_value
 				local perk_rarity = element.perk_rarity
-				local description = Items.perk_description(perk_item, perk_rarity, perk_value)
+				local description = Items.trait_description(perk_item, perk_rarity, perk_value)
 				local text_height = _style_text_height(description, weapon_perk_style, ui_renderer)
 				local entry_height = math.max(weapon_perk_style.font_size + 8, text_height + 14)
 
@@ -3568,7 +3596,7 @@ local function generate_blueprints_function(grid_size, optional_item)
 				local perk_item = preview_perk and preview_perk.preview_perk_item or element.perk_item
 				local perk_value = preview_perk and preview_perk.preview_perk_value or element.perk_value
 				local perk_rarity = preview_perk and preview_perk.preview_perk_rarity or element.perk_rarity
-				local description = Items.perk_description(perk_item, perk_rarity, perk_value)
+				local description = Items.trait_description(perk_item, perk_rarity, perk_value)
 				content.text = description
 				content.rank = Items.perk_textures(perk_item, perk_rarity)
 
@@ -5193,6 +5221,7 @@ local function generate_blueprints_function(grid_size, optional_item)
 			pass_template = {
 				{
 					value = "content/ui/materials/frames/frame_tile_1px",
+					style_id = "tile_top",
 					pass_type = "texture",
 					style = {
 						vertical_alignment = "top",
@@ -5211,6 +5240,7 @@ local function generate_blueprints_function(grid_size, optional_item)
 				},
 				{
 					value = "content/ui/materials/frames/frame_corner_2px",
+					style_id = "corner_top",
 					pass_type = "texture",
 					style = {
 						vertical_alignment = "top",
@@ -5229,6 +5259,7 @@ local function generate_blueprints_function(grid_size, optional_item)
 				},
 				{
 					value = "content/ui/materials/frames/frame_tile_1px",
+					style_id = "tile_bottom",
 					pass_type = "texture",
 					style = {
 						vertical_alignment = "top",
@@ -5247,6 +5278,7 @@ local function generate_blueprints_function(grid_size, optional_item)
 				},
 				{
 					value = "content/ui/materials/frames/frame_corner_2px",
+					style_id = "corner_bottom",
 					pass_type = "texture",
 					style = {
 						vertical_alignment = "top",
@@ -5265,6 +5297,7 @@ local function generate_blueprints_function(grid_size, optional_item)
 				},
 				{
 					value = "content/ui/materials/frames/line_thin_detailed_01",
+					style_id = "detailed_bottom",
 					pass_type = "texture",
 					style = {
 						vertical_alignment = "top",

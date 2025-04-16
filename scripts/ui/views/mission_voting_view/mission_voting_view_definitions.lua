@@ -95,11 +95,7 @@ local mission_info_top_panel_size = {
 }
 local title_bar_size = {
 	outer_panel_size[1],
-	80
-}
-local mission_circumstance_size = {
-	mission_info_size[1],
-	71
+	99
 }
 local details_panel_size = {
 	inner_panel_size[1],
@@ -113,17 +109,9 @@ local scrollbar_size = {
 	10,
 	details_panel_size[2] - 40
 }
-local accept_button_size = {
-	440,
-	78
-}
 local timer_bar_size = {
 	310,
 	10
-}
-local secondary_button_size = {
-	398,
-	64
 }
 local title_bar_bottom_size = {
 	zone_image_panel_size[1],
@@ -160,20 +148,10 @@ local mission_info_panel_position = {
 	50,
 	3
 }
-local mission_type_position = {
-	0,
-	50,
-	4
-}
 local mission_summary_position = {
 	0,
 	20,
 	4
-}
-local mission_difficulty_challenge_position = {
-	0,
-	15,
-	1
 }
 local details_button_position = {
 	0,
@@ -192,7 +170,7 @@ local zone_image_bottom_fade_position = {
 }
 local reward_main_mission_position = {
 	0,
-	10,
+	18,
 	10
 }
 local timer_bar_position = {
@@ -245,25 +223,10 @@ local mission_difficulty_position = {
 	0,
 	4
 }
-local mission_circumstance_position = {
-	0,
-	0,
-	0
-}
 local footer_position = {
 	0,
 	0,
 	25
-}
-local player_portrait_position = {
-	18,
-	26,
-	15
-}
-local mission_difficulty_extra_offset = {
-	0,
-	20,
-	0
 }
 local details_panel_position = {
 	0,
@@ -521,7 +484,7 @@ local scenegraph_definition = {
 		parent = "zone_image_panel",
 		horizontal_alignment = "center",
 		size = {
-			49.6,
+			0,
 			49.6
 		},
 		position = {
@@ -576,6 +539,14 @@ local widget_definitions = {
 			pass_type = "text",
 			value = Managers.localization:localize("loc_mission_voting_view_title"),
 			style = ViewStyles.title_font_style
+		}
+	}, "title_bar"),
+	initiator = UIWidget.create_definition({
+		{
+			value = "",
+			value_id = "initiator_text",
+			pass_type = "text",
+			style = ViewStyles.initiator_font_style
 		}
 	}, "title_bar"),
 	title_bar_bottom = UIWidget.create_definition({
@@ -725,9 +696,29 @@ local mission_info_widget_definitions = {
 			style = {
 				vertical_alignment = "center",
 				horizontal_alignment = "left",
-				color = Color.terminal_text_header(255, true),
+				color = Color.terminal_text_body(255, true),
 				offset = {
 					-20,
+					10,
+					1
+				},
+				size = {
+					50,
+					50
+				}
+			}
+		},
+		{
+			value_id = "danger_icon_drop_shadow",
+			style_id = "danger_icon_drop_shadow",
+			pass_type = "texture",
+			value = "content/ui/materials/icons/generic/danger",
+			style = {
+				vertical_alignment = "center",
+				horizontal_alignment = "left",
+				color = Color.black(255, true),
+				offset = {
+					-18,
 					10,
 					0
 				},
@@ -746,6 +737,23 @@ local mission_info_widget_definitions = {
 			value = "content/ui/materials/backgrounds/default_square",
 			style_id = "difficulty_icon",
 			pass_type = "multi_texture"
+		},
+		{
+			value = "content/ui/materials/icons/generic/havoc_chevron",
+			style_id = "rankup_icon_background",
+			pass_type = "multi_texture"
+		},
+		{
+			value = "content/ui/materials/icons/generic/havoc_chevron",
+			style_id = "rankup_icon",
+			pass_type = "multi_texture"
+		},
+		{
+			value_id = "rank_text",
+			style_id = "rank_text",
+			pass_type = "text",
+			value = "",
+			style = ViewStyles.rank_text_font_style
 		}
 	}, "mission_danger_level", nil, nil, ViewStyles.difficulty),
 	rewards_text = UIWidget.create_definition({

@@ -3,12 +3,11 @@ local behavior_gestalts = BotSettings.behavior_gestalts
 
 local function training_ground_bot_profiles(all_profiles)
 	all_profiles.bot_training_grounds = {
-		gender = "male",
-		selected_voice = "veteran_male_a",
-		archetype = "veteran",
-		name_list_id = "male_names_1",
 		current_level = 1,
-		specialization = "veteran_2",
+		selected_voice = "veteran_male_a",
+		gender = "male",
+		name_list_id = "male_names_1",
+		archetype = "veteran",
 		loadout = {
 			slot_body_hair = "content/items/characters/player/human/hair/empty_hair",
 			slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_black_01",

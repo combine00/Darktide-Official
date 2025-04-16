@@ -1,6 +1,8 @@
 local ButtonPassTemplates = require("scripts/ui/pass_templates/button_pass_templates")
 local Items = require("scripts/utilities/items")
+local LoadingStateData = require("scripts/ui/loading_state_data")
 local MasterItems = require("scripts/backend/master_items")
+local Offer = require("scripts/utilities/offer")
 local Promise = require("scripts/foundation/utilities/promise")
 local ScriptWorld = require("scripts/foundation/utilities/script_world")
 local StoreViewContentBlueprints = require("scripts/ui/views/store_view/store_view_content_blueprints")
@@ -615,65 +617,6 @@ function StoreView:_is_owned(items)
 	return total_count == owned_count, owned_items
 end
 
-function StoreView:_extract_items(offer)
-	local offer_type = offer.description.type
-	local items = {}
-
-	if offer_type == "bundle" then
-		local bundle_info = offer.bundleInfo
-
-		for i = 1, #bundle_info do
-			local bundle_offer = bundle_info[i]
-			local real_item, item = self:_extract_item(bundle_offer.description)
-			items[#items + 1] = {
-				real_item = real_item,
-				gearId = bundle_offer.description.gearId,
-				item = item,
-				offer = bundle_offer
-			}
-		end
-	else
-		local real_item, item = self:_extract_item(offer.description)
-		items[#items + 1] = {
-			real_item = real_item,
-			gearId = offer.description.gearId,
-			item = item,
-			offer = offer
-		}
-	end
-
-	return items
-end
-
-function StoreView:_extract_item(description)
-	local modified_desciption = table.clone(description)
-	modified_desciption.gear_id = description.gearId
-	local item = MasterItems.get_store_item_instance(modified_desciption)
-
-	if not item then
-		return
-	end
-
-	local visual_item = nil
-	local item_type = item.item_type
-
-	if item_type == "WEAPON_SKIN" then
-		visual_item = Items.weapon_skin_preview_item(item)
-	elseif item_type == "WEAPON_TRINKET" then
-		visual_item = Items.weapon_trinket_preview_item(item)
-
-		if visual_item and not visual_item.slots then
-			visual_item.slots = {
-				"slot_trinket_1"
-			}
-		end
-	end
-
-	visual_item = visual_item or item
-
-	return item, visual_item
-end
-
 function StoreView:_fill_layout_with_offers(pages, offers, bundle_rules)
 	self:_unload_url_textures()
 
@@ -706,7 +649,7 @@ function StoreView:_fill_layout_with_offers(pages, offers, bundle_rules)
 			if bundle_info then
 				local starting_price = offer.price and offer.price.amount.amount or 0
 				local discounted_price = starting_price
-				local items = self:_extract_items(offer)
+				local items = Offer.extract_items(offer)
 				local _, owned_items = self:_is_owned(items)
 
 				if #owned_items > 0 then
@@ -1096,8 +1039,6 @@ function StoreView:_destroy_aquilas_presentation()
 end
 
 function StoreView:_fetch_storefront(storefront, on_complete_callback)
-	self:_destroy_current_grid()
-
 	local storefront_request_id = self._storefront_request_id + 1
 	self._storefront_request_id = storefront_request_id
 
@@ -1123,7 +1064,11 @@ function StoreView:_fetch_storefront(storefront, on_complete_callback)
 	end
 
 	return self._store_promise:next(function (data)
+		self:_destroy_current_grid()
+
 		if storefront_request_id ~= self._storefront_request_id or not self._store_promise or not data then
+			self._store_promise = nil
+
 			return
 		end
 
@@ -1186,7 +1131,7 @@ function StoreView:_fetch_storefront(storefront, on_complete_callback)
 
 		local layout_config = data.layout_config
 
-		if not layout_config.layout then
+		if not layout_config or not layout_config.layout then
 			local layout = {
 				pages = {
 					{
@@ -1504,7 +1449,7 @@ function StoreView:_handle_input(input_service)
 	local using_cursor = self._using_cursor_navigation
 
 	if not using_cursor then
-		if input_service:get("hotkey_menu_special_1") and not self._aquila_open then
+		if input_service:get("hotkey_menu_special_1") and not self._aquila_open and not self._widgets_by_name.aquila_button.content.hotspot.disabled then
 			self:_play_sound(UISoundEvents.default_click)
 
 			local on_complete_callback = callback(self, "setup_aquila_store")
@@ -1552,9 +1497,22 @@ function StoreView:update(dt, t, input_service)
 	if self._store_promise or self._purchase_promise then
 		input_service = input_service:null_service()
 		self._widgets_by_name.loading.content.visible = true
+
+		if not self._show_loading then
+			Managers.event:trigger("event_start_waiting")
+		end
+
+		Managers.event:trigger("event_set_waiting_state", LoadingStateData.WAIT_REASON.store)
+
+		local wait_reason, _, text_opacity = Managers.ui:current_wait_info()
+		self._widgets_by_name.loading.content.text = wait_reason or ""
+		self._widgets_by_name.loading.style.text.text_color[1] = text_opacity
 		self._show_loading = true
 	elseif self._show_loading then
 		self._show_loading = false
+
+		Managers.event:trigger("event_stop_waiting")
+
 		self._widgets_by_name.loading.content.visible = false
 	end
 

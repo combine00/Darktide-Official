@@ -46,18 +46,18 @@ local talent_builder_view_settings = {
 		}
 	},
 	node_gradient_colors = {
+		"content/ui/textures/color_ramps/class_node_colors/ogryn_01",
+		"content/ui/textures/color_ramps/class_node_colors/ogryn_02",
+		"content/ui/textures/color_ramps/class_node_colors/ogryn_03",
+		"content/ui/textures/color_ramps/class_node_colors/psyker_01",
+		"content/ui/textures/color_ramps/class_node_colors/psyker_02",
+		"content/ui/textures/color_ramps/class_node_colors/psyker_03",
 		"content/ui/textures/color_ramps/class_node_colors/veteran_01",
 		"content/ui/textures/color_ramps/class_node_colors/veteran_02",
 		"content/ui/textures/color_ramps/class_node_colors/veteran_03",
 		"content/ui/textures/color_ramps/class_node_colors/zealot_01",
 		"content/ui/textures/color_ramps/class_node_colors/zealot_02",
-		"content/ui/textures/color_ramps/class_node_colors/zealot_03",
-		"content/ui/textures/color_ramps/class_node_colors/psyker_01",
-		"content/ui/textures/color_ramps/class_node_colors/psyker_02",
-		"content/ui/textures/color_ramps/class_node_colors/psyker_03",
-		"content/ui/textures/color_ramps/class_node_colors/ogryn_01",
-		"content/ui/textures/color_ramps/class_node_colors/ogryn_02",
-		"content/ui/textures/color_ramps/class_node_colors/ogryn_03"
+		"content/ui/textures/color_ramps/class_node_colors/zealot_03"
 	},
 	settings_by_node_type = {
 		start = {
@@ -210,21 +210,21 @@ local talent_builder_view_settings = {
 		}
 	},
 	starting_talent_nodes_offset_by_name = {
-		veteran = {
-			60,
+		ogryn = {
+			2,
 			-20
 		},
 		psyker = {
 			33,
 			-25
 		},
+		veteran = {
+			60,
+			-20
+		},
 		zealot = {
 			-30,
 			35
-		},
-		ogryn = {
-			2,
-			-20
 		}
 	},
 	starting_points_material_by_name = {
@@ -266,7 +266,7 @@ local talent_builder_view_settings = {
 		}
 	},
 	glow_colors_by_class = {
-		veteran = {
+		psyker = {
 			line_chosen = {
 				fill_color = {
 					255,
@@ -296,7 +296,37 @@ local talent_builder_view_settings = {
 				}
 			}
 		},
-		psyker = {
+		ogryn = {
+			line_chosen = {
+				fill_color = {
+					255,
+					224,
+					250,
+					255
+				},
+				blur_color = {
+					255,
+					99,
+					167,
+					176
+				}
+			},
+			line_available = {
+				fill_color = {
+					255,
+					39,
+					74,
+					78
+				},
+				blur_color = {
+					127,
+					42,
+					55,
+					59
+				}
+			}
+		},
+		veteran = {
 			line_chosen = {
 				fill_color = {
 					255,
@@ -336,36 +366,6 @@ local talent_builder_view_settings = {
 				},
 				blur_color = {
 					150,
-					99,
-					167,
-					176
-				}
-			},
-			line_available = {
-				fill_color = {
-					255,
-					39,
-					74,
-					78
-				},
-				blur_color = {
-					127,
-					42,
-					55,
-					59
-				}
-			}
-		},
-		ogryn = {
-			line_chosen = {
-				fill_color = {
-					255,
-					224,
-					250,
-					255
-				},
-				blur_color = {
-					255,
 					99,
 					167,
 					176

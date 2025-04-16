@@ -84,9 +84,7 @@ function HazardPropSystem:extensions_ready(world, unit)
 end
 
 function HazardPropSystem:on_gameplay_post_init(level)
-	if self._is_server then
-		self:_populate_hazard_props()
-	end
+	self:_populate_hazard_props()
 end
 
 function HazardPropSystem:_shuffle(source)
@@ -94,7 +92,27 @@ function HazardPropSystem:_shuffle(source)
 	self._seed = table.shuffle(source, seed)
 end
 
+function HazardPropSystem:re_populate_hazard_props()
+	if not self._is_server then
+		return
+	end
+
+	local props = self._prop_extensions
+	local num_props = #props
+	local idle_state = HazardPropSettings.hazard_state.idle
+
+	for i = 1, num_props do
+		props[i]:set_current_state(idle_state)
+	end
+
+	self:_populate_hazard_props()
+end
+
 function HazardPropSystem:_populate_hazard_props()
+	if not self._is_server then
+		return
+	end
+
 	local props = self._prop_extensions
 	local num_props = #props
 
@@ -114,7 +132,7 @@ function HazardPropSystem:_populate_hazard_props()
 		end
 
 		local hazard_pool = {}
-		local remainders = {}
+		local remainder = {}
 
 		for hazard_type, weight in pairs(hazard_weight) do
 			local percentage_of_pool = weight / total_weight
@@ -124,11 +142,11 @@ function HazardPropSystem:_populate_hazard_props()
 				hazard_pool[#hazard_pool + 1] = hazard_type
 			end
 
-			remainders[hazard_type] = count % 1
+			remainder[hazard_type] = count % 1
 		end
 
 		if num_props > #hazard_pool then
-			local fillers = self:_sort_remainders(remainders)
+			local fillers = self:_sort_remainders(remainder)
 
 			for i = 1, #fillers do
 				if num_props > #hazard_pool then

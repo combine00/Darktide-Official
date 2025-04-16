@@ -39,6 +39,7 @@ local PresenceManagerDummy = require("scripts/managers/presence/presence_manager
 local ProfileSynchronizationManager = require("scripts/managers/loading/profile_synchronization_manager")
 local ProgressionManager = require("scripts/managers/progression/progression_manager")
 local Promise = require("scripts/foundation/utilities/promise")
+local PS5UDSManager = require("scripts/managers/ps5_uds/ps5_uds_manager")
 local SaveManager = nil
 
 if IS_PLAYSTATION then
@@ -102,7 +103,7 @@ function StateGame:on_enter(parent, params)
 		Managers.telemetry_events:system_settings()
 	end
 
-	if not IS_XBS then
+	if not IS_XBS and not IS_PLAYSTATION then
 		Managers.save:load()
 	end
 
@@ -116,7 +117,7 @@ function StateGame:on_enter(parent, params)
 		state_change_callbacks.PresenceManager = callback(Managers.presence, "cb_on_game_state_change")
 	end
 
-	self._sm = GameStateMachine:new(self, start_state, start_params, creation_context, state_change_callbacks, "Game", true)
+	self._sm = GameStateMachine:new(self, start_state, start_params, creation_context, state_change_callbacks, "Main", "Game", true)
 
 	if Managers.ui then
 		self._sm:register_on_state_change_callback("UIManager", callback(Managers.ui, "cb_on_game_state_change"))
@@ -139,7 +140,7 @@ function StateGame:on_enter(parent, params)
 	local program_name = string.format("darktide-%s-%s", app_type, tostring(APPLICATION_SETTINGS.content_revision))
 
 	Profiler.set_program_name(program_name)
-	Managers.event:register(self, "on_suspend", "_on_suspend")
+	Managers.event:register(self, "on_pre_suspend", "_on_pre_suspend")
 end
 
 local function _connection_options(is_dedicated_hub_server, is_dedicated_mission_server)
@@ -252,7 +253,12 @@ function StateGame:_init_managers(package_manager, localization_manager, event_d
 		Managers.presence = PresenceManagerDummy:new()
 	end
 
-	Managers.stats = StatsManager:new(not DEDICATED_SERVER, event_delegate)
+	if IS_PLAYSTATION then
+		Managers.ps5_uds = PS5UDSManager:new()
+	end
+
+	local is_stat_client = not DEDICATED_SERVER
+	Managers.stats = StatsManager:new(is_stat_client, event_delegate)
 	local use_batched_saving = is_dedicated_mission_server and GameParameters.save_achievements_in_batch
 	local broadcast_unlocks = is_dedicated_mission_server
 	Managers.achievements = AchievementsManager:new(not DEDICATED_SERVER, event_delegate, use_batched_saving, broadcast_unlocks)
@@ -283,7 +289,7 @@ function StateGame:_init_managers(package_manager, localization_manager, event_d
 	end
 end
 
-function StateGame:on_exit(on_shutdown)
+function StateGame:on_exit(exit_params)
 	if not DEDICATED_SERVER then
 		Managers.wwise_game_sync:set_game_state_machine(nil)
 	end
@@ -296,9 +302,9 @@ function StateGame:on_exit(on_shutdown)
 		self._sm:unregister_on_state_change_callback("PresenceManager")
 	end
 
-	self._sm:delete(on_shutdown)
+	self._sm:delete(exit_params)
 	self._vo_sources_cache:destroy()
-	Managers.event:unregister(self, "on_suspend")
+	Managers.event:unregister(self, "on_pre_suspend")
 	Managers:destroy()
 	self._approve_channel_delegate:delete()
 	self._event_delegate:delete()
@@ -331,6 +337,7 @@ function StateGame:update(dt)
 
 	if IS_PLAYSTATION then
 		Managers.save:update()
+		Managers.ps5_uds:update(dt)
 	end
 
 	if GameParameters.testify then
@@ -450,11 +457,14 @@ function StateGame:state_machine()
 	return self._sm
 end
 
-function StateGame:_on_suspend()
+function StateGame:_on_pre_suspend()
 	local error_state = CLASSES.StateError
 	local params = {}
+	local exit_params = {
+		on_suspend = true
+	}
 
-	self._sm:force_change_state(error_state, params)
+	self._sm:force_change_state(error_state, params, exit_params)
 end
 
 return StateGame

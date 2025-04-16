@@ -251,6 +251,54 @@ local weapon_charge_templates = {
 		use_charge = true,
 		warp_charge_percent = 0.08
 	},
+	forcesword_2h_p1_m1_weapon_special = {
+		charge_duration = 3.1,
+		charge_on_action_start = true,
+		full_charge_warp_charge_percent = 0.025,
+		warp_charge_percent = {
+			lerp_perfect = 0.25,
+			lerp_basic = 0.65
+		}
+	},
+	powersword_2h_p1_m1_weapon_special = {
+		overheat_overtime = {
+			fully_charged_charge_level = 0.525,
+			full_charge_overheat_percent = 0.025,
+			limit_max_charge_to_ammo_clip = true,
+			charge_duration = 1,
+			charge_on_action_start = true,
+			min_charge = 0.05,
+			overheat_percent = {
+				lerp_perfect = 0.03,
+				lerp_basic = 0.05
+			}
+		},
+		overheat_swing = {
+			use_charge = true,
+			lockout_enabled = true,
+			overheat_percent = {
+				lerp_perfect = 0.03,
+				lerp_basic = 0.1
+			}
+		},
+		overheat_decay = {
+			auto_vent_delay = 1,
+			low_threshold_decay_rate_modifier = 1.5,
+			vent_interval = 0.25,
+			high_threshold_decay_rate_modifier = 1,
+			vent_duration = 2,
+			critical_threshold_decay_rate_modifier = 0.5,
+			thresholds = {
+				high = 0.7,
+				critical = 0.9,
+				low = 0.3
+			},
+			auto_vent_duration = {
+				lerp_perfect = 8,
+				lerp_basic = 14
+			}
+		}
+	},
 	chain_lightning_ability_spread = {
 		charge_duration = 0.1,
 		charge_on_action_start = true,

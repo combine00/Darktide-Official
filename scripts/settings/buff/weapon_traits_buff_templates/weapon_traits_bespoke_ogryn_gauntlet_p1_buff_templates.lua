@@ -91,11 +91,14 @@ templates.weapon_trait_bespoke_ogryn_gauntlet_p1_chained_melee_hits_increases_po
 }
 templates.weapon_trait_bespoke_ogryn_gauntlet_p1_chained_melee_hits_increases_power_child = table.clone(BaseWeaponTraitBuffTemplates.chained_hits_increases_power_child)
 templates.weapon_trait_bespoke_ogryn_gauntlet_p1_melee_power_after_ranged_explosion = {
-	allow_proc_while_active = true,
 	predicted = false,
+	allow_proc_while_active = true,
 	max_stacks = 1,
 	class_name = "proc_buff",
 	active_duration = 4,
+	buff_data = {
+		required_num_hits = 3
+	},
 	proc_events = {
 		[proc_events.on_explosion_hit] = 1
 	},
@@ -119,10 +122,13 @@ templates.weapon_trait_bespoke_ogryn_gauntlet_p1_melee_power_after_ranged_explos
 	end
 }
 templates.weapon_trait_bespoke_ogryn_gauntlet_p1_power_bonus_after_weapon_special_multiple = {
-	allow_proc_while_active = true,
 	predicted = false,
+	allow_proc_while_active = true,
 	class_name = "proc_buff",
 	active_duration = 6,
+	buff_data = {
+		required_num_hits = 3
+	},
 	proc_events = {
 		[proc_events.on_explosion_hit] = 1
 	},

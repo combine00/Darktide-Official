@@ -56,6 +56,10 @@ function PsykerThrowingKnivesEffects:init(context, slot, weapon_template, fx_sou
 end
 
 function PsykerThrowingKnivesEffects:fixed_update(unit, dt, t)
+	return
+end
+
+function PsykerThrowingKnivesEffects:update(unit, dt, t, frame)
 	self._remaining_ability_charges = self._ability_extension:remaining_ability_charges("grenade_ability")
 	self._t = t
 	local any_visible = self:_update_ammo_count(t)
@@ -65,10 +69,6 @@ function PsykerThrowingKnivesEffects:fixed_update(unit, dt, t)
 	else
 		self:_destroy_passive_sfx()
 	end
-end
-
-function PsykerThrowingKnivesEffects:update(unit, dt, t, frame)
-	return
 end
 
 function PsykerThrowingKnivesEffects:update_first_person_mode(first_person_mode)

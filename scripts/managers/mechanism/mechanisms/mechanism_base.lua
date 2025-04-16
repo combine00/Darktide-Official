@@ -33,6 +33,10 @@ function MechanismBase:profile_changes_are_allowed()
 	return true
 end
 
+function MechanismBase:mechanism_data()
+	return self._mechanism_data
+end
+
 function MechanismBase:_set_state(state)
 	Log.info("MechanismBase", "Mechanism %s changing state %s -> %s", self.name, self._state, state)
 

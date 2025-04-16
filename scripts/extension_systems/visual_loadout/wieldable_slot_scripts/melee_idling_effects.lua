@@ -17,7 +17,7 @@ function MeleeIdlingEffects:init(context, slot, weapon_template, fx_sources)
 end
 
 function MeleeIdlingEffects:destroy()
-	self:_stop_sfx()
+	self:_stop_sfx(true)
 end
 
 function MeleeIdlingEffects:wield()
@@ -33,11 +33,17 @@ function MeleeIdlingEffects:fixed_update(unit, dt, t, frame)
 end
 
 function MeleeIdlingEffects:update(unit, dt, t)
-	return
+	if not self._looping_playing_id then
+		self:_start_sfx()
+	end
 end
 
 function MeleeIdlingEffects:update_first_person_mode(first_person_mode)
-	return
+	if self._first_person_mode ~= first_person_mode then
+		self:_stop_sfx(true)
+
+		self._first_person_mode = first_person_mode
+	end
 end
 
 function MeleeIdlingEffects:_start_sfx()
@@ -45,7 +51,7 @@ function MeleeIdlingEffects:_start_sfx()
 	local should_play_husk_effect = self._fx_extension:should_play_husk_effect()
 	local resolved, event_name, resolved_stop, stop_event_name = visual_loadout_extension:resolve_looping_gear_sound(LOOPING_SOUND_ALIAS, should_play_husk_effect, _sfx_external_properties)
 
-	if resolved then
+	if resolved and not self._looping_playing_id then
 		local sfx_source_id = self._fx_extension:sound_source(self._fx_source_name)
 		local playing_id = WwiseWorld.trigger_resource_event(self._wwise_world, event_name, sfx_source_id)
 		self._looping_playing_id = playing_id
@@ -56,14 +62,14 @@ function MeleeIdlingEffects:_start_sfx()
 	end
 end
 
-function MeleeIdlingEffects:_stop_sfx()
+function MeleeIdlingEffects:_stop_sfx(force_stop)
 	local looping_playing_id = self._looping_playing_id
 	local looping_stop_event_name = self._looping_stop_event_name
 	local sfx_source_id = self._fx_extension:sound_source(self._fx_source_name)
 
-	if looping_stop_event_name and sfx_source_id then
+	if not force_stop and looping_stop_event_name and sfx_source_id then
 		WwiseWorld.trigger_resource_event(self._wwise_world, looping_stop_event_name, sfx_source_id)
-	else
+	elseif self._looping_playing_id then
 		WwiseWorld.stop_event(self._wwise_world, looping_playing_id)
 	end
 

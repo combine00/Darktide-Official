@@ -1,5 +1,6 @@
 local Promise = require("scripts/foundation/utilities/promise")
 local PSNRestrictions = class("PSNRestrictions")
+local verify_premium_header = "verify_premium"
 
 local function _check_premium()
 	local request_started = false
@@ -112,7 +113,10 @@ function PSNRestrictions:psn_signin()
 		if Playstation.signed_in(PS5.initial_user_id()) then
 			return Promise.resolved()
 		else
-			return Promise.rejected({})
+			return Promise.rejected({
+				message = "loc_psn_not_connected",
+				header = "PSNRestrictions:psn_signin"
+			})
 		end
 	end)
 end
@@ -126,7 +130,10 @@ function PSNRestrictions:verify_premium()
 				if status.success then
 					return Promise.resolved()
 				else
-					return Promise.rejected({})
+					return Promise.rejected({
+						message = "loc_psn_premium_fail_desc",
+						header = verify_premium_header
+					})
 				end
 			end)
 		end
@@ -141,6 +148,10 @@ function PSNRestrictions:fetch_communication_restrictions(web_api, account_id)
 	local content = nil
 
 	return web_api:send_request(user_id, api_group, path, method, content)
+end
+
+function PSNRestrictions:verify_premium_header()
+	return verify_premium_header
 end
 
 return PSNRestrictions

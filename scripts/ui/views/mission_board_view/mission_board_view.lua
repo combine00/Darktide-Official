@@ -5,7 +5,7 @@ local MissionTypes = require("scripts/settings/mission/mission_types")
 local MissionTemplates = require("scripts/settings/mission/mission_templates")
 local MissionObjectiveTemplates = require("scripts/settings/mission_objective/mission_objective_templates")
 local DialogueSpeakerVoiceSettings = require("scripts/settings/dialogue/dialogue_speaker_voice_settings")
-local DangerSettings = require("scripts/settings/difficulty/danger_settings")
+local Danger = require("scripts/utilities/danger")
 local CircumstanceTemplates = require("scripts/settings/circumstance/circumstance_templates")
 local Zones = require("scripts/settings/zones/zones")
 local BackendUtilities = require("scripts/foundation/managers/backend/utilities/backend_utilities")
@@ -15,6 +15,7 @@ local InputUtils = require("scripts/managers/input/input_utils")
 local MissionUtilities = require("scripts/utilities/ui/mission")
 local PlayerProgressionUnlocks = require("scripts/settings/player/player_progression_unlocks")
 local Promise = require("scripts/foundation/utilities/promise")
+local PromiseContainer = require("scripts/utilities/ui/promise_container")
 local RegionLocalizationMappings = require("scripts/settings/backend/region_localization")
 local TextUtils = require("scripts/utilities/ui/text")
 local UIFonts = require("scripts/managers/ui/ui_fonts")
@@ -57,13 +58,13 @@ local mission_type_data = {
 		display_style = mission_type_auric_font
 	}
 }
-local service_type = "View"
-local gamepad_action_navigate_secondary_left = "navigate_secondary_left_pressed"
-local alias_key_navigate_secondary_left = Managers.ui:get_input_alias_key(gamepad_action_navigate_secondary_left, service_type)
-local input_text_navigate_secondary_left = InputUtils.input_text_for_current_input_device(service_type, alias_key_navigate_secondary_left)
-local gamepad_action_navigate_secondary_right = "navigate_secondary_right_pressed"
-local alias_key_navigate_secondary_right = Managers.ui:get_input_alias_key(gamepad_action_navigate_secondary_right, service_type)
-local input_text_navigate_secondary_right = InputUtils.input_text_for_current_input_device(service_type, alias_key_navigate_secondary_right)
+
+local function _get_input_text(action)
+	local service_type = "View"
+	local alias_key = Managers.ui:get_input_alias_key(action, service_type)
+
+	return InputUtils.input_text_for_current_input_device(service_type, alias_key)
+end
 
 function MissionBoardView:init(settings, context)
 	MissionBoardView.super.init(self, MissionBoardViewDefinitions, settings, context)
@@ -71,7 +72,7 @@ function MissionBoardView:init(settings, context)
 	self._debug_draw_overlaps = true
 	self._mission_widgets = {}
 	self.can_start_mission = false
-	self._promises = {}
+	self._promise_container = PromiseContainer:new()
 	self._regions_latency = {}
 	self._backend_data_expiry_time = -1
 	self._has_queued_missions = false
@@ -432,8 +433,8 @@ function MissionBoardView:_generate_mission_type_selection()
 		{
 			value_id = "arrow_left_text",
 			pass_type = "text",
+			value = "<",
 			style_id = "arrow_left_text",
-			value = input_text_navigate_secondary_left,
 			style = {
 				font_size = 24,
 				text_vertical_alignment = "center",
@@ -460,8 +461,8 @@ function MissionBoardView:_generate_mission_type_selection()
 		{
 			value_id = "arrow_right_text",
 			pass_type = "text",
+			value = ">",
 			style_id = "arrow_right_text",
-			value = input_text_navigate_secondary_right,
 			style = {
 				font_size = 24,
 				text_vertical_alignment = "center",
@@ -566,6 +567,18 @@ function MissionBoardView:_generate_mission_type_selection()
 				local color = is_disabled and style.disabled_color or style.default_color
 
 				ColorUtilities.color_copy(color, style.color, true)
+			end
+		},
+		{
+			pass_type = "logic",
+			value = function (pass, ui_renderer, logic_style, content, position, size)
+				local gamepad_active = InputDevice.gamepad_active
+
+				if content.was_gamepad_active ~= gamepad_active then
+					content.was_gamepad_active = gamepad_active
+					content.arrow_left_text = gamepad_active and _get_input_text("navigate_secondary_left_pressed") or "<"
+					content.arrow_right_text = gamepad_active and _get_input_text("navigate_secondary_right_pressed") or ">"
+				end
 			end
 		}
 	}
@@ -698,11 +711,7 @@ function MissionBoardView:_generate_mission_type_selection()
 end
 
 function MissionBoardView:on_exit()
-	local promises = self._promises
-
-	for promise, _ in pairs(promises) do
-		promise:cancel()
-	end
+	self._promise_container:delete()
 
 	local mission_board_save_data = self._mission_board_save_data
 
@@ -841,7 +850,7 @@ function MissionBoardView:_handle_input(input_service, dt, t)
 	local flash_mission_widget = self._flash_mission_widget
 
 	if flash_mission_widget and flash_mission_widget.visible and flash_mission_widget.content.hotspot.on_pressed then
-		self:_set_selected_mission(flash_mission_widget.content.mission, true, true)
+		self:_set_selected_mission(flash_mission_widget.content.mission, true)
 	end
 
 	local story_mission_view_button = self._widgets_by_name.story_mission_view_button
@@ -1023,7 +1032,7 @@ function MissionBoardView:_update_can_start_mission()
 	else
 		local danger = self._quickplay_difficulty
 		local mission_mode = self._selected_mission_type
-		required_level = DangerSettings.required_level_by_mission_type(danger, mission_mode)
+		required_level = Danger.required_level_by_mission_type(danger, mission_mode)
 	end
 
 	local widgets_by_name = self._widgets_by_name
@@ -1231,6 +1240,7 @@ function MissionBoardView:_set_selected_quickplay(move_gamepad_cursor)
 	widget.style.speaker_corner.offset[2] = widget.content.size[2]
 	widget.style.speaker_icon.offset[2] = widget.content.size[2]
 	widget.offset[2] = self._ui_scenegraph.detail.size[2] + margin
+	self._widgets_by_name.difficulty_stepper_window.offset[2] = widget.offset[2] + widget.content.size[2] + margin
 	self._widgets_by_name.difficulty_stepper.offset[2] = widget.offset[2] + widget.content.size[2] + margin
 	self._widgets_by_name.objective_2.visible = false
 	self._widgets_by_name.difficulty_stepper.visible = true
@@ -1239,7 +1249,7 @@ function MissionBoardView:_set_selected_quickplay(move_gamepad_cursor)
 	self._widgets_by_name.play_team_button_legend.visible = true
 end
 
-function MissionBoardView:_set_selected_mission(mission, move_gamepad_cursor, is_flash)
+function MissionBoardView:_set_selected_mission(mission, move_gamepad_cursor)
 	self:_reset_selection()
 
 	self._selected_mission = mission
@@ -1266,7 +1276,7 @@ function MissionBoardView:_set_selected_mission(mission, move_gamepad_cursor, is
 	local xp = mission.xp
 	local credits = mission.credits
 	local mission_template = MissionTemplates[mission.map]
-	local danger = DangerSettings.calculate_danger(mission.challenge, mission.resistance)
+	local danger = Danger.calculate_danger(mission.challenge, mission.resistance)
 	local widget = self._widgets_by_name.detail
 	widget.dirty = true
 	widget.visible = true
@@ -1355,6 +1365,28 @@ function MissionBoardView:_set_selected_mission(mission, move_gamepad_cursor, is
 		end
 
 		self._bonus_widgets = nil
+	end
+
+	content.unlock_text = ""
+
+	if content.is_flash then
+		local narrative_manager = Managers.narrative
+		local narrative_story = "unlock_havoc"
+		local not_visited_chapter_name = "unlock_havoc_2"
+		local current_chapter = narrative_manager:current_chapter(narrative_story)
+		local current_chapter_name = current_chapter and current_chapter.name
+
+		if current_chapter_name == not_visited_chapter_name then
+			local havoc_info = Managers.data_service.havoc:get_settings()
+			local mission_type = self._selected_mission_type
+
+			if havoc_info.starting_rank and havoc_info.starting_rank[mission_type] then
+				local rank = havoc_info.starting_rank[mission_type]
+				content.unlock_text = Localize("loc_havoc_maelstrom_access", true, {
+					rank = rank
+				})
+			end
+		end
 	end
 
 	local vo_profile = mission.missionGiver or mission_template.mission_brief_vo.vo_profile
@@ -1640,7 +1672,7 @@ function MissionBoardView:_join_mission_data()
 
 			has_flash_mission_changed = true
 		else
-			local danger = DangerSettings.calculate_danger(mission.challenge, mission.resistance)
+			local danger = Danger.calculate_danger(mission.challenge, mission.resistance)
 			local position = self:_get_free_position(mission.displayIndex, danger)
 
 			if position then
@@ -1722,7 +1754,7 @@ function MissionBoardView:_populate_mission_widget(widget, mission, position, is
 	local location_image_material_values = style.location_image.material_values
 	location_image_material_values.texture_map = is_medium_widget and mission_template.texture_medium or mission_template.texture_small
 	location_image_material_values.show_static = is_locked and 1 or 0
-	local danger = DangerSettings.calculate_danger(mission.challenge, mission.resistance)
+	local danger = Danger.calculate_danger(mission.challenge, mission.resistance)
 	content.danger = danger
 	content.is_locked = is_locked
 	local completed_danger = self:_mission_highest_completed_danger(map)
@@ -1808,7 +1840,7 @@ function MissionBoardView:_update_fetch_missions(t)
 	end
 
 	self._is_fetching_missions = true
-	local missions_future = self:_cancel_promise_on_exit(Managers.data_service.mission_board:fetch(nil, 1))
+	local missions_future = self._promise_container:cancel_on_destroy(Managers.data_service.mission_board:fetch(nil, 1))
 
 	missions_future:next(function (mission_data)
 		return self:_update_bonus_rewards():next(function ()
@@ -1820,7 +1852,7 @@ function MissionBoardView:_update_fetch_missions(t)
 end
 
 function MissionBoardView:_update_bonus_rewards()
-	return self:_cancel_promise_on_exit(Managers.data_service.mission_board:get_rewards()):next(function (bonus_data)
+	return self._promise_container:cancel_on_destroy(Managers.data_service.mission_board:get_rewards()):next(function (bonus_data)
 		local filtered_bonus_data = {}
 
 		for mission_type, values in pairs(bonus_data) do
@@ -2275,11 +2307,11 @@ end
 function MissionBoardView:fetch_regions()
 	local region_promise = Managers.backend.interfaces.region_latency:get_region_latencies()
 
-	self:_cancel_promise_on_exit(region_promise):next(function (regions_data)
+	self._promise_container:cancel_on_destroy(region_promise):next(function (regions_data)
 		local prefered_region_promise = nil
 
 		if BackendUtilities.prefered_mission_region == "" then
-			prefered_region_promise = self:_cancel_promise_on_exit(Managers.backend.interfaces.region_latency:get_preferred_reef())
+			prefered_region_promise = self._promise_container:cancel_on_destroy(Managers.backend.interfaces.region_latency:get_preferred_reef())
 		else
 			prefered_region_promise = Promise.resolved()
 		end
@@ -2290,22 +2322,6 @@ function MissionBoardView:fetch_regions()
 			self._regions_latency = regions_latency
 		end)
 	end)
-end
-
-function MissionBoardView:_cancel_promise_on_exit(promise)
-	local promises = self._promises
-
-	if promise:is_pending() and not promises[promise] then
-		promises[promise] = true
-
-		promise:next(function ()
-			self._promises[promise] = nil
-		end, function ()
-			self._promises[promise] = nil
-		end)
-	end
-
-	return promise
 end
 
 function MissionBoardView:_on_group_finder_pressed()

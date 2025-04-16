@@ -110,10 +110,6 @@ local ogryn_b_ogryn_a = {
 			[1.0] = 1.90749,
 			[2.0] = 3.383125
 		},
-		sound_event_weights = {
-			[1.0] = 0.5,
-			[2.0] = 0.5
-		},
 		randomize_indexes = {}
 	},
 	combat_pause_quirk_killing_stopped_b = {

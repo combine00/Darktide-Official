@@ -1,4 +1,3 @@
-local Archetypes = require("scripts/settings/archetype/archetypes")
 local MinigameSettings = require("scripts/settings/minigame/minigame_settings")
 local TrainingGroundsSoundEvents = require("scripts/settings/training_grounds/training_grounds_sound_events")
 local UISoundEvents = require("scripts/settings/ui/ui_sound_events")
@@ -13,27 +12,7 @@ local views = {
 		load_always = true,
 		class = "SystemView",
 		disable_game_world = false,
-		load_in_hub = true,
 		close_on_hotkey_pressed = false,
-		enter_sound_events = {
-			UISoundEvents.system_menu_enter
-		},
-		exit_sound_events = {
-			UISoundEvents.system_menu_exit
-		},
-		wwise_states = {
-			options = WwiseGameSyncSettings.state_groups.options.ingame_menu
-		}
-	},
-	inbox_view = {
-		state_bound = true,
-		display_name = "loc_inbox_view_display_name",
-		path = "scripts/ui/views/inbox_view/inbox_view",
-		package = "packages/ui/views/inbox_view/inbox_view",
-		class = "InboxView",
-		disable_game_world = false,
-		load_in_hub = true,
-		game_world_blur = 1.1,
 		enter_sound_events = {
 			UISoundEvents.system_menu_enter
 		},
@@ -74,26 +53,6 @@ local views = {
 			UISoundEvents.default_menu_exit
 		}
 	},
-	discard_items_view = {
-		state_bound = true,
-		display_name = "loc_discard_items_view_display_name",
-		close_on_hotkey_pressed = true,
-		path = "scripts/ui/views/discard_items_view/discard_items_view",
-		package = "packages/ui/views/discard_items_view/discard_items_view",
-		class = "DiscardItemsView",
-		disable_game_world = false,
-		load_in_hub = true,
-		game_world_blur = 1.1,
-		wwise_states = {
-			options = WwiseGameSyncSettings.state_groups.options.ingame_menu
-		},
-		enter_sound_events = {
-			UISoundEvents.default_menu_enter
-		},
-		exit_sound_events = {
-			UISoundEvents.default_menu_exit
-		}
-	},
 	options_view = {
 		state_bound = true,
 		display_name = "loc_options_view_display_name",
@@ -102,7 +61,6 @@ local views = {
 		load_always = true,
 		class = "OptionsView",
 		disable_game_world = false,
-		load_in_hub = true,
 		game_world_blur = 1.1,
 		enter_sound_events = {
 			UISoundEvents.default_menu_enter
@@ -118,7 +76,6 @@ local views = {
 		display_name = "loc_character_appearance_view_display_name",
 		state_bound = true,
 		use_transition_ui = true,
-		load_in_hub = true,
 		path = "scripts/ui/views/character_appearance_view/character_appearance_view",
 		package = "packages/ui/views/character_appearance_view/character_appearance_view",
 		class = "CharacterAppearanceView",
@@ -298,30 +255,6 @@ local views = {
 			UISoundEvents.default_menu_exit
 		}
 	},
-	account_profile_view = {
-		display_name = "loc_account_profile_view_display_name",
-		state_bound = true,
-		use_transition_ui = true,
-		path = "scripts/ui/views/account_profile_view/account_profile_view",
-		package = "packages/ui/views/account_profile_view/account_profile_view",
-		load_always = true,
-		class = "AccountProfileView",
-		disable_game_world = true,
-		load_in_hub = true,
-		game_world_blur = 1.1,
-		levels = {
-			"content/levels/ui/inventory/inventory"
-		},
-		enter_sound_events = {
-			UISoundEvents.default_menu_enter
-		},
-		exit_sound_events = {
-			UISoundEvents.default_menu_exit
-		},
-		wwise_states = {
-			options = WwiseGameSyncSettings.state_groups.options.ingame_menu
-		}
-	},
 	class_selection_view = {
 		state_bound = true,
 		display_name = "loc_class_selection_view_display_name",
@@ -332,10 +265,10 @@ local views = {
 		disable_game_world = false,
 		game_world_blur = 1,
 		levels = {
-			"content/levels/ui/class_selection/class_selection_zealot/class_selection_zealot",
-			"content/levels/ui/class_selection/class_selection_veteran/class_selection_veteran",
+			"content/levels/ui/class_selection/class_selection_ogryn/class_selection_ogryn",
 			"content/levels/ui/class_selection/class_selection_psyker/class_selection_psyker",
-			"content/levels/ui/class_selection/class_selection_ogryn/class_selection_ogryn"
+			"content/levels/ui/class_selection/class_selection_veteran/class_selection_veteran",
+			"content/levels/ui/class_selection/class_selection_zealot/class_selection_zealot"
 		},
 		testify_flags = {
 			ui_views = false
@@ -399,18 +332,13 @@ local views = {
 		}
 	},
 	end_view = {
-		load_in_hub = true,
 		display_name = "loc_end_view_display_name",
 		state_bound = true,
 		use_transition_ui = true,
 		path = "scripts/ui/views/end_view/end_view",
 		package = "packages/ui/views/end_view/end_view",
-		load_always = true,
 		class = "EndView",
 		disable_game_world = true,
-		levels = {
-			"content/levels/ui/end_of_round/ui_eor_background"
-		},
 		enter_sound_events = {
 			UISoundEvents.end_screen_enter
 		},
@@ -419,15 +347,13 @@ local views = {
 		}
 	},
 	end_player_view = {
-		parent_transition_view = "end_view",
-		display_name = "loc_end_player_view_display_name",
-		state_bound = false,
-		path = "scripts/ui/views/end_player_view/end_player_view",
 		package = "packages/ui/views/end_player_view/end_player_view",
-		load_always = false,
+		display_name = "loc_end_player_view_display_name",
 		class = "EndPlayerView",
 		disable_game_world = false,
-		load_in_hub = true
+		state_bound = false,
+		parent_transition_view = "end_view",
+		path = "scripts/ui/views/end_player_view/end_player_view"
 	},
 	loading_view = {
 		dynamic_package_folder = "packages/ui/views/loading_view/",
@@ -451,9 +377,6 @@ local views = {
 		load_always = true,
 		class = "MissionIntroView",
 		disable_game_world = true,
-		levels = {
-			"content/levels/ui/mission_intro/mission_intro"
-		},
 		enter_sound_events = {
 			UISoundEvents.mission_briefing_start
 		},
@@ -533,9 +456,6 @@ local views = {
 		class = "LobbyView",
 		disable_game_world = true,
 		load_in_hub = true,
-		levels = {
-			"content/levels/ui/lobby/lobby"
-		},
 		testify_flags = {
 			ui_views = false
 		},
@@ -582,22 +502,6 @@ local views = {
 		},
 		exit_sound_events = {
 			UISoundEvents.barber_chirurgeon_on_exit
-		},
-		wwise_states = {
-			options = WwiseGameSyncSettings.state_groups.options.vendor_menu
-		}
-	},
-	body_shop_view = {
-		load_in_hub = true,
-		display_name = "loc_body_shop_view_display_name",
-		state_bound = true,
-		use_transition_ui = true,
-		path = "scripts/ui/views/body_shop_view/body_shop_view",
-		package = "packages/ui/views/body_shop_view/body_shop_view",
-		class = "BodyShopView",
-		disable_game_world = true,
-		levels = {
-			"content/levels/ui/character_create/character_create"
 		},
 		wwise_states = {
 			options = WwiseGameSyncSettings.state_groups.options.vendor_menu
@@ -777,7 +681,6 @@ local views = {
 		class = "MainMenuBackgroundView",
 		disable_game_world = true,
 		use_transition_ui = true,
-		load_in_hub = true,
 		path = "scripts/ui/views/main_menu_background_view/main_menu_background_view",
 		levels = {
 			"content/levels/ui/main_menu/main_menu"
@@ -939,18 +842,11 @@ _declare_view("store_view", require("scripts/ui/views/store_view/store_view_decl
 _declare_view("store_item_detail_view", require("scripts/ui/views/store_item_detail_view/store_item_detail_view_declaration_settings"))
 _declare_view("credits_goods_vendor_view", require("scripts/ui/views/credits_goods_vendor_view/credits_goods_vendor_view_declaration_settings"))
 _declare_view("crafting_view", require("scripts/ui/views/crafting_view/crafting_view_declaration_settings"))
-_declare_view("crafting_modify_view", require("scripts/ui/views/crafting_modify_view/crafting_modify_view_declaration_settings"))
-_declare_view("crafting_upgrade_item_view", require("scripts/ui/views/crafting_upgrade_item_view/crafting_upgrade_item_view_declaration_settings"))
-_declare_view("crafting_extract_trait_view", require("scripts/ui/views/crafting_extract_trait_view/crafting_extract_trait_view_declaration_settings"))
-_declare_view("crafting_replace_trait_view", require("scripts/ui/views/crafting_replace_trait_view/crafting_replace_trait_view_declaration_settings"))
-_declare_view("crafting_modify_options_view", require("scripts/ui/views/crafting_modify_options_view/crafting_modify_options_view_declaration_settings"))
-_declare_view("crafting_replace_perk_view", require("scripts/ui/views/crafting_replace_perk_view/crafting_replace_perk_view_declaration_settings"))
 _declare_view("crafting_mechanicus_modify_view", require("scripts/ui/views/crafting_mechanicus_modify_view/crafting_mechanicus_modify_view_declaration_settings"))
 _declare_view("crafting_mechanicus_barter_items_view", require("scripts/ui/views/crafting_mechanicus_barter_items_view/crafting_mechanicus_barter_items_view_declaration_settings"))
 _declare_view("crafting_mechanicus_upgrade_item_view", require("scripts/ui/views/crafting_mechanicus_upgrade_item_view/crafting_mechanicus_upgrade_item_view_declaration_settings"))
 _declare_view("crafting_mechanicus_replace_trait_view", require("scripts/ui/views/crafting_mechanicus_replace_trait_view/crafting_mechanicus_replace_trait_view_declaration_settings"))
 _declare_view("crafting_mechanicus_replace_perk_view", require("scripts/ui/views/crafting_mechanicus_replace_perk_view/crafting_mechanicus_replace_perk_view_declaration_settings"))
-_declare_view("crafting_mechanicus_modify_options_view", require("scripts/ui/views/crafting_mechanicus_modify_options_view/crafting_mechanicus_modify_options_view_declaration_settings"))
 _declare_view("crafting_mechanicus_upgrade_expertise_view", require("scripts/ui/views/crafting_mechanicus_upgrade_expertise_view/crafting_mechanicus_upgrade_expertise_view_declaration_settings"))
 _declare_view("masteries_overview_view", require("scripts/ui/views/masteries_overview_view/masteries_overview_view_declaration_settings"))
 _declare_view("mastery_view", require("scripts/ui/views/mastery_view/mastery_view_declaration_settings"))
@@ -959,8 +855,13 @@ _declare_view("cosmetics_vendor_view", require("scripts/ui/views/cosmetics_vendo
 _declare_view("cosmetics_vendor_background_view", require("scripts/ui/views/cosmetics_vendor_background_view/cosmetics_vendor_background_view_declaration_settings"))
 _declare_view("story_mission_lore_view", require("scripts/ui/views/story_mission_lore_view/story_mission_lore_view_declaration_settings"))
 _declare_view("story_mission_play_view", require("scripts/ui/views/story_mission_play_view/story_mission_play_view_declaration_settings"))
+_declare_view("havoc_background_view", require("scripts/ui/views/havoc_background_view/havoc_background_view_declaration_settings"))
+_declare_view("havoc_play_view", require("scripts/ui/views/havoc_play_view/havoc_play_view_declaration_settings"))
+_declare_view("havoc_reward_presentation_view", require("scripts/ui/views/havoc_reward_presentation_view/havoc_reward_presentation_view_declaration_settings"))
 _declare_view("group_finder_view", require("scripts/ui/views/group_finder_view/group_finder_view_declaration_settings"))
 _declare_view("penance_overview_view", require("scripts/ui/views/penance_overview_view/penance_overview_view_declaration_settings"))
+_declare_view("report_player_view", require("scripts/ui/views/report_player_view/report_player_view_declaration_settings"))
+_declare_view("horde_play_view", require("scripts/ui/views/horde_play_view/horde_play_view_declaration_settings"))
 
 for view_name, settings in pairs(views) do
 	settings.name = view_name

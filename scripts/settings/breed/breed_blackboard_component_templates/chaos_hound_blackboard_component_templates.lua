@@ -31,6 +31,9 @@ local chaos_hound = {
 	},
 	record_state = {
 		has_disabled_player = "boolean"
+	},
+	summon_unit = {
+		owner = "Unit"
 	}
 }
 
