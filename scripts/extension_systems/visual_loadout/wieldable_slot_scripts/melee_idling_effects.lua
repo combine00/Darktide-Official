@@ -1,9 +1,11 @@
 local WieldableSlotScriptInterface = require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/wieldable_slot_script_interface")
 local MeleeIdlingEffects = class("MeleeIdlingEffects")
 local LOOPING_SOUND_ALIAS = "equipped_item_passive_loop"
+local LOOPING_PARTICLE_ALIAS = "equipped_item_passive"
 local _sfx_external_properties = {}
+local _vfx_external_properties = {}
 
-function MeleeIdlingEffects:init(context, slot, weapon_template, fx_sources)
+function MeleeIdlingEffects:init(context, slot, weapon_template, fx_sources, item, unit_1p, unit_3p)
 	self._world = context.world
 	self._wwise_world = context.wwise_world
 	self._is_husk = context.is_husk
@@ -17,15 +19,18 @@ function MeleeIdlingEffects:init(context, slot, weapon_template, fx_sources)
 end
 
 function MeleeIdlingEffects:destroy()
-	self:_stop_sfx(true)
+	self:_stop_sfx_loop(true)
+	self:_stop_vfx_loop(true)
 end
 
 function MeleeIdlingEffects:wield()
-	self:_start_sfx()
+	self:_start_sfx_loop()
+	self:_start_vfx_loop()
 end
 
 function MeleeIdlingEffects:unwield()
-	self:_stop_sfx()
+	self:_stop_sfx_loop()
+	self:_stop_vfx_loop()
 end
 
 function MeleeIdlingEffects:fixed_update(unit, dt, t, frame)
@@ -34,19 +39,21 @@ end
 
 function MeleeIdlingEffects:update(unit, dt, t)
 	if not self._looping_playing_id then
-		self:_start_sfx()
+		self:_start_sfx_loop()
+		self:_start_vfx_loop()
 	end
 end
 
 function MeleeIdlingEffects:update_first_person_mode(first_person_mode)
 	if self._first_person_mode ~= first_person_mode then
-		self:_stop_sfx(true)
+		self:_stop_sfx_loop(true)
+		self:_stop_vfx_loop(true)
 
 		self._first_person_mode = first_person_mode
 	end
 end
 
-function MeleeIdlingEffects:_start_sfx()
+function MeleeIdlingEffects:_start_sfx_loop()
 	local visual_loadout_extension = self._visual_loadout_extension
 	local should_play_husk_effect = self._fx_extension:should_play_husk_effect()
 	local resolved, event_name, resolved_stop, stop_event_name = visual_loadout_extension:resolve_looping_gear_sound(LOOPING_SOUND_ALIAS, should_play_husk_effect, _sfx_external_properties)
@@ -62,7 +69,7 @@ function MeleeIdlingEffects:_start_sfx()
 	end
 end
 
-function MeleeIdlingEffects:_stop_sfx(force_stop)
+function MeleeIdlingEffects:_stop_sfx_loop(force_stop)
 	local looping_playing_id = self._looping_playing_id
 	local looping_stop_event_name = self._looping_stop_event_name
 	local sfx_source_id = self._fx_extension:sound_source(self._fx_source_name)
@@ -75,6 +82,34 @@ function MeleeIdlingEffects:_stop_sfx(force_stop)
 
 	self._looping_playing_id = nil
 	self._looping_stop_event_name = nil
+end
+
+function MeleeIdlingEffects:_start_vfx_loop()
+	local resolved, effect_name = self._visual_loadout_extension:resolve_gear_particle(LOOPING_PARTICLE_ALIAS, _vfx_external_properties)
+
+	if resolved then
+		local world = self._world
+		local new_effect_id = World.create_particles(world, effect_name, Vector3.zero())
+		local vfx_link_unit, vfx_link_node = self._fx_extension:vfx_spawner_unit_and_node(self._fx_source_name)
+
+		World.link_particles(world, new_effect_id, vfx_link_unit, vfx_link_node, Matrix4x4.identity(), "stop")
+
+		self._looping_effect_id = new_effect_id
+	end
+end
+
+function MeleeIdlingEffects:_stop_vfx_loop(force_stop)
+	local current_effect_id = self._looping_effect_id
+
+	if current_effect_id then
+		if force_stop then
+			World.destroy_particles(self._world, current_effect_id)
+		else
+			World.stop_spawning_particles(self._world, current_effect_id)
+		end
+	end
+
+	self._looping_effect_id = nil
 end
 
 implements(MeleeIdlingEffects, WieldableSlotScriptInterface)

@@ -58,20 +58,6 @@ local scenegraph_definition = {
 			2
 		}
 	},
-	archetype_options = {
-		vertical_alignment = "bottom",
-		parent = "archetype",
-		horizontal_alignment = "center",
-		size = {
-			0,
-			265
-		},
-		position = {
-			3,
-			-337,
-			10
-		}
-	},
 	archetype_info = {
 		vertical_alignment = "bottom",
 		parent = "archetype",
@@ -83,7 +69,21 @@ local scenegraph_definition = {
 		position = {
 			0,
 			0,
-			2
+			3
+		}
+	},
+	archetype_options = {
+		vertical_alignment = "top",
+		parent = "archetype_info",
+		horizontal_alignment = "left",
+		size = {
+			0,
+			0
+		},
+		position = {
+			0,
+			0,
+			10
 		}
 	},
 	class_option = {
@@ -419,42 +419,6 @@ local widget_definitions = {
 			pass_type = "text",
 			value = "",
 			style = ClassSelectionViewFontStyle.archetype_description_style
-		},
-		{
-			value = "content/ui/materials/effects/class_selection_top_candles",
-			value_id = "top_candles",
-			pass_type = "texture",
-			style = {
-				vertical_alignment = "top",
-				horizontal_alignment = "center",
-				size = {
-					760,
-					390
-				},
-				offset = {
-					0,
-					-350,
-					3
-				}
-			}
-		},
-		{
-			value = "content/ui/materials/frames/class_selection_top",
-			value_id = "top",
-			pass_type = "texture",
-			style = {
-				vertical_alignment = "top",
-				horizontal_alignment = "center",
-				size = {
-					760,
-					390
-				},
-				offset = {
-					0,
-					-350,
-					2
-				}
-			}
 		}
 	}, "archetype_info"),
 	class_background = UIWidget.create_definition({
@@ -548,25 +512,67 @@ local widget_definitions = {
 		original_text = Utf8.upper(Localize("loc_character_creator_continue"))
 	})
 }
+local archetype_option_frame_definition = UIWidget.create_definition({
+	{
+		style_id = "frame",
+		value_id = "frame",
+		pass_type = "texture",
+		value = "content/ui/materials/base/ui_default_base",
+		style = {
+			vertical_alignment = "bottom",
+			horizontal_alignment = "left",
+			hdr = true,
+			offset = {
+				0,
+				0,
+				2
+			},
+			material_values = {
+				texture_map = ClassSelectionViewSettings.archetype_frames_textures.mid_1.texture
+			}
+		}
+	}
+}, "archetype_options", nil, ClassSelectionViewSettings.archetype_frames_textures.mid_1.size)
 local archetype_option_definition = UIWidget.create_definition({
 	{
 		pass_type = "hotspot",
 		content_id = "hotspot"
 	},
 	{
+		style_id = "icon",
+		value_id = "icon",
 		pass_type = "texture",
+		value = "content/ui/materials/base/ui_default_base",
+		style = {
+			vertical_alignment = "center",
+			horizontal_alignment = "center",
+			hdr = true,
+			offset = {
+				0,
+				0,
+				2
+			},
+			material_values = {
+				texture_map = "content/ui/textures/frames/class_selection/windows/class_selection_top_temp_unselected"
+			}
+		}
+	},
+	{
 		value_id = "icon_highlight",
+		pass_type = "texture",
+		value = "content/ui/materials/base/ui_default_base",
 		style_id = "icon_highlight",
 		style = {
 			vertical_alignment = "center",
 			horizontal_alignment = "center",
 			hdr = true,
-			original_size = ClassSelectionViewSettings.archetype_option_icon_size,
-			size = ClassSelectionViewSettings.archetype_option_icon_size,
 			offset = {
 				0,
 				0,
-				2
+				3
+			},
+			material_values = {
+				texture_map = "content/ui/textures/frames/class_selection/windows/class_selection_top_temp"
 			}
 		},
 		change_function = function (content, style)
@@ -592,7 +598,7 @@ local archetype_option_definition = UIWidget.create_definition({
 			hover_color = Color.terminal_corner_hover(255, true),
 			offset = {
 				0,
-				-3,
+				0,
 				4
 			},
 			size_addition = {
@@ -702,6 +708,7 @@ return {
 	legend_inputs = legend_inputs,
 	widget_definitions = widget_definitions,
 	scenegraph_definition = scenegraph_definition,
+	archetype_option_frame_definition = archetype_option_frame_definition,
 	archetype_option_definition = archetype_option_definition,
 	archetype_selection_definition = archetype_selection_definition,
 	animations = animations

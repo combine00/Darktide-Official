@@ -358,17 +358,15 @@ local particles = {
 			"wielded_weapon_template"
 		},
 		particles = {
-			powermaul_p1_m2 = "content/fx/particles/weapons/shock_maul/powermaul_1h_looping_mesh",
 			powermaul_2h_p1_m1 = "content/fx/particles/weapons/power_maul/power_maul_activated_2hand",
+			chainsword_2h_p1_m3 = "content/fx/particles/weapons/swords/chainsword/chainsword_weapon_special_activate_smoke",
 			chainaxe_p1_m3 = "content/fx/particles/weapons/swords/chainsword/chain_axe_special_weapon_activate_sparks_smoke",
 			chainsword_p1_m2 = "content/fx/particles/weapons/swords/chainsword/chainsword_weapon_special_activate_smoke",
 			chainaxe_p1_m2 = "content/fx/particles/weapons/swords/chainsword/chain_axe_special_weapon_activate_sparks_smoke",
-			chainsword_2h_p1_m3 = "content/fx/particles/weapons/swords/chainsword/chainsword_weapon_special_activate_smoke",
-			powermaul_p1_m1 = "content/fx/particles/weapons/shock_maul/powermaul_1h_looping_mesh",
-			thunderhammer_2h_p1_m1 = "content/fx/particles/weapons/hammers/thunder_hammer_activate_linger",
-			powersword_p1_m1 = "content/fx/particles/weapons/swords/powersword_1h_activate_mesh_loop",
 			chainsword_p1_m1 = "content/fx/particles/weapons/swords/chainsword/chainsword_weapon_special_activate_smoke",
 			ogryn_powermaul_p1_m1 = "content/fx/particles/weapons/power_maul/power_maul_activated",
+			thunderhammer_2h_p1_m1 = "content/fx/particles/weapons/hammers/thunder_hammer_activate_linger",
+			powersword_p1_m1 = "content/fx/particles/weapons/swords/powersword_1h_activate_mesh_loop",
 			thunderhammer_2h_p1_m2 = "content/fx/particles/weapons/hammers/thunder_hammer_activate_linger",
 			chainaxe_p1_m1 = "content/fx/particles/weapons/swords/chainsword/chain_axe_special_weapon_activate_sparks_smoke",
 			chainsword_2h_p1_m1 = "content/fx/particles/weapons/swords/chainsword/chainsword_weapon_special_activate_smoke",
@@ -486,14 +484,16 @@ local particles = {
 		},
 		particles = {
 			zealot_relic = "content/fx/particles/abilities/zealot_relic_emit_01",
-			syringe_corruption_pocketable = "content/fx/particles/pocketables/syringe_corruption_heal_bubbles",
 			psyker_throwing_knives = "content/fx/particles/abilities/psyker_throwing_knife_idle",
+			syringe_power_boost_pocketable = "content/fx/particles/pocketables/syringe_power_boost_bubbles",
 			flamer_p1_m1 = "content/fx/particles/weapons/rifles/zealot_flamer/zealot_flamer_pilot_light",
-			servo_skull = "content/fx/particles/interacts/servoskull_visibility_hover",
-			grimoire_pocketable = "content/fx/particles/interacts/grimoire_idle",
+			powermaul_p1_m1 = "content/fx/particles/weapons/shock_maul/powermaul_1h_looping_mesh",
 			syringe_speed_boost_pocketable = "content/fx/particles/pocketables/syringe_speed_boost_bubbles",
+			servo_skull = "content/fx/particles/interacts/servoskull_visibility_hover",
+			syringe_corruption_pocketable = "content/fx/particles/pocketables/syringe_corruption_heal_bubbles",
 			syringe_ability_boost_pocketable = "content/fx/particles/pocketables/syringe_ability_boost_bubbles",
-			syringe_power_boost_pocketable = "content/fx/particles/pocketables/syringe_power_boost_bubbles"
+			grimoire_pocketable = "content/fx/particles/interacts/grimoire_idle",
+			powermaul_p1_m2 = "content/fx/particles/weapons/shock_maul/powermaul_1h_looping_mesh"
 		}
 	},
 	melee_blocked_attack = {

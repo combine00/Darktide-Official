@@ -2,9 +2,10 @@ local BotSpawning = require("scripts/managers/bot/bot_spawning")
 local CameraShake = require("scripts/utilities/camera/camera_shake")
 local Effect = require("scripts/extension_systems/fx/utilities/effect")
 local FixedFrame = require("scripts/utilities/fixed_frame")
-local MaterialFx = require("scripts/utilities/material_fx")
 local ForceRotation = require("scripts/extension_systems/locomotion/utilities/force_rotation")
 local GameModeSettings = require("scripts/settings/game_mode/game_mode_settings")
+local HordesModeSettings = require("scripts/settings/hordes_mode_settings")
+local MaterialFx = require("scripts/utilities/material_fx")
 local MaterialQuery = require("scripts/utilities/material_query")
 local NavQueries = require("scripts/utilities/nav_queries")
 local PlayerCharacterConstants = require("scripts/settings/player_character/player_character_constants")
@@ -12,7 +13,7 @@ local PlayerMovement = require("scripts/utilities/player_movement")
 local PlayerUnitVisualLoadout = require("scripts/extension_systems/visual_loadout/utilities/player_unit_visual_loadout")
 local PlayerVisibility = require("scripts/utilities/player_visibility")
 local PlayerVoiceGrunts = require("scripts/utilities/player_voice_grunts")
-local PlayerVOStoryStage = require("scripts/utilities/player_vo_story_stage")
+local PlayerVoStoryStage = require("scripts/utilities/player_vo_story_stage")
 local ScriptWorld = "scripts/foundation/utilities/script_world"
 local Vo = require("scripts/utilities/vo")
 local slot_configuration = PlayerCharacterConstants.slot_configuration
@@ -102,9 +103,7 @@ function FlowCallbacks.set_allowed_nav_tag_volume_type(params)
 	local nav_mesh_manager = Managers.state.nav_mesh
 	local nav_tag_volume_data = nav_mesh_manager:nav_tag_volume_data()
 
-	for i = 1, #nav_tag_volume_data do
-		local data = nav_tag_volume_data[i]
-
+	for volume, data in pairs(nav_tag_volume_data) do
 		if data.type == volume_type then
 			nav_mesh_manager:set_allowed_nav_tag_layer(data.name, allowed)
 		end
@@ -285,19 +284,24 @@ function FlowCallbacks.minion_fx(params)
 
 	local vfx = breed.vfx
 	local particle_name = vfx[name]
+	local switch_name = nil
 	local switch_on_wielded_slot = params.switch_on_wielded_slot
+	local use_switch = switch_on_wielded_slot
 
-	if switch_on_wielded_slot then
-		local visual_loadout_extension = ScriptUnit.extension(unit, "visual_loadout_system")
-		local wielded_slot_name = visual_loadout_extension:wielded_slot_name()
+	if use_switch then
+		if switch_on_wielded_slot then
+			local visual_loadout_extension = ScriptUnit.extension(unit, "visual_loadout_system")
+			local wielded_slot_name = visual_loadout_extension:wielded_slot_name()
+			switch_name = wielded_slot_name
+		end
 
-		if wielded_slot_name then
+		if switch_name then
 			if type(wwise_event) == "table" then
-				wwise_event = wwise_event[wielded_slot_name]
+				wwise_event = wwise_event[switch_name]
 			end
 
 			if type(particle_name) == "table" then
-				particle_name = particle_name[wielded_slot_name]
+				particle_name = particle_name[switch_name]
 			end
 		else
 			wwise_event = nil
@@ -886,13 +890,15 @@ function FlowCallbacks.player_inventory_event(params)
 	local wielded_slot = inventory_component.wielded_slot
 
 	if wielded_slot ~= "none" then
-		local unit_1p, unit_3p, attachments_1p, attachments_3p = visual_loadout_extension:unit_and_attachments_from_slot(wielded_slot)
+		local unit_1p, unit_3p, attachments_by_unit_1p, attachments_by_unit_3p = visual_loadout_extension:unit_and_attachments_from_slot(wielded_slot)
 
 		if unit_1p then
 			unit_flow_event(unit_1p, event_name)
 		end
 
-		if attachments_1p then
+		if attachments_by_unit_1p then
+			local attachments_1p = attachments_by_unit_1p[unit_1p]
+
 			for i = 1, #attachments_1p do
 				local attachment_unit = attachments_1p[i]
 
@@ -1005,7 +1011,7 @@ function FlowCallbacks.trigger_cinematic_video_with_popup(params)
 	local video_config_name = params.video_config_name
 	local popup_config_name = params.popup_config_name
 
-	Managers.state.video:play_video_with_popup(video_config_name, popup_config_name)
+	Managers.video:play_video_with_popup(video_config_name, popup_config_name)
 end
 
 function FlowCallbacks.trigger_cinematic_video(params)
@@ -1385,6 +1391,16 @@ function FlowCallbacks.trigger_lua_unit_event(params)
 	end
 end
 
+function FlowCallbacks.trigger_lua_level_event(params)
+	local event = params.event
+	local level = params.level
+	local event_manager = Managers.event
+
+	if event_manager then
+		event_manager:trigger(event, level)
+	end
+end
+
 function FlowCallbacks.trigger_lua_level_and_unit_event(params)
 	local event = params.event
 	local level = params.level
@@ -1709,7 +1725,7 @@ end
 function FlowCallbacks.set_player_vo_story_stage(params)
 	local story_stage = params.story_stage
 
-	PlayerVOStoryStage.set_story_stage(story_stage)
+	PlayerVoStoryStage.set_story_stage(story_stage)
 end
 
 function FlowCallbacks.set_story_ticker(params)
@@ -1804,8 +1820,9 @@ function FlowCallbacks.start_terror_event(params)
 
 	if terror_event_manager then
 		local event_name = params.event_name
+		local optional_level = params.optional_level
 
-		terror_event_manager:start_event(event_name)
+		terror_event_manager:start_event(event_name, nil, optional_level)
 	end
 end
 
@@ -2448,6 +2465,14 @@ function FlowCallbacks.light_controller_set_light_flicker_config(params)
 	extension:set_flicker_state(flicker_enabled, flicker_configuration, false)
 end
 
+function FlowCallbacks.is_circumstance_active(params)
+	local circumstance_name = params.circumstance_name
+	local active_circumstance_name = Managers.state.circumstance:circumstance_name()
+	flow_return_table.active = active_circumstance_name == circumstance_name
+
+	return flow_return_table
+end
+
 function FlowCallbacks.is_theme_active(params)
 	local theme_tag = params.theme_tag
 	local active_theme_tag = Managers.state.circumstance:active_theme_tag()
@@ -2813,8 +2838,6 @@ function FlowCallbacks.mission_buffs_send_legendary_buff_selection(params)
 end
 
 function FlowCallbacks.hordes_mode_wave_start(params)
-	local is_server = Managers.state.game_session and Managers.state.game_session:is_server()
-
 	Managers.event:trigger("hordes_mode_on_wave_started", params.wave_num)
 end
 
@@ -2829,8 +2852,6 @@ function FlowCallbacks.hordes_mode_objective_completed(params)
 end
 
 function FlowCallbacks.hordes_mode_wave_completed(params)
-	local is_server = Managers.state.game_session and Managers.state.game_session:is_server()
-
 	Managers.event:trigger("hordes_mode_on_wave_completed", params.wave_num > 0 and params.wave_num or 1)
 end
 
@@ -2844,6 +2865,19 @@ end
 
 function FlowCallbacks.hordes_mode_on_mcguffin_returned(params)
 	Managers.event:trigger("hordes_mode_on_mcguffin_returned")
+end
+
+function FlowCallbacks.hordes_mode_start_random_terror_event(params)
+	local terror_event_manager = Managers.state.terror_event
+
+	if terror_event_manager then
+		local event_chunk_name = params.event_chunk_name
+		local difficulty = Managers.state.difficulty:get_initial_challenge()
+		local resistance = Managers.state.difficulty:get_initial_resistance()
+		local target_terror_chunk_name = HordesModeSettings.terror_event_name_function(event_chunk_name, difficulty, resistance)
+
+		terror_event_manager:start_random_event(target_terror_chunk_name)
+	end
 end
 
 function FlowCallbacks.set_unit_material_scalar(params)

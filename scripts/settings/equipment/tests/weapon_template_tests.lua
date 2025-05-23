@@ -212,7 +212,6 @@ function _validate_chain_actions(weapon_template, action_settings)
 
 	local actions = weapon_template.actions
 	local action_inputs = weapon_template.action_inputs
-	local stop_input = action_settings.stop_input
 	local success = true
 	local error_msg = ""
 	local has_grenade_ability = false
@@ -697,7 +696,7 @@ function _check_tweak_template_existence(weapon_template, template_type, source_
 
 			if not source_templates[base_template_name] then
 				success = false
-				error_msg = string.format("%s\nalternate_fire template named %q for type %q does not exist", error_msg, base_template_name, template_type)
+				error_msg = string.format("%s\nalternate_fire template named %q for type %q does not exist. Has it been added to the relevant parent template lua file?", error_msg, base_template_name, template_type)
 			end
 		end
 	end
@@ -713,7 +712,7 @@ function _check_tweak_template_existence(weapon_template, template_type, source_
 
 		if not source_templates[base_template_name] then
 			success = false
-			error_msg = string.format("%s\nTemplate named %q for type %q does not exist", error_msg, base_template_name, template_type)
+			error_msg = string.format("%s\nTemplate named %q for type %q does not exist. Has it been added to the relevant parent template lua file?", error_msg, base_template_name, template_type)
 		end
 	end
 

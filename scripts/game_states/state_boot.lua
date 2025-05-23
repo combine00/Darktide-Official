@@ -42,6 +42,7 @@ function StateBoot:_create_startup_world()
 	self._viewport = Application.create_viewport(world, "overlay")
 	local camera_unit = World.spawn_unit_ex(world, "core/units/camera")
 	local camera = Unit.camera(camera_unit, "camera")
+	self._camera_unit = camera_unit
 
 	Camera.set_data(camera, "unit", camera_unit)
 	Viewport.set_data(self._viewport, "camera", camera)
@@ -98,11 +99,12 @@ function StateBoot:on_exit()
 
 	World.destroy_shading_environment(world, shading_environment)
 
-	local viewport = self._viewport
-	local camera = Viewport.get_data(viewport, "camera")
-	local camera_unit = Camera.get_data(camera, "unit")
+	local camera_unit = self._camera_unit
 
 	World.destroy_unit(world, camera_unit)
+
+	local viewport = self._viewport
+
 	Application.destroy_viewport(world, viewport)
 	Application.release_world(world)
 end

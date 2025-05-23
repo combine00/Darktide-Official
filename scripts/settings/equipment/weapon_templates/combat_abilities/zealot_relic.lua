@@ -56,147 +56,136 @@ local weapon_template = {
 				}
 			}
 		}
+	}
+}
+
+table.add_missing(weapon_template.action_inputs, BaseTemplateSettings.action_inputs)
+
+weapon_template.action_input_hierarchy = {
+	{
+		transition = "stay",
+		input = "wield"
 	},
-	action_input_hierarchy = {
-		{
-			transition = "stay",
-			input = "wield"
-		},
-		{
-			transition = "stay",
-			input = "wield_previous"
-		},
-		{
-			input = "channel",
-			transition = {
-				{
-					transition = "base",
-					input = "cancel_channeling"
-				},
-				{
-					transition = "base",
-					input = "wield_previous"
-				},
-				{
-					transition = "base",
-					input = "wield"
-				},
-				{
-					input = "grenade_ability",
-					transition = {
-						{
-							transition = "base",
-							input = "wield_previous"
-						}
-					}
-				}
-			}
-		}
+	{
+		transition = "stay",
+		input = "wield_previous"
 	},
-	actions = {
-		action_unwield = {
-			allowed_during_sprint = true,
-			start_input = "wield",
-			uninterruptible = true,
-			kind = "unwield",
-			total_time = 0,
-			allowed_chain_actions = {}
-		},
-		action_wield = {
-			sprint_requires_press_to_interrupt = true,
-			allowed_during_sprint = true,
-			kind = "wield",
-			abort_sprint = true,
-			uninterruptible = true,
-			anim_event = "equip_relic",
-			total_time = 0.5,
-			allowed_chain_actions = {
-				channel = {
-					action_name = "action_zealot_channel"
-				},
-				grenade_ability = {
+	{
+		input = "channel",
+		transition = {
+			{
+				transition = "base",
+				input = "cancel_channeling"
+			},
+			{
+				transition = "base",
+				input = "wield_previous"
+			},
+			{
+				transition = "base",
+				input = "wield"
+			},
+			{
+				input = "grenade_ability",
+				transition = {
 					{
-						action_name = "grenade_ability"
-					},
-					{
-						action_name = "grenade_ability_quick_throw"
+						transition = "base",
+						input = "wield_previous"
 					}
 				}
-			},
-			conditional_state_to_action_input = {
-				auto_chain = {
-					input_name = "channel"
-				}
 			}
-		},
-		action_zealot_channel = {
-			kind = "zealot_channel",
-			radius = 10,
-			start_input = "channel",
-			force_stagger_duration = 2,
-			sprint_requires_press_to_interrupt = true,
-			power_level_time_in_action_multiplier = 0.25,
-			offensive_buff = "zealot_channel_damage",
-			defensive_buff = "zealot_channel_toughness_damage_reduction",
-			force_stagger_radius = 4,
-			toughness_bonus_buff = "zealot_channel_toughness_bonus",
-			radius_time_in_action_multiplier = 0.1,
-			allowed_during_sprint = true,
-			ability_type = "combat_ability",
-			add_buff_time = 4,
-			vo_tag = "ability_litany",
-			abort_sprint = true,
-			uninterruptible = true,
-			power_level = 500,
-			stop_input = "cancel_channeling",
-			total_time = 5.5,
-			damage_profile = DamageProfileTemplates.zealot_channel_stagger,
-			allowed_chain_actions = {
-				wield = {
-					action_name = "action_unwield",
-					chain_time = 0.5
-				},
-				cancel_channeling = {
-					action_name = "action_unwield_to_previous",
-					chain_time = 0.5
-				},
-				wield_previous = {
-					action_name = "action_unwield_to_previous",
-					chain_time = 0.5
-				},
-				grenade_ability = {
-					{
-						action_name = "grenade_ability"
-					},
-					{
-						action_name = "grenade_ability_quick_throw"
-					}
-				}
-			},
-			conditional_state_to_action_input = {
-				auto_chain = {
-					input_name = "wield_previous"
-				}
-			}
-		},
-		action_unwield_to_previous = {
-			allowed_during_sprint = true,
-			start_input = "wield_previous",
-			uninterruptible = true,
-			kind = "unwield_to_previous",
-			unwield_to_weapon = true,
-			total_time = 0,
-			allowed_chain_actions = {}
 		}
 	}
 }
-weapon_template.actions.grenade_ability_quick_throw = table.clone_instance(BaseTemplateSettings.actions.grenade_ability_quick_throw)
-weapon_template.actions.grenade_ability_quick_throw.conditional_state_to_action_input = {
+weapon_template.actions = {
+	action_unwield = {
+		allowed_during_sprint = true,
+		start_input = "wield",
+		uninterruptible = true,
+		kind = "unwield",
+		total_time = 0,
+		allowed_chain_actions = {}
+	},
+	action_wield = {
+		sprint_requires_press_to_interrupt = true,
+		allowed_during_sprint = true,
+		kind = "wield",
+		abort_sprint = true,
+		uninterruptible = true,
+		anim_event = "equip_relic",
+		total_time = 0.5,
+		allowed_chain_actions = {
+			channel = {
+				action_name = "action_zealot_channel"
+			},
+			grenade_ability = BaseTemplateSettings.generate_grenade_ability_chain_actions()
+		},
+		conditional_state_to_action_input = {
+			auto_chain = {
+				input_name = "channel"
+			}
+		}
+	},
+	action_zealot_channel = {
+		kind = "zealot_channel",
+		radius = 10,
+		start_input = "channel",
+		force_stagger_duration = 2,
+		sprint_requires_press_to_interrupt = true,
+		power_level_time_in_action_multiplier = 0.25,
+		offensive_buff = "zealot_channel_damage",
+		defensive_buff = "zealot_channel_toughness_damage_reduction",
+		force_stagger_radius = 4,
+		toughness_bonus_buff = "zealot_channel_toughness_bonus",
+		radius_time_in_action_multiplier = 0.1,
+		allowed_during_sprint = true,
+		ability_type = "combat_ability",
+		add_buff_time = 4,
+		vo_tag = "ability_litany",
+		abort_sprint = true,
+		uninterruptible = true,
+		power_level = 500,
+		stop_input = "cancel_channeling",
+		total_time = 5.5,
+		damage_profile = DamageProfileTemplates.zealot_channel_stagger,
+		allowed_chain_actions = {
+			wield = {
+				action_name = "action_unwield",
+				chain_time = 0.5
+			},
+			cancel_channeling = {
+				action_name = "action_unwield_to_previous",
+				chain_time = 0.5
+			},
+			wield_previous = {
+				action_name = "action_unwield_to_previous",
+				chain_time = 0.5
+			},
+			grenade_ability = BaseTemplateSettings.generate_grenade_ability_chain_actions()
+		},
+		conditional_state_to_action_input = {
+			auto_chain = {
+				input_name = "wield_previous"
+			}
+		}
+	},
+	action_unwield_to_previous = {
+		allowed_during_sprint = true,
+		start_input = "wield_previous",
+		uninterruptible = true,
+		kind = "unwield_to_previous",
+		unwield_to_weapon = true,
+		total_time = 0,
+		allowed_chain_actions = {}
+	},
+	grenade_ability_zealot_throwing_knives = table.clone_instance(BaseTemplateSettings.actions.grenade_ability_zealot_throwing_knives)
+}
+weapon_template.actions.grenade_ability_zealot_throwing_knives.conditional_state_to_action_input = {
 	auto_chain = {
 		input_name = "wield_previous"
 	}
 }
-weapon_template.actions.grenade_ability_quick_throw.allowed_chain_actions = {
+weapon_template.actions.grenade_ability_zealot_throwing_knives.allowed_chain_actions = {
 	wield_previous = {
 		action_name = "action_unwield_to_previous"
 	}

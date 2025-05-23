@@ -124,6 +124,14 @@ function PickupSpawnerExtension:can_spawn_pickup(component_index, pickup_name)
 	return component.spawnable_pickups == "all" or table.contains(component.spawnable_pickups, pickup_name)
 end
 
+function PickupSpawnerExtension:spawnable_pickups_amount(component_index)
+	component_index = component_index or 1
+	local component = self._components[component_index]
+	local num_items = #component.spawnable_pickups
+
+	return num_items
+end
+
 function PickupSpawnerExtension:_fetch_next_item(component_index)
 	local component = self._components[component_index]
 	local num_items = #component.spawnable_pickups

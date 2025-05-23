@@ -146,7 +146,7 @@ function BotJumpAssist:_editor_debug_draw(unit)
 				drawer:line(from, to, success_color)
 				drawer:sphere(from, 0.3, success_color)
 				drawer:sphere(to, 0.3, success_color)
-				drawer:cone(to - Vector3.normalize(from - to) * 0.25, to, 0.3, Color.light_green(), 9, 9)
+				drawer:cone(to - Vector3.normalize(from - to) * 0.25, to, 0.3, Color.light_green(), 9, 9, false)
 
 				local layer_name = BotNavTransition.calculate_nav_tag_layer(from, to, should_jump)
 

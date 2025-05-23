@@ -1,5 +1,68 @@
 return function ()
 	define_rule({
+		pre_wwise_event = "play_radio_static_start",
+		concurrent_wwise_event = "play_vox_static_loop",
+		name = "info_asset_cult_breaking_wheel",
+		post_wwise_event = "play_radio_static_end",
+		response = "info_asset_cult_breaking_wheel",
+		database = "mission_vo_dm_propaganda",
+		wwise_route = 1,
+		category = "vox_prio_0",
+		speaker_routing = {
+			target = "all"
+		},
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"look_at"
+			},
+			{
+				"query_context",
+				"look_at_tag",
+				OP.EQ,
+				"info_asset_cult_breaking_wheel"
+			},
+			{
+				"query_context",
+				"distance",
+				OP.GT,
+				1
+			},
+			{
+				"query_context",
+				"distance",
+				OP.LT,
+				17
+			},
+			{
+				"user_context",
+				"class_name",
+				OP.SET_INCLUDES,
+				args = {
+					"pilot",
+					"sergeant",
+					"tech_priest"
+				}
+			},
+			{
+				"faction_memory",
+				"info_asset_cult_breaking_wheel",
+				OP.EQ,
+				0
+			}
+		},
+		on_done = {
+			{
+				"faction_memory",
+				"info_asset_cult_breaking_wheel",
+				OP.ADD,
+				1
+			}
+		}
+	})
+	define_rule({
 		post_wwise_event = "play_radio_static_end",
 		concurrent_wwise_event = "play_vox_static_loop",
 		pre_wwise_event = "play_radio_static_start",

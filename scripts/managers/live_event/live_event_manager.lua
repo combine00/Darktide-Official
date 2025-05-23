@@ -1,17 +1,25 @@
 local Items = require("scripts/utilities/items")
 local LiveEvents = require("scripts/settings/live_event/live_events")
-local MasterItems = require("scripts/backend/master_items")
 local Promise = require("scripts/foundation/utilities/promise")
 local UISoundEvents = require("scripts/settings/ui/ui_sound_events")
 local LiveEventManager = class("LiveEventManager")
 local REFRESH_TIMER_SUCCESS = 300
 local REFRESH_TIMER_FAILURE = 60
 local STATE_FAIL_DELAY = 60
+local CLIENT_RPCS = {
+	"rpc_live_event_trigger_combat_feed"
+}
 
-function LiveEventManager:init(is_host)
+function LiveEventManager:init(is_host, event_delegate)
 	self._events = {}
 	self._active_event_id = nil
 	self._is_host = not not is_host
+	self._event_delegate = event_delegate
+
+	if not is_host then
+		self._event_delegate:register_connection_events(self, unpack(CLIENT_RPCS))
+	end
+
 	self._players = {}
 	self._time_since_update = 0
 end
@@ -21,6 +29,12 @@ function LiveEventManager:destroy()
 
 	if refresh_promise and refresh_promise:is_pending() then
 		refresh_promise:cancel()
+	end
+
+	self:_stop_current_event()
+
+	if not self._is_host then
+		self._event_delegate:unregister_events(unpack(CLIENT_RPCS))
 	end
 end
 
@@ -235,7 +249,6 @@ end
 function LiveEventManager:_update_player(dt, id)
 	local player_data = self._players[id]
 	local account_id = player_data.account_id
-	local is_host = self._is_host
 
 	for event_id, _ in pairs(self._events) do
 		if not player_data.progress[event_id] then
@@ -278,6 +291,55 @@ function LiveEventManager:_needs_update(dt, t)
 	return REFRESH_TIMER_SUCCESS < self._time_since_update
 end
 
+function LiveEventManager:_stop_current_event()
+	self._active_event_id = nil
+
+	if self._listener_id then
+		Managers.stats:remove_listener(self._listener_id)
+
+		self._listener_id = nil
+	end
+end
+
+function LiveEventManager:_start_event(event_id)
+	local event_data = self._events[event_id]
+	local template = LiveEvents[event_data.template_name]
+	local combat_feed = template.combat_feed
+
+	if combat_feed and self._is_host then
+		self._listener_id = Managers.stats:add_listener("TEAM", {
+			combat_feed.stat_id
+		}, callback(self, "_trigger_combat_feed", event_id))
+	end
+
+	self._active_event_id = event_id
+end
+
+function LiveEventManager:_update_active_event(dt, t)
+	local active_event_id = nil
+	local lowest_time = math.huge
+	local server_time = Managers.backend:get_server_time(t)
+
+	for event_id, event_data in pairs(self._events) do
+		local starts_at = event_data.starts_at
+		local ends_at = event_data.ends_at
+		local has_values = starts_at and ends_at
+		local is_active = has_values and starts_at <= server_time and server_time <= ends_at
+
+		if is_active and starts_at < lowest_time then
+			active_event_id = event_id
+		end
+	end
+
+	if active_event_id ~= self._active_event_id then
+		self:_stop_current_event()
+	end
+
+	if active_event_id ~= self._active_event_id then
+		self:_start_event(active_event_id)
+	end
+end
+
 function LiveEventManager:update(dt, t)
 	local is_refreshing = self._refresh_promise
 
@@ -295,24 +357,10 @@ function LiveEventManager:update(dt, t)
 		self:_update_player(dt, id)
 	end
 
-	local active_event_id = nil
-	local server_time = Managers.backend:get_server_time(t)
-
-	for event_id, event_data in pairs(self._events) do
-		local starts_at = event_data.starts_at
-		local ends_at = event_data.ends_at
-		local has_values = starts_at and ends_at
-		local is_active = has_values and starts_at <= server_time and server_time <= ends_at
-
-		if is_active then
-			active_event_id = event_id
-		end
-	end
-
-	self._active_event_id = active_event_id
+	self:_update_active_event(dt, t)
 end
 
-local function get_template_name(str)
+local function get_template_name_from_old_category(str)
 	if type(str) ~= "string" then
 		return
 	end
@@ -326,8 +374,17 @@ local function get_template_name(str)
 	return table.concat(table.slice(parts, 2, #parts - 2), "-")
 end
 
+local function get_template_name_from_track_name(str)
+	if type(str) ~= "string" then
+		return
+	end
+
+	local parts = string.split(str, "-")
+
+	return table.concat(table.slice(parts, 1, #parts - 1), "-")
+end
+
 function LiveEventManager:_clear_events()
-	self._active_event_id = nil
 	local events = self._events
 
 	table.clear(events)
@@ -336,7 +393,19 @@ end
 function LiveEventManager:_add_event(backend_data)
 	local id = backend_data.id
 	local category = backend_data.category
-	local template_name = get_template_name(category)
+	local name = backend_data.name
+
+	Log.info("LiveEventManager", "Category: %s, name: %s", category, backend_data.name)
+
+	local template_name = get_template_name_from_track_name(name)
+
+	Log.info("LiveEventManager", "template-name: %s", template_name)
+
+	if not LiveEvents[template_name] then
+		template_name = get_template_name_from_old_category(category)
+
+		Log.info("LiveEventManager", "template-name: %s", template_name)
+	end
 
 	if not LiveEvents[template_name] then
 		Log.warning("LiveEventManager", "No template for event '%s' with category '%s'.", id, category)
@@ -428,7 +497,7 @@ function LiveEventManager:active_tiers()
 end
 
 function LiveEventManager:active_event_id()
-	return self._active_event_id
+	return self._events[self._active_event_id] and self._active_event_id or nil
 end
 
 function LiveEventManager:_get_current_xp(id, event_id)
@@ -465,12 +534,49 @@ function LiveEventManager:active_time_left(optional_t)
 	local event_data = self:_active_event()
 
 	if not event_data or not event_data.ends_at then
-		return -math.huge
+		return 0
 	end
 
 	local t = Managers.backend:get_server_time(optional_t or Managers.time:time("main"))
 
 	return (event_data.ends_at - t) / 1000
+end
+
+function LiveEventManager:_show_combat_feed_message(amount)
+	local event_data = self:_active_event()
+
+	if not event_data then
+		return
+	end
+
+	local template = LiveEvents[event_data.template_name]
+	local combat_feed = template.combat_feed
+
+	if not combat_feed then
+		return
+	end
+
+	local loc_key = combat_feed.loc_key
+	local message = Localize(loc_key, true, {
+		amount = amount
+	})
+	local notification_type = table.nested_get(Managers.save:account_data(), "interface_settings", "crafting_pickup_notification_type")
+
+	if notification_type == "combat_feed" then
+		Managers.event:trigger("event_add_combat_feed_message", message)
+	elseif notification_type == "notification" then
+		Managers.event:trigger("event_add_notification_message", "default", message)
+	end
+end
+
+function LiveEventManager:rpc_live_event_trigger_combat_feed(channel_id, amount)
+	self:_show_combat_feed_message(amount)
+end
+
+function LiveEventManager:_trigger_combat_feed(event_id, listener_id, stat_id, amount)
+	if self._is_host then
+		Managers.state.game_session:send_rpc_clients("rpc_live_event_trigger_combat_feed", amount)
+	end
 end
 
 return LiveEventManager

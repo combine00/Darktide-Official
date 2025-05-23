@@ -33,6 +33,7 @@ local chaos_hound = {
 		has_disabled_player = "boolean"
 	},
 	summon_unit = {
+		last_owner_position = "Vector3Box",
 		owner = "Unit"
 	}
 }

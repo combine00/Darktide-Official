@@ -165,30 +165,18 @@ function MoveablePlatformExtension:can_move()
 	local can_activate_wall_collision_enabled = not self._wall_collision_enabled or self._wall_collision_enabled and not self:_passengers_inside_walls()
 
 	if not all_on_board or not can_activate_wall_collision_enabled then
-		self:_set_block_text("loc_action_interaction_inactive_platform_missing_players")
-
-		return false
+		return false, "loc_action_interaction_inactive_platform_missing_players"
 	end
 
-	local hostiles_onboard = self:_check_hostile_onboard()
+	if self._require_all_players_onboard then
+		local hostiles_onboard = self:_check_hostile_onboard()
 
-	if hostiles_onboard and self._require_all_players_onboard then
-		self:_set_block_text("loc_action_interaction_inactive_platform_hostiles_onboard")
-
-		return false
+		if hostiles_onboard then
+			return false, "loc_action_interaction_inactive_platform_hostiles_onboard"
+		end
 	end
 
-	self:_set_block_text(nil)
-
-	return true
-end
-
-function MoveablePlatformExtension:_set_block_text(text)
-	self._block_text = text
-end
-
-function MoveablePlatformExtension:block_text()
-	return self._block_text
+	return true, nil
 end
 
 function MoveablePlatformExtension:_set_direction(direction)
@@ -827,6 +815,14 @@ function MoveablePlatformExtension:destroy()
 			nav_mesh_manager:set_allowed_nav_tag_layer(layer_name_stop, true)
 		end
 	end
+
+	if self._nav_tag_start_volume then
+		Managers.state.nav_mesh:remove_nav_tag_volume(self._nav_tag_start_volume)
+	end
+
+	if self._nav_tag_stop_volume then
+		Managers.state.nav_mesh:remove_nav_tag_volume(self._nav_tag_stop_volume)
+	end
 end
 
 function MoveablePlatformExtension:_valid_passenger_player_unit(player_unit)
@@ -902,9 +898,7 @@ function MoveablePlatformExtension:_setup_nav_gates(unit)
 	local volume_points = Unit.volume_points(unit, "g_volume_block")
 	local volume_height = Unit.volume_height(unit, "g_volume_block")
 	local volume_alt_min, volume_alt_max = self:_get_volume_alt_min_max(volume_points, volume_height)
-
-	Managers.state.nav_mesh:add_nav_tag_volume(volume_points, volume_alt_min, volume_alt_max, layer_name_start, true)
-
+	self._nav_tag_start_volume = Managers.state.nav_mesh:add_nav_tag_volume(volume_points, volume_alt_min, volume_alt_max, layer_name_start, true)
 	self._layer_name_start = layer_name_start
 	local offset_position = self._stop_position:unbox() - Unit.world_position(unit, 1)
 
@@ -914,9 +908,7 @@ function MoveablePlatformExtension:_setup_nav_gates(unit)
 	end
 
 	volume_alt_min, volume_alt_max = self:_get_volume_alt_min_max(volume_points, volume_height)
-
-	Managers.state.nav_mesh:add_nav_tag_volume(volume_points, volume_alt_min, volume_alt_max, layer_name_stop, false)
-
+	self._nav_tag_stop_volume = Managers.state.nav_mesh:add_nav_tag_volume(volume_points, volume_alt_min, volume_alt_max, layer_name_stop, false)
 	self._layer_name_stop = layer_name_stop
 end
 

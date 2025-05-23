@@ -40,6 +40,8 @@ function PickupSystem:init(context, system_init_data, ...)
 	self._rubberband_pool_remaining = {}
 	self._rubberband_pool_special_spawned = {}
 	self._rubberband_free_spots = 0
+	self._unit_to_skip_group = {}
+	self._skip_group_count = {}
 
 	if is_server then
 		self:_create_game_object(self._game_session)
@@ -234,7 +236,11 @@ function PickupSystem:_populate_pickups()
 	local num_spawners = #PICKUP_SPAWNER_EXTENSIONS
 	local pickup_spawners = PICKUP_SPAWNER_EXTENSIONS
 
-	table.sort(pickup_spawners, _compare_absolute_spawner_position)
+	if Managers.state.main_path:path_type() == "linear" then
+		table.sort(pickup_spawners, _compare_absolute_spawner_position)
+	else
+		self._seed = self:_shuffle(pickup_spawners, self._seed)
+	end
 
 	for i = 1, num_spawners do
 		pickup_spawners[i]:spawn_guaranteed()
@@ -620,7 +626,12 @@ function PickupSystem:_spawn_spread_pickups(pickup_spawners, distribution_type, 
 	end
 
 	local spawners_after_chest_remove = #USABLE_SPAWNERS
-	seed = self:_spawn_linear_pickups(distribution_type, pickup_pool, USABLE_SPAWNERS, PICKUPS_TO_SPAWN, seed)
+
+	if Managers.state.main_path:path_type() == "linear" then
+		seed = self:_spawn_linear_pickups(distribution_type, pickup_pool, USABLE_SPAWNERS, PICKUPS_TO_SPAWN, seed)
+	else
+		seed = self:_spawn_open_pickups(distribution_type, pickup_pool, USABLE_SPAWNERS, PICKUPS_TO_SPAWN, seed)
+	end
 
 	for i = 1, #USABLE_SPAWNERS do
 		if USABLE_SPAWNERS[i].chest then
@@ -774,6 +785,37 @@ function PickupSystem:_spawn_linear_pickups(distribution_type, pickup_pool, usab
 	return seed
 end
 
+function PickupSystem:_spawn_open_pickups(distribution_type, pickup_pool, usable_spawners, pickups_to_spawn, seed)
+	table.clear(pickups_to_spawn)
+
+	for pickup_type, value in pairs(pickup_pool) do
+		for pickup_name, amount in pairs(value) do
+			for i = 1, amount do
+				local selected_pickup_name = pickup_name
+				local selector_func = PICKUP_SELECTOR[pickup_name]
+
+				if selector_func then
+					selected_pickup_name, seed = selector_func(seed)
+				end
+
+				pickups_to_spawn[#pickups_to_spawn + 1] = selected_pickup_name
+			end
+		end
+	end
+
+	for i = #usable_spawners, 1, -1 do
+		local spawner = usable_spawners[i]
+		local success, pickup_index = self:_check_spawn(spawner, pickups_to_spawn)
+
+		if success then
+			table.remove(pickups_to_spawn, pickup_index)
+			table.remove(usable_spawners, i)
+		end
+	end
+
+	return seed
+end
+
 function PickupSystem:_check_spawn(spawner, pickups_to_spawn, pickup_type)
 	local num_pickups_to_spawn = #pickups_to_spawn
 	local spawner_extension = spawner.extension
@@ -820,8 +862,34 @@ function PickupSystem:has_interacted(pickup_unit, player_session_id)
 	return table.array_contains(interactors, player_session_id)
 end
 
-function PickupSystem:spawn_pickup(pickup_name, position, rotation, optional_pickup_spawner, optional_placed_on_unit, optional_spawn_interaction_cooldown, optional_origin_player)
+function PickupSystem:_skip_group_blocks(skip_group)
+	if not skip_group then
+		return false
+	end
+
+	local count = self._skip_group_count[skip_group] or 0
+	local soft_cap = PickupSettings.skip_group.soft_cap
+	local hard_cap = PickupSettings.skip_group.hard_cap
+
+	if hard_cap <= count then
+		return true
+	end
+
+	if soft_cap <= count and math.random(hard_cap - soft_cap) <= count - soft_cap then
+		return true
+	end
+
+	return false
+end
+
+function PickupSystem:spawn_pickup(pickup_name, position, rotation, optional_pickup_spawner, optional_placed_on_unit, optional_spawn_interaction_cooldown, optional_origin_player, skip_group)
 	local pickup_settings = PICKUPS_BY_NAME[pickup_name]
+	local skip_spawning = self:_skip_group_blocks(skip_group)
+
+	if skip_spawning then
+		return
+	end
+
 	local unit_template_name = pickup_settings.unit_template_name
 	local unit_name = pickup_settings.unit_name
 
@@ -836,12 +904,25 @@ function PickupSystem:spawn_pickup(pickup_name, position, rotation, optional_pic
 		rotation = Quaternion.multiply(rotation, new_rotation)
 	end
 
+	if pickup_settings.randomized_rotation then
+		local lim = 360
+		local rx, ry, rz = unpack(pickup_settings.randomized_rotation)
+		local random_rotation = Quaternion.from_euler_angles_xyz(rx and math.random() * lim or 0, ry and math.random() * lim or 0, rz and math.random() * lim or 0)
+		rotation = Quaternion.multiply(rotation, random_rotation)
+	end
+
 	local pickup_unit, pickup_unit_go_id = Managers.state.unit_spawner:spawn_network_unit(unit_name, unit_template_name, position, rotation, nil, pickup_settings, optional_placed_on_unit, optional_spawn_interaction_cooldown, optional_origin_player)
-	self._spawned_pickups[#self._spawned_pickups + 1] = pickup_unit
+	local spawned_pickups = self._spawned_pickups
+	spawned_pickups[#spawned_pickups + 1] = pickup_unit
 	self._pickup_to_interactors[pickup_unit] = {}
 
 	if optional_pickup_spawner then
 		self._pickup_to_spawner[pickup_unit] = optional_pickup_spawner
+	end
+
+	if skip_group then
+		self._skip_group_count[skip_group] = (self._skip_group_count[skip_group] or 0) + 1
+		self._unit_to_skip_group[pickup_unit] = skip_group
 	end
 
 	return pickup_unit, pickup_unit_go_id
@@ -856,29 +937,22 @@ function PickupSystem:player_spawn_pickup(pickup_name, position, rotation, playe
 end
 
 function PickupSystem:despawn_pickup(pickup_unit)
-	local unit_spawner_manager = Managers.state.unit_spawner
 	local spawned_pickups = self._spawned_pickups
-	local num_spawned_pickups = #spawned_pickups
 	self._pickup_to_spawner[pickup_unit] = nil
 	self._pickup_to_owner[pickup_unit] = nil
 	self._pickup_to_owner_player[pickup_unit] = nil
 	self._pickup_to_interactors[pickup_unit] = nil
-	local deleted_index = nil
-	local ALIVE = ALIVE
+	local skip_group = self._unit_to_skip_group[pickup_unit]
 
-	for i = 1, num_spawned_pickups do
-		local unit = spawned_pickups[i]
-
-		if ALIVE[unit] and unit == pickup_unit then
-			unit_spawner_manager:mark_for_deletion(unit)
-
-			deleted_index = i
-
-			break
-		end
+	if skip_group then
+		self._skip_group_count[skip_group] = self._skip_group_count[skip_group] - 1
+		self._unit_to_skip_group[pickup_unit] = nil
 	end
 
-	table.swap_delete(self._spawned_pickups, deleted_index)
+	local deleted_index = table.index_of(spawned_pickups, pickup_unit)
+
+	Managers.state.unit_spawner:mark_for_deletion(pickup_unit)
+	table.swap_delete(spawned_pickups, deleted_index)
 end
 
 function PickupSystem:interact_with(pickup_unit, player_session_id)

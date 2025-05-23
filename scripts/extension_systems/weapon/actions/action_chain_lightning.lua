@@ -63,6 +63,7 @@ function ActionChainLightning:init(action_context, action_params, action_setting
 	local first_person_unit = self._first_person_unit
 	local player_unit = self._player_unit
 	local physics_world = self._physics_world
+	local is_server = self._is_server
 	local unit_data_extension = action_context.unit_data_extension
 	self._action_component = unit_data_extension:write_component("action_shoot")
 	local action_module_charge_component = unit_data_extension:write_component("action_module_charge")
@@ -71,14 +72,14 @@ function ActionChainLightning:init(action_context, action_params, action_setting
 	local target_finder_module_class_name = action_settings.target_finder_module_class_name
 	local targeting_module_component = unit_data_extension:write_component("action_module_targeting")
 	self._targeting_module_component = targeting_module_component
-	self._targeting_module = ActionModules[target_finder_module_class_name]:new(physics_world, player_unit, targeting_module_component, action_settings)
+	self._targeting_module = ActionModules[target_finder_module_class_name]:new(is_server, physics_world, player_unit, targeting_module_component, action_settings)
 	local overload_module_class_name = action_settings.overload_module_class_name
 
 	if overload_module_class_name then
-		self._overload_module = ActionModules[overload_module_class_name]:new(player_unit, action_settings, self._inventory_slot_component)
+		self._overload_module = ActionModules[overload_module_class_name]:new(is_server, player_unit, action_settings, self._inventory_slot_component)
 	end
 
-	self._charge_module = ActionModules.charge:new(physics_world, player_unit, first_person_unit, action_module_charge_component, action_settings)
+	self._charge_module = ActionModules.charge:new(is_server, physics_world, player_unit, first_person_unit, action_module_charge_component, action_settings)
 	local fx_settings = action_settings.fx
 	local looping_shoot_sfx_alias = fx_settings.looping_shoot_sfx_alias
 
@@ -529,7 +530,7 @@ function ActionChainLightning:_deal_damage(t, time_in_action, source_item)
 			power_level = power_level * random_mod
 		end
 
-		local damage_dealt, attack_result, damage_efficiency, stagger_result, hit_weakspot = ChainLightning.execute_attack(unit, player_unit, power_level, attack_charge, depth, ii, attack_direction, damage_profile, damage_type, is_critical_strike, source_item)
+		ChainLightning.execute_attack(unit, player_unit, power_level, attack_charge, depth, ii, attack_direction, damage_profile, damage_type, is_critical_strike, source_item)
 	end
 end
 

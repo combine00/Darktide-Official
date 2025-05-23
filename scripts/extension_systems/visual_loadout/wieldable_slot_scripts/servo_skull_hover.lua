@@ -4,7 +4,7 @@ local LOOPING_PARTICLE_ALIAS = "equipped_item_passive"
 local FX_SOURCE_NAME = "_antigrav"
 local EXTERNAL_PROPERTIES = {}
 
-function ServoSkullHover:init(context, slot, weapon_template, fx_sources)
+function ServoSkullHover:init(context, slot, weapon_template, fx_sources, item, unit_1p, unit_3p)
 	self._world = context.world
 	local fx_extension = context.fx_extension
 	local visual_loadout_extension = context.visual_loadout_extension

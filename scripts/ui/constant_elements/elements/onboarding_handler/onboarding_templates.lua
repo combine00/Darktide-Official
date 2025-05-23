@@ -896,10 +896,8 @@ local templates = {
 				return
 			end
 
-			local narrative_manager = Managers.narrative
-
-			if narrative_manager:get_havoc_unlock_status() == "unlocked" then
-				narrative_manager:skip_story("unlock_havoc")
+			if Managers.data_service.havoc:get_havoc_unlock_status() == "unlocked" then
+				Managers.narrative:skip_story("unlock_havoc")
 
 				return
 			end
@@ -953,7 +951,7 @@ local templates = {
 
 			local narrative_manager = Managers.narrative
 
-			if narrative_manager:get_havoc_unlock_status() == "unlocked" then
+			if Managers.data_service.havoc:get_havoc_unlock_status() == "unlocked" then
 				narrative_manager:skip_story("unlock_havoc")
 
 				return
@@ -968,7 +966,6 @@ local templates = {
 
 			Managers.event:trigger("event_add_mission_objective", objective)
 			Managers.data_service.havoc:set_havoc_unlock_status("awaiting_maelstrom_completion")
-			narrative_manager:set_havoc_unlock_status("awaiting_maelstrom_completion")
 		end,
 		on_deactivation = function (self, close_condition_met)
 			if not self.objective then
@@ -1010,7 +1007,7 @@ local templates = {
 
 			local narrative_manager = Managers.narrative
 
-			if narrative_manager:get_havoc_unlock_status() == "unlocked" then
+			if Managers.data_service.havoc:get_havoc_unlock_status() == "unlocked" then
 				narrative_manager:skip_story("unlock_havoc")
 
 				return
@@ -1042,7 +1039,6 @@ local templates = {
 			if close_condition_met then
 				Managers.narrative:complete_current_chapter("unlock_havoc", "unlock_havoc_3")
 				Managers.data_service.havoc:set_havoc_unlock_status("unlocked")
-				Managers.narrative:set_havoc_unlock_status("unlocked")
 			end
 		end,
 		close_condition = function (self)

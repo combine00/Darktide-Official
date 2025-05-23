@@ -38,6 +38,7 @@ function Destructible:init(unit, is_server)
 				end)
 
 				local num_destructible_stages = #destructible_stages
+				self._skip_stages = self:get_data(unit, "skip_stages")
 				self._destructible_stages = destructible_stages
 				self._has_run_first_stage_update = self._is_server
 				self._current_health_percent = 1
@@ -50,11 +51,9 @@ function Destructible:init(unit, is_server)
 
 			if collectible_type and collectible_type ~= "none" then
 				local collectible_name = self:get_data(unit, "collectible_name")
-				local collectible_id = self:get_data(unit, "collectible_id")
 				local collectible_section_id = self:get_data(unit, "collectible_section_id")
 				collectible_data = {
 					name = collectible_name,
-					id = collectible_id,
 					section_id = collectible_section_id
 				}
 			end
@@ -90,6 +89,43 @@ function Destructible:extensions_ready(world, unit)
 	end
 end
 
+local function get_current_stage(destructible_stages, current_health_percent)
+	local stage_count = destructible_stages and #destructible_stages or 0
+
+	for i = stage_count, 1, -1 do
+		local stage = destructible_stages[i]
+		local next_stage = destructible_stages[i + 1]
+		local above_next_threshold = not next_stage or next_stage.health_threshold < current_health_percent
+		local below_curr_threshold = current_health_percent <= stage.health_threshold
+
+		if above_next_threshold and below_curr_threshold then
+			return i, stage_count
+		end
+	end
+
+	return 1, stage_count
+end
+
+function Destructible:_hotjoin_stage_update(unit, dt, t)
+	local destructible_stages = self._destructible_stages
+
+	if not destructible_stages then
+		return false
+	end
+
+	local current_health_percent = self._current_health_percent
+	local current_stage_index, stage_count = get_current_stage(destructible_stages, current_health_percent)
+	local stage = destructible_stages[current_stage_index]
+	local hot_join_event_name = stage.hot_join_event_name
+
+	if hot_join_event_name ~= "" then
+		Unit.flow_event(unit, hot_join_event_name)
+	end
+
+	self._has_run_first_stage_update = true
+	self._current_stage_index = current_stage_index
+end
+
 function Destructible:update(unit, dt, t)
 	local destructible_stages = self._destructible_stages
 	local damage_material_slot_name = self._damage_material_slot_name
@@ -106,71 +142,42 @@ function Destructible:update(unit, dt, t)
 		return false
 	end
 
-	local last_stage_index = self._current_stage_index
 	local last_health_percent = self._current_health_percent
 	local current_health_percent = health_extension:current_health_percent()
+	local health_changed = current_health_percent ~= last_health_percent
 
-	if destructible_stages and not self._is_server and not self._has_run_first_stage_update then
-		for ii = #destructible_stages, 1, -1 do
-			local stage = destructible_stages[ii]
-			local next_stage = destructible_stages[ii + 1]
-			local within_threshold = nil
+	if health_changed and has_damage_material then
+		local material_value = 1 - current_health_percent
+		material_value = 0
 
-			if next_stage then
-				within_threshold = current_health_percent <= stage.health_threshold and next_stage.health_threshold < current_health_percent
-			else
-				within_threshold = current_health_percent <= stage.health_threshold
-			end
-
-			if within_threshold then
-				local hot_join_event_name = stage.hot_join_event_name
-
-				if hot_join_event_name ~= "" then
-					Unit.flow_event(unit, hot_join_event_name)
-				end
-
-				self._current_health_percent = current_health_percent
-				self._current_stage_index = ii
-				last_health_percent = current_health_percent
-				last_stage_index = ii
-
-				break
-			end
-		end
-
-		self._has_run_first_stage_update = true
+		Unit.set_scalar_for_material(unit, damage_material_slot_name, damage_amount_variable_name, material_value)
 	end
 
-	if current_health_percent ~= last_health_percent then
-		if has_damage_material then
-			local material_value = 1 - current_health_percent
-			material_value = 0
+	local needs_hotjoin_update = not self._is_server and not self._has_run_first_stage_update
 
-			Unit.set_scalar_for_material(unit, damage_material_slot_name, damage_amount_variable_name, material_value)
-		end
+	if needs_hotjoin_update then
+		self:_hotjoin_stage_update(unit, dt, t)
+	end
 
-		if destructible_stages then
-			for ii = #destructible_stages, 1, -1 do
-				local stage = destructible_stages[ii]
-				local next_stage = destructible_stages[ii + 1]
-				local within_threshold = nil
+	local last_stage_index = self._current_stage_index
+	local current_stage_index = health_changed and get_current_stage(destructible_stages, current_health_percent) or last_stage_index
 
-				if next_stage then
-					within_threshold = current_health_percent <= stage.health_threshold and next_stage.health_threshold < current_health_percent
-				else
-					within_threshold = current_health_percent <= stage.health_threshold
-				end
+	if last_stage_index < current_stage_index then
+		local start_at = self._skip_stages and current_stage_index or last_stage_index + 1
 
-				local stage_lowered = last_stage_index < ii
+		for i = start_at, current_stage_index do
+			local stage = destructible_stages[i]
+			local event_name = stage.event_name
 
-				if within_threshold and stage_lowered then
-					Unit.flow_event(unit, stage.event_name)
-
-					self._current_stage_index = ii
-				end
+			if event_name ~= "" then
+				Unit.flow_event(unit, event_name)
 			end
 		end
 
+		self._current_stage_index = current_stage_index
+	end
+
+	if health_changed then
 		self._current_health_percent = current_health_percent
 	end
 
@@ -388,6 +395,11 @@ Destructible.component_data = {
 		ui_name = "Broadphase Radius",
 		step = 0.1
 	},
+	skip_stages = {
+		ui_type = "check_box",
+		value = true,
+		ui_name = "Skip stages"
+	},
 	mass = {
 		ui_type = "number",
 		min = 0,
@@ -438,14 +450,6 @@ Destructible.component_data = {
 		value = false,
 		ui_name = "use_health_extension_health",
 		category = "DO NOT USE - IS HACK"
-	},
-	collectible_id = {
-		ui_type = "number",
-		min = 0,
-		decimals = 0,
-		category = "Collectibles",
-		value = 1,
-		ui_name = "Collectible ID"
 	},
 	collectible_section_id = {
 		ui_type = "number",

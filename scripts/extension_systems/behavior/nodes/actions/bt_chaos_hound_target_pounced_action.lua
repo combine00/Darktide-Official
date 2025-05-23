@@ -1,6 +1,7 @@
 require("scripts/extension_systems/behavior/nodes/bt_node")
 
 local Attack = require("scripts/utilities/attack/attack")
+local AttackIntensity = require("scripts/utilities/attack_intensity")
 local AttackSettings = require("scripts/settings/damage/attack_settings")
 local Blackboard = require("scripts/extension_systems/blackboard/utilities/blackboard")
 local Explosion = require("scripts/utilities/attack/explosion")
@@ -172,6 +173,7 @@ function BtChaosHoundTargetPouncedAction:_damage_target(unit, pounce_target, act
 	local attack_type = AttackSettings.attack_types.melee
 	local damage_type = action_data.damage_type
 
+	AttackIntensity.set_attacked(pounce_target)
 	Attack.execute(pounce_target, damage_profile, "power_level", power_level, "hit_world_position", hit_position, "attack_type", attack_type, "attacking_unit", unit, "damage_type", damage_type)
 end
 

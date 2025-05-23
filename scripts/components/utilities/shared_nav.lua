@@ -12,12 +12,12 @@ function SharedNav.create_nav_info()
 end
 
 local function _clear_nav_info(nav_info)
-	local nav_world_from_level_id = nav_info.nav_world_from_level_id
+	local traverse_logic_from_level_id = nav_info.traverse_logic_from_level_id
 
-	for level_id, nav_world in pairs(nav_world_from_level_id) do
-		GwNavWorld.destroy(nav_world)
+	for level_id, traverse_logic in pairs(traverse_logic_from_level_id) do
+		GwNavTraverseLogic.destroy(traverse_logic)
 
-		nav_world_from_level_id[level_id] = nil
+		traverse_logic_from_level_id[level_id] = nil
 	end
 
 	local nav_tag_cost_table_from_level_id = nav_info.nav_tag_cost_table_from_level_id
@@ -28,12 +28,12 @@ local function _clear_nav_info(nav_info)
 		nav_tag_cost_table_from_level_id[level_id] = nil
 	end
 
-	local traverse_logic_from_level_id = nav_info.traverse_logic_from_level_id
+	local nav_world_from_level_id = nav_info.nav_world_from_level_id
 
-	for level_id, traverse_logic in pairs(traverse_logic_from_level_id) do
-		GwNavTraverseLogic.destroy(traverse_logic)
+	for level_id, nav_world in pairs(nav_world_from_level_id) do
+		GwNavWorld.destroy(nav_world)
 
-		traverse_logic_from_level_id[level_id] = nil
+		nav_world_from_level_id[level_id] = nil
 	end
 end
 

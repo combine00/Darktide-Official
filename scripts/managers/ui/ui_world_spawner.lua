@@ -17,19 +17,6 @@ function UIWorldSpawner:init(world_name, world_layer, timer_name, optional_view_
 	self._unit_spawner = UIUnitSpawner:new(world)
 	self._world = world
 	self._story_speed = 1
-	self._default_animation_data = {
-		x = {
-			value = 0
-		},
-		y = {
-			value = 0
-		},
-		z = {
-			value = 0
-		}
-	}
-	self._camera_rotation_animation_data = table.clone(self._default_animation_data)
-	self._camera_position_animation_data = table.clone(self._default_animation_data)
 end
 
 function UIWorldSpawner:play_story(story_name, start_time, play_backwards, on_complete_callback, on_complete_callback_time_fraction)
@@ -303,11 +290,53 @@ function UIWorldSpawner:_create_world(world_name, layer, timer_name, optional_vi
 	return world
 end
 
+local function quaternion_apply(data, name, quaternion)
+	return data[name]:store(quaternion)
+end
+
+local function quaternion_get(data)
+	return data.value:unbox()
+end
+
+local function quaternion_lerp(from, to, percent)
+	return Quaternion.lerp(from:unbox(), to:unbox(), percent)
+end
+
+local function quaternion_animation_data(default)
+	return {
+		value = QuaternionBox(default),
+		from = QuaternionBox(default),
+		to = QuaternionBox(default),
+		apply = quaternion_apply,
+		lerp = quaternion_lerp,
+		get = quaternion_get
+	}
+end
+
+local function direct_apply(data, name, value)
+	data[name] = value
+end
+
+local function direct_get(data)
+	return data.value
+end
+
+local function numeric_animation_data(default)
+	return {
+		value = default,
+		from = default,
+		to = default,
+		apply = direct_apply,
+		lerp = math.lerp,
+		get = direct_get
+	}
+end
+
 function UIWorldSpawner:create_viewport(camera_unit, viewport_name, viewport_type, viewport_layer, shading_environment, shading_callback, render_targets)
 	local world = self._world
 
 	if self._viewport then
-		local ignore_camera_destruction = true
+		local ignore_camera_destruction = self._ignore_camera_destruction
 
 		ScriptWorld.destroy_viewport(world, self._viewport_name, ignore_camera_destruction)
 
@@ -316,11 +345,7 @@ function UIWorldSpawner:create_viewport(camera_unit, viewport_name, viewport_typ
 	end
 
 	shading_callback = shading_callback or callback(self, "_shading_callback")
-
-	if not camera_unit then
-		self._handle_camera_unit_destruction = true
-	end
-
+	self._ignore_camera_destruction = camera_unit ~= nil
 	local viewport = ScriptWorld.create_viewport(world, viewport_name, viewport_type, viewport_layer, camera_unit, nil, nil, nil, shading_environment, shading_callback, nil, render_targets)
 	self._viewport = viewport
 	self._viewport_name = viewport_name
@@ -332,10 +357,19 @@ function UIWorldSpawner:create_viewport(camera_unit, viewport_name, viewport_typ
 	local camera_rotation = Unit.world_rotation(camera_unit, 1)
 	self._boxed_camera_start_position = Vector3Box(camera_position)
 	self._boxed_camera_start_rotation = QuaternionBox(camera_rotation)
+	local fov = math.deg(Camera.vertical_fov(camera))
+	self._start_camera_fov = fov
+	self._camera_animation_data = {
+		fov = numeric_animation_data(fov),
+		rotation = quaternion_animation_data(camera_rotation),
+		position = {
+			dx = numeric_animation_data(0),
+			dy = numeric_animation_data(0),
+			dz = numeric_animation_data(0)
+		}
+	}
 
 	ScriptWorld.activate_viewport(world, viewport)
-
-	self._initial_fov = Camera.vertical_fov(camera) / math.pi * 180
 
 	return viewport
 end
@@ -376,7 +410,14 @@ function UIWorldSpawner:add_viewport_custom_output_targets(custom_render_targets
 	Viewport.add_custom_output_targets(self._viewport, custom_render_targets)
 end
 
-function UIWorldSpawner:change_camera_unit(camera_unit, add_shadow_cull_camera)
+function UIWorldSpawner:change_camera_unit(camera_unit, add_shadow_cull_camera, revert_camera_changes)
+	local is_same_unit = camera_unit == self._camera_unit
+
+	if not is_same_unit and revert_camera_changes then
+		self:reset_camera_target()
+		self:_update_camera(1e-06)
+	end
+
 	local viewport = self._viewport
 
 	ScriptWorld.change_camera_unit(viewport, camera_unit, add_shadow_cull_camera)
@@ -384,11 +425,17 @@ function UIWorldSpawner:change_camera_unit(camera_unit, add_shadow_cull_camera)
 	local camera = ScriptViewport.camera(viewport)
 	self._camera = camera
 	self._camera_unit = camera_unit
-	local camera_position = Unit.world_position(camera_unit, 1)
-	local camera_rotation = Unit.world_rotation(camera_unit, 1)
 
-	Vector3Box.store(self._boxed_camera_start_position, camera_position)
-	QuaternionBox.store(self._boxed_camera_start_rotation, camera_rotation)
+	if not is_same_unit then
+		local camera_position = Unit.world_position(camera_unit, 1)
+		local camera_rotation = Unit.world_rotation(camera_unit, 1)
+		self._start_camera_fov = math.deg(Camera.vertical_fov(camera))
+
+		Vector3Box.store(self._boxed_camera_start_position, camera_position)
+		QuaternionBox.store(self._boxed_camera_start_rotation, camera_rotation)
+	end
+
+	self:reset_camera_target()
 end
 
 function UIWorldSpawner:sync_camera_to_camera_unit(camera_unit)
@@ -404,6 +451,7 @@ function UIWorldSpawner:set_camera_position(position)
 
 	Unit.set_local_position(camera_unit, 1, position)
 	Vector3Box.store(self._boxed_camera_start_position, position)
+	self:reset_target_camera_offset()
 end
 
 function UIWorldSpawner:set_camera_rotation(rotation)
@@ -411,6 +459,7 @@ function UIWorldSpawner:set_camera_rotation(rotation)
 
 	Unit.set_local_rotation(camera_unit, 1, rotation)
 	QuaternionBox.store(self._boxed_camera_start_rotation, rotation)
+	self:reset_target_camera_rotation()
 end
 
 function UIWorldSpawner:set_viewport_position(x_scale, y_scale)
@@ -437,7 +486,10 @@ function UIWorldSpawner:_update_viewport_rect()
 end
 
 function UIWorldSpawner:_set_fov(fov)
-	Camera.set_vertical_fov(self._camera, math.pi * fov / 180)
+	self._start_camera_fov = fov
+
+	Camera.set_vertical_fov(self._camera, fov * math.pi / 180)
+	self:reset_target_camera_fov()
 end
 
 function UIWorldSpawner:boxed_camera_start_position()
@@ -475,24 +527,108 @@ function UIWorldSpawner:_shading_callback(world, shading_env, viewport, default_
 	end
 end
 
-function UIWorldSpawner:set_camera_rotation_axis_offset(axis, value, animation_time, func_ptr)
-	self:_animate_axis(self._camera_rotation_animation_data, axis, value, animation_time, func_ptr)
+function UIWorldSpawner:interpolate_to_camera(target_camera_unit, percent, animation_time, func_ptr)
+	local boxed_camera_start_position = self:boxed_camera_start_position()
+	local default_camera_world_position = Vector3.from_array(boxed_camera_start_position)
+	local target_world_position = Unit.world_position(target_camera_unit, 1)
+
+	self:set_target_camera_offset(percent * (target_world_position.x - default_camera_world_position.x), percent * (target_world_position.y - default_camera_world_position.y), percent * (target_world_position.z - default_camera_world_position.z), animation_time, func_ptr)
+
+	local boxed_camera_start_rotation = self:boxed_camera_start_rotation()
+	local default_camera_world_rotation = boxed_camera_start_rotation:unbox()
+	local target_world_rotation = Unit.world_rotation(target_camera_unit, 1)
+	local interpolated_world_rotation = Quaternion.lerp(default_camera_world_rotation, target_world_rotation, percent)
+
+	self:set_target_camera_rotation(interpolated_world_rotation, animation_time, func_ptr)
+
+	local start_camera_fov = self._start_camera_fov
+	local target_camera = Unit.camera(target_camera_unit, "camera")
+
+	if target_camera then
+		local target_fov = Camera.vertical_fov(target_camera) * 180 / math.pi
+		local current_fov = start_camera_fov + (target_fov - start_camera_fov) * percent
+
+		self:set_target_camera_fov(current_fov, animation_time, func_ptr)
+	else
+		self:set_target_camera_fov(start_camera_fov, animation_time, func_ptr)
+	end
 end
 
-function UIWorldSpawner:set_camera_position_axis_offset(axis, value, animation_time, func_ptr)
-	self:_animate_axis(self._camera_position_animation_data, axis, value, animation_time, func_ptr)
+function UIWorldSpawner:set_target_camera_offset_for_axis(axis, value, animation_time, func)
+	self:_set_animation_data(self._camera_animation_data.position[axis], value, 0, animation_time, func)
 end
 
-function UIWorldSpawner:camera_position_axis_offset(axis)
-	return self._camera_position_animation_data[axis].value
+function UIWorldSpawner:set_target_camera_rotation(target_world_rotation, animation_time, func_ptr)
+	local initial_rotation = self._boxed_camera_start_rotation:unbox()
+
+	self:_set_animation_data(self._camera_animation_data.rotation, target_world_rotation, initial_rotation, animation_time, func_ptr)
 end
 
-function UIWorldSpawner:reset_camera_rotation_axis_offset()
-	self._camera_rotation_animation_data = table.clone(self._default_animation_data)
+function UIWorldSpawner:set_target_camera_offset(dx, dy, dz, animation_time, func_ptr)
+	self:_set_animation_data(self._camera_animation_data.position.dx, dx, 0, animation_time, func_ptr)
+	self:_set_animation_data(self._camera_animation_data.position.dy, dy, 0, animation_time, func_ptr)
+	self:_set_animation_data(self._camera_animation_data.position.dz, dz, 0, animation_time, func_ptr)
 end
 
-function UIWorldSpawner:reset_camera_position_axis_offset()
-	self._camera_position_animation_data = table.clone(self._default_animation_data)
+function UIWorldSpawner:set_target_camera_position(x, y, z, animation_time, func_ptr)
+	local dx = x and x - self._boxed_camera_start_position.x or 0
+	local dy = y and y - self._boxed_camera_start_position.y or 0
+	local dz = z and z - self._boxed_camera_start_position.z or 0
+
+	self:set_target_camera_offset(dx, dy, dz, animation_time, func_ptr)
+end
+
+function UIWorldSpawner:set_target_camera_fov(target_fov, animation_time, func_ptr)
+	self:_set_animation_data(self._camera_animation_data.fov, target_fov, self._start_camera_fov, animation_time, func_ptr)
+end
+
+function UIWorldSpawner:reset_target_camera_fov(animation_time, func_ptr)
+	self:set_target_camera_fov(self._start_camera_fov, animation_time, func_ptr)
+end
+
+function UIWorldSpawner:reset_target_camera_offset(animation_time, func_ptr)
+	self:set_target_camera_offset(0, 0, 0, animation_time, func_ptr)
+end
+
+function UIWorldSpawner:reset_target_camera_rotation(animation_time, func_ptr)
+	self:set_target_camera_rotation(self._boxed_camera_start_rotation:unbox(), animation_time, func_ptr)
+end
+
+function UIWorldSpawner:reset_camera_target(animation_time, func_ptr)
+	self:reset_target_camera_fov(animation_time, func_ptr)
+	self:reset_target_camera_offset(animation_time, func_ptr)
+	self:reset_target_camera_rotation(animation_time, func_ptr)
+end
+
+local function linear(x)
+	return x
+end
+
+function UIWorldSpawner:_set_animation_data(data, target, default_value, animation_time, func_ptr)
+	data.total_time = animation_time or 0
+	data.time = 0
+	data.func = func_ptr or linear
+
+	data:apply("from", data:get() or default_value)
+	data:apply("to", target or default_value)
+end
+
+function UIWorldSpawner:_update_animation_data(data, dt)
+	local total_time = data.total_time
+
+	if total_time then
+		data.time = math.min(data.time + dt, total_time)
+		local percent = total_time > 0 and data.func(data.time / total_time) or 1
+		local value = data.lerp(data.from, data.to, percent)
+
+		data:apply("value", value)
+	end
+
+	if total_time and data.time == total_time then
+		data.total_time = false
+		data.time = 0
+		data.func = linear
+	end
 end
 
 function UIWorldSpawner:_animate_axis(source, axis, value, animation_time, func_ptr, optional_start_time)
@@ -538,46 +674,40 @@ function UIWorldSpawner:_set_world_blur_value(blur_amount)
 	end
 end
 
-function UIWorldSpawner:_update_animation_data(animation_data, dt)
-	for axis, data in pairs(animation_data) do
-		local total_time = data.total_time
-
-		if total_time then
-			local old_time = data.time
-			data.time = math.min(old_time + dt, total_time)
-			local progress = total_time > 0 and math.min(1, data.time / total_time) or 1
-			local func = data.func
-			local anim_progress = func and func(progress) or progress
-			data.value = (data.to - data.from) * anim_progress + data.from
-
-			if progress == 1 then
-				data.total_time = nil
-			end
-		end
-	end
+function UIWorldSpawner:_update_camera_animations(dt)
+	self:_update_animation_data(self._camera_animation_data.rotation, dt)
+	self:_update_animation_data(self._camera_animation_data.fov, dt)
+	self:_update_animation_data(self._camera_animation_data.position.dx, dt)
+	self:_update_animation_data(self._camera_animation_data.position.dy, dt)
+	self:_update_animation_data(self._camera_animation_data.position.dz, dt)
 end
 
 function UIWorldSpawner:_update_camera_rotation()
-	local camera_rotation_animation_data = self._camera_rotation_animation_data
-	local camera_rotation = self._boxed_camera_start_rotation:unbox()
-	local x = camera_rotation_animation_data.x.value
-	local y = camera_rotation_animation_data.y.value
-	local z = camera_rotation_animation_data.z.value
-	local camera_anim_rotation = Quaternion.from_euler_angles_xyz(x, y, z)
-	camera_rotation = Quaternion.multiply(camera_rotation, camera_anim_rotation)
+	local camera_rotation = self._camera_animation_data.rotation:get()
 
 	Unit.set_local_rotation(self._camera_unit, 1, camera_rotation)
 end
 
 function UIWorldSpawner:_update_camera_position()
 	local boxed_camera_start_position = self._boxed_camera_start_position
-	local camera_position_animation_data = self._camera_position_animation_data
+	local camera_position_animation_data = self._camera_animation_data.position
 	local camera_position_new = Vector3.zero()
-	camera_position_new.x = boxed_camera_start_position[1] + camera_position_animation_data.x.value
-	camera_position_new.y = boxed_camera_start_position[2] + camera_position_animation_data.y.value
-	camera_position_new.z = boxed_camera_start_position[3] + camera_position_animation_data.z.value
+	camera_position_new.x = boxed_camera_start_position[1] + camera_position_animation_data.dx:get()
+	camera_position_new.y = boxed_camera_start_position[2] + camera_position_animation_data.dy:get()
+	camera_position_new.z = boxed_camera_start_position[3] + camera_position_animation_data.dz:get()
 
 	Unit.set_local_position(self._camera_unit, 1, camera_position_new)
+end
+
+function UIWorldSpawner:_update_fov()
+	Camera.set_vertical_fov(self._camera, math.rad(self._camera_animation_data.fov:get()))
+end
+
+function UIWorldSpawner:_update_camera(dt)
+	self:_update_camera_animations(dt)
+	self:_update_camera_position()
+	self:_update_camera_rotation()
+	self:_update_fov()
 end
 
 function UIWorldSpawner:_update_world_blur(dt)
@@ -615,16 +745,17 @@ function UIWorldSpawner:update(dt, t)
 		self:_set_world_blur_value(blur_value)
 	end
 
-	if self._extension_manager then
-		self._extension_manager:pre_update(dt, t)
-		self._extension_manager:update()
+	local extension_manager = self._extension_manager
+
+	if extension_manager then
+		extension_manager:pre_update(dt, t)
+		extension_manager:update()
 	end
 
-	if self._viewport then
-		self:_update_animation_data(self._camera_position_animation_data, dt)
-		self:_update_animation_data(self._camera_rotation_animation_data, dt)
-		self:_update_camera_position()
-		self:_update_camera_rotation()
+	local animation_data = self._camera_animation_data
+
+	if animation_data then
+		self:_update_camera(dt)
 	end
 
 	local active_story_id = self._active_story_id
@@ -684,7 +815,9 @@ function UIWorldSpawner:destroy()
 	end
 
 	if self._viewport then
-		ScriptWorld.destroy_viewport(world, self._viewport_name)
+		local ignore_camera_destruction = self._ignore_camera_destruction
+
+		ScriptWorld.destroy_viewport(world, self._viewport_name, ignore_camera_destruction)
 
 		self._viewport = nil
 		self._viewport_name = nil

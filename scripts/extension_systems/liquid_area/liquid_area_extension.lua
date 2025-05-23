@@ -134,6 +134,13 @@ function LiquidAreaExtension:init(extension_init_context, unit, extension_init_d
 		size = 0
 	}
 	self._set_filled_send_array = Script.new_array(real_index_max_size)
+	self._use_liquid_drawer = template.use_liquid_drawer
+end
+
+function LiquidAreaExtension:set_drawer(drawers)
+	if self._use_liquid_drawer and self._area_template_name then
+		self._drawer = drawers[self._area_template_name]
+	end
 end
 
 function LiquidAreaExtension:game_object_initialized(game_session, game_object_id)
@@ -266,7 +273,12 @@ function LiquidAreaExtension:_set_filled(real_index)
 
 	if vfx_name_filled then
 		local rotation = liquid.rotation:unbox()
-		liquid.particle_id = World.create_particles(world, vfx_name_filled, position, rotation)
+
+		if self._drawer then
+			liquid.particle_id = self._drawer:add_cell(position, rotation)
+		else
+			liquid.particle_id = World.create_particles(world, vfx_name_filled, position, rotation)
+		end
 	else
 		liquid.particle_id = nil
 	end
@@ -368,7 +380,11 @@ function LiquidAreaExtension:destroy()
 		local particle_id = liquid.particle_id
 
 		if particle_id then
-			World.stop_spawning_particles(world, particle_id)
+			if self._drawer then
+				self._drawer:remove_cell(particle_id)
+			else
+				World.stop_spawning_particles(world, particle_id)
+			end
 		end
 	end
 

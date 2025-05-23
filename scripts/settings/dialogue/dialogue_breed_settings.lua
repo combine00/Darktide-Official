@@ -218,6 +218,7 @@ dialogue_breed_settings.mission_giver = {
 	wwise_voices = {
 		"sergeant_a",
 		"sergeant_b",
+		"sergeant_c",
 		"pilot_a",
 		"tech_priest_a",
 		"tech_priest_b",
@@ -259,7 +260,8 @@ dialogue_breed_settings.sergeant = {
 	wwise_voice_switch_group = "voice_profile",
 	wwise_voices = {
 		"sergeant_a",
-		"sergeant_b"
+		"sergeant_b",
+		"sergeant_c"
 	}
 }
 dialogue_breed_settings.explicator = {

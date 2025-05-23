@@ -47,6 +47,12 @@ function TimedSynchronizerExtension:start_event()
 	end
 end
 
+function TimedSynchronizerExtension:finished_event()
+	TimedSynchronizerExtension.super.finished_event(self)
+
+	self._paused = false
+end
+
 function TimedSynchronizerExtension:add_time(time)
 	if self._is_server then
 		local mission_objective = self._mission_objective_system:active_objective(self._objective_name)

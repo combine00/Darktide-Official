@@ -5,7 +5,7 @@ local LOOPING_HAND_VFX_ALIAS = "chain_lightning_hand"
 local DEFAULT_HAND = "left"
 local _vfx_external_properties = {}
 
-function ChainLightningHandEffects:init(context, slot, weapon_template, fx_sources)
+function ChainLightningHandEffects:init(context, slot, weapon_template, fx_sources, item, unit_1p, unit_3p)
 	self._world = context.world
 	self._physics_world = context.physics_world
 	self._is_husk = context.is_husk

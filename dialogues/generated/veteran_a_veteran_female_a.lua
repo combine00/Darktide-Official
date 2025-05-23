@@ -25,7 +25,7 @@ local veteran_a_veteran_female_a = {
 			[1.0] = "loc_veteran_female_a__combat_pause_limited_bolt_on_a_veteran_a_02_b_01"
 		},
 		sound_events_duration = {
-			[1.0] = 2.821167
+			[1.0] = 2.821146
 		},
 		randomize_indexes = {}
 	},
@@ -58,7 +58,7 @@ local veteran_a_veteran_female_a = {
 			[1.0] = "loc_veteran_female_a__combat_pause_limited_bolt_on_a_veteran_a_04_b_01"
 		},
 		sound_events_duration = {
-			[1.0] = 2.7
+			[1.0] = 2.699979
 		},
 		randomize_indexes = {}
 	},

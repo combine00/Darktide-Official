@@ -32,7 +32,7 @@ function AmmunitionInteraction:interactor_condition_func(interactor_unit, intera
 	return can_interact and AmmunitionInteraction.super.interactor_condition_func(self, interactor_unit, interactee_unit)
 end
 
-function AmmunitionInteraction:hud_block_text(interactor_unit, interactee_unit, interactable_actor_node_index)
+function AmmunitionInteraction:hud_block_text(interactor_unit, interactee_unit)
 	local can_interact = _can_interact(interactor_unit, interactee_unit)
 
 	if not can_interact then
@@ -43,7 +43,7 @@ function AmmunitionInteraction:hud_block_text(interactor_unit, interactee_unit, 
 		end
 	end
 
-	return AmmunitionInteraction.super.hud_block_text(self, interactor_unit, interactee_unit, interactable_actor_node_index)
+	return AmmunitionInteraction.super.hud_block_text(self, interactor_unit, interactee_unit)
 end
 
 function AmmunitionInteraction:_add_ammo(interactor_unit, pickup_data)

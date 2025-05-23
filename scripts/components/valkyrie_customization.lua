@@ -55,31 +55,31 @@ function ValkyrieCustomization:_build_socket(unit, world, spawned, landinggear_i
 	local lgi = "0" .. tostring(landinggear_index)
 	local socket_node = Unit.node(unit, "anim_valkyrie_" .. lgi .. "_landinggear_node")
 
-	World.link_unit(world, spawned, Unit.node(spawned, "anim_valkyrie_01_landinggear_01"), unit, socket_node, World.LINK_MODE_MAPE_NAME)
+	World.link_unit(world, spawned, Unit.node(spawned, "anim_valkyrie_01_landinggear_01"), unit, socket_node, World.LINK_MODE_MAP_NAME)
 
 	socket_node = Unit.node(unit, "anim_landinggear_" .. lgi .. "_piston_01_bottom_node")
 
-	World.link_unit(world, spawned, Unit.node(spawned, "anim_landinggear_01_piston_01_bottom"), unit, socket_node, World.LINK_MODE_MAPE_NAME)
+	World.link_unit(world, spawned, Unit.node(spawned, "anim_landinggear_01_piston_01_bottom"), unit, socket_node, World.LINK_MODE_MAP_NAME)
 
 	socket_node = Unit.node(unit, "anim_landinggear_" .. lgi .. "_piston_02_bottom_node")
 
-	World.link_unit(world, spawned, Unit.node(spawned, "anim_landinggear_01_piston_02_bottom"), unit, socket_node, World.LINK_MODE_MAPE_NAME)
+	World.link_unit(world, spawned, Unit.node(spawned, "anim_landinggear_01_piston_02_bottom"), unit, socket_node, World.LINK_MODE_MAP_NAME)
 
 	socket_node = Unit.node(unit, "anim_valkyrie_" .. lgi .. "_landinggear_foot_01_node")
 
-	World.link_unit(world, spawned, Unit.node(spawned, "anim_valkyrie_01_landinggear_foot_01"), unit, socket_node, World.LINK_MODE_MAPE_NAME)
+	World.link_unit(world, spawned, Unit.node(spawned, "anim_valkyrie_01_landinggear_foot_01"), unit, socket_node, World.LINK_MODE_MAP_NAME)
 
 	socket_node = Unit.node(unit, "anim_valkyrie_" .. lgi .. "_landinggear_foot_02_node")
 
-	World.link_unit(world, spawned, Unit.node(spawned, "anim_valkyrie_01_landinggear_foot_02"), unit, socket_node, World.LINK_MODE_MAPE_NAME)
+	World.link_unit(world, spawned, Unit.node(spawned, "anim_valkyrie_01_landinggear_foot_02"), unit, socket_node, World.LINK_MODE_MAP_NAME)
 
 	socket_node = Unit.node(unit, "anim_landinggear_" .. lgi .. "_piston_01_top_node")
 
-	World.link_unit(world, spawned, Unit.node(spawned, "anim_landinggear_01_piston_01_top"), unit, socket_node, World.LINK_MODE_MAPE_NAME)
+	World.link_unit(world, spawned, Unit.node(spawned, "anim_landinggear_01_piston_01_top"), unit, socket_node, World.LINK_MODE_MAP_NAME)
 
 	socket_node = Unit.node(unit, "anim_landinggear_" .. lgi .. "_piston_02_top_node")
 
-	World.link_unit(world, spawned, Unit.node(spawned, "anim_landinggear_01_piston_02_top"), unit, socket_node, World.LINK_MODE_MAPE_NAME)
+	World.link_unit(world, spawned, Unit.node(spawned, "anim_landinggear_01_piston_02_top"), unit, socket_node, World.LINK_MODE_MAP_NAME)
 end
 
 function ValkyrieCustomization:_build_valkyrie(index, unit, world, node_name, unit_name)
@@ -120,7 +120,7 @@ function ValkyrieCustomization:_build_valkyrie(index, unit, world, node_name, un
 	if string.find(node_name, "ap_valkyrie_landinggear_01") then
 		World.link_unit(world, spawned, 1, unit, socket_node, World.LINK_MODE_NODE_NAME)
 	elseif string.find(node_name, "landinggear") then
-		World.link_unit(world, spawned, 1, unit, socket_node, World.LINK_MODE_MAPE_NAME)
+		World.link_unit(world, spawned, 1, unit, socket_node, World.LINK_MODE_MAP_NAME)
 
 		if string.find(node_name, "2") then
 			self:_build_socket(unit, world, spawned, 2)

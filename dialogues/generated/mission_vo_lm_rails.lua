@@ -982,6 +982,57 @@ return function ()
 		post_wwise_event = "play_radio_static_end",
 		concurrent_wwise_event = "play_vox_static_loop",
 		pre_wwise_event = "play_radio_static_start",
+		name = "mission_rails_proceed_to_logistratum",
+		response = "mission_rails_proceed_to_logistratum",
+		database = "mission_vo_lm_rails",
+		wwise_route = 1,
+		category = "vox_prio_0",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"mission_info"
+			},
+			{
+				"query_context",
+				"trigger_id",
+				OP.EQ,
+				"mission_rails_proceed_to_logistratum"
+			},
+			{
+				"user_context",
+				"class_name",
+				OP.SET_INCLUDES,
+				args = {
+					"explicator",
+					"sergeant",
+					"tech_priest"
+				}
+			},
+			{
+				"faction_memory",
+				"mission_rails_proceed_to_logistratum",
+				OP.EQ,
+				0
+			}
+		},
+		on_done = {
+			{
+				"faction_memory",
+				"mission_rails_proceed_to_logistratum",
+				OP.ADD,
+				1
+			}
+		},
+		heard_speak_routing = {
+			target = "disabled"
+		}
+	})
+	define_rule({
+		post_wwise_event = "play_radio_static_end",
+		concurrent_wwise_event = "play_vox_static_loop",
+		pre_wwise_event = "play_radio_static_start",
 		name = "mission_rails_refectory",
 		response = "mission_rails_refectory",
 		database = "mission_vo_lm_rails",

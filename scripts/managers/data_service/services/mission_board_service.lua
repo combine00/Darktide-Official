@@ -62,4 +62,12 @@ function MissionBoardService:get_rewards()
 	return self._backend_interface.mission_board:get_rewards()
 end
 
+function MissionBoardService:get_unlocked_missions(account_id, character_id)
+	return self._backend_interface.mission_board:get_unlocked_missions(account_id, character_id)
+end
+
+function MissionBoardService:get_difficulty_progress(account_id, character_id)
+	return self._backend_interface.mission_board:get_difficulty_progress(account_id, character_id)
+end
+
 return MissionBoardService

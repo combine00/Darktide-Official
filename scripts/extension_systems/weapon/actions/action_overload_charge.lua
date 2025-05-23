@@ -7,7 +7,7 @@ function ActionOverloadCharge:init(action_context, action_params, action_setting
 	ActionOverloadCharge.super.init(self, action_context, action_params, action_settings)
 
 	local overload_module_class_name = action_settings.overload_module_class_name
-	self._overload_module = ActionModules[overload_module_class_name]:new(self._player_unit, action_settings, self._inventory_slot_component)
+	self._overload_module = ActionModules[overload_module_class_name]:new(self._is_server, self._player_unit, action_settings, self._inventory_slot_component)
 end
 
 function ActionOverloadCharge:start(action_settings, t, time_scale, action_start_params)

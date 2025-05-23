@@ -605,6 +605,12 @@ function math.quat_rotate_towards(from, to, angle_rad)
 	return Quaternion.lerp(from, to, lerp_t)
 end
 
+function math.normalize_modulus(x, m)
+	local fmod = math.fmod
+
+	return fmod(fmod(x + m / 2, m) + m, m) - m / 2
+end
+
 function math.uuid()
 	local template = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
 

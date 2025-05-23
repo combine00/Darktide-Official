@@ -9,7 +9,7 @@ local STICKYNESS_VFX_LOOP_ALIAS = "melee_sticky_loop"
 local _sticky_armor_type = nil
 local STICKY_FX_SOURCE_NAME = "_sticky"
 
-function StickyEffects:init(context, slot, weapon_template, fx_sources)
+function StickyEffects:init(context, slot, weapon_template, fx_sources, item, unit_1p, unit_3p)
 	self._is_husk = context.is_husk
 	self._is_local_unit = context.is_local_unit
 	self._world = context.world

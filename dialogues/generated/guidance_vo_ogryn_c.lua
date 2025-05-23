@@ -975,32 +975,6 @@ local guidance_vo_ogryn_c = {
 			0.1
 		},
 		randomize_indexes = {}
-	},
-	info_asset_nurgle_growth = {
-		randomize_indexes_n = 0,
-		sound_events_n = 5,
-		sound_events = {
-			"loc_ogryn_c__asset_nurgle_growth_01",
-			"loc_ogryn_c__asset_nurgle_growth_02",
-			"loc_ogryn_c__asset_nurgle_growth_03",
-			"loc_ogryn_c__asset_nurgle_growth_04",
-			"loc_ogryn_c__asset_nurgle_growth_05"
-		},
-		sound_events_duration = {
-			4.444156,
-			3.377219,
-			2.444167,
-			4.585563,
-			2.456958
-		},
-		sound_event_weights = {
-			0.2,
-			0.2,
-			0.2,
-			0.2,
-			0.2
-		},
-		randomize_indexes = {}
 	}
 }
 

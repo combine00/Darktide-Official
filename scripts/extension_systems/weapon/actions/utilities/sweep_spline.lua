@@ -2,9 +2,9 @@ local Hermite = require("scripts/utilities/spline/hermite")
 local SweepSplineTemplates = require("scripts/settings/equipment/sweep_spline_templates")
 local SweepSpline = class("SweepSpline")
 
-local function _apply_first_person_context(local_point, first_person, anchor_point_offset)
-	local pos = first_person.position
-	local rot = first_person.rotation
+local function _apply_reference_context(local_point, reference_position, reference_rotation, anchor_point_offset)
+	local pos = reference_position
+	local rot = reference_rotation
 
 	if anchor_point_offset then
 		local local_anchor_point_offset = Vector3(anchor_point_offset[1], anchor_point_offset[2], anchor_point_offset[3])
@@ -17,9 +17,7 @@ local function _apply_first_person_context(local_point, first_person, anchor_poi
 	return pos + world_offset, world_offset
 end
 
-function SweepSpline:init(spline_settings, first_person_component)
-	self._first_person_component = first_person_component
-
+function SweepSpline:init(spline_settings)
 	if not spline_settings.points then
 		local template = SweepSplineTemplates[spline_settings.template]
 		spline_settings.points = table.clone(template.points)
@@ -36,7 +34,7 @@ function SweepSpline:init(spline_settings, first_person_component)
 	self:_build(spline_settings)
 end
 
-function SweepSpline:position_and_rotation(t)
+function SweepSpline:position_and_rotation(t, reference_position, reference_rotation)
 	local num_splines = self._num_splines
 	local spline_t = t * num_splines
 	local splines_index = t == 1 and num_splines or math.floor(spline_t) + 1
@@ -47,7 +45,7 @@ function SweepSpline:position_and_rotation(t)
 	local p3 = points[3]:unbox()
 	local p4 = points[4]:unbox()
 	local point = Hermite.calc_point(local_t, p1, p2, p3, p4)
-	local sweep_position, anchor_to_point_offset = _apply_first_person_context(point, self._first_person_component, self._anchor_point_offset)
+	local sweep_position, anchor_to_point_offset = _apply_reference_context(point, reference_position, reference_rotation, self._anchor_point_offset)
 	local tangent = Hermite.calc_tangent(local_t, p1, p2, p3, p4)
 	tangent.y = 0
 	local tangent_dir = Vector3.normalize(tangent)

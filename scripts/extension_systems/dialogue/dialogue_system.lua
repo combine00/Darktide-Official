@@ -82,9 +82,8 @@ function DialogueSystem:init(extension_system_creation_context, system_init_data
 
 		local game_mode_name = self._current_mission.game_mode_name
 		self._current_game_mode = game_mode_name
-		local dialogue_filename = DialogueSettings.default_rule_path .. game_mode_name
 
-		self:_load_dialogue_resource(dialogue_filename)
+		self:_load_dialogue_resource(game_mode_name)
 
 		local blocked_auto_load = DialogueSettings.blocked_auto_load_files[self._current_mission.name]
 
@@ -290,7 +289,9 @@ function DialogueSystem:extensions_ready(world, unit, extension_name)
 		table.insert(self._in_game_voice_profiles, voice_profile)
 		self:_update_global_context_player_voices(self._in_game_voice_profiles)
 
-		if self._current_game_mode == "coop_complete_objective" then
+		local player_load_files_game_modes = DialogueSettings.player_load_files_game_modes
+
+		if player_load_files_game_modes[self._current_game_mode] then
 			self:_load_player_resource(voice_profile)
 		elseif self._current_game_mode == "survival" and not DEDICATED_SERVER or self._current_game_mode == "shooting_range" then
 			local player_unit_spawn_manager = Managers.state.player_unit_spawn
@@ -324,7 +325,9 @@ function DialogueSystem:on_remove_extension(unit, extension_name)
 
 		table.remove(self._in_game_voice_profiles, voice_profile_index)
 
-		if self._current_game_mode == "coop_complete_objective" then
+		local player_load_files_game_modes = DialogueSettings.player_load_files_game_modes
+
+		if player_load_files_game_modes[self._current_game_mode] then
 			self:_unload_player_resource(voice_profile)
 		end
 	end

@@ -9,7 +9,7 @@ local FX_SOURCE_NAME = "_emit"
 local _external_properties = {}
 local ZealotRelicEffects = class("ZealotRelicEffects")
 
-function ZealotRelicEffects:init(context, slot, weapon_template, fx_sources)
+function ZealotRelicEffects:init(context, slot, weapon_template, fx_sources, item, unit_1p, unit_3p)
 	local unit = context.owner_unit
 	local wwise_world = context.wwise_world
 	local unit_data_extension = ScriptUnit.extension(unit, "unit_data_system")

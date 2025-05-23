@@ -6,6 +6,7 @@ local categories = {
 	"Animation",
 	"Auspex",
 	"Backend",
+	"Behavior_tree",
 	"Blackboard",
 	"Bot Character",
 	"Breed Picker",
@@ -43,6 +44,7 @@ local categories = {
 	"Game Flow",
 	"Game Mode",
 	"Gameplay State",
+	"Garbage Detection",
 	"Groups",
 	"Health Station",
 	"Hit Mass",
@@ -411,6 +413,19 @@ params.debug_draw_cultist_ritualist_chanting_effects = {
 	value = false,
 	category = "Effects"
 }
+params.debug_draw_shock_mine_link_effects = {
+	value = false,
+	category = "Effects"
+}
+params.log_resolve_particle_effect_fallback = {
+	value = false,
+	category = "Effects",
+	options = {
+		false,
+		"all",
+		"debug"
+	}
+}
 params.debug_use_dev_error_levels = {
 	value = true,
 	category = "Error"
@@ -757,7 +772,10 @@ params.character_profile_selector = {
 		return value
 	end,
 	options_function = function ()
-		local options = {}
+		local options = {
+			false,
+			"Backend Profile"
+		}
 
 		if Managers.backend:authenticated() then
 			Managers.data_service.profiles:fetch_all_backend_profiles():next(function (profile_data)
@@ -770,11 +788,9 @@ params.character_profile_selector = {
 						if profile then
 							local character_id = profile.character_id
 
-							table.insert(options, 1, character_id)
+							table.insert(options, 3, character_id)
 						end
 					end
-				elseif not profiles or #profiles == 0 then
-					table.insert(options, 1, false)
 				end
 
 				if profile_data.selected_profile then
@@ -783,8 +799,6 @@ params.character_profile_selector = {
 			end):catch(function ()
 				return
 			end)
-		else
-			table.insert(options, 1, false)
 		end
 
 		local ProfileUtils = require("scripts/utilities/profile_utils")
@@ -800,7 +814,10 @@ params.character_profile_selector = {
 	options_texts_function = function ()
 		local MasterItems = require("scripts/backend/master_items")
 		local ProfileUtils = require("scripts/utilities/profile_utils")
-		local options_texts = {}
+		local options_texts = {
+			"false",
+			"Backend Profile"
+		}
 
 		if Managers.backend:authenticated() then
 			Managers.data_service.profiles:fetch_all_backend_profiles():next(function (profile_data)
@@ -817,17 +834,11 @@ params.character_profile_selector = {
 							local level = profile.current_level and tostring(profile.current_level) or "n/a"
 							local option_text = string.format("%s - %s (%s)", archetype_name_pretty, character_name, level)
 
-							table.insert(options_texts, 1, option_text)
+							table.insert(options_texts, 3, option_text)
 						end
 					end
-				elseif not profiles or #profiles == 0 then
-					table.insert(options_texts, 1, "Backend profile")
 				end
-			end):catch(function ()
-				return
 			end)
-		else
-			table.insert(options_texts, 1, "Backend profile")
 		end
 
 		local local_profiles = ProfileUtils.local_profiles(MasterItems.get_cached())
@@ -844,6 +855,8 @@ params.character_profile_selector = {
 	end,
 	on_value_set = function (new_value, old_value)
 		if not new_value then
+			_character_profile_selector_preview_value = new_value
+
 			return
 		end
 
@@ -990,6 +1003,10 @@ params.debug_player_gear_fx = {
 	category = "Player Character"
 }
 params.debug_player_suppression = {
+	value = false,
+	category = "Player Character"
+}
+params.disable_player_suppression = {
 	value = false,
 	category = "Player Character"
 }
@@ -1524,6 +1541,10 @@ params.debug_selected_unit_threat = {
 	value = false,
 	category = "Perception"
 }
+params.print_current_node_for_selected = {
+	value = false,
+	category = "Behavior_tree"
+}
 params.debug_blackboards = {
 	value = false,
 	category = "Blackboard"
@@ -1594,6 +1615,15 @@ params.always_play_husk_effects = {
 params.debug_wwise_timestamp = {
 	value = false,
 	category = "Wwise"
+}
+params.log_resolve_sound_fallback = {
+	value = false,
+	category = "Wwise",
+	options = {
+		false,
+		"all",
+		"debug"
+	}
 }
 
 local function _debug_slots_options()
@@ -1679,6 +1709,10 @@ params.draw_smartobject_fails = {
 	category = "Navigation"
 }
 params.debug_nav_tag_volume_creation_times = {
+	value = false,
+	category = "Navigation"
+}
+params.debug_adapt_speed = {
 	value = false,
 	category = "Navigation"
 }
@@ -2458,6 +2492,10 @@ params.show_stats_rpcs = {
 params.show_stats_performance = {
 	value = false,
 	category = "Stats"
+}
+params.disable_live_event_fetching = {
+	value = false,
+	category = "Misc"
 }
 params.distance_to_selected_unit = {
 	value = false,
@@ -4109,6 +4147,14 @@ params.mission_seed_override = {
 	value = "none",
 	category = "Gameplay State"
 }
+params.dump_leaking_tables_pre_shutdown = {
+	value = false,
+	category = "Garbage Detection"
+}
+params.dump_leaking_tables_post_shutdown = {
+	value = false,
+	category = "Garbage Detection"
+}
 params.debug_respawn_beacon = {
 	value = false,
 	category = "Respawn"
@@ -4655,6 +4701,10 @@ params.log_weapon_template_resource_dependencies = {
 	category = "Weapon"
 }
 params.debug_alternate_fire = {
+	value = false,
+	category = "Weapon"
+}
+params.debug_blocking = {
 	value = false,
 	category = "Weapon"
 }
@@ -5269,6 +5319,10 @@ params.debug_liquid_area_paint_template = {
 		return table.keys(LiquidAreaTemplates)
 	end
 }
+params.debug_liquid_area_vfx = {
+	value = false,
+	category = "Liquid Area"
+}
 
 local function _set_max_external_time_step(new_value, old_value)
 	if new_value == "Default" then
@@ -5363,6 +5417,9 @@ params.switch_to_explosion_physics_overlap = {
 	value = false,
 	category = "Explosion Rework Testing"
 }
+params.keep_empty_server_alive = {
+	value = false
+}
 params.category_log_levels = {
 	hidden = true,
 	value = {
@@ -5428,6 +5485,9 @@ params.debug_gadget_extension = {
 }
 params.disable_beast_of_nurgle_consumed_effect = {
 	value = false
+}
+params.imgui_lua_inspector_input = {
+	value = ""
 }
 
 local function _set_build_override_parameter(parameter_name, value)

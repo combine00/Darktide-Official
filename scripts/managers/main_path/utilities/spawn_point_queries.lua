@@ -37,10 +37,12 @@ function SpawnPointQueries.generate_nav_spawn_points(nav_world, nav_triangle_gro
 	local nav_spawn_points = GwNavSpawnPoints.create(nav_world, nav_triangle_group)
 	local num_groups, num_sub_groups = GwNavSpawnPoints.get_count(nav_spawn_points)
 	local num_spawn_points_per_subgroup = parameters.num_spawn_points_per_subgroup
+	local num_spawn_points_per_triangle = parameters.num_spawn_points_per_triangle
 	local min_free_radius = parameters.min_free_radius
 	local min_distance_to_others = parameters.min_distance_to_others
 	local nav_tag_cost_table = parameters.nav_tag_cost_table
 	local seed = parameters.seed
+	local path_type = parameters.path_type
 	local GwNavSpawnPoints_get_triangle_count = GwNavSpawnPoints.get_triangle_count
 	local GwNavSpawnPoints_get_spawn_point_position = GwNavSpawnPoints.get_spawn_point_position
 	local spawn_point_positions = Script.new_array(num_groups)
@@ -53,7 +55,13 @@ function SpawnPointQueries.generate_nav_spawn_points(nav_world, nav_triangle_gro
 		for j = 1, num_sub_groups do
 			local num_triangles = GwNavSpawnPoints_get_triangle_count(nav_spawn_points, i, j)
 			local num_sub_group_spawn_points = nil
-			num_sub_group_spawn_points = math.min(num_triangles, num_spawn_points_per_subgroup)
+
+			if path_type == "open" then
+				num_sub_group_spawn_points = math.min(num_triangles, num_triangles * num_spawn_points_per_triangle)
+			else
+				num_sub_group_spawn_points = math.min(num_triangles, num_spawn_points_per_subgroup)
+			end
+
 			local sub_group_positions = Script.new_array(num_sub_group_spawn_points)
 
 			for k = 1, num_sub_group_spawn_points do
@@ -86,11 +94,13 @@ function SpawnPointQueries.update_time_slice_nav_spawn_points(time_slice_data, n
 	local num_groups = parameters.num_groups
 	local num_sub_groups = parameters.num_sub_groups
 	local num_spawn_points_per_subgroup = parameters.num_spawn_points_per_subgroup
+	local num_spawn_points_per_triangle = parameters.num_spawn_points_per_triangle
 	local nav_world = parameters.nav_world
 	local min_free_radius = parameters.min_free_radius
 	local min_distance_to_others = parameters.min_distance_to_others
 	local nav_tag_cost_table = parameters.nav_tag_cost_table
 	local seed = parameters.seed
+	local path_type = parameters.path_type
 
 	for index = last_index + 1, num_groups do
 		local start_timer = GameplayInitTimeSlice.pre_process(performance_counter_handle, duration_ms)
@@ -104,7 +114,13 @@ function SpawnPointQueries.update_time_slice_nav_spawn_points(time_slice_data, n
 		for j = 1, num_sub_groups do
 			local num_triangles = GwNavSpawnPoints_get_triangle_count(nav_spawn_points, index, j)
 			local num_sub_group_spawn_points = nil
-			num_sub_group_spawn_points = math.min(num_triangles, num_spawn_points_per_subgroup)
+
+			if path_type == "open" then
+				num_sub_group_spawn_points = math.min(num_triangles, num_triangles * num_spawn_points_per_triangle)
+			else
+				num_sub_group_spawn_points = math.min(num_triangles, num_spawn_points_per_subgroup)
+			end
+
 			local sub_group_positions = Script.new_array(num_sub_group_spawn_points)
 
 			for k = 1, num_sub_group_spawn_points do

@@ -23,7 +23,7 @@ local veteran_a_veteran_male_a = {
 			[1.0] = "loc_veteran_male_a__combat_pause_limited_bolt_on_a_veteran_a_02_b_01"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678
+			[1.0] = 2.487229
 		},
 		randomize_indexes = {}
 	},
@@ -34,7 +34,7 @@ local veteran_a_veteran_male_a = {
 			[1.0] = "loc_veteran_male_a__combat_pause_limited_bolt_on_a_veteran_a_03_a_01"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678
+			[1.0] = 3.388958
 		},
 		randomize_indexes = {}
 	},
@@ -45,7 +45,7 @@ local veteran_a_veteran_male_a = {
 			[1.0] = "loc_veteran_male_a__combat_pause_limited_bolt_on_a_veteran_a_04_a_01"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678
+			[1.0] = 3.964479
 		},
 		randomize_indexes = {}
 	},
@@ -56,7 +56,7 @@ local veteran_a_veteran_male_a = {
 			[1.0] = "loc_veteran_male_a__combat_pause_limited_bolt_on_a_veteran_a_04_b_01"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678
+			[1.0] = 2.650604
 		},
 		randomize_indexes = {}
 	},

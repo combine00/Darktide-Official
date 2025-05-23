@@ -35,6 +35,7 @@ function MinionAnimationExtension:init(extension_init_context, unit, extension_i
 	if animation_variables then
 		local num_anim_variables = #animation_variables
 		local variables = Script.new_map(num_anim_variables)
+		local index_name_variables = Script.new_map(num_anim_variables)
 		local go_var_lookup = Script.new_table(num_anim_variables * 2, num_anim_variables)
 		local var_idx = 1
 
@@ -42,6 +43,7 @@ function MinionAnimationExtension:init(extension_init_context, unit, extension_i
 			local variable_name = animation_variables[i]
 			local variable_index = Unit.animation_find_variable(unit, variable_name)
 			variables[variable_name] = variable_index
+			index_name_variables[variable_index] = variable_name
 			local anim_var_name_id = Script.id_string_32(variable_name)
 			go_var_lookup[var_idx] = anim_var_name_id
 			go_var_lookup[var_idx + 1] = 0
@@ -50,6 +52,7 @@ function MinionAnimationExtension:init(extension_init_context, unit, extension_i
 		end
 
 		self._variables = variables
+		self._index_name_variables = index_name_variables
 		self._go_var_lookup = go_var_lookup
 	end
 
@@ -93,9 +96,14 @@ function MinionAnimationExtension:anim_event_with_variable_float(event_name, var
 	local game_object_id = self._game_object_id
 	local event_index = Unit.animation_event(unit, event_name)
 	local variable_index = Unit.animation_find_variable(unit, variable_name)
+	local variable_bounds = self._animation_variable_bounds
+
+	if variable_bounds and variable_bounds[variable_name] then
+		variable_value = math.clamp(variable_value, variable_bounds[variable_name][1], variable_bounds[variable_name][2])
+	end
 
 	Unit_animation_set_variable(unit, variable_index, variable_value)
-	Managers.state.game_session:send_rpc_clients("rpc_minion_anim_event_variable_float", game_object_id, event_index, variable_index, variable_value)
+	Managers.state.game_session:send_rpc_clients("rpc_minion_anim_event_variable_float", game_object_id, event_index, variable_index, variable_value, variable_name)
 end
 
 function MinionAnimationExtension:has_variable(name)
@@ -127,8 +135,18 @@ function MinionAnimationExtension:update(unit, ...)
 
 		for i = 1, modified_table_size, 2 do
 			local index = go_var_lookup[go_var_lookup[i]]
+			local variable_name = self._index_name_variables[index]
+			local variable_value = go_var_lookup[i + 1]
 
-			Unit_animation_set_variable(unit, index, go_var_lookup[i + 1])
+			if variable_name then
+				local variable_bounds = self._animation_variable_bounds
+
+				if variable_bounds and variable_bounds[variable_name] then
+					variable_value = math.clamp(variable_value, variable_bounds[variable_name][1], variable_bounds[variable_name][2])
+				end
+			end
+
+			Unit_animation_set_variable(unit, index, variable_value)
 		end
 	end
 end

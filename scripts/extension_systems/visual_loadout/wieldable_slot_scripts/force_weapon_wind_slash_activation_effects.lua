@@ -37,8 +37,8 @@ local FINGER_FX_SOURCE_LOOKUP = {
 }
 local _external_properties = {}
 
-function ForceWeaponWindSlashActivationEffects:init(context, slot, weapon_template, fx_sources)
-	ForceWeaponWindSlashActivationEffects.super.init(self, context, slot, weapon_template, fx_sources)
+function ForceWeaponWindSlashActivationEffects:init(context, slot, weapon_template, fx_sources, item, unit_1p, unit_3p)
+	ForceWeaponWindSlashActivationEffects.super.init(self, context, slot, weapon_template, fx_sources, item, unit_1p, unit_3p)
 
 	if DEDICATED_SERVER then
 		return

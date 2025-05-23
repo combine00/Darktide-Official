@@ -34,7 +34,7 @@ return function ()
 			}
 		},
 		heard_speak_routing = {
-			target = "mission_giver_default"
+			target = "mission_giver_default_class"
 		}
 	})
 	define_rule({
@@ -358,7 +358,7 @@ return function ()
 			}
 		},
 		heard_speak_routing = {
-			target = "mission_giver_default"
+			target = "mission_giver_default_class"
 		}
 	})
 end

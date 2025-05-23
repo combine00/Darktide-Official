@@ -3,17 +3,18 @@ local Component = require("scripts/utilities/component")
 local WieldableSlotScriptInterface = require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/wieldable_slot_script_interface")
 local AmmoBelt = class("AmmoBelt")
 
-function AmmoBelt:init(context, slot, weapon_template, fx_sources)
+function AmmoBelt:init(context, slot, weapon_template, fx_sources, item, unit_1p, unit_3p)
 	local owner_unit = context.owner_unit
 	self._weapon_actions = weapon_template.actions
 	local unit_data_extension = ScriptUnit.extension(owner_unit, "unit_data_system")
 	self._inventory_slot_component = unit_data_extension:read_component(slot.name)
 	self._weapon_action_component = unit_data_extension:read_component("weapon_action")
 	local unit_components = {}
-	local num_attachments_1p = #slot.attachments_1p
+	local attachments_1p = slot.attachments_by_unit_1p[unit_1p]
+	local num_attachments_1p = #attachments_1p
 
 	for ii = 1, num_attachments_1p do
-		local attachment_unit = slot.attachments_1p[ii]
+		local attachment_unit = attachments_1p[ii]
 		local components = Component.get_components_by_name(attachment_unit, "AmmoBelt")
 
 		for _, component in ipairs(components) do
@@ -24,10 +25,11 @@ function AmmoBelt:init(context, slot, weapon_template, fx_sources)
 		end
 	end
 
-	local num_attachments_3p = #slot.attachments_3p
+	local attachments_3p = slot.attachments_by_unit_3p[unit_3p]
+	local num_attachments_3p = #attachments_3p
 
 	for ii = 1, num_attachments_3p do
-		local attachment_unit = slot.attachments_3p[ii]
+		local attachment_unit = attachments_3p[ii]
 		local components = Component.get_components_by_name(attachment_unit, "AmmoBelt")
 
 		for _, component in ipairs(components) do

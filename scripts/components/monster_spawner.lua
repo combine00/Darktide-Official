@@ -43,8 +43,7 @@ function MonsterSpawner:init(unit, is_server, nav_world)
 		Matrix4x4.set_translation(pose, center_position)
 
 		local volume_points, volume_altitude_min, volume_altitude_max = NavTagVolumeBox.create_from_pose(nav_world, pose, half_extents)
-
-		Managers.state.nav_mesh:add_nav_tag_volume(volume_points, volume_altitude_min, volume_altitude_max, NAV_TAG_LAYER_NAME, true, NAV_TAG_LAYER_TYPE)
+		self._nav_tag_volume = Managers.state.nav_mesh:add_nav_tag_volume(volume_points, volume_altitude_min, volume_altitude_max, NAV_TAG_LAYER_NAME, true, NAV_TAG_LAYER_TYPE)
 	end
 
 	local run_update = false
@@ -53,7 +52,9 @@ function MonsterSpawner:init(unit, is_server, nav_world)
 end
 
 function MonsterSpawner:destroy()
-	return
+	if self._nav_tag_volume then
+		Managers.state.nav_mesh:remove_nav_tag_volume(self._nav_tag_volume)
+	end
 end
 
 function MonsterSpawner:enable(unit)

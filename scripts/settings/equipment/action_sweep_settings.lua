@@ -58,5 +58,6 @@ action_sweep_settings.hit_zone_priority_functions = {
 		end
 	end
 }
+action_sweep_settings.multi_sweep_process_mode = table.enum("shared", "separate")
 
 return settings("ActionSweepSettings", action_sweep_settings)

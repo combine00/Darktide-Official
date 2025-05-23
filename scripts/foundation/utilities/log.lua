@@ -282,4 +282,3 @@ end
 
 print_error = Log._msg_print_error
 print_warning = Log._msg_print_warning
-print = Log._default_print

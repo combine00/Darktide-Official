@@ -419,18 +419,16 @@ templates.ogryn_slabshield_shield_plant = {
 	end
 }
 templates.shockmaul_stun_interval = {
+	start_with_frame_offset = true,
 	start_interval_on_apply = true,
-	buff_id = "shock_grenade_shock",
-	max_stacks = 1,
+	max_stacks_cap = 1,
 	predicted = false,
 	refresh_duration_on_stack = true,
-	max_stacks_cap = 1,
 	duration = 8,
-	start_with_frame_offset = true,
+	max_stacks = 1,
 	class_name = "interval_buff",
 	keywords = {
-		buff_keywords.electrocuted,
-		buff_keywords.shock_grenade_shock
+		buff_keywords.electrocuted
 	},
 	interval = {
 		0.3,

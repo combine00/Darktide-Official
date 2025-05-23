@@ -4,7 +4,7 @@ local WieldableSlotScriptInterface = require("scripts/extension_systems/visual_l
 local ForceStaffAoeTargetingEffects = class("ForceStaffAoeTargetingEffects")
 local SPAWN_POS = Vector3Box(400, 400, 400)
 
-function ForceStaffAoeTargetingEffects:init(context, slot, weapon_template, fx_sources)
+function ForceStaffAoeTargetingEffects:init(context, slot, weapon_template, fx_sources, item, unit_1p, unit_3p)
 	local wwise_world = context.wwise_world
 	local owner_unit = context.owner_unit
 	self._world = context.world

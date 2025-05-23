@@ -250,6 +250,7 @@ local function _bolstering_start_function(template_context, template_data)
 end
 
 templates.havoc_bolstering = {
+	predicted = false,
 	max_stacks = 5,
 	class_name = "buff",
 	keywords = {
@@ -343,6 +344,7 @@ local function _corruption_stop_function(template_context, template_data)
 end
 
 templates.havoc_corrupted_enemies = {
+	predicted = false,
 	max_stacks = 1,
 	class_name = "buff",
 	keywords = {
@@ -412,6 +414,153 @@ templates.havoc_corrupted_enemies = {
 		}
 	}
 }
+local breedlookup = {
+	chaos_ogryn_bulwark = {
+		"renegade_berzerker",
+		"renegade_gunner",
+		"renegade_executor"
+	},
+	chaos_ogryn_executor = {
+		"renegade_berzerker",
+		"renegade_gunner",
+		"renegade_executor"
+	},
+	chaos_ogryn_gunner = {
+		"renegade_berzerker",
+		"renegade_gunner",
+		"renegade_executor"
+	},
+	renegade_berzerker = {
+		"renegade_assault",
+		"renegade_melee",
+		"renegade_rifleman"
+	},
+	renegade_executor = {
+		"renegade_assault",
+		"renegade_melee",
+		"renegade_rifleman"
+	},
+	renegade_gunner = {
+		"renegade_assault",
+		"renegade_melee",
+		"renegade_rifleman"
+	},
+	renegade_shocktrooper = {
+		"renegade_assault",
+		"renegade_melee",
+		"renegade_rifleman"
+	},
+	cultist_berzerker = {
+		"cultist_melee",
+		"cultist_assault"
+	},
+	cultist_gunner = {
+		"cultist_melee",
+		"cultist_assault"
+	},
+	cultist_shocktrooper = {
+		"cultist_melee",
+		"cultist_assault"
+	},
+	renegade_assault = {
+		"chaos_poxwalker",
+		"chaos_newly_infected"
+	},
+	renegade_melee = {
+		"chaos_poxwalker",
+		"chaos_newly_infected"
+	},
+	renegade_rifleman = {
+		"chaos_poxwalker",
+		"chaos_newly_infected"
+	},
+	cultist_melee = {
+		"chaos_poxwalker",
+		"chaos_newly_infected"
+	},
+	cultist_assault = {
+		"chaos_poxwalker",
+		"chaos_newly_infected"
+	},
+	chaos_plague_ogryn = {
+		"cultist_mutant"
+	},
+	chaos_spawn = {
+		"cultist_mutant"
+	},
+	renegade_captain = {
+		"chaos_daemonhost"
+	}
+}
+
+local function _duplicating_enemies_stop_function(template_context, template_data)
+	local unit = template_context.unit
+	local blackboard = template_data.blackboard
+	local perception_component = blackboard.perception
+	local owner_breed = template_context.breed.name
+	local breed = "chaos_poxwalker"
+	local possible_breeds = nil
+
+	if breedlookup[owner_breed] then
+		possible_breeds = breedlookup[owner_breed]
+		local value_check = math.random(1, #possible_breeds)
+		breed = possible_breeds[value_check]
+	end
+
+	local position = Unit.world_position(unit, 1)
+	local rotation = Unit.local_rotation(unit, 1)
+	local vfx_name = "content/fx/particles/enemies/twin_disappear_cloud"
+	local node_position = Unit.world_position(unit, 1) + Vector3(0, 0, 0.25)
+	local fx_system = Managers.state.extension:system("fx_system")
+
+	fx_system:trigger_vfx(vfx_name, node_position, rotation)
+
+	for i = 1, 2 do
+		local right = Quaternion.right(Unit.local_rotation(unit, 1))
+
+		if i % 2 == 0 then
+			position = position + right
+		else
+			position = position + -right
+		end
+
+		local mutator_manager = Managers.state.mutator
+		local nurgle_warp_mutator = mutator_manager:mutator("mutator_duplicating_enemies")
+
+		nurgle_warp_mutator:add_split_spawn(position, rotation, breed, nil, perception_component.target_unit)
+
+		local minion_death_manager = Managers.state.minion_death
+		local minion_ragdoll = minion_death_manager:minion_ragdoll()
+
+		minion_ragdoll:remove_ragdoll_safe(unit)
+	end
+end
+
+templates.havoc_duplicating_enemies = {
+	predicted = false,
+	max_stacks = 1,
+	class_name = "buff",
+	keywords = {},
+	start_func = function (template_data, template_context)
+		local unit = template_context.unit
+
+		if not template_context.is_server then
+			return
+		end
+
+		template_data.blackboard = BLACKBOARDS[unit]
+		local navigation_extension = ScriptUnit.extension(unit, "navigation_system")
+		template_data.visual_loadout_extension = ScriptUnit.extension(unit, "visual_loadout_system")
+		template_data.nav_world = navigation_extension:nav_world()
+	end,
+	stop_func = function (template_data, template_context)
+		if not template_context.is_server then
+			return
+		end
+
+		_duplicating_enemies_stop_function(template_context, template_data)
+	end
+}
 templates.common_minion_on_fire = {
 	interval = 0.5,
 	max_stacks = 1,
@@ -461,6 +610,7 @@ local TOUGHNED_SKIN_COLOR = {
 	0.011764705882352941
 }
 templates.havoc_toughened_skin = {
+	predicted = false,
 	max_stacks = 1,
 	class_name = "buff",
 	start_func = function (template_data, template_context)
@@ -548,6 +698,7 @@ local function _apply_poxburster_bile(template_data, template_context)
 end
 
 templates.havoc_sticky_poxburster = {
+	predicted = false,
 	max_stacks = 1,
 	class_name = "buff",
 	start_func = function (template_data, template_context)
@@ -802,6 +953,8 @@ templates.blessed_by_the_garden = {
 		on_screen_effect = "content/fx/particles/screenspace/screen_gardens_embrace"
 	}
 }
+templates.live_heal_test = table.clone(templates.blessed_by_the_garden)
+templates.live_heal_test.duration = math.huge
 local BUFF_RADIUS = 5
 local HAVOC_RESULT_1 = {}
 
@@ -891,9 +1044,10 @@ local NURGLE_MORALE_IMPROVED_BUFF = {
 	0.5764705882352941
 }
 templates.blessed_by_nurgle_parasite = {
-	duration = 3,
-	max_stacks = 1,
+	predicted = false,
 	refresh_duration_on_stack = true,
+	max_stacks = 1,
+	duration = 3,
 	class_name = "buff",
 	stat_buffs = {
 		[buff_stat_buffs.impact_modifier] = -3,
@@ -1509,6 +1663,7 @@ templates.havoc_melee_permanent_damage_05 = {
 	}
 }
 templates.havoc_positive_grenade_buff_1 = {
+	predicted = false,
 	class_name = "buff",
 	start_func = function (template_data, template_context)
 		local unit = template_context.unit
@@ -1533,6 +1688,7 @@ templates.havoc_positive_grenade_buff_1 = {
 	}
 }
 templates.havoc_positive_grenade_buff_2 = {
+	predicted = false,
 	class_name = "buff",
 	start_func = function (template_data, template_context)
 		local unit = template_context.unit
@@ -1557,6 +1713,7 @@ templates.havoc_positive_grenade_buff_2 = {
 	}
 }
 templates.havoc_positive_grenade_buff_3 = {
+	predicted = false,
 	class_name = "buff",
 	start_func = function (template_data, template_context)
 		local unit = template_context.unit
@@ -1581,6 +1738,7 @@ templates.havoc_positive_grenade_buff_3 = {
 	}
 }
 templates.havoc_positive_grenade_buff_4 = {
+	predicted = false,
 	class_name = "buff",
 	start_func = function (template_data, template_context)
 		local unit = template_context.unit
@@ -1605,6 +1763,7 @@ templates.havoc_positive_grenade_buff_4 = {
 	}
 }
 templates.havoc_positive_grenade_buff_5 = {
+	predicted = false,
 	class_name = "buff",
 	start_func = function (template_data, template_context)
 		local unit = template_context.unit

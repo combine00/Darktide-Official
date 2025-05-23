@@ -37,6 +37,7 @@ templates.gadget_coherency_aura_lingers = {
 	}
 }
 templates.gadget_mission_reward_rare_loot_increase = {
+	predicted = false,
 	meta_buff = true,
 	meta_stat_buffs = {
 		[meta_stat_buffs.mission_reward_rare_loot_modifier] = {
@@ -46,6 +47,7 @@ templates.gadget_mission_reward_rare_loot_increase = {
 	}
 }
 templates.gadget_side_mission_double_reward = {
+	predicted = false,
 	meta_buff = true,
 	meta_stat_buffs = {
 		[meta_stat_buffs.side_mission_reward_xp_modifier] = 1,
@@ -186,18 +188,21 @@ templates.gadget_corruption_resistance = {
 	}
 }
 templates.gadget_mission_xp_increase = {
+	predicted = false,
 	meta_buff = true,
 	meta_stat_buffs = {
 		[meta_stat_buffs.mission_reward_xp_modifier] = 0.15
 	}
 }
 templates.gadget_mission_credits_increase = {
+	predicted = false,
 	meta_buff = true,
 	meta_stat_buffs = {
 		[meta_stat_buffs.mission_reward_credit_modifier] = 0.15
 	}
 }
 templates.gadget_mission_reward_gear_instead_of_weapon_increase = {
+	predicted = false,
 	meta_buff = true,
 	meta_stat_buffs = {
 		[meta_stat_buffs.mission_reward_gear_instead_of_weapon_modifier] = 0.25

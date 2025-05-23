@@ -15,70 +15,71 @@ local templates = {}
 table.make_unique(templates)
 
 templates.ranged_weakspot_damage = {
+	predicted = false,
 	class_name = "buff",
-	keywords = {},
 	stat_buffs = {
 		[buff_stat_buffs.ranged_weakspot_damage] = 0.3
 	}
 }
 templates.increased_suppression = {
+	predicted = false,
 	class_name = "buff",
-	keywords = {},
 	stat_buffs = {
 		[buff_stat_buffs.increased_suppression] = 0.5
 	}
 }
 templates.spread_reduction = {
+	predicted = false,
 	class_name = "buff",
-	keywords = {},
 	stat_buffs = {
 		[buff_stat_buffs.spread_modifier] = -0.15
 	}
 }
 templates.spread_and_sway_reduction = {
+	predicted = false,
 	class_name = "buff",
-	keywords = {},
 	stat_buffs = {
 		[buff_stat_buffs.spread_modifier] = -0.15,
 		[buff_stat_buffs.sway_modifier] = 0.7
 	}
 }
 templates.recoil_reduction = {
+	predicted = false,
 	class_name = "buff",
-	keywords = {},
 	stat_buffs = {
 		[buff_stat_buffs.recoil_modifier] = -0.3
 	}
 }
 templates.alternate_fire_movement_speed = {
+	predicted = false,
 	class_name = "buff",
-	keywords = {},
 	stat_buffs = {
 		[buff_stat_buffs.alternate_fire_movement_speed_reduction_modifier] = 0.3
 	}
 }
 templates.ranged_attack_speed = {
+	predicted = false,
 	class_name = "buff",
-	keywords = {},
 	stat_buffs = {
 		[buff_stat_buffs.ranged_attack_speed] = 0.5
 	}
 }
 templates.overheat_time = {
+	predicted = false,
 	class_name = "buff",
-	keywords = {},
 	stat_buffs = {
 		[buff_stat_buffs.charge_up_time] = -0.5
 	}
 }
 templates.reduced_overheat = {
+	predicted = false,
 	class_name = "buff",
-	keywords = {},
 	stat_buffs = {
 		[buff_stat_buffs.overheat_amount] = -0.5
 	}
 }
 templates.braced_damage_reduction = {
+	predicted = false,
 	class_name = "buff",
 	conditional_stat_buffs = {
 		[buff_stat_buffs.damage] = -0.1

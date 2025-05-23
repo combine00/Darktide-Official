@@ -1,4 +1,17 @@
 local mission_vo_cm_habs_remake_zealot_female_c = {
+	info_extraction_response = {
+		randomize_indexes_n = 0,
+		sound_events_n = 2,
+		sound_events = {
+			[1.0] = "loc_zealot_female_c__info_extraction_response_01",
+			[2.0] = "loc_zealot_female_c__info_extraction_response_02"
+		},
+		sound_events_duration = {
+			[1.0] = 2.11099,
+			[2.0] = 2.753927
+		},
+		randomize_indexes = {}
+	},
 	level_hab_block_apartments = {
 		randomize_indexes_n = 0,
 		sound_events_n = 2,

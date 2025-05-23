@@ -226,7 +226,7 @@ function MinigameExtension:action(held, t)
 	if self._action_held ~= held then
 		self._action_held = held
 
-		if self._is_server and self._current_state == STATES.active then
+		if self._current_state == STATES.active then
 			if held then
 				self._minigame:on_action_pressed(t)
 			else

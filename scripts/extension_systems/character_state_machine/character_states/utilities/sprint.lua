@@ -13,7 +13,7 @@ local INPUT_ALIGNED_WITH_MOVENESS = TAU / 7
 local ENOUGH_MOVE_IN_FORWARD_DIRECTION = 0.7
 local VELOCITY_ALIGNED_WITH_ORIENTATION = TAU / 7
 
-function Sprint.check(t, unit, movement_state_component, sprint_character_state_component, input_source, locomotion_component, weapon_action_component, combat_ability_action_component, alternate_fire_component, weapon_template, player_character_constants)
+function Sprint.check(t, unit, movement_state_component, sprint_character_state_component, input_source, locomotion_component, weapon_action_component, combat_ability_action_component, alternate_fire_component, weapon_template, player_character_constants, buff_extension)
 	local current_weapon_action_name, weapon_action_setting = Action.current_action(weapon_action_component, weapon_template)
 	local combat_ability_template = AbilityTemplate.current_ability_template(combat_ability_action_component)
 	local _, combat_ability_action_settings = Action.current_action(combat_ability_action_component, combat_ability_template)
@@ -39,7 +39,8 @@ function Sprint.check(t, unit, movement_state_component, sprint_character_state_
 
 	local weapon_action_prevents_sprint = Sprint.prevent_sprint(weapon_action_setting)
 	local combat_ability_prevents_sprint = Sprint.prevent_sprint(combat_ability_action_settings)
-	local prevents_sprint = weapon_action_prevents_sprint or combat_ability_prevents_sprint
+	local has_no_sprint_keyword = buff_extension:has_keyword(buff_keywords.no_sprint)
+	local prevents_sprint = weapon_action_prevents_sprint or combat_ability_prevents_sprint or has_no_sprint_keyword
 
 	if prevents_sprint then
 		return false
@@ -211,14 +212,14 @@ function Sprint.prevent_sprint(action_setting)
 		return false
 	end
 
-	local action_setting_prevent_sprint = action_setting.prevent_sprint
+	local action_setting_prevent_sprint = action_setting.prevent_sprint and not action_setting.override_allow_during_sprint
 
 	if action_setting_prevent_sprint ~= nil then
 		return action_setting_prevent_sprint
 	end
 
 	local action_kind = action_setting.kind
-	local action_kind_prevent_sprint = _prevent_sprint_table[action_kind]
+	local action_kind_prevent_sprint = _prevent_sprint_table[action_kind] and not action_setting.override_allow_during_sprint
 
 	return action_kind_prevent_sprint
 end

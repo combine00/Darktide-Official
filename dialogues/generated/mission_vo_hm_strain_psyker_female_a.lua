@@ -35,6 +35,19 @@ local mission_vo_hm_strain_psyker_female_a = {
 		},
 		randomize_indexes = {}
 	},
+	mission_strain_cross_hangar_b = {
+		randomize_indexes_n = 0,
+		sound_events_n = 2,
+		sound_events = {
+			[1.0] = "loc_psyker_female_a__mission_strain_cross_hangar_b_01",
+			[2.0] = "loc_psyker_female_a__mission_strain_cross_hangar_b_02"
+		},
+		sound_events_duration = {
+			[1.0] = 3.45678,
+			[2.0] = 3.45678
+		},
+		randomize_indexes = {}
+	},
 	mission_strain_crossroads = {
 		randomize_indexes_n = 0,
 		sound_events_n = 2,
@@ -45,19 +58,6 @@ local mission_vo_hm_strain_psyker_female_a = {
 		sound_events_duration = {
 			[1.0] = 1.923646,
 			[2.0] = 4.475396
-		},
-		randomize_indexes = {}
-	},
-	mission_strain_daemonic_overgrowth_a = {
-		randomize_indexes_n = 0,
-		sound_events_n = 2,
-		sound_events = {
-			[1.0] = "loc_psyker_female_a__mission_strain_daemonic_overgrowth_a_01",
-			[2.0] = "loc_psyker_female_a__mission_strain_daemonic_overgrowth_a_02"
-		},
-		sound_events_duration = {
-			[1.0] = 4.393083,
-			[2.0] = 4.339792
 		},
 		randomize_indexes = {}
 	},
@@ -99,19 +99,6 @@ local mission_vo_hm_strain_psyker_female_a = {
 			0.1,
 			0.1,
 			0.1
-		},
-		randomize_indexes = {}
-	},
-	mission_strain_inert_tanks = {
-		randomize_indexes_n = 0,
-		sound_events_n = 2,
-		sound_events = {
-			[1.0] = "loc_psyker_female_a__mission_strain_inert_tanks_01",
-			[2.0] = "loc_psyker_female_a__mission_strain_inert_tanks_02"
-		},
-		sound_events_duration = {
-			[1.0] = 3.443583,
-			[2.0] = 2.091479
 		},
 		randomize_indexes = {}
 	},

@@ -6,7 +6,7 @@ local communication_hack = {
 	icon = "",
 	condition = "loc_communication_hack_condition",
 	item_rewards = {
-		"content/items/titles/title_test_9"
+		"content/items/2d/insignias/insignia_event_hack"
 	}
 }
 

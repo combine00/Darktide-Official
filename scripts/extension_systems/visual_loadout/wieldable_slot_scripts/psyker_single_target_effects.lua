@@ -4,7 +4,7 @@ local PsykerSingleTargetEffects = class("PsykerSingleTargetEffects")
 local SPAWN_POS = Vector3Box(400, 400, 400)
 local SHOW_EFFECT_FOR_ALL = true
 
-function PsykerSingleTargetEffects:init(context, slot, weapon_template, fx_sources)
+function PsykerSingleTargetEffects:init(context, slot, weapon_template, fx_sources, item, unit_1p, unit_3p)
 	local wwise_world = context.wwise_world
 	self._world = context.world
 	self._wwise_world = wwise_world

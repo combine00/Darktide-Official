@@ -97,9 +97,7 @@ local action_data = {
 			death_arm_right = 5.1
 		}
 	},
-	disable = {
-		disable_anims = {}
-	},
+	disable = {},
 	stagger = {
 		stagger_duration_mods = {
 			stagger_explosion_front_2 = 0.8

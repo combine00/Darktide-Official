@@ -113,7 +113,7 @@ function BtMoveToPositionAction:run(unit, breed, blackboard, scratchpad, action_
 	end
 
 	if not scratchpad.start_move_event_anim_speed_duration and action_data.adapt_speed then
-		MinionMovement.smooth_speed_based_on_distance(unit, scratchpad, dt, action_data)
+		MinionMovement.smooth_speed_based_on_distance(unit, scratchpad, dt, action_data, breed)
 	end
 
 	if scratchpad.is_anim_driven and scratchpad.start_rotation_timing and scratchpad.start_rotation_timing <= t then

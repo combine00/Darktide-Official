@@ -1,7 +1,8 @@
 local Overheat = require("scripts/utilities/overheat")
 local OverheatActionModule = class("OverheatActionModule")
 
-function OverheatActionModule:init(player_unit, action_settings, inventory_slot_component)
+function OverheatActionModule:init(is_server, player_unit, action_settings, inventory_slot_component)
+	self._is_server = is_server
 	self._player_unit = player_unit
 	self._action_settings = action_settings
 	self._inventory_slot_component = inventory_slot_component

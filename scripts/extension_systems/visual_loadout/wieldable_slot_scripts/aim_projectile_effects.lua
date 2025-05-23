@@ -17,7 +17,7 @@ local AIM_TRAJECTORY_EFFECT_DEFAULT_RADIUS = 0.03
 local STUNNED_RECOVERY_LERP_TIME = 0.6
 local _calculate_arc_position = nil
 
-function AimProjectileEffects:init(context, slot, weapon_template, fx_sources)
+function AimProjectileEffects:init(context, slot, weapon_template, fx_sources, item, unit_1p, unit_3p)
 	self._world = context.world
 	self._wwise_world = context.wwise_world
 	self._physics_world = context.physics_world

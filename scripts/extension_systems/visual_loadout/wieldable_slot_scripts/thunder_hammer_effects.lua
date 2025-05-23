@@ -6,7 +6,7 @@ local FX_SOURCE_NAME = "_special_active"
 local SPECIAL_ACTIVE_LOOPING_SFX_ALIAS = "weapon_special_loop"
 local SPECIAL_ACTIVE_LOOPING_VFX_ALIAS = "weapon_special_loop"
 
-function ThunderHammerEffects:init(context, slot, weapon_template, fx_sources)
+function ThunderHammerEffects:init(context, slot, weapon_template, fx_sources, item, unit_1p, unit_3p)
 	local is_husk = context.is_husk
 	local owner_unit = context.owner_unit
 	self._is_husk = is_husk

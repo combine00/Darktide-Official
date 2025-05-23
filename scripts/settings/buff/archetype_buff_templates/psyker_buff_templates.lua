@@ -568,7 +568,7 @@ templates.psyker_knife_replenishment = {
 			if first_person_extension and first_person_extension:is_in_first_person_mode() and missing_charges == 1 then
 				external_properties.indicator_type = "psyker_throwing_knives"
 
-				template_data.fx_extension:trigger_gear_wwise_event("grenade_recover_indicator", external_properties)
+				template_data.fx_extension:trigger_gear_wwise_event("charge_ready_indicator", external_properties)
 			end
 		end
 	end,
@@ -1270,7 +1270,6 @@ templates.psyker_elite_kills_aura_tracking_buff = {
 		template_data.parent_buff_name = "psyker_aura_damage_vs_elites"
 		template_data.hook_name = "hook_psyker_team_elite_aura_kills"
 		template_data.last_num_in_coherency = 0
-		template_data.valid_buff_owners = {}
 	end,
 	proc_func = function (params, template_data, template_context)
 		if not template_context.is_server then
@@ -1283,7 +1282,7 @@ templates.psyker_elite_kills_aura_tracking_buff = {
 			return
 		end
 
-		template_data.last_num_in_coherency, template_data.valid_buff_owners = template_data.coherency_extension:evaluate_and_send_achievement_data(template_data.last_num_in_coherency, template_data.valid_buff_owners, template_data.parent_buff_name, template_data.hook_name)
+		template_data.last_num_in_coherency = template_data.coherency_extension:evaluate_and_send_achievement_data(template_data.parent_buff_name, template_data.hook_name)
 	end
 }
 templates.psyker_aura_crit_chance_aura = {
@@ -1315,7 +1314,6 @@ templates.psyker_crit_hits_aura_tracking_buff = {
 		local unit = template_context.unit
 		template_data.coherency_extension = ScriptUnit.extension(unit, "coherency_system")
 		template_data.last_num_in_coherency = 0
-		template_data.valid_buff_owners = {}
 		template_data.num_crits_made = 0
 	end,
 	proc_func = function (params, template_data, template_context)
@@ -1336,7 +1334,7 @@ templates.psyker_crit_hits_aura_tracking_buff = {
 		if template_data.num_crits_made >= 2 then
 			local hook_name = "hook_psyker_team_critical_hits_aura"
 			local parent_buff_name = "psyker_aura_crit_chance_aura"
-			template_data.last_num_in_coherency, template_data.valid_buff_owners = template_data.coherency_extension:evaluate_and_send_achievement_data(template_data.last_num_in_coherency, template_data.valid_buff_owners, parent_buff_name, hook_name, template_data.num_crits_made)
+			template_data.last_num_in_coherency = template_data.coherency_extension:evaluate_and_send_achievement_data(parent_buff_name, hook_name, template_data.num_crits_made)
 			template_data.num_crits_made = 0
 		end
 
@@ -1979,7 +1977,7 @@ templates.psyker_kills_during_smite_tracking = {
 			local parent_buff_name = "psyker_grenade_chain_lightning"
 
 			if template_data.afflicted_units_killed >= 1 then
-				template_data.last_num_in_coherency, template_data.valid_buff_owners = template_data.coherency_extension:evaluate_and_send_achievement_data(template_data.last_num_in_coherency, template_data.valid_buff_owners, parent_buff_name, hook_name, template_data.afflicted_units_killed)
+				template_data.last_num_in_coherency = template_data.coherency_extension:evaluate_and_send_achievement_data(parent_buff_name, hook_name, template_data.afflicted_units_killed)
 				template_data.afflicted_units_killed = 0
 			end
 
@@ -2012,7 +2010,6 @@ templates.psyker_kills_during_smite_tracking = {
 		template_data.afflicted_unit_level_index = {}
 		template_data.afflicted_units_killed = 0
 		template_data.last_num_in_coherency = 0
-		template_data.valid_buff_owners = {}
 		template_data.talent_extension = ScriptUnit.extension(unit, "talent_system")
 		template_data.buff_extension = ScriptUnit.has_extension(unit, "buff_system")
 		template_data.coherency_extension = ScriptUnit.extension(unit, "coherency_system")
@@ -2373,7 +2370,7 @@ templates.psyker_boost_allies_passing_through_force_field = {
 	end
 }
 templates.psyker_force_field_buff = {
-	predicted = true,
+	predicted = false,
 	class_name = "buff",
 	refresh_duration_on_stack = true,
 	buff_category = buff_categories.talents_secondary,
@@ -2418,7 +2415,6 @@ templates.psyker_cooldown_reduction_aura_tracking_buff = {
 		template_data.coherency_extension = ScriptUnit.extension(unit, "coherency_system")
 		template_data.ability_extension = ScriptUnit.extension(unit, "ability_system")
 		template_data.last_num_in_coherency = 0
-		template_data.valid_buff_owners = {}
 	end,
 	proc_func = function (params, template_data, template_context)
 		if not template_context.is_server then
@@ -2430,7 +2426,7 @@ templates.psyker_cooldown_reduction_aura_tracking_buff = {
 		local saved_time = default_cooldown_time * talent_settings_3.coherency.ability_cooldown_modifier * -1
 		local hook_name = "hook_psyker_team_cooldown_recovery_aura"
 		local parent_buff_name = "psyker_aura_ability_cooldown"
-		template_data.last_num_in_coherency, template_data.valid_buff_owners = template_data.coherency_extension:evaluate_and_send_achievement_data(template_data.last_num_in_coherency, template_data.valid_buff_owners, parent_buff_name, hook_name, saved_time)
+		template_data.last_num_in_coherency = template_data.coherency_extension:evaluate_and_send_achievement_data(parent_buff_name, hook_name, saved_time)
 	end
 }
 templates.psyker_aura_ability_cooldown_improved = {
@@ -2464,7 +2460,6 @@ templates.psyker_improved_cooldown_reduction_aura_tracking_buff = {
 		template_data.coherency_extension = ScriptUnit.extension(unit, "coherency_system")
 		template_data.ability_extension = ScriptUnit.extension(unit, "ability_system")
 		template_data.last_num_in_coherency = 0
-		template_data.valid_buff_owners = {}
 	end,
 	proc_func = function (params, template_data, template_context)
 		if not template_context.is_server then
@@ -2476,7 +2471,7 @@ templates.psyker_improved_cooldown_reduction_aura_tracking_buff = {
 		local saved_time = default_cooldown_time * talent_settings_3.coherency.ability_cooldown_modifier_improved * -1
 		local hook_name = "hook_psyker_team_cooldown_recovery_aura"
 		local parent_buff_name = "psyker_cooldown_aura_improved"
-		template_data.last_num_in_coherency, template_data.valid_buff_owners = template_data.coherency_extension:evaluate_and_send_achievement_data(template_data.last_num_in_coherency, template_data.valid_buff_owners, parent_buff_name, hook_name, saved_time)
+		template_data.last_num_in_coherency = template_data.coherency_extension:evaluate_and_send_achievement_data(parent_buff_name, hook_name, saved_time)
 	end
 }
 templates.psyker_stun_effect = {
@@ -2592,6 +2587,7 @@ templates.psyker_increased_vent_speed = {
 	}
 }
 templates.psyker_kills_stack_other_weapon_damage = {
+	predicted = false,
 	class_name = "proc_buff",
 	proc_events = {
 		[proc_events.on_kill] = 1
@@ -2646,8 +2642,9 @@ templates.psyker_cycle_stacking_non_warp_damage = {
 	}
 }
 templates.psyker_cycle_stacking_melee_damage_stacks = {
-	class_name = "proc_buff",
+	predicted = false,
 	max_stacks = 4,
+	class_name = "proc_buff",
 	stat_buffs = {
 		[stat_buffs.melee_damage] = 0.05
 	},
@@ -2666,8 +2663,9 @@ templates.psyker_cycle_stacking_melee_damage_stacks = {
 	end
 }
 templates.psyker_cycle_stacking_ranged_damage_stacks = {
-	class_name = "proc_buff",
+	predicted = false,
 	max_stacks = 4,
+	class_name = "proc_buff",
 	stat_buffs = {
 		[stat_buffs.ranged_damage] = 0.05
 	},
@@ -2686,6 +2684,7 @@ templates.psyker_cycle_stacking_ranged_damage_stacks = {
 	end
 }
 templates.psyker_crits_empower_warp = {
+	predicted = false,
 	class_name = "proc_buff",
 	proc_events = {
 		[proc_events.on_critical_strike] = 1,
@@ -2721,9 +2720,10 @@ templates.psyker_crits_empower_warp_buff = {
 	}
 }
 templates.psyker_dodge_after_crits = {
-	hud_icon_gradient_map = "content/ui/textures/color_ramps/talent_default",
+	predicted = true,
 	hud_priority = 3,
 	hud_icon = "content/ui/textures/icons/buffs/hud/psyker/psyker_1_tier_4_name_1",
+	hud_icon_gradient_map = "content/ui/textures/color_ramps/talent_default",
 	class_name = "proc_buff",
 	active_duration = 1,
 	proc_events = {

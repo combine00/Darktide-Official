@@ -23,6 +23,7 @@ function NavMeshManager:init(world, nav_world, is_server, network_event_delegate
 	self._sparse_nav_graph_connected = false
 	local nav_tag_volume_data = self:_require_nav_tag_volume_data(level_name, {})
 	local nav_tag_volume_layers = self:_create_nav_tag_volumes_from_level_data(nav_tag_volume_data)
+	self._level_nav_tags = {}
 	self._nav_tag_volume_data = nav_tag_volume_data
 	self._nav_cost_map_lookup = self:_setup_nav_cost_map_lookup()
 	self._nav_tag_layer_lookup = self:_setup_nav_tag_layer_lookup(nav_tag_volume_layers)
@@ -74,12 +75,8 @@ function NavMeshManager:_require_nav_tag_volume_data(level_name, nav_tag_volume_
 end
 
 function NavMeshManager:_create_nav_tag_volumes_from_level_data(nav_tag_volume_data)
-	if self._dynamic_mesh_spawning then
-		self._sparse_graph_dirty = true
-
-		if self._sparse_nav_graph_connected then
-			return
-		end
+	if self._dynamic_mesh_spawning and self._sparse_nav_graph_connected then
+		self:_make_sparse_graph_dirty()
 	end
 
 	local nav_world = self._nav_world
@@ -110,13 +107,69 @@ function NavMeshManager:_create_nav_tag_volumes_from_level_data(nav_tag_volume_d
 	return layer_id_to_name
 end
 
-function NavMeshManager:add_nav_tag_volume(bottom_points, altitude_min, altitude_max, layer_name, allowed, optional_type)
-	if self._dynamic_mesh_spawning then
-		self._sparse_graph_dirty = true
+function NavMeshManager:add_nav_tag_volumes_for_level(level, optional_position, optional_rotation)
+	local nav_tag_volume_data = {}
+	local level_name = Level.name(level):match("(.+)%..+$")
+	local file_path = level_name .. "_volume_data"
 
-		if self._sparse_nav_graph_connected then
-			return
+	if Application.can_get_resource("lua", file_path) then
+		local volume_data = require(file_path).volume_data
+
+		for i = 1, #volume_data do
+			local data = volume_data[i]
+
+			if string.find(data.type, "content/volume_types/nav_tag_volumes/") ~= nil then
+				nav_tag_volume_data[#nav_tag_volume_data + 1] = table.clone(data)
+			end
 		end
+	end
+
+	local level_nav_tag_volumes = {}
+
+	for i = 1, #nav_tag_volume_data do
+		local data = nav_tag_volume_data[i]
+		local alt_min_z = data.alt_min_vector[3] + (optional_position and optional_position[3] or 0)
+		local alt_max_z = data.alt_max_vector[3] + (optional_position and optional_position[3] or 0)
+		local bottom_points = Navigation.vector3s_from_arrays(data.bottom_points)
+
+		if optional_rotation then
+			for j = 1, #bottom_points do
+				bottom_points[j] = Quaternion.rotate(optional_rotation, bottom_points[j])
+			end
+		end
+
+		if optional_position then
+			for j = 1, #bottom_points do
+				bottom_points[j] = bottom_points[j] + optional_position
+			end
+		end
+
+		local volume_name = data.name
+		local volume_allowed = true
+		local volume_type = data.type
+		level_nav_tag_volumes[#level_nav_tag_volumes + 1] = self:add_nav_tag_volume(bottom_points, alt_min_z, alt_max_z, volume_name, volume_allowed, volume_type)
+	end
+
+	self._level_nav_tags[level] = level_nav_tag_volumes
+end
+
+function NavMeshManager:remove_nav_tag_volumes_for_level(level)
+	local level_nav_tag_volumes = self._level_nav_tags[level]
+
+	if not level_nav_tag_volumes then
+		Log.error("NavMeshManager", "[remove_nav_tag_volumes_for_level] trying to remove nav tags volumes for level: %s, which wass not added", Level.name(level))
+
+		return
+	end
+
+	for i = 1, #level_nav_tag_volumes do
+		self:remove_nav_tag_volume(level_nav_tag_volumes[i])
+	end
+end
+
+function NavMeshManager:add_nav_tag_volume(bottom_points, altitude_min, altitude_max, layer_name, allowed, optional_type)
+	if self._dynamic_mesh_spawning and self._sparse_nav_graph_connected then
+		self:_make_sparse_graph_dirty()
 	end
 
 	local nav_tag_layer_lookup = self._nav_tag_layer_lookup
@@ -130,11 +183,11 @@ function NavMeshManager:add_nav_tag_volume(bottom_points, altitude_min, altitude
 
 	self._nav_tag_allowed_layers[layer_name] = allowed
 	local nav_tag_volume_data = self._nav_tag_volume_data
-	nav_tag_volume_data[#nav_tag_volume_data + 1] = {
+	local nav_tag_volume = Navigation.create_nav_tag_volume(self._nav_world, bottom_points, altitude_min, altitude_max, layer_id, Color.orange())
+	nav_tag_volume_data[nav_tag_volume] = {
 		name = layer_name,
 		type = optional_type,
-		bottom_points = Navigation.vector3s_to_arrays(bottom_points),
-		nav_tag_volume = Navigation.create_nav_tag_volume(self._nav_world, bottom_points, altitude_min, altitude_max, layer_id, Color.orange())
+		bottom_points = Navigation.vector3s_to_arrays(bottom_points)
 	}
 
 	if not self._is_server then
@@ -149,6 +202,19 @@ function NavMeshManager:add_nav_tag_volume(bottom_points, altitude_min, altitude
 			GwNavTagLayerCostTable.forbid_layer(cost_table, layer_id)
 		end
 	end
+
+	return nav_tag_volume
+end
+
+function NavMeshManager:remove_nav_tag_volume(nav_tag_volume)
+	local data = self._nav_tag_volume_data[nav_tag_volume]
+
+	if data then
+		self._nav_tag_volume_data[nav_tag_volume] = nil
+		self._nav_tag_allowed_layers[data.name] = false
+	end
+
+	Navigation.destroy_nav_tag_volume(nav_tag_volume)
 end
 
 function NavMeshManager:_setup_nav_cost_map_lookup()
@@ -243,9 +309,7 @@ function NavMeshManager:nav_tag_volume_layer_ids_by_volume_type(volume_type)
 	local volume_data = self._nav_tag_volume_data
 	local layer_ids = {}
 
-	for i = 1, #volume_data do
-		local data = volume_data[i]
-
+	for nav_tag_volume, data in pairs(volume_data) do
 		if data.type == volume_type then
 			layer_ids[#layer_ids + 1] = self:nav_tag_layer_id(data.name)
 		end
@@ -255,11 +319,10 @@ function NavMeshManager:nav_tag_volume_layer_ids_by_volume_type(volume_type)
 end
 
 function NavMeshManager:destroy()
+	self._level_nav_tags = nil
+
 	self:_destroy_nav_cost_maps()
 	self:_destroy_nav_tag_volumes()
-	GwNavWorld.disconnect_sparse_graph(self._nav_world, self._sparse_nav_graph_nav_data)
-
-	self._sparse_nav_graph_connected = false
 
 	if not self._is_server then
 		self._network_event_delegate:unregister_events(unpack(CLIENT_RPCS))
@@ -439,10 +502,29 @@ function NavMeshManager:on_gameplay_post_init()
 	self._level_spawned = true
 end
 
+function NavMeshManager:_make_sparse_graph_dirty()
+	if self._sparse_nav_graph_connected then
+		GwNavWorld.disconnect_sparse_graph(self._nav_world, self._sparse_nav_graph_nav_data)
+
+		self._sparse_nav_graph_connected = false
+	end
+
+	self._sparse_graph_dirty = true
+end
+
 function NavMeshManager:_connect_sparse_graph()
+	if self._sparse_nav_graph_connected then
+		return
+	end
+
 	local num_nav_tag_layers = #self._nav_tag_layer_lookup
 	self._sparse_nav_graph_nav_data = GwNavWorld.connect_sparse_graph(self._nav_world)
 	self._sparse_nav_graph_connected = true
+	self._sparse_graph_dirty = false
+end
+
+function NavMeshManager:is_sparse_graph_connected()
+	return self._sparse_nav_graph_connected
 end
 
 function NavMeshManager:_recompute_nav_cost_maps()
@@ -465,7 +547,11 @@ end
 
 function NavMeshManager:update(dt, t)
 	if self._sparse_graph_dirty then
-		self._sparse_graph_dirty = false
+		local nav_world = self._nav_world
+
+		if nav_world and GwNavTagVolume.all_integrated(nav_world) then
+			self:_connect_sparse_graph()
+		end
 	end
 
 	if self._should_recompute_nav_cost_maps and self._next_nav_cost_map_recomputation_t < t then
@@ -499,7 +585,7 @@ function NavMeshManager:set_allowed_nav_tag_layer(layer_name, allowed)
 	end
 
 	if self._dynamic_mesh_spawning and self._sparse_nav_graph_connected then
-		return
+		self:_make_sparse_graph_dirty()
 	end
 
 	local layer_id = self._nav_tag_layer_lookup[layer_name]

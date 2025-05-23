@@ -136,6 +136,10 @@ function SmartTag:is_valid(t)
 end
 
 function SmartTag.validate_target_unit(target_unit)
+	if not Unit.alive(target_unit) then
+		return false, REMOVE_TAG_REASONS.tagged_unit_died
+	end
+
 	local target_type = Unit.get_data(target_unit, "smart_tag_target_type")
 
 	if target_type == "pickup" then

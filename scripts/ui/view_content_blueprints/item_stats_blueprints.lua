@@ -3303,13 +3303,12 @@ local function generate_blueprints_function(grid_size, optional_item)
 				content.gamepad_bar_matrix = {
 					{
 						1,
-						2,
-						6
+						5,
+						3
 					},
 					{
 						4,
-						5,
-						3
+						2
 					}
 				}
 				content.gamepad_selected_index = {}
@@ -3369,14 +3368,16 @@ local function generate_blueprints_function(grid_size, optional_item)
 					content.gamepad_selected_index[2] = index_y
 					local selected_index = gamepad_bar_matrix[index_y][index_x]
 
-					for ii = 1, total_stats do
-						local is_hover = parent_active and ii == selected_index
-						style["hover_frame_" .. ii].color[1] = is_hover and 128 or 0
-						style["hover_frame_border_" .. ii].color[1] = is_hover and 128 or 0
-						style["hover_frame_corner_" .. ii].color[1] = is_hover and 128 or 0
+					if selected_index then
+						for ii = 1, total_stats do
+							local is_hover = parent_active and ii == selected_index
+							style["hover_frame_" .. ii].color[1] = is_hover and 128 or 0
+							style["hover_frame_border_" .. ii].color[1] = is_hover and 128 or 0
+							style["hover_frame_corner_" .. ii].color[1] = is_hover and 128 or 0
 
-						if is_hover then
-							stat_data = content["bar_breakdown_" .. ii] or stat_data
+							if is_hover then
+								stat_data = content["bar_breakdown_" .. ii] or stat_data
+							end
 						end
 					end
 				else

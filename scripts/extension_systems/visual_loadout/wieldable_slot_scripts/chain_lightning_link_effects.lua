@@ -228,7 +228,7 @@ function FxDataTables:return_table(fx_data_table)
 	fx_data_table:clear()
 end
 
-function ChainLightningLinkEffects:init(context, slot, weapon_template, fx_sources)
+function ChainLightningLinkEffects:init(context, slot, weapon_template, fx_sources, item, unit_1p, unit_3p)
 	local owner_unit = context.owner_unit
 	self._world = context.world
 	self._physics_world = context.physics_world

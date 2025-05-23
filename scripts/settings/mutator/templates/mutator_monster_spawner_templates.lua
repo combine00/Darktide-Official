@@ -41,6 +41,20 @@ local mutator_templates = {
 				"havoc_twins"
 			}
 		}
+	},
+	mutator_nurgle_totem = {
+		class = "scripts/managers/mutator/mutators/mutator_monster_spawner",
+		spawner_template = {
+			spawn_locations = "skulls_locations",
+			trigger_distance = 55,
+			injection_template = "nurgle_totems",
+			force_horde_on_spawn = true,
+			asset_package = "content/characters/enemy/mutators/skull_totems_assets",
+			num_to_spawn = 3,
+			monster_breed_name = {
+				"nurgle_totems"
+			}
+		}
 	}
 }
 

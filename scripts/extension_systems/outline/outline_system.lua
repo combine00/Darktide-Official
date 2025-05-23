@@ -407,7 +407,7 @@ function OutlineSystem:rpc_add_outline_to_unit(channel_id, go_id, outline_id)
 	local outline_name = NetworkLookup.outline_types[outline_id]
 	local unit = Managers.state.unit_spawner:unit(go_id)
 
-	if HEALTH_ALIVE[unit] then
+	if ALIVE[unit] then
 		self:add_outline(unit, outline_name)
 	end
 end
@@ -416,7 +416,7 @@ function OutlineSystem:rpc_remove_outline_from_unit(channel_id, go_id, outline_i
 	local outline_name = NetworkLookup.outline_types[outline_id]
 	local unit = Managers.state.unit_spawner:unit(go_id)
 
-	if HEALTH_ALIVE[unit] then
+	if ALIVE[unit] then
 		self:remove_outline(unit, outline_name)
 	end
 end
@@ -424,7 +424,7 @@ end
 function OutlineSystem:rpc_remove_all_outlines_from_unit(channel_id, go_id)
 	local unit = Managers.state.unit_spawner:unit(go_id)
 
-	if HEALTH_ALIVE[unit] then
+	if ALIVE[unit] then
 		self:remove_all_outlines(unit)
 	end
 end

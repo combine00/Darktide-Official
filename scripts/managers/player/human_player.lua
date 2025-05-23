@@ -114,19 +114,12 @@ end
 
 function HumanPlayer:set_profile(profile)
 	self._profile = profile
+	self._telemetry_subject = {
+		account_id = self._account_id,
+		character_id = self:character_id()
+	}
 
-	if self:type() == "HumanPlayer" then
-		self._telemetry_subject = {
-			account_id = self._account_id,
-			character_id = self:character_id()
-		}
-	elseif self:type() == "BotPlayer" then
-		self._telemetry_subject = {
-			bot = true,
-			account_id = self._debug_name,
-			character_id = self:local_player_id()
-		}
-	end
+	Managers.event:trigger("event_player_set_profile", self, profile)
 end
 
 function HumanPlayer:profile()

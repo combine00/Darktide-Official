@@ -7,6 +7,9 @@ local Navigation = {
 
 		return tag_volume
 	end,
+	destroy_nav_tag_volume = function (tag_volume)
+		return
+	end,
 	create_traverse_logic = function (nav_world, nav_tag_allowed_layers, optional_nav_cost_map_multipliers, enable_crowd_dispersion)
 		local nav_mesh_manager = Managers.state.nav_mesh
 		local nav_tag_cost_table = GwNavTagLayerCostTable.create()

@@ -75,251 +75,247 @@ local function generate_base_template(functional_unit, visual_unit, allow_rotati
 					}
 				}
 			}
-		},
-		action_input_hierarchy = {
-			{
-				input = "aim_force_field",
-				transition = {
-					{
-						transition = "base",
-						input = "place_force_field"
-					},
-					{
-						transition = "base",
-						input = "wield"
-					},
-					{
-						transition = "base",
-						input = "cancel"
-					},
-					{
-						transition = "base",
-						input = "grenade_ability"
-					}
+		}
+	}
+
+	table.add_missing(base_template.action_inputs, BaseTemplateSettings.action_inputs)
+
+	base_template.action_input_hierarchy = {
+		{
+			input = "aim_force_field",
+			transition = {
+				{
+					transition = "base",
+					input = "place_force_field"
+				},
+				{
+					transition = "base",
+					input = "wield"
+				},
+				{
+					transition = "base",
+					input = "cancel"
+				},
+				{
+					transition = "base",
+					input = "grenade_ability"
 				}
-			},
-			{
-				input = "instant_aim_force_field",
-				transition = {
-					{
-						transition = "base",
-						input = "instant_place_force_field"
-					},
-					{
-						transition = "base",
-						input = "wield"
-					},
-					{
-						transition = "base",
-						input = "cancel"
-					},
-					{
-						transition = "base",
-						input = "grenade_ability"
-					}
-				}
-			},
-			{
-				transition = "base",
-				input = "wield"
-			},
-			{
-				transition = "stay",
-				input = "cancel"
-			},
-			{
-				transition = "stay",
-				input = "unwield_to_previous"
-			},
-			{
-				transition = "stay",
-				input = "grenade_ability"
 			}
 		},
-		actions = {
-			action_unwield = {
-				allowed_during_sprint = true,
-				start_input = "wield",
-				uninterruptible = true,
-				kind = "unwield",
-				total_time = 0,
-				allowed_chain_actions = {}
-			},
-			action_unwield_to_previous = {
-				allowed_during_sprint = true,
-				uninterruptible = true,
-				kind = "unwield_to_previous",
-				unwield_to_weapon = false,
-				total_time = 0,
-				allowed_chain_actions = {}
-			},
-			action_wield = {
-				kind = "wield",
-				uninterruptible = true,
-				anim_event_3p = "equip_shield",
-				anim_event = "equip",
-				total_time = 0.25,
-				conditional_state_to_action_input = {
-					auto_chain = {
-						input_name = "aim_force_field"
-					}
+		{
+			input = "instant_aim_force_field",
+			transition = {
+				{
+					transition = "base",
+					input = "instant_place_force_field"
 				},
-				allowed_chain_actions = {
-					instant_aim_force_field = {
-						action_name = "action_instant_aim_force_field"
-					},
-					aim_force_field = {
-						action_name = "action_aim_force_field",
-						chain_time = 0.1
-					}
+				{
+					transition = "base",
+					input = "wield"
+				},
+				{
+					transition = "base",
+					input = "cancel"
+				},
+				{
+					transition = "base",
+					input = "grenade_ability"
+				}
+			}
+		},
+		{
+			transition = "base",
+			input = "wield"
+		},
+		{
+			transition = "stay",
+			input = "cancel"
+		},
+		{
+			transition = "stay",
+			input = "unwield_to_previous"
+		},
+		{
+			transition = "stay",
+			input = "grenade_ability"
+		}
+	}
+	base_template.actions = {
+		action_unwield = {
+			allowed_during_sprint = true,
+			start_input = "wield",
+			uninterruptible = true,
+			kind = "unwield",
+			total_time = 0,
+			allowed_chain_actions = {}
+		},
+		action_unwield_to_previous = {
+			allowed_during_sprint = true,
+			uninterruptible = true,
+			kind = "unwield_to_previous",
+			unwield_to_weapon = false,
+			total_time = 0,
+			allowed_chain_actions = {}
+		},
+		action_wield = {
+			kind = "wield",
+			uninterruptible = true,
+			anim_event_3p = "equip_shield",
+			anim_event = "equip",
+			total_time = 0.25,
+			conditional_state_to_action_input = {
+				auto_chain = {
+					input_name = "aim_force_field"
 				}
 			},
-			action_aim_force_field = {
-				uninterruptible = true,
-				kind = "aim_force_field",
-				abort_sprint = true,
-				allowed_during_sprint = true,
-				prevent_sprint = true,
-				total_time = math.huge,
-				visual_unit = visual_unit,
-				place_configuration = {
-					rotation_steps = 4,
-					rotation_input = "action_one_pressed",
-					distance = 10,
-					rotate_sound_event = "wwise/events/player/play_ability_psyker_protectorate_shield_rotate",
-					anim_rotate_event = "ability_rotate_shield",
-					allow_rotation = allow_rotation,
-					sound_position_offset = Vector3Box(Vector3.up() * 1.5)
+			allowed_chain_actions = {
+				instant_aim_force_field = {
+					action_name = "action_instant_aim_force_field"
 				},
-				allowed_chain_actions = {
-					wield = {
-						action_name = "action_unwield"
-					},
-					place_force_field = {
-						action_name = "action_place_force_field",
-						chain_time = 0.1
-					},
-					cancel = {
-						action_name = "action_cancel"
-					},
-					grenade_ability = {
-						{
-							action_name = "grenade_ability"
-						},
-						{
-							action_name = "grenade_ability_quick_throw"
-						}
-					}
+				aim_force_field = {
+					action_name = "action_aim_force_field",
+					chain_time = 0.1
+				}
+			}
+		},
+		action_aim_force_field = {
+			uninterruptible = true,
+			kind = "aim_force_field",
+			abort_sprint = true,
+			allowed_during_sprint = true,
+			prevent_sprint = true,
+			total_time = math.huge,
+			visual_unit = visual_unit,
+			place_configuration = {
+				rotation_steps = 4,
+				rotation_input = "action_one_pressed",
+				distance = 10,
+				rotate_sound_event = "wwise/events/player/play_ability_psyker_protectorate_shield_rotate",
+				anim_rotate_event = "ability_rotate_shield",
+				allow_rotation = allow_rotation,
+				sound_position_offset = Vector3Box(Vector3.up() * 1.5)
+			},
+			allowed_chain_actions = {
+				wield = {
+					action_name = "action_unwield"
+				},
+				place_force_field = {
+					action_name = "action_place_force_field",
+					chain_time = 0.1
+				},
+				cancel = {
+					action_name = "action_cancel"
+				},
+				grenade_ability = BaseTemplateSettings.generate_grenade_ability_chain_actions()
+			}
+		},
+		action_instant_aim_force_field = {
+			uninterruptible = true,
+			kind = "aim_force_field",
+			abort_sprint = true,
+			allowed_during_sprint = true,
+			prevent_sprint = true,
+			total_time = 0,
+			visual_unit = visual_unit,
+			place_configuration = {
+				allow_rotation = false,
+				distance = 10,
+				sound_position_offset = Vector3Box(Vector3.up() * 1.5)
+			},
+			conditional_state_to_action_input = {
+				auto_chain = {
+					input_name = "instant_place_force_field"
 				}
 			},
-			action_instant_aim_force_field = {
-				uninterruptible = true,
-				kind = "aim_force_field",
-				abort_sprint = true,
-				allowed_during_sprint = true,
-				prevent_sprint = true,
-				total_time = 0,
-				visual_unit = visual_unit,
-				place_configuration = {
-					allow_rotation = false,
-					distance = 10,
-					sound_position_offset = Vector3Box(Vector3.up() * 1.5)
+			allowed_chain_actions = {
+				wield = {
+					action_name = "action_unwield"
 				},
-				conditional_state_to_action_input = {
-					auto_chain = {
-						input_name = "instant_place_force_field"
-					}
+				instant_place_force_field = {
+					action_name = "action_instant_place_force_field"
 				},
-				allowed_chain_actions = {
-					wield = {
-						action_name = "action_unwield"
-					},
-					instant_place_force_field = {
-						action_name = "action_instant_place_force_field"
-					},
-					cancel = {
-						action_name = "action_cancel"
-					}
+				cancel = {
+					action_name = "action_cancel"
+				}
+			}
+		},
+		action_place_force_field = {
+			use_ability_charge = true,
+			weapon_handling_template = "time_scale_1_4",
+			kind = "place_force_field",
+			unwield_slot = true,
+			allowed_during_sprint = true,
+			ability_type = "combat_ability",
+			use_aim_data = true,
+			vo_tag = "ability_protectorate_start",
+			abort_sprint = true,
+			place_time = 0.05,
+			uninterruptible = true,
+			anim_event = "attack_shoot",
+			prevent_sprint = true,
+			total_time = 0.6,
+			functional_unit = functional_unit,
+			action_movement_curve = {
+				{
+					modifier = 0.4,
+					t = 0.1
+				},
+				{
+					modifier = 0.6,
+					t = 0.2
+				},
+				{
+					modifier = 0.8,
+					t = 0.3
+				},
+				{
+					modifier = 1,
+					t = 0.4
+				},
+				start_modifier = 0.3
+			},
+			conditional_state_to_action_input = {
+				auto_chain = {
+					input_name = "unwield_to_previous"
 				}
 			},
-			action_place_force_field = {
-				use_ability_charge = true,
-				weapon_handling_template = "time_scale_1_4",
-				kind = "place_force_field",
-				unwield_slot = true,
-				allowed_during_sprint = true,
-				ability_type = "combat_ability",
-				use_aim_data = true,
-				vo_tag = "ability_protectorate_start",
-				abort_sprint = true,
-				place_time = 0.05,
-				uninterruptible = true,
-				anim_event = "attack_shoot",
-				prevent_sprint = true,
-				total_time = 0.6,
-				functional_unit = functional_unit,
-				action_movement_curve = {
-					{
-						modifier = 0.4,
-						t = 0.1
-					},
-					{
-						modifier = 0.6,
-						t = 0.2
-					},
-					{
-						modifier = 0.8,
-						t = 0.3
-					},
-					{
-						modifier = 1,
-						t = 0.4
-					},
-					start_modifier = 0.3
+			allowed_chain_actions = {
+				unwield_to_previous = {
+					action_name = "action_unwield_to_previous"
+				}
+			}
+		},
+		action_cancel = {
+			start_input = "cancel",
+			anim_end_event = "attack_finished",
+			kind = "dummy",
+			uninterruptible = true,
+			anim_event = "attack_charge_cancel",
+			anim_time_scale = 1,
+			total_time = 0.22,
+			action_movement_curve = {
+				{
+					modifier = 0.5,
+					t = 0.2
 				},
-				conditional_state_to_action_input = {
-					auto_chain = {
-						input_name = "unwield_to_previous"
-					}
+				{
+					modifier = 0.4,
+					t = 0.3
 				},
-				allowed_chain_actions = {
-					unwield_to_previous = {
-						action_name = "action_unwield_to_previous"
-					}
+				{
+					modifier = 1,
+					t = 0.5
+				},
+				start_modifier = 0.8
+			},
+			conditional_state_to_action_input = {
+				auto_chain = {
+					input_name = "unwield_to_previous"
 				}
 			},
-			action_cancel = {
-				start_input = "cancel",
-				anim_end_event = "attack_finished",
-				kind = "dummy",
-				uninterruptible = true,
-				anim_event = "attack_charge_cancel",
-				anim_time_scale = 1,
-				total_time = 0.22,
-				action_movement_curve = {
-					{
-						modifier = 0.5,
-						t = 0.2
-					},
-					{
-						modifier = 0.4,
-						t = 0.3
-					},
-					{
-						modifier = 1,
-						t = 0.5
-					},
-					start_modifier = 0.8
-				},
-				conditional_state_to_action_input = {
-					auto_chain = {
-						input_name = "unwield_to_previous"
-					}
-				},
-				allowed_chain_actions = {
-					unwield_to_previous = {
-						action_name = "action_unwield_to_previous"
-					}
+			allowed_chain_actions = {
+				unwield_to_previous = {
+					action_name = "action_unwield_to_previous"
 				}
 			}
 		}

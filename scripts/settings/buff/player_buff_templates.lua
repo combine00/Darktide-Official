@@ -61,6 +61,7 @@ local MAX_POWER_LEVEL = PowerLevelSettings.max_power_level
 templates.knocked_down_damage_tick = {
 	interval = 2,
 	hud_icon = "content/ui/textures/icons/buffs/hud/states_knocked_down_buff_hud",
+	predicted = false,
 	hud_priority = 1,
 	class_name = "interval_buff",
 	is_negative = true,
@@ -169,6 +170,7 @@ templates.grimoire_damage_tick = {
 	predicted = false
 }
 templates.weakspot_kill_reload_speed = {
+	predicted = false,
 	class_name = "proc_buff",
 	active_duration = 5,
 	proc_events = {
@@ -265,9 +267,10 @@ templates.no_toughness_damage_buff = {
 	end
 }
 templates.player_spawn_grace = {
-	class_name = "buff",
 	duration = 5,
 	hud_icon = "content/ui/textures/icons/buffs/hud/states_grace_time_hud",
+	predicted = false,
+	class_name = "buff",
 	keywords = {
 		keywords.unperceivable
 	},
@@ -1046,6 +1049,7 @@ templates.player_suppression_node_buff_low_3 = table.clone(templates.player_supp
 templates.player_suppression_node_buff_low_4 = table.clone(templates.player_suppression_node_buff_low_1)
 templates.player_suppression_node_buff_low_5 = table.clone(templates.player_suppression_node_buff_low_1)
 templates.player_wounds_node_buff_1 = {
+	predicted = false,
 	class_name = "buff",
 	stat_buffs = {
 		[stat_buffs.extra_max_amount_of_wounds] = 1
@@ -1056,6 +1060,7 @@ templates.player_wounds_node_buff_2.stats_buffs = {
 	[stat_buffs.extra_max_amount_of_wounds] = 2
 }
 templates.player_stamina_node_buff_1 = {
+	predicted = false,
 	class_name = "buff",
 	stat_buffs = {
 		[stat_buffs.stamina_modifier] = 1
@@ -1066,6 +1071,7 @@ templates.player_stamina_node_buff_2.stats_buffs = {
 	[stat_buffs.stamina_modifier] = 2
 }
 templates.player_max_warp_charge_node_buff_1 = {
+	predicted = false,
 	class_name = "buff",
 	stat_buffs = {
 		[stat_buffs.warp_charge_amount] = 1
@@ -1076,6 +1082,7 @@ templates.player_max_warp_charge_node_buff_2.stats_buffs = {
 	[stat_buffs.warp_charge_amount] = 2
 }
 templates.player_dodge_count_node_buff_1 = {
+	predicted = false,
 	class_name = "buff",
 	stat_buffs = {
 		[stat_buffs.extra_consecutive_dodges] = 1
@@ -1086,6 +1093,7 @@ templates.player_dodge_count_node_buff_2.stats_buffs = {
 	[stat_buffs.extra_consecutive_dodges] = 2
 }
 templates.player_crit_chance_node_buff_1 = {
+	predicted = false,
 	class_name = "buff",
 	stat_buffs = {
 		[stat_buffs.critical_strike_chance] = 0.1
@@ -1096,6 +1104,7 @@ templates.player_crit_chance_node_buff_2.stats_buffs = {
 	[stat_buffs.critical_strike_chance] = 0.2
 }
 templates.player_max_ammo_node_buff_1 = {
+	predicted = false,
 	class_name = "buff",
 	stat_buffs = {
 		[stat_buffs.ammo_reserve_capacity] = 0.15
@@ -1103,6 +1112,7 @@ templates.player_max_ammo_node_buff_1 = {
 }
 templates.player_max_ammo_node_buff_2 = table.clone(templates.player_max_ammo_node_buff_1)
 templates.player_coherency_regen_node_buff_1 = {
+	predicted = false,
 	class_name = "buff",
 	stat_buffs = {
 		[stat_buffs.toughness_coherency_regen_rate_multiplier] = 0.1
@@ -1133,6 +1143,7 @@ end
 
 templates.bot_medium_buff = {
 	class_name = "buff",
+	predicted = false,
 	keywords = {
 		keywords.uninterruptible,
 		keywords.stun_immune
@@ -1160,6 +1171,7 @@ templates.bot_medium_buff = {
 }
 templates.bot_high_buff = {
 	class_name = "buff",
+	predicted = false,
 	keywords = {
 		keywords.uninterruptible,
 		keywords.stun_immune

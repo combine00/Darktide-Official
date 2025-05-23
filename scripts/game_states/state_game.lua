@@ -63,6 +63,7 @@ local TransitionManager = require("scripts/managers/transition/transition_manage
 local UIFontManager = require("scripts/managers/ui/ui_font_manager")
 local UIManager = require("scripts/managers/ui/ui_manager")
 local UrlLoaderManager = require("scripts/managers/url_loader/url_loader_manager")
+local VideoManager = require("scripts/managers/video/video_manager")
 local VOSourcesCache = require("scripts/extension_systems/dialogue/vo_sources_cache")
 local VotingManager = require("scripts/managers/voting/voting_manager")
 local WorldLevelDespawnManager = require("scripts/managers/world_level_despawn/world_level_despawn_manager")
@@ -187,6 +188,7 @@ function StateGame:_init_managers(package_manager, localization_manager, event_d
 	end
 
 	Managers.wwise_game_sync = WwiseGameSyncManager:new(Managers.world)
+	Managers.video = VideoManager:new()
 	Managers.token = TokenManager:new()
 	Managers.save = SaveManager:new(GameParameters.save_file_name, GameParameters.cloud_save_enabled)
 	Managers.input = InputManager:new()
@@ -264,7 +266,7 @@ function StateGame:_init_managers(package_manager, localization_manager, event_d
 	Managers.achievements = AchievementsManager:new(not DEDICATED_SERVER, event_delegate, use_batched_saving, broadcast_unlocks)
 	Managers.voting = VotingManager:new(event_delegate)
 	Managers.progression = ProgressionManager:new()
-	Managers.live_event = LiveEventManager:new(DEDICATED_SERVER)
+	Managers.live_event = LiveEventManager:new(DEDICATED_SERVER, event_delegate)
 	Managers.telemetry = TelemetryManager:new()
 	Managers.telemetry_events = TelemetryEvents:new(Managers.telemetry, Managers.connection)
 	Managers.telemetry_reporters = TelemetryReporters:new()
@@ -355,6 +357,7 @@ function StateGame:update(dt)
 	if not DEDICATED_SERVER then
 		Managers.dlc:update(dt, t)
 		Managers.wwise_game_sync:update(dt, t)
+		Managers.video:update(dt, t)
 	end
 
 	Managers.loading:update(dt)

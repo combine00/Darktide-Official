@@ -1,4 +1,3 @@
-local CinematicSceneTemplates = require("scripts/settings/cinematic_scene/cinematic_scene_templates")
 local MatchmakingConstants = require("scripts/settings/network/matchmaking_constants")
 local HOST_TYPES = MatchmakingConstants.HOST_TYPES
 local NO_TRANSITION_UI = {

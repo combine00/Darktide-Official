@@ -428,14 +428,6 @@ function NarrativeManager:set_ever_received_havoc_order(data)
 	end
 end
 
-function NarrativeManager:get_havoc_unlock_status()
-	return self._havoc_unlock_status
-end
-
-function NarrativeManager:set_havoc_unlock_status(value)
-	self._havoc_unlock_status = value
-end
-
 function NarrativeManager:get_havoc_cadence_status()
 	return self._havoc_cadence_status
 end

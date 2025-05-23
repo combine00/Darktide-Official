@@ -1,7 +1,7 @@
 local WieldableSlotScriptInterface = require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/wieldable_slot_script_interface")
 local ShovelFoldCorrector = class("ShovelFoldCorrector")
 
-function ShovelFoldCorrector:init(context, slot, weapon_template, fx_sources)
+function ShovelFoldCorrector:init(context, slot, weapon_template, fx_sources, item, unit_1p, unit_3p)
 	self._is_server = context.is_server
 	self._is_local_unit = context.is_local_unit
 	local owner_unit = context.owner_unit

@@ -113,9 +113,7 @@ local template_groups = {
 	},
 	{
 		"ogryn_power_mauls",
-		"ogryn_powermaul_p1_m1",
-		"ogryn_powermaul_p1_m2",
-		"ogryn_powermaul_p1_m3"
+		"ogryn_powermaul_p1_m1"
 	},
 	{
 		"ogryn_powermaul_slabshield",
@@ -144,7 +142,9 @@ local template_groups = {
 	{
 		"power_swords",
 		"powersword_p1_m1",
-		"powersword_p1_m2"
+		"powersword_p1_m2",
+		"powersword_p2_m1",
+		"powersword_p2_m2"
 	},
 	{
 		"thunder_hammers_2h",
@@ -572,7 +572,7 @@ local function _generate_chain_attack_info(weapon_template, working_templates, f
 					local start_attack = actions[start_attack_name]
 					action_chain_actions = start_attack.allowed_chain_actions
 					attack_name = action_chain_actions[action_name] and action_chain_actions[action_name].action_name or nil
-				elseif not actions[attack_name].fire_configuration and not actions[attack_name].damage_profile then
+				elseif not actions[attack_name].fire_configuration and not actions[attack_name].fire_configurations and not actions[attack_name].damage_profile then
 					for j = 1, #charge_input_templates do
 						local input_template = charge_input_templates[j]
 						action_name = _find_action_based_on_input(weapon_template.action_inputs, input_template)

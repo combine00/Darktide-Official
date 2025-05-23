@@ -29,6 +29,16 @@ local material_overrides = {
 			}
 		}
 	},
+	emissive_red_04 = {
+		property_overrides = {
+			emissive_color_intensity = {
+				0.09,
+				0,
+				0.01,
+				1
+			}
+		}
+	},
 	emissive_green_01 = {
 		property_overrides = {
 			emissive_color_intensity = {
@@ -96,6 +106,16 @@ local material_overrides = {
 				0.178,
 				0,
 				0.5
+			}
+		}
+	},
+	emissive_yellow_01 = {
+		property_overrides = {
+			emissive_color_intensity = {
+				1,
+				1,
+				0,
+				1
 			}
 		}
 	}

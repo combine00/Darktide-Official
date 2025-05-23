@@ -9,7 +9,7 @@ function PickupInteraction:stop(world, interactor_unit, unit_data_component, t, 
 		local pickup_name = Unit.get_data(interactee_unit, "pickup_type")
 		local pickup_data = Pickups.by_name[pickup_name]
 
-		pickup_data.on_pickup_func(interactee_unit, interactor_unit)
+		pickup_data.on_pickup_func(interactee_unit, interactor_unit, pickup_data, t)
 
 		local player_or_nil = Managers.state.player_unit_spawn:owner(interactor_unit)
 		local interactor_session_id_or_nil = player_or_nil and player_or_nil:session_id()
@@ -56,6 +56,10 @@ function PickupInteraction:_update_stats(target_unit, interactor_session_id)
 	local telemetry_reporters_manager = Managers.telemetry_reporters
 	local pickup_name = Unit.get_data(target_unit, "pickup_type")
 	local player_or_nil = player_manager:player_from_session_id(interactor_session_id)
+
+	if player_or_nil and pickup_name then
+		Managers.stats:record_private("hook_picked_up_item", player_or_nil, pickup_name)
+	end
 
 	if player_or_nil then
 		telemetry_reporters_manager:reporter("picked_items"):register_event(player_or_nil, pickup_name)
@@ -111,6 +115,10 @@ function PickupInteraction:_use_charge(target_unit, interactor_unit)
 			pickup_system:despawn_pickup(target_unit)
 		end
 	end
+end
+
+function PickupInteraction:hud_block_text(interactor_unit, interactee_unit, target_node)
+	return PickupInteraction.super.hud_block_text(self, interactor_unit, interactee_unit, target_node)
 end
 
 return PickupInteraction

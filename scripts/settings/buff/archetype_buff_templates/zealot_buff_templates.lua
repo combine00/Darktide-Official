@@ -45,6 +45,7 @@ local templates = {}
 table.make_unique(templates)
 
 templates.zealot_damage_after_dash = {
+	predicted = false,
 	class_name = "proc_buff",
 	active_duration = 4,
 	proc_events = {
@@ -846,7 +847,6 @@ templates.zealot_preacher_coherency_corruption_healing = {
 		template_data.health_extension = ScriptUnit.extension(unit, "health_system")
 		template_data.coherency_extension = ScriptUnit.extension(unit, "coherency_system")
 		template_data.last_num_in_coherency = 0
-		template_data.valid_buff_owners = {}
 	end,
 	interval_func = function (template_data, template_context, template)
 		if not template_context.is_server then
@@ -860,7 +860,7 @@ templates.zealot_preacher_coherency_corruption_healing = {
 		if permanent_damage_taken ~= 0 then
 			local hook_name = "hook_zealot_corruption_healed_aura"
 			local parent_buff_name = "zealot_corruption_healing_coherency"
-			template_data.last_num_in_coherency, template_data.valid_buff_owners = template_data.coherency_extension:evaluate_and_send_achievement_data(template_data.last_num_in_coherency, template_data.valid_buff_owners, parent_buff_name, hook_name, corruption_heal_amount)
+			template_data.last_num_in_coherency = template_data.coherency_extension:evaluate_and_send_achievement_data(parent_buff_name, hook_name, corruption_heal_amount)
 		end
 	end,
 	related_talents = {
@@ -883,7 +883,6 @@ templates.zealot_preacher_coherency_corruption_healing_improved = {
 		template_data.health_extension = ScriptUnit.extension(unit, "health_system")
 		template_data.coherency_extension = ScriptUnit.extension(unit, "coherency_system")
 		template_data.last_num_in_coherency = 0
-		template_data.valid_buff_owners = {}
 	end,
 	interval_func = function (template_data, template_context, template)
 		if not template_context.is_server then
@@ -897,7 +896,7 @@ templates.zealot_preacher_coherency_corruption_healing_improved = {
 		if permanent_damage_taken ~= 0 then
 			local hook_name = "hook_zealot_corruption_healed_aura"
 			local parent_buff_name = "zealot_corruption_healing_coherency_improved"
-			template_data.last_num_in_coherency, template_data.valid_buff_owners = template_data.coherency_extension:evaluate_and_send_achievement_data(template_data.last_num_in_coherency, template_data.valid_buff_owners, parent_buff_name, hook_name, corruption_heal_amount_increased)
+			template_data.last_num_in_coherency = template_data.coherency_extension:evaluate_and_send_achievement_data(parent_buff_name, hook_name, corruption_heal_amount_increased)
 		end
 	end,
 	related_talents = {
@@ -999,7 +998,7 @@ local crit_chance_shared = talent_settings_3.offensive_2.crit_share
 templates.zealot_fanatic_rage_minor = {
 	max_stacks_cap = 1,
 	refresh_duration_on_stack = true,
-	predicted = true,
+	predicted = false,
 	hud_priority = 1,
 	hud_icon = "content/ui/textures/icons/buffs/hud/zealot/zealot_keystone_fanatic_rage",
 	hud_icon_gradient_map = "content/ui/textures/color_ramps/talent_keystone",
@@ -1020,7 +1019,7 @@ templates.zealot_fanatic_rage_minor = {
 templates.zealot_fanatic_rage_major = {
 	max_stacks_cap = 1,
 	refresh_duration_on_stack = true,
-	predicted = true,
+	predicted = false,
 	hud_priority = 1,
 	hud_icon = "content/ui/textures/icons/buffs/hud/zealot/zealot_keystone_fanatic_rage",
 	hud_icon_gradient_map = "content/ui/textures/color_ramps/talent_keystone",
@@ -1093,7 +1092,7 @@ templates.zealot_dash_buff = {
 local martyrdom_damage_step = talent_settings_2.passive_1.damage_per_step
 templates.zealot_martyrdom_base = {
 	hud_always_show_stacks = true,
-	predicted = true,
+	predicted = false,
 	hud_priority = 2,
 	hud_icon = "content/ui/textures/icons/buffs/hud/zealot/zealot_keystone_martyrdom",
 	hud_icon_gradient_map = "content/ui/textures/color_ramps/talent_keystone",
@@ -1497,7 +1496,6 @@ templates.zealot_toughness_on_aura_tracking_buff = {
 		template_data.coherency_extension = ScriptUnit.extension(unit, "coherency_system")
 		template_data.health_extension = ScriptUnit.extension(unit, "health_system")
 		template_data.last_num_in_coherency = 0
-		template_data.valid_buff_owners = {}
 		template_data.last_damage_recived = 0
 		template_data.damage_to_take = 0
 		template_data.damage_reduction = talent_settings_2.coherency.toughness_damage_taken_multiplier
@@ -1517,7 +1515,7 @@ templates.zealot_toughness_on_aura_tracking_buff = {
 		if template_data.damage_to_take >= 0 then
 			local parent_buff_name = "zealot_toughness_damage_coherency"
 			local hook_name = "hook_toughness_reduced_aura"
-			template_data.last_num_in_coherency, template_data.valid_buff_owners = template_data.coherency_extension:evaluate_and_send_achievement_data(template_data.last_num_in_coherency, template_data.valid_buff_owners, parent_buff_name, hook_name, template_data.damage_to_take)
+			template_data.last_num_in_coherency = template_data.coherency_extension:evaluate_and_send_achievement_data(parent_buff_name, hook_name, template_data.damage_to_take)
 			template_data.last_damage_recived = toughness_damage
 		else
 			template_data.last_damage_recived = 0
@@ -1552,7 +1550,6 @@ templates.zealot_improved_toughness_on_aura_tracking_buff = {
 		template_data.coherency_extension = ScriptUnit.extension(unit, "coherency_system")
 		template_data.health_extension = ScriptUnit.extension(unit, "health_system")
 		template_data.last_num_in_coherency = 0
-		template_data.valid_buff_owners = {}
 		template_data.last_damage_recived = 0
 		template_data.damage_to_take = 0
 		template_data.damage_reduction = talent_settings_2.coop_2.toughness_damage_taken_multiplier
@@ -1572,7 +1569,7 @@ templates.zealot_improved_toughness_on_aura_tracking_buff = {
 		if template_data.damage_to_take >= 0 then
 			local parent_buff_name = "zealot_toughness_damage_reduction_coherency_improved"
 			local hook_name = "hook_toughness_reduced_aura"
-			template_data.last_num_in_coherency, template_data.valid_buff_owners = template_data.coherency_extension:evaluate_and_send_achievement_data(template_data.last_num_in_coherency, template_data.valid_buff_owners, parent_buff_name, hook_name, template_data.damage_to_take)
+			template_data.last_num_in_coherency = template_data.coherency_extension:evaluate_and_send_achievement_data(parent_buff_name, hook_name, template_data.damage_to_take)
 			template_data.last_damage_recived = toughness_damage
 		else
 			template_data.last_damage_recived = 0
@@ -2135,13 +2132,14 @@ local ALLOWED_INVISIBILITY_DAMAGE_TYPES = {
 	[damage_types.electrocution] = true
 }
 templates.zealot_invisibility = {
-	unique_buff_id = "zealot_invisibility",
-	duration = 3,
+	predicted = true,
 	hud_priority = 4,
 	allow_proc_while_active = true,
 	hud_icon = "content/ui/textures/icons/buffs/hud/zealot/zealot_ability_stealth",
 	hud_icon_gradient_map = "content/ui/textures/color_ramps/talent_ability",
+	duration = 3,
 	class_name = "proc_buff",
+	unique_buff_id = "zealot_invisibility",
 	keywords = {
 		keywords.invisible
 	},
@@ -2230,7 +2228,7 @@ templates.zealot_invisibility = {
 templates.zealot_invisibility_increased_duration = table.clone(templates.zealot_invisibility)
 templates.zealot_invisibility_increased_duration.duration = 5
 templates.zealot_sprinting_cost_reduction = {
-	predicted = true,
+	predicted = false,
 	class_name = "buff",
 	stat_buffs = {
 		[stat_buffs.sprinting_cost_multiplier] = 0.8
@@ -2305,6 +2303,7 @@ templates.zealot_damage_reduction_after_dodge = {
 	}
 }
 templates.zealot_increased_sprint_speed = {
+	predicted = false,
 	class_name = "buff",
 	keywords = {
 		keywords.sprint_dodge_in_overtime
@@ -2315,6 +2314,7 @@ templates.zealot_increased_sprint_speed = {
 }
 local damage_taken_to_ability_cd_percentage = talent_settings_3.combat_ability_cd_restore_on_damage.damage_taken_to_ability_cd_percentage
 templates.zealot_ability_cooldown_on_heavy_melee_damage = {
+	predicted = true,
 	class_name = "proc_buff",
 	proc_events = {
 		[proc_events.on_damage_taken] = 1
@@ -2353,6 +2353,7 @@ templates.zealot_ability_cooldown_on_heavy_melee_damage = {
 }
 templates.zealot_ability_cooldown_on_leaving_coherency = {
 	cooldown_duration = 15,
+	predicted = true,
 	class_name = "proc_buff",
 	proc_events = {
 		[proc_events.on_coherency_exit] = 1
@@ -2429,6 +2430,7 @@ templates.zealot_ability_cooldown_on_leaving_coherency_on_backstab = {
 	end
 }
 templates.zealot_increase_ability_cooldown_increase_bonus = {
+	predicted = false,
 	class_name = "buff",
 	stat_buffs = {
 		[stat_buffs.ability_cooldown_modifier] = 0.25

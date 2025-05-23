@@ -1,4 +1,3 @@
-local Component = require("scripts/utilities/component")
 local GyroscopeParticleEffect = component("GyroscopeParticleEffect")
 
 function GyroscopeParticleEffect:init(unit)

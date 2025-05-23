@@ -5,7 +5,7 @@ local HoloSightTemplates = require("scripts/settings/equipment/holo_sight_templa
 local HoloSight = class("HoloSight")
 local _slot_components, _update_glass_visibility = nil
 
-function HoloSight:init(context, slot, weapon_template, fx_sources)
+function HoloSight:init(context, slot, weapon_template, fx_sources, item, unit_1p, unit_3p)
 	local owner_unit = context.owner_unit
 	local unit_data_extension = ScriptUnit.extension(owner_unit, "unit_data_system")
 	local alternate_fire_component = unit_data_extension:read_component("alternate_fire")
@@ -16,8 +16,8 @@ function HoloSight:init(context, slot, weapon_template, fx_sources)
 	self._slot = slot
 	self._hip_at_t = nil
 	self._alternate_fire_at_t = nil
-	self._holo_sight_components_1p = _slot_components(slot.attachments_1p)
-	self._holo_sight_components_3p = _slot_components(slot.attachments_3p)
+	self._holo_sight_components_1p = _slot_components(slot.attachments_by_unit_1p[unit_1p])
+	self._holo_sight_components_3p = _slot_components(slot.attachments_by_unit_3p[unit_3p])
 
 	_update_glass_visibility(self._holo_sight_components_3p, false)
 

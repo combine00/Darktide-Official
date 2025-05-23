@@ -1,6 +1,7 @@
 local ChargeActionModule = class("ChargeActionModule")
 
-function ChargeActionModule:init(physics_world, player_unit, first_person_unit, action_module_charge_component, action_settings)
+function ChargeActionModule:init(is_server, physics_world, player_unit, first_person_unit, action_module_charge_component, action_settings)
+	self._is_server = is_server
 	self._physics_world = physics_world
 	self._player_unit = player_unit
 	self._first_person_unit = first_person_unit

@@ -25,9 +25,6 @@ function MasteriesOverviewView:init(settings, context)
 	self._mastery_traits = context.changeable_context and context.changeable_context.mastery_traits or {}
 	self._mastery_marks = {}
 	self._parent = context and context.parent
-
-	Managers.event:trigger("event_mastery_set_camera")
-
 	local camera_settings = context.changeable_context.camera_settings
 
 	if camera_settings then
@@ -215,7 +212,7 @@ end
 
 function MasteriesOverviewView:_set_camera_focus(camera_settings)
 	for i = 1, #camera_settings do
-		Managers.event:trigger(camera_settings[1], camera_settings[2], camera_settings[3], camera_settings[4], camera_settings[5])
+		Managers.event:trigger(unpack(camera_settings[i]))
 	end
 end
 

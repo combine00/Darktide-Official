@@ -1,3 +1,4 @@
+local Breeds = require("scripts/settings/breed/breeds")
 local EquipmentComponent = require("scripts/extension_systems/visual_loadout/equipment_component")
 local ImpactFxResourceDependencies = require("scripts/settings/damage/impact_fx_resource_dependencies")
 local Luggable = require("scripts/utilities/luggable")
@@ -62,7 +63,9 @@ function PlayerUnitVisualLoadoutExtension:init(extension_init_context, unit, ext
 	local equipment_component = EquipmentComponent:new(world, self._item_definitions, unit_spawner, unit, extension_manager, optional_item_streaming_settings, nil, nil)
 	self._equipment_component = equipment_component
 	self._physics_world = physics_world
-	local equipment = equipment_component.initialize_equipment(slot_configuration)
+	local breed_name = self._player:profile()
+	local breed_settings = Breeds[breed_name]
+	local equipment = equipment_component.initialize_equipment(slot_configuration, breed_settings)
 	self._equipment = equipment
 	self._locally_wielded_slot = nil
 	local first_person_extension = ScriptUnit.extension(unit, "first_person_system")
@@ -207,25 +210,30 @@ function PlayerUnitVisualLoadoutExtension:game_object_initialized(session, objec
 	end
 end
 
-local function _register_fx_sources(fx_extension, unit_1p, unit_3p, attachments_1p, attachments_3p, source_config, slot_name, is_in_first_person_mode)
+local function _register_fx_sources(fx_extension, slot, source_config, slot_name, is_in_first_person_mode)
+	local unit_1p = slot.unit_1p
+	local attachments_by_unit_1p = slot.attachments_by_unit_1p
+	local attachment_id_lookup_1p = slot.attachment_id_lookup_1p
 	local sources = {}
 
 	for alias, node_name in pairs(source_config) do
 		local source_name = slot_name .. alias
 
-		fx_extension:register_sound_source(source_name, unit_1p, attachments_1p, node_name)
+		fx_extension:register_sound_source(source_name, unit_1p, attachments_by_unit_1p, attachment_id_lookup_1p, node_name)
 
-		local parent_unit, vfx_attachments = nil
+		local parent_unit, vfx_attachments, attachment_id_lookup = nil
 
 		if is_in_first_person_mode then
 			parent_unit = unit_1p
-			vfx_attachments = attachments_1p
+			vfx_attachments = attachments_by_unit_1p
+			attachment_id_lookup = attachment_id_lookup_1p
 		else
-			parent_unit = unit_3p
-			vfx_attachments = attachments_3p
+			parent_unit = slot.unit_3p
+			vfx_attachments = slot.attachments_by_unit_3p
+			attachment_id_lookup = slot.attachment_id_lookup_3p
 		end
 
-		fx_extension:register_vfx_spawner(source_name, parent_unit, vfx_attachments, node_name)
+		fx_extension:register_vfx_spawner(source_name, parent_unit, vfx_attachments, attachment_id_lookup, node_name)
 
 		sources[alias] = source_name
 	end
@@ -236,23 +244,23 @@ end
 local function _move_fx_sources(fx_extension, source_config, sources, slot, is_in_first_person_mode)
 	local unit_1p = slot.unit_1p
 	local unit_3p = slot.unit_3p
-	local attachments_1p = slot.attachments_1p
-	local attachments_3p = slot.attachments_3p
-	local parent_unit, attachments = nil
+	local parent_unit, attachments, attachment_id_lookup = nil
 
 	if is_in_first_person_mode then
 		parent_unit = unit_1p
-		attachments = attachments_1p
+		attachments = slot.attachments_by_unit_1p
+		attachment_id_lookup = slot.attachment_id_lookup_1p
 	else
 		parent_unit = unit_3p
-		attachments = attachments_3p
+		attachments = slot.attachments_by_unit_3p
+		attachment_id_lookup = slot.attachment_id_lookup_3p
 	end
 
 	for alias, source_name in pairs(sources) do
 		local node_name = source_config[alias]
 
-		fx_extension:move_sound_source(source_name, parent_unit, attachments, node_name)
-		fx_extension:move_vfx_spawner(source_name, parent_unit, attachments, node_name)
+		fx_extension:move_sound_source(source_name, parent_unit, attachments, attachment_id_lookup, node_name)
+		fx_extension:move_vfx_spawner(source_name, parent_unit, attachments, attachment_id_lookup, node_name)
 	end
 end
 
@@ -278,10 +286,9 @@ function PlayerUnitVisualLoadoutExtension:update(unit, dt, t)
 
 		for slot_name, slot in pairs(spawned_slots) do
 			if slot.wieldable then
-				local item = slot.item
 				local slot_fx_sources = fx_sources[slot_name]
 
-				WieldableSlotScripts.create(self._wieldable_slot_scripts_context, wieldable_slot_scripts, slot_fx_sources, slot, item)
+				WieldableSlotScripts.create(self._wieldable_slot_scripts_context, wieldable_slot_scripts, slot_fx_sources, slot)
 
 				local slot_scripts = wieldable_slot_scripts[slot_name]
 
@@ -609,14 +616,14 @@ function PlayerUnitVisualLoadoutExtension:_equip_item_to_slot(item, slot_name, t
 		local weapon_template = WeaponTemplate.weapon_template_from_item(item)
 		local weapon_template_name = weapon_template.name
 		local fx_source_config = weapon_template.fx_sources
-		local fx_sources = _register_fx_sources(self._fx_extension, slot.unit_1p, slot.unit_3p, slot.attachments_1p, slot.attachments_3p, fx_source_config, slot_name, is_in_first_person_mode)
+		local fx_sources = _register_fx_sources(self._fx_extension, slot, fx_source_config, slot_name, is_in_first_person_mode)
 
 		self._weapon_extension:on_wieldable_slot_equipped(item, slot_name, slot.unit_1p, fx_sources, t, optional_existing_unit_3p, from_server_correction_occurred)
 
 		self._fx_sources[slot_name] = fx_sources
 
 		if slot.attachment_spawn_status == "fully_spawned" then
-			WieldableSlotScripts.create(self._wieldable_slot_scripts_context, self._wieldable_slot_scripts, fx_sources, slot, item)
+			WieldableSlotScripts.create(self._wieldable_slot_scripts_context, self._wieldable_slot_scripts, fx_sources, slot)
 		end
 
 		local template_name = weapon_template.name
@@ -888,6 +895,10 @@ function PlayerUnitVisualLoadoutExtension:source_fx_for_slot(slot_name)
 	return self._fx_sources[slot_name]
 end
 
+function PlayerUnitVisualLoadoutExtension:currently_wielded_slot()
+	return self._inventory_component.wielded_slot
+end
+
 function PlayerUnitVisualLoadoutExtension:force_update_item_visibility()
 	self:_update_item_visibility(self._is_in_first_person_mode)
 end
@@ -961,7 +972,7 @@ end
 function PlayerUnitVisualLoadoutExtension:unit_and_attachments_from_slot(slot_name)
 	local slot = self._equipment[slot_name]
 
-	return slot.unit_1p, slot.unit_3p, slot.attachments_1p, slot.attachments_3p
+	return slot.unit_1p, slot.unit_3p, slot.attachments_by_unit_1p, slot.attachments_by_unit_3p
 end
 
 function PlayerUnitVisualLoadoutExtension:_cache_node_names(weapon_template, slot_name)
@@ -987,8 +998,8 @@ function PlayerUnitVisualLoadoutExtension:_unit_and_node_from_node_name(slot_nam
 	local slot = self._equipment[slot_name]
 	local unit_1p = slot.unit_1p
 	local unit_3p = slot.unit_3p
-	local attachments_1p = slot.attachments_1p
-	local attachments_3p = slot.attachments_3p
+	local attachments_1p = slot.attachments_by_unit_1p and slot.attachments_by_unit_1p[unit_1p]
+	local attachments_3p = slot.attachments_by_unit_3p and slot.attachments_by_unit_3p[unit_3p]
 
 	if unit_1p and Unit.has_node(unit_1p, node_name) then
 		node_unit_1p = unit_1p
@@ -996,12 +1007,14 @@ function PlayerUnitVisualLoadoutExtension:_unit_and_node_from_node_name(slot_nam
 	elseif attachments_1p then
 		local num_attachments = #attachments_1p
 
-		for i = 1, num_attachments do
+		for i = num_attachments, 1, -1 do
 			local unit = attachments_1p[i]
 
 			if Unit.has_node(unit, node_name) then
 				node_unit_1p = unit
 				node_index_1p = Unit.node(unit, node_name)
+
+				break
 			end
 		end
 	end
@@ -1012,12 +1025,14 @@ function PlayerUnitVisualLoadoutExtension:_unit_and_node_from_node_name(slot_nam
 	elseif attachments_3p then
 		local num_attachments = #attachments_3p
 
-		for i = 1, num_attachments do
+		for i = num_attachments, 1, -1 do
 			local unit = attachments_3p[i]
 
 			if Unit.has_node(unit, node_name) then
 				node_unit_3p = unit
 				node_index_3p = Unit.node(unit, node_name)
+
+				break
 			end
 		end
 	end

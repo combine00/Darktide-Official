@@ -957,43 +957,32 @@ function CharacterAppearanceView:_change_page_indicator(index)
 	end
 end
 
-function CharacterAppearanceView:_move_camera(revert)
+function CharacterAppearanceView:_pan_camera(revert)
 	local world_spawner = self._world_spawner
-	local time = 1.5
-	local func_ptr = math.easeOutCubic
-	local boxed_camera_start_position = world_spawner:boxed_camera_start_position()
-	local default_camera_world_position = Vector3.from_array(boxed_camera_start_position)
-	local boxed_camera_start_rotation = world_spawner:boxed_camera_start_rotation()
-	local default_camera_world_rotation = boxed_camera_start_rotation:unbox()
-	local target_world_position = default_camera_world_position
-	local target_world_rotation = default_camera_world_rotation
-	local camera_world_position = default_camera_world_position
-	local camera_world_rotation = default_camera_world_rotation
+	local dx = nil
+	local profile = self._character_create:profile()
+	local selected_archetype = profile.archetype.name
 
-	if revert == true then
-		world_spawner:set_camera_position_axis_offset("x", target_world_position.x - camera_world_position.x, time, func_ptr)
-	else
-		local profile = self._character_create:profile()
-		local selected_archetype = profile.archetype.name
-		local ogryn_offset = 1.7
-		local human_offset = 1.2
-
+	if not revert and selected_archetype == "ogryn" then
 		if self._is_barber_mindwipe then
-			ogryn_offset = 1.5
-			human_offset = 0.85
-		end
-
-		if selected_archetype == "ogryn" then
-			world_spawner:set_camera_position_axis_offset("x", ogryn_offset - (target_world_position.x - camera_world_position.x), time, func_ptr)
+			dx = 1.5
 		else
-			world_spawner:set_camera_position_axis_offset("x", human_offset - (target_world_position.x - camera_world_position.x), time, func_ptr)
+			dx = 1.7
 		end
 	end
 
-	local camera_world_rotation_x, camera_world_rotation_y, camera_world_rotation_z = Quaternion.to_euler_angles_xyz(camera_world_rotation)
-	local target_world_rotation_x, target_world_rotation_y, target_world_rotation_z = Quaternion.to_euler_angles_xyz(target_world_rotation)
+	if not revert and selected_archetype ~= "ogryn" then
+		if self._is_barber_mindwipe then
+			dx = 0.85
+		else
+			dx = 1.2
+		end
+	end
 
-	world_spawner:set_camera_rotation_axis_offset("x", target_world_rotation_x - camera_world_rotation_x, time, func_ptr)
+	local time = 1.5
+	local func_ptr = math.easeOutCubic
+
+	world_spawner:set_target_camera_offset_for_axis("dx", dx, time, func_ptr)
 end
 
 function CharacterAppearanceView:_open_page(index)
@@ -1715,23 +1704,21 @@ function CharacterAppearanceView:_set_camera_height_option(camera_focus, gear_vi
 	self:_set_camera(camera_focus, gear_visible, true)
 
 	self._disable_zoom = true
-	local world_spawner = self._world_spawner
 	local time = 1
 	local func_ptr = math.easeOutCubic
-	local boxed_camera_start_position = world_spawner:boxed_camera_start_position()
-	local default_camera_world_position = Vector3.from_array(boxed_camera_start_position)
 	local profile = self._character_create:profile()
 	local selected_archetype = profile.archetype.name
+	local world_spawner = self._world_spawner
 
 	if selected_archetype == "ogryn" then
-		world_spawner:set_camera_position_axis_offset("y", default_camera_world_position.y + 2.8, time, func_ptr)
-		world_spawner:set_camera_position_axis_offset("x", default_camera_world_position.x + 2.6, time, func_ptr)
+		world_spawner:set_target_camera_offset_for_axis("dy", -0.5, time, func_ptr)
 	else
-		world_spawner:set_camera_position_axis_offset("y", default_camera_world_position.y - 0.5, time, func_ptr)
+		world_spawner:set_target_camera_offset_for_axis("dy", -0.5, time, func_ptr)
 	end
 end
 
 function CharacterAppearanceView:_set_camera(camera_focus, gear_visible, no_height_compensation, time)
+	time = time or 1
 	self._disable_zoom = false
 	self._gear_visible = gear_visible
 	local in_barber_chair = self._in_barber_chair
@@ -1743,7 +1730,6 @@ function CharacterAppearanceView:_set_camera(camera_focus, gear_visible, no_heig
 	local slot_camera_unit = self._camera_by_slot_id[camera_focus]
 	self._focus_camera_unit = slot_camera_unit
 	local world_spawner = self._world_spawner
-	local time = time or 1
 	local func_ptr = math.easeOutCubic
 	local is_camera_zoomed = self:_is_camera_zoomed(camera_focus)
 	local camera_zoom_changed = self._camera_zoomed ~= is_camera_zoomed
@@ -1754,13 +1740,7 @@ function CharacterAppearanceView:_set_camera(camera_focus, gear_visible, no_heig
 	if camera_zoom_changed then
 		local animations_per_archetype = CharacterAppearanceViewSettings.animations_per_archetype
 		local animations_settings = animations_per_archetype[archetype_name]
-		local animation_event = nil
-
-		if is_camera_zoomed then
-			animation_event = animations_settings.events.head
-		else
-			animation_event = animations_settings.events.body
-		end
+		local animation_event = is_camera_zoomed and animations_settings.events.head or animations_settings.events.body
 
 		if not in_barber_chair then
 			self._profile_spawner:assign_animation_event(animation_event)
@@ -1775,28 +1755,20 @@ function CharacterAppearanceView:_set_camera(camera_focus, gear_visible, no_heig
 	local default_camera_world_rotation = boxed_camera_start_rotation:unbox()
 	local target_world_position = slot_camera_unit and Unit.world_position(slot_camera_unit, 1) or default_camera_world_position
 	local target_world_rotation = slot_camera_unit and Unit.world_rotation(slot_camera_unit, 1) or default_camera_world_rotation
-	local camera_world_position = default_camera_world_position
-	local camera_world_rotation = default_camera_world_rotation
-
-	world_spawner:set_camera_position_axis_offset("x", target_world_position.x - camera_world_position.x, time, func_ptr)
-	world_spawner:set_camera_position_axis_offset("y", target_world_position.y - camera_world_position.y, time, func_ptr)
+	local x = target_world_position.x
+	local y = target_world_position.y
+	local z = target_world_position.z
 
 	if no_height_compensation then
 		local model_height_difference = archetype_name == "ogryn" and -0.2 or 0
-
-		world_spawner:set_camera_position_axis_offset("z", target_world_position.z + model_height_difference - camera_world_position.z, time, func_ptr)
+		z = z + model_height_difference
 	else
 		local height = self._character_create:height()
-
-		world_spawner:set_camera_position_axis_offset("z", target_world_position.z * height - camera_world_position.z, time, func_ptr)
+		z = z * height
 	end
 
-	local camera_world_rotation_x, camera_world_rotation_y, camera_world_rotation_z = Quaternion.to_euler_angles_xyz(camera_world_rotation)
-	local target_world_rotation_x, target_world_rotation_y, target_world_rotation_z = Quaternion.to_euler_angles_xyz(target_world_rotation)
-
-	world_spawner:set_camera_rotation_axis_offset("x", target_world_rotation_x - camera_world_rotation_x, time, func_ptr)
-	world_spawner:set_camera_rotation_axis_offset("y", target_world_rotation_y - camera_world_rotation_y, time, func_ptr)
-	world_spawner:set_camera_rotation_axis_offset("z", target_world_rotation_z - camera_world_rotation_z, time, func_ptr)
+	world_spawner:set_target_camera_position(x, y, z, time, func_ptr)
+	world_spawner:set_target_camera_rotation(target_world_rotation, time, func_ptr)
 end
 
 function CharacterAppearanceView:draw(dt, t, input_service, layer)
@@ -4931,14 +4903,14 @@ function CharacterAppearanceView:_get_pages()
 				end
 
 				self:_update_character_name()
-				self:_move_camera()
+				self:_pan_camera()
 				self:_handle_continue_button_text()
 
 				self._widgets_by_name.continue_button.content.gamepad_action = "secondary_action_pressed"
 				self._continue_input_override = "secondary_action_pressed"
 			end,
 			leave = function ()
-				self:_move_camera(true)
+				self:_pan_camera(true)
 				self:_create_errors_name_input()
 				self:_destroy_support_page_widgets()
 

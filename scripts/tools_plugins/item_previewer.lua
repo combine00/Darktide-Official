@@ -201,18 +201,13 @@ function ItemPreviewer:_spawn_item(item_data, root_unit)
 	attach_settings.skip_link_children = false
 
 	if VisualLoadoutCustomization then
-		local attached_units = {}
-		EditorApi.preview_resource, attached_units = VisualLoadoutCustomization.spawn_item(item_data, attach_settings, root_unit, nil, nil, nil)
+		local attached_units, mission_template, equipment = nil
+		EditorApi.preview_resource, attached_units = VisualLoadoutCustomization.spawn_item(item_data, attach_settings, root_unit, false, false, false, mission_template, equipment)
 		self.attached_units_table = self.attached_units_table or {}
 
 		if EditorApi.preview_resource then
-			table.append(self.attached_units_table, {
-				EditorApi.preview_resource
-			})
-		end
-
-		if attached_units then
-			table.append(self.attached_units_table, attached_units)
+			table.insert(self.attached_units_table, EditorApi.preview_resource)
+			table.append(self.attached_units_table, attached_units[EditorApi.preview_resource])
 		end
 	else
 		Log.error("ItemPreviewer", "VisualLoadoutCustomization not loaded!")

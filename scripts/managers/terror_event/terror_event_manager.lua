@@ -1,3 +1,4 @@
+local ScriptWorld = require("scripts/foundation/utilities/script_world")
 local BreedQueries = require("scripts/utilities/breed_queries")
 local HordeSettings = require("scripts/settings/horde/horde_settings")
 local LoadedDice = require("scripts/utilities/loaded_dice")
@@ -118,7 +119,7 @@ function TerrorEventManager:_calculate_random_event_probabilities(random_events)
 	return random_event_probabilities
 end
 
-function TerrorEventManager:start_event(event_name, optional_seed)
+function TerrorEventManager:start_event(event_name, optional_seed, optional_level)
 	if not self._is_server then
 		return
 	end
@@ -127,7 +128,8 @@ function TerrorEventManager:start_event(event_name, optional_seed)
 	start_events[#start_events + 1] = {
 		name = event_name,
 		data = {
-			seed = optional_seed
+			seed = optional_seed,
+			level = optional_level
 		}
 	}
 
@@ -169,7 +171,7 @@ function TerrorEventManager:stop_event(event_name)
 	Managers.event:trigger("terror_event_stopped")
 end
 
-function TerrorEventManager:_event_has_minion_spawners(event_name)
+function TerrorEventManager:_event_has_minion_spawners(event_name, optional_level)
 	local nodes = self._event_templates[event_name]
 	local minion_spawn_system = self._minion_spawner_system
 	local spawners_exists = true
@@ -178,7 +180,7 @@ function TerrorEventManager:_event_has_minion_spawners(event_name)
 		local spawner_group = nodes[i].spawner_group
 
 		if spawner_group then
-			local spawners = minion_spawn_system:spawners_in_group(spawner_group)
+			local spawners = minion_spawn_system:spawners_in_group(spawner_group, nodes[i].group_in_level_data, optional_level)
 
 			if not spawners or #spawners == 0 then
 				spawners_exists = false
@@ -511,18 +513,22 @@ function TerrorEventManager:_update_event(event, dt, t)
 	return false
 end
 
-function TerrorEventManager:trigger_network_synced_level_flow(flow_event_name)
-	Level.trigger_event(self._level, flow_event_name)
+function TerrorEventManager:trigger_network_synced_level_flow(flow_event_name, optional_level)
+	local level = optional_level or self._level
+
+	Level.trigger_event(level, flow_event_name)
 
 	local flow_event_id = self._flow_events_network_lookup[flow_event_name]
+	local level_id = ScriptWorld.level_id(self._world, level)
 
-	Managers.state.game_session:send_rpc_clients("rpc_terror_event_trigger_level_flow", flow_event_id)
+	Managers.state.game_session:send_rpc_clients("rpc_terror_event_trigger_level_flow", level_id, flow_event_id)
 end
 
-function TerrorEventManager:rpc_terror_event_trigger_level_flow(channel_id, flow_event_id)
+function TerrorEventManager:rpc_terror_event_trigger_level_flow(channel_id, level_id, flow_event_id)
+	local level = ScriptWorld.level_from_id(self._world, level_id)
 	local flow_event_name = self._flow_events_network_lookup[flow_event_id]
 
-	Level.trigger_event(self._level, flow_event_name)
+	Level.trigger_event(level, flow_event_name)
 end
 
 function TerrorEventManager:destroy()

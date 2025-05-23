@@ -2,6 +2,7 @@ local GameplayInitStepInterface = require("scripts/game_states/game/gameplay_sub
 local GameplayInitStepExtensions = require("scripts/game_states/game/gameplay_sub_states/gameplay_init_step_states/gameplay_init_step_extensions")
 local MainPathManager = require("scripts/managers/main_path/main_path_manager")
 local NavMeshManager = require("scripts/managers/nav_mesh/nav_mesh_manager")
+local MissionTemplates = require("scripts/settings/mission/mission_templates")
 local GameplayInitStepNavigation = class("GameplayInitStepNavigation")
 
 function GameplayInitStepNavigation:on_enter(parent, params)
@@ -36,7 +37,10 @@ function GameplayInitStepNavigation:_init_navigation(world, nav_world, is_server
 	local dynamic_mesh_spawning = game_mode_settings.dynamic_mesh_spawning or false
 	Managers.state.nav_mesh = NavMeshManager:new(world, nav_world, is_server, network_event_delegate, level_name, dynamic_mesh_spawning)
 	local use_nav_point_time_slice = true
-	Managers.state.main_path = MainPathManager:new(world, nav_world, level_name, level_seed, mission_name, num_sides, is_server, use_nav_point_time_slice)
+	local mission_template = MissionTemplates[mission_name]
+	local path_type = mission_template.path_type or "linear"
+	local main_path_resource_name = level_name .. "_main_path"
+	Managers.state.main_path = MainPathManager:new(world, nav_world, level_seed, main_path_resource_name, path_type, num_sides, is_server, use_nav_point_time_slice)
 end
 
 implements(GameplayInitStepNavigation, GameplayInitStepInterface)

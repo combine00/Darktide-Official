@@ -9,7 +9,7 @@ local VISIBILITY_GROUP_NAME = "trail"
 local EXTERNAL_PROPERTIES = {}
 local _slot_components, _update_status = nil
 
-function SweepTrail:init(context, slot, weapon_template, fx_sources, item)
+function SweepTrail:init(context, slot, weapon_template, fx_sources, item, unit_1p, unit_3p)
 	local owner_unit = context.owner_unit
 	self._weapon_template = weapon_template
 	self._weapon_actions = weapon_template.actions
@@ -20,8 +20,8 @@ function SweepTrail:init(context, slot, weapon_template, fx_sources, item)
 	self._inventory_slot_component = unit_data_extension:read_component(slot.name)
 	self._weapon_action_component = unit_data_extension:read_component("weapon_action")
 	self._fx_extension = ScriptUnit.extension(owner_unit, "fx_system")
-	self._sweep_trail_components_1p = _slot_components(slot.attachments_1p)
-	self._sweep_trail_components_3p = _slot_components(slot.attachments_3p)
+	self._sweep_trail_components_1p = _slot_components(slot.attachments_by_unit_1p[unit_1p])
+	self._sweep_trail_components_3p = _slot_components(slot.attachments_by_unit_3p[unit_3p])
 	self._trail_visible = true
 end
 

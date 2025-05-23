@@ -1,6 +1,7 @@
 local Breed = require("scripts/utilities/breed")
 local BuffSettings = require("scripts/settings/buff/buff_settings")
 local Health = require("scripts/utilities/health")
+local JobInterface = require("scripts/managers/unit_job/job_interface")
 local PlayerUnitStatus = require("scripts/utilities/attack/player_unit_status")
 local Toughness = require("scripts/utilities/toughness/toughness")
 local buff_keywords = BuffSettings.keywords
@@ -48,7 +49,7 @@ function ProximityHeal:init(logic_context, init_data, owner_unit_or_nil)
 	self._knock_down_player_heal_speed_multiplier = med_kit_settings.knock_down_player_heal_speed_multiplier or 1
 end
 
-function ProximityHeal:unit_entered_proximity(unit)
+function ProximityHeal:unit_entered_proximity(t, unit)
 	local health_extension = ScriptUnit.has_extension(unit, "health_system")
 
 	if not health_extension then
@@ -171,7 +172,7 @@ function ProximityHeal:_play_fx_for_unit(unit, t)
 end
 
 function ProximityHeal:start_job()
-	if self:job_completed() or self:is_job_canceled() then
+	if self:is_job_completed() or self:is_job_canceled() then
 		return
 	end
 
@@ -181,7 +182,7 @@ function ProximityHeal:start_job()
 	self._started = true
 end
 
-function ProximityHeal:job_completed()
+function ProximityHeal:is_job_completed()
 	if not self._started then
 		return false
 	end
@@ -212,5 +213,7 @@ end
 function ProximityHeal:is_job_canceled()
 	return not not self._is_canceled
 end
+
+implements(ProximityHeal, JobInterface)
 
 return ProximityHeal

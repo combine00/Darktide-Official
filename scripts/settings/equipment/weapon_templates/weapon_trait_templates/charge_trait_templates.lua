@@ -242,6 +242,32 @@ local charge_trait_templates = {
 				min = 0
 			}
 		}
+	},
+	powersword_p2_heat_stat = {
+		{
+			"overheat_overtime",
+			"overheat_percent",
+			{
+				max = 1,
+				min = 0
+			}
+		},
+		{
+			"overheat_swing",
+			"overheat_percent",
+			{
+				max = 1,
+				min = 0
+			}
+		},
+		{
+			"overheat_decay",
+			"auto_vent_duration",
+			{
+				max = 1,
+				min = 0
+			}
+		}
 	}
 }
 

@@ -993,7 +993,7 @@ function PlayerUnitVisualLoadout.slot_flow_event(first_person_extension, visual_
 	-- Decompilation error in this vicinity:
 	--- BLOCK #2 4-12, warpins: 2 ---
 	local is_first_person = first_person_extension:is_in_first_person_mode()
-	local unit_1p, unit_3p, attachments_1p, attachments_3p = visual_loadout_extension:unit_and_attachments_from_slot(inventory_slot)
+	local unit_1p, unit_3p, attachments_by_unit_1p, attachments_by_unit_3p = visual_loadout_extension:unit_and_attachments_from_slot(inventory_slot)
 
 	--- END OF BLOCK #2 ---
 
@@ -1031,7 +1031,7 @@ function PlayerUnitVisualLoadout.slot_flow_event(first_person_extension, visual_
 	--- BLOCK #5 19-20, warpins: 2 ---
 	--- END OF BLOCK #5 ---
 
-	slot7 = if attachments_1p then
+	slot7 = if attachments_by_unit_1p then
 	JUMP TO BLOCK #6
 	else
 	JUMP TO BLOCK #14
@@ -1040,7 +1040,9 @@ function PlayerUnitVisualLoadout.slot_flow_event(first_person_extension, visual_
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #6 21-24, warpins: 1 ---
+	--- BLOCK #6 21-25, warpins: 1 ---
+	local attachments_1p = attachments_by_unit_1p[unit_1p]
+
 	--- END OF BLOCK #6 ---
 
 	FLOW; TARGET BLOCK #7
@@ -1048,11 +1050,11 @@ function PlayerUnitVisualLoadout.slot_flow_event(first_person_extension, visual_
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #7 25-30, warpins: 0 ---
+	--- BLOCK #7 26-31, warpins: 0 ---
 	for i = 1, #attachments_1p do
 
 		-- Decompilation error in this vicinity:
-		--- BLOCK #0 25-30, warpins: 2 ---
+		--- BLOCK #0 26-31, warpins: 2 ---
 		local attachment_unit = attachments_1p[i]
 
 		unit_flow_event(attachment_unit, flow_event_name)
@@ -1069,7 +1071,7 @@ function PlayerUnitVisualLoadout.slot_flow_event(first_person_extension, visual_
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #8 31-31, warpins: 1 ---
+	--- BLOCK #8 32-32, warpins: 1 ---
 	--- END OF BLOCK #8 ---
 
 	UNCONDITIONAL JUMP; TARGET BLOCK #14
@@ -1077,7 +1079,7 @@ function PlayerUnitVisualLoadout.slot_flow_event(first_person_extension, visual_
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #9 32-33, warpins: 1 ---
+	--- BLOCK #9 33-34, warpins: 1 ---
 	--- END OF BLOCK #9 ---
 
 	slot6 = if unit_3p then
@@ -1089,7 +1091,7 @@ function PlayerUnitVisualLoadout.slot_flow_event(first_person_extension, visual_
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #10 34-37, warpins: 1 ---
+	--- BLOCK #10 35-38, warpins: 1 ---
 	unit_flow_event(unit_3p, flow_event_name)
 
 	--- END OF BLOCK #10 ---
@@ -1099,10 +1101,10 @@ function PlayerUnitVisualLoadout.slot_flow_event(first_person_extension, visual_
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #11 38-39, warpins: 2 ---
+	--- BLOCK #11 39-40, warpins: 2 ---
 	--- END OF BLOCK #11 ---
 
-	slot8 = if attachments_3p then
+	slot8 = if attachments_by_unit_3p then
 	JUMP TO BLOCK #12
 	else
 	JUMP TO BLOCK #14
@@ -1111,7 +1113,9 @@ function PlayerUnitVisualLoadout.slot_flow_event(first_person_extension, visual_
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #12 40-43, warpins: 1 ---
+	--- BLOCK #12 41-45, warpins: 1 ---
+	local attachments_3p = attachments_by_unit_3p[unit_3p]
+
 	--- END OF BLOCK #12 ---
 
 	FLOW; TARGET BLOCK #13
@@ -1119,11 +1123,11 @@ function PlayerUnitVisualLoadout.slot_flow_event(first_person_extension, visual_
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #13 44-49, warpins: 0 ---
+	--- BLOCK #13 46-51, warpins: 0 ---
 	for i = 3, #attachments_3p do
 
 		-- Decompilation error in this vicinity:
-		--- BLOCK #0 44-49, warpins: 2 ---
+		--- BLOCK #0 46-51, warpins: 2 ---
 		local attachment_unit = attachments_3p[i]
 
 		unit_flow_event(attachment_unit, flow_event_name)
@@ -1140,7 +1144,7 @@ function PlayerUnitVisualLoadout.slot_flow_event(first_person_extension, visual_
 
 
 	-- Decompilation error in this vicinity:
-	--- BLOCK #14 50-50, warpins: 4 ---
+	--- BLOCK #14 52-52, warpins: 4 ---
 	return
 	--- END OF BLOCK #14 ---
 

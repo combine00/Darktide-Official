@@ -12,7 +12,7 @@ local DESTROY_TIME = 0.2
 local _external_properties = {}
 local GrimoireEffects = class("GrimoireEffects")
 
-function GrimoireEffects:init(context, slot, weapon_template, fx_sources)
+function GrimoireEffects:init(context, slot, weapon_template, fx_sources, item, unit_1p, unit_3p)
 	self._is_husk = context.is_husk
 	self._world = context.world
 	self._wwise_world = context.wwise_world

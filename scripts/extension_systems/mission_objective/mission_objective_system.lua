@@ -431,6 +431,18 @@ function MissionObjectiveSystem:_change_active_objective_ui_string(is_header, ne
 	end
 end
 
+function MissionObjectiveSystem:set_objective_progress(objective_name, progression)
+	local active_objective = self._active_objectives[objective_name]
+	local old_progression = active_objective:progression()
+
+	if old_progression ~= progression then
+		local objective_name_id = NetworkLookup.mission_objective_names[objective_name]
+
+		self:send_rpc_to_clients("rpc_update_mission_objective_progression", objective_name_id, progression)
+		active_objective:set_progression()
+	end
+end
+
 function MissionObjectiveSystem:set_objective_show_ui(objective_name, show)
 	local active_objective = self._active_objectives[objective_name]
 

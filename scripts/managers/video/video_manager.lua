@@ -8,6 +8,14 @@ function VideoManager:init()
 end
 
 function VideoManager:play_video_with_popup(video_config_name, popup_config_name)
+	if self._popup_id then
+		Managers.event:trigger("event_remove_ui_popup", self._popup_id)
+
+		self._popup_id = nil
+
+		Log.warning("VideoManager", "A new video popup replaced an old video popup")
+	end
+
 	self._popup_config_name = popup_config_name
 	self._video_config_name = video_config_name
 end

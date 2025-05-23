@@ -1,28 +1,28 @@
 local UIWidget = require("scripts/managers/ui/ui_widget")
+local render_size = 1024
 local screen_size = {
-	1920,
-	1080
+	render_size,
+	render_size
 }
-local screen_ratio = screen_size[1] / screen_size[2]
 local decoration_inquisition_widget_size = {
-	screen_ratio * 112,
-	112
+	render_size * 0.1,
+	render_size * 0.1
 }
 local decoration_left_mark_widget_size = {
-	screen_ratio * 112,
-	224
+	render_size * 0.1,
+	render_size * 0.2
 }
 local decoration_right_mark_widget_size = {
-	screen_ratio * 112,
-	224
+	render_size * 0.1,
+	render_size * 0.2
 }
 local decoration_eagle_widget_size = {
-	screen_ratio * 448,
-	448
+	render_size * 0.4,
+	render_size * 0.4
 }
 local decoration_skull_widget_size = {
-	screen_ratio * 112,
-	112
+	render_size * 0.1,
+	render_size * 0.1
 }
 local scenegraph_definition = {
 	scanner_base = {
@@ -44,7 +44,7 @@ local scenegraph_definition = {
 		},
 		position = {
 			0,
-			100,
+			0,
 			1
 		}
 	}
@@ -63,13 +63,13 @@ local widget_definitions = {
 					0
 				},
 				offset = {
-					-960,
-					-540,
+					0,
+					0,
 					-1
 				}
 			}
 		}
-	}, "center_pivot", nil, screen_size),
+	}, "scanner_base", nil, screen_size),
 	noise_background = UIWidget.create_definition({
 		{
 			value = "content/ui/materials/backgrounds/scanner/scanner_background_noise",
@@ -83,13 +83,13 @@ local widget_definitions = {
 					0
 				},
 				offset = {
-					-960,
-					-540,
+					0,
+					0,
 					-1
 				}
 			}
 		}
-	}, "center_pivot", nil, screen_size),
+	}, "scanner_base", nil, screen_size),
 	decoration_inquisition = UIWidget.create_definition({
 		{
 			value = "content/ui/materials/backgrounds/scanner/scanner_decoration_inquisition",
@@ -104,8 +104,8 @@ local widget_definitions = {
 					0
 				},
 				offset = {
-					-100,
-					-325,
+					-decoration_inquisition_widget_size[1] / 2,
+					-render_size * 0.31,
 					5
 				}
 			}
@@ -125,8 +125,8 @@ local widget_definitions = {
 					0
 				},
 				offset = {
-					-900,
-					-100,
+					-render_size * 0.46,
+					render_size * 0.07 - decoration_left_mark_widget_size[2] / 2,
 					5
 				}
 			}
@@ -146,8 +146,8 @@ local widget_definitions = {
 					0
 				},
 				offset = {
-					700,
-					-100,
+					render_size * 0.46 - decoration_right_mark_widget_size[1],
+					render_size * 0.07 - decoration_right_mark_widget_size[2] / 2,
 					5
 				}
 			}
@@ -167,8 +167,8 @@ local widget_definitions = {
 					0
 				},
 				offset = {
-					100,
-					100,
+					render_size * 0.07,
+					render_size * 0.1,
 					5
 				}
 			}
@@ -188,8 +188,8 @@ local widget_definitions = {
 					0
 				},
 				offset = {
-					-500,
-					250,
+					-render_size * 0.26,
+					render_size * 0.23,
 					5
 				}
 			}

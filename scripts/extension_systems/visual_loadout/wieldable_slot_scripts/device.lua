@@ -2,7 +2,7 @@ local WieldableSlotScriptInterface = require("scripts/extension_systems/visual_l
 local Device = class("Device")
 local HOLO_SCREEN_VISIBILITY_GROUP = "display_solid"
 
-function Device:init(context, slot, weapon_template, fx_sources)
+function Device:init(context, slot, weapon_template, fx_sources, item, unit_1p, unit_3p)
 	local item_unit_1p = slot.unit_1p
 	local item_unit_3p = slot.unit_3p
 	self._item_unit_1p = item_unit_1p

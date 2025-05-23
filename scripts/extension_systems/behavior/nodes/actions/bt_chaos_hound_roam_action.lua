@@ -18,6 +18,7 @@ function BtChaosHoundRoamAction:enter(unit, breed, blackboard, scratchpad, actio
 	scratchpad.perception_component = blackboard.perception
 	scratchpad.stagger_component = stagger_component
 	local summon_component = Blackboard.write_component(blackboard, "summon_unit")
+	scratchpad.summon_component = summon_component
 	scratchpad.owner_unit = summon_component.owner
 	local speed = action_data.speed
 
@@ -26,7 +27,7 @@ function BtChaosHoundRoamAction:enter(unit, breed, blackboard, scratchpad, actio
 	scratchpad.original_rotation_speed = locomotion_extension:rotation_speed()
 
 	locomotion_extension:set_rotation_speed(action_data.rotation_speed)
-	self:_get_random_position(scratchpad, navigation_extension)
+	self:_get_random_position(scratchpad, navigation_extension, t)
 	self:_move_to(scratchpad, navigation_extension)
 
 	stagger_component.controlled_stagger = false
@@ -35,6 +36,8 @@ end
 function BtChaosHoundRoamAction:init_values(blackboard)
 	local summon_component = Blackboard.write_component(blackboard, "summon_unit")
 	summon_component.owner = nil
+
+	summon_component.last_owner_position:store(0, 0, 0)
 end
 
 function BtChaosHoundRoamAction:leave(unit, breed, blackboard, scratchpad, action_data, t, reason, destroy)
@@ -72,9 +75,13 @@ function BtChaosHoundRoamAction:run(unit, breed, blackboard, scratchpad, action_
 	local unit_position = POSITION_LOOKUP[unit]
 	local wanted_position = scratchpad.current_goal_position:unbox()
 	local distance = Vector3.distance(unit_position, wanted_position)
+	local stuck = scratchpad.stuck_t
 
 	if distance < 6 then
-		self:_get_random_position(scratchpad, navigation_extension)
+		self:_get_random_position(scratchpad, navigation_extension, t)
+		self:_move_to(scratchpad, navigation_extension)
+	elseif stuck < t then
+		self:_get_random_position(scratchpad, navigation_extension, t)
 		self:_move_to(scratchpad, navigation_extension)
 	end
 
@@ -155,23 +162,24 @@ local DEFAULT_RADIUS = {
 }
 local NAV_MESH_ABOVE = 5
 local NAV_MESH_BELOW = 5
-local RAYCAST_Z_OFFSET = 0.1
 local DEFAULT_TRIES = 6
 
-function BtChaosHoundRoamAction:_get_random_position(scratchpad, navigation_extension)
-	local success = false
+function BtChaosHoundRoamAction:_get_random_position(scratchpad, navigation_extension, t)
 	local owner_unit = scratchpad.owner_unit
-	local owner_position = POSITION_LOOKUP[owner_unit]
 
-	if owner_position then
-		scratchpad.last_owner_position = owner_position
+	if HEALTH_ALIVE[owner_unit] then
+		local owner_position = POSITION_LOOKUP[owner_unit]
+
+		if owner_position then
+			scratchpad.summon_component.last_owner_position:store(owner_position)
+		end
 	end
 
-	local last_owner_position = scratchpad.last_owner_position
+	local last_owner_position = scratchpad.summon_component.last_owner_position:unbox()
 
 	if last_owner_position then
 		local nav_world = scratchpad.navigation_extension:nav_world()
-		local traverse_logic = scratchpad.navigation_extension:traverse_logic()
+		local _ = scratchpad.navigation_extension:traverse_logic()
 		local wanted_position = nil
 
 		for i = 1, DEFAULT_TRIES do
@@ -189,6 +197,8 @@ function BtChaosHoundRoamAction:_get_random_position(scratchpad, navigation_exte
 			end
 		end
 	end
+
+	scratchpad.stuck_t = t + 10
 end
 
 function BtChaosHoundRoamAction:_move_to(scratchpad, navigation_extension)

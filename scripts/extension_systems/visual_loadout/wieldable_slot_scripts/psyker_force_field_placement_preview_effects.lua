@@ -1,7 +1,7 @@
 local WieldableSlotScriptInterface = require("scripts/extension_systems/visual_loadout/wieldable_slot_scripts/wieldable_slot_script_interface")
 local PsykerForceFieldPlacementPreviewEffects = class("PsykerForceFieldPlacementPreviewEffects")
 
-function PsykerForceFieldPlacementPreviewEffects:init(context, slot, weapon_template, fx_sources)
+function PsykerForceFieldPlacementPreviewEffects:init(context, slot, weapon_template, fx_sources, item, unit_1p, unit_3p)
 	local wwise_world = context.wwise_world
 	self._world = context.world
 	self._wwise_world = wwise_world

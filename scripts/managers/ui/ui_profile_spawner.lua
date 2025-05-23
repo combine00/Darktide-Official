@@ -601,7 +601,7 @@ function UIProfileSpawner:_spawn_character_profile(profile, profile_loader, posi
 			skip_link_children = true
 		}
 	}
-	local slots = equipment_component.initialize_equipment(gear_slots, slot_options)
+	local slots = equipment_component.initialize_equipment(gear_slots, breed_settings, slot_options)
 	local slot_equip_order = PlayerCharacterConstants.slot_equip_order
 	local equipped_items = {}
 

@@ -88,6 +88,7 @@ end
 
 function LegacyV2ProximitySystem:on_add_extension(world, unit, extension_name, extension_init_data, ...)
 	local extension = LegacyV2ProximitySystem.super.on_add_extension(self, world, unit, extension_name, extension_init_data, ...)
+	local is_high_intensity = Managers.state.difficulty:get_resistance() >= 4
 	local breed = extension.breed
 
 	if extension_name == "PlayerProximityExtension" then
@@ -115,7 +116,7 @@ function LegacyV2ProximitySystem:on_add_extension(world, unit, extension_name, e
 				num = 0,
 				side_relation = "enemy",
 				breed_types = CHARACTER_BREED_TYPES,
-				distance = DialogueSettings.enemies_close_distance
+				distance = is_high_intensity and DialogueSettings.enemies_close_distance / 2 or DialogueSettings.enemies_close_distance
 			},
 			{
 				count_start = 0,

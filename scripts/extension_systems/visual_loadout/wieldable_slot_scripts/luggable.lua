@@ -3,7 +3,7 @@ local WieldableSlotScriptInterface = require("scripts/extension_systems/visual_l
 local locomotion_states = ProjectileLocomotionSettings.states
 local Luggable = class("Luggable")
 
-function Luggable:init(context, slot, weapon_template, fx_sources)
+function Luggable:init(context, slot, weapon_template, fx_sources, item, unit_1p, unit_3p)
 	local is_server = context.is_server
 	self._is_server = is_server
 	self._slot = slot

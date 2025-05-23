@@ -364,6 +364,7 @@ templates.weapon_trait_melee_weapon_special_max_activations = {
 	}
 }
 templates.weapon_trait_reload_unwielded_weapons = {
+	predicted = true,
 	class_name = "timed_trigger_buff",
 	active_duration = 1,
 	trigger_function = function (data, context)

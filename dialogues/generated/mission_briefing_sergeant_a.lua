@@ -80,12 +80,6 @@ local mission_briefing_sergeant_a = {
 			5.200792,
 			5.532333
 		},
-		sound_event_weights = {
-			0.25,
-			0.25,
-			0.25,
-			0.25
-		},
 		randomize_indexes = {}
 	},
 	mission_cargo_briefing_c = {
@@ -102,12 +96,6 @@ local mission_briefing_sergeant_a = {
 			8.064521,
 			8.321167,
 			8.177521
-		},
-		sound_event_weights = {
-			0.25,
-			0.25,
-			0.25,
-			0.25
 		},
 		randomize_indexes = {}
 	},

@@ -3,7 +3,7 @@ local WieldableSlotScriptInterface = require("scripts/extension_systems/visual_l
 local WarpChargeVentingEffects = class("WarpChargeVentingEffects")
 local _start_vfx, _stop_vfx = nil
 
-function WarpChargeVentingEffects:init(context, slot, weapon_template, fx_sources)
+function WarpChargeVentingEffects:init(context, slot, weapon_template, fx_sources, item, unit_1p, unit_3p)
 	local is_husk = context.is_husk
 	local owner_unit = context.owner_unit
 	self._is_husk = is_husk

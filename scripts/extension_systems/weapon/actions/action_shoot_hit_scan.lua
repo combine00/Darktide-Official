@@ -14,7 +14,7 @@ local ALL_HITS = {}
 local INDEX_DISTANCE = 2
 local _hit_sort_function, _find_line_effect = nil
 
-function ActionShootHitScan:_shoot(position, rotation, power_level, charge_level)
+function ActionShootHitScan:_shoot(position, rotation, power_level, charge_level, t, fire_config)
 	local debug_drawer = self._debug_drawer
 	local is_local_unit = self._is_local_unit
 	local is_server = self._is_server
@@ -25,7 +25,6 @@ function ActionShootHitScan:_shoot(position, rotation, power_level, charge_level
 	local weapon_item = self._weapon.item
 	local wielded_slot = self._inventory_component.wielded_slot
 	local action_settings = self._action_settings
-	local fire_config = action_settings.fire_configuration
 	local hit_scan_template = fire_config.hit_scan_template
 	local max_distance = hit_scan_template.range
 	local is_critical_strike = self._critical_strike_component.is_active
@@ -88,7 +87,7 @@ function ActionShootHitScan:_shoot(position, rotation, power_level, charge_level
 	local fx_settings = action_settings.fx
 	local line_effect = _find_line_effect(fx_settings, charge_level)
 
-	self:_play_line_fx(line_effect, position, end_position)
+	self:_play_line_fx(line_effect, position, end_position, self:_reference_attachment_id(fire_config))
 
 	local shot_result = self._shot_result
 	shot_result.data_valid = true

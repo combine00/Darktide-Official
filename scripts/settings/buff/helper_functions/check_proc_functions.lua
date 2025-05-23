@@ -282,6 +282,14 @@ function CheckProcFunctions.on_non_warp_kill(params, template_data, template_con
 	return true
 end
 
+function CheckProcFunctions.on_close_kill(params, template_data, template_context, t)
+	if params.attack_result ~= attack_results.died then
+		return false
+	end
+
+	return _is_within_close_distance(params, template_data, template_context, t)
+end
+
 function CheckProcFunctions.on_ranged_close_kill(params, template_data, template_context, t)
 	if params.attack_result ~= attack_results.died then
 		return false
@@ -472,6 +480,10 @@ function CheckProcFunctions.on_staggering_hit(params, template_data, template_co
 	local stagger_result = params.stagger_result
 
 	return stagger_result == stagger_results.stagger
+end
+
+function CheckProcFunctions.on_staggered_kill(params, template_data, template_context, t)
+	return template_context.is_server and params.was_staggered_before_attack
 end
 
 function CheckProcFunctions.on_melee_stagger_hit(params, template_data, template_context, t)

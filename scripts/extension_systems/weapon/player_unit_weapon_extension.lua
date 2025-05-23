@@ -139,13 +139,18 @@ function PlayerUnitWeaponExtension:init(extension_init_context, unit, extension_
 	self._last_fixed_t = extension_init_context.fixed_frame_t
 	self._wwise_ammo_parameter_value = 0
 	self._fixed_time_step = Managers.state.game_session.fixed_time_step
+	self._persistent_data_by_slot = {}
+
+	for slot_name, _ in pairs(slot_configuration) do
+		self._persistent_data_by_slot[slot_name] = {}
+	end
 end
 
 function PlayerUnitWeaponExtension:_init_action_components(unit_data_extension)
 	local action_sweep = unit_data_extension:write_component("action_sweep")
-	action_sweep.sweep_position = Vector3.zero()
-	action_sweep.sweep_rotation = Quaternion.identity()
-	action_sweep.sweep_aborted = false
+	action_sweep.reference_position = Vector3.zero()
+	action_sweep.reference_rotation = Quaternion.identity()
+	action_sweep.sweep_aborted_bit_array = 0
 	action_sweep.sweep_aborted_t = 0
 	action_sweep.sweep_aborted_unit = nil
 	action_sweep.sweep_aborted_actor_index = nil
@@ -161,6 +166,7 @@ function PlayerUnitWeaponExtension:_init_action_components(unit_data_extension)
 	action_shoot.shooting_charge_level = 0
 	action_shoot.shooting_position = Vector3.zero()
 	action_shoot.shooting_rotation = Quaternion.identity()
+	action_shoot.current_fire_config = 1
 	local action_shoot_pellets = unit_data_extension:write_component("action_shoot_pellets")
 	action_shoot_pellets.num_pellets_fired = 0
 	local action_flamer_gas = unit_data_extension:write_component("action_flamer_gas")
@@ -423,6 +429,9 @@ function PlayerUnitWeaponExtension:on_wieldable_slot_equipped(item, slot_name, w
 		optional_weapon_unit = weapon_unit,
 		player_unit = self._unit
 	}
+
+	self:_init_persistent_data(slot_name, weapon_template)
+
 	local weapon = Weapon:new(weapon_init_data)
 	local weapons = self._weapons
 	weapons[slot_name] = weapon
@@ -1429,6 +1438,51 @@ end
 
 function PlayerUnitWeaponExtension:unblock_actions()
 	self._action_handler:unblock_actions()
+end
+
+function PlayerUnitWeaponExtension:_init_persistent_data(slot_name, weapon_template)
+	self:_clear_persistent_data(slot_name)
+
+	local persistent_slot_data = self._persistent_data_by_slot[slot_name]
+	local persistent_data_spec = weapon_template.persistent_slot_data_spec
+
+	if persistent_data_spec then
+		for key, value in pairs(persistent_data_spec) do
+			persistent_slot_data[key] = value
+		end
+	end
+end
+
+function PlayerUnitWeaponExtension:_clear_persistent_data(slot_name)
+	local persistent_data = self._persistent_data_by_slot[slot_name]
+
+	table.clear(persistent_data)
+end
+
+function PlayerUnitWeaponExtension:set_persistent_data(slot_name, key, value)
+	local persistent_data = self._persistent_data_by_slot[slot_name]
+
+	if persistent_data[key] == nil then
+		local item = self._visual_loadout_extension:item_in_slot(slot_name)
+		local weapon_template_name = item and item.weapon_template or "(No template in slot)"
+
+		ferror("Persistent data key '%s' does not exist, add it to the weapon template, %s", key, weapon_template_name)
+	end
+
+	persistent_data[key] = value
+end
+
+function PlayerUnitWeaponExtension:get_persistent_data(slot_name, key)
+	local persistent_data = self._persistent_data_by_slot[slot_name]
+
+	if persistent_data[key] == nil then
+		local item = self._visual_loadout_extension:item_in_slot(slot_name)
+		local weapon_template_name = item and item.weapon_template or "(No template in slot)"
+
+		ferror("Persistent data key '%s' does not exist, add it to the weapon template, %s", key, weapon_template_name)
+	end
+
+	return persistent_data[key]
 end
 
 function PlayerUnitWeaponExtension:action_input_is_currently_valid(component_name, action_input, used_input, current_fixed_t)

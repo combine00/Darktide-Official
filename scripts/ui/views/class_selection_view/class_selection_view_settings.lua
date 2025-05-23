@@ -7,7 +7,7 @@ local class_selection_view_settings = {
 	archetype_select_spacing = 80,
 	shading_environment = "content/shading_environments/ui/class_selection",
 	class_option_expanded_size_fraction = 0.25,
-	archetype_option_spacing = 25,
+	archetype_option_spacing = -2,
 	viewport_layer = 1,
 	class_select_spacing = 120,
 	world_name = "ui_class_selection_world",
@@ -35,6 +35,83 @@ local class_selection_view_settings = {
 	archetype_option_icon_size = {
 		128,
 		263
+	},
+	archetype_frames_textures = {
+		left = {
+			texture = "content/ui/textures/frames/class_selection/frames/class_selection_frame_left",
+			size = {
+				234,
+				380
+			},
+			offset = {
+				0,
+				0
+			},
+			icon_offset = {
+				94,
+				21.6
+			}
+		},
+		mid_1 = {
+			texture = "content/ui/textures/frames/class_selection/frames/class_selection_frame_mid_01",
+			size = {
+				156,
+				348
+			},
+			offset = {
+				0,
+				0
+			},
+			icon_offset = {
+				14.6,
+				21.6
+			}
+		},
+		mid_2 = {
+			texture = "content/ui/textures/frames/class_selection/frames/class_selection_frame_mid_02",
+			size = {
+				156,
+				348
+			},
+			offset = {
+				0,
+				0
+			},
+			icon_offset = {
+				14.6,
+				21.6
+			}
+		},
+		mid_3 = {
+			texture = "content/ui/textures/frames/class_selection/frames/class_selection_frame_mid_03",
+			size = {
+				156,
+				348
+			},
+			offset = {
+				0,
+				0
+			},
+			icon_offset = {
+				14.6,
+				21.6
+			}
+		},
+		right = {
+			texture = "content/ui/textures/frames/class_selection/frames/class_selection_frame_right",
+			size = {
+				234,
+				380
+			},
+			offset = {
+				0,
+				0
+			},
+			icon_offset = {
+				13.6,
+				21.6
+			}
+		}
 	}
 }
 

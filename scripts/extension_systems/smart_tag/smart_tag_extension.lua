@@ -87,34 +87,34 @@ function SmartTagExtension:_setup_display_name(unit)
 	end
 end
 
-function SmartTagExtension:can_tag(tagger_unit)
-	local template_name = self:_contextual_tag_template_name(tagger_unit)
+function SmartTagExtension:can_tag(tagger_unit, alternate)
+	local template_name = self:_contextual_tag_template_name(tagger_unit, alternate)
 
 	return template_name ~= nil
 end
 
-function SmartTagExtension:contextual_tag_template(tagger_unit)
-	local template_name = self:_contextual_tag_template_name(tagger_unit)
+function SmartTagExtension:contextual_tag_template(tagger_unit, alternate)
+	local template_name = self:_contextual_tag_template_name(tagger_unit, alternate)
 	local template = template_name and smart_tag_templates[template_name]
 
 	return template
 end
 
 local _pickup_name_to_tag_template_name = {
-	container_01_luggable = "luggable_container_over_here",
-	medical_crate_pocketable = "pocketable_medical_crate_over_here",
-	small_grenade = "small_grenade_over_here",
-	small_platinum = "small_platinum_pickup_over_here",
+	medical_crate_deployable = "deployed_medical_crate_over_here",
 	large_metal = "large_metal_pickup_over_here",
+	large_clip = "large_clip_over_here",
+	small_platinum = "small_platinum_pickup_over_here",
+	small_grenade = "small_grenade_over_here",
 	control_rod_01_luggable = "luggable_control_rod_over_here",
-	communications_hack_device = "side_mission_communication_device_over_here",
+	consumable = "side_mission_consumable_over_here",
 	battery_02_luggable = "luggable_battery_over_here",
-	syringe_corruption_pocketable = "syringe_corruption_over_here",
 	syringe_ability_boost_pocketable = "syringe_ability_boost_over_here",
+	syringe_corruption_pocketable = "syringe_corruption_over_here",
 	small_metal = "small_metal_pickup_over_here",
 	container_02_luggable = "luggable_container_over_here",
-	consumable = "side_mission_consumable_over_here",
-	large_clip = "large_clip_over_here",
+	container_01_luggable = "luggable_container_over_here",
+	communications_hack_device = "side_mission_communication_device_over_here",
 	grimoire = "side_mission_grimoire_over_here",
 	large_platinum = "large_platinum_pickup_over_here",
 	syringe_speed_boost_pocketable = "syringe_speed_boost_over_here",
@@ -122,13 +122,13 @@ local _pickup_name_to_tag_template_name = {
 	container_03_luggable = "luggable_container_over_here",
 	ammo_cache_pocketable = "pocketable_ammo_cache_over_here",
 	battery_01_luggable = "luggable_battery_over_here",
-	medical_crate_deployable = "deployed_medical_crate_over_here",
+	medical_crate_pocketable = "pocketable_medical_crate_over_here",
 	tome = "side_mission_tome_over_here",
 	ammo_cache_deployable = "deployed_ammo_cache_over_here",
 	syringe_power_boost_pocketable = "syringe_power_boost_over_here"
 }
 
-function SmartTagExtension:_contextual_tag_template_name(tagger_unit)
+function SmartTagExtension:_contextual_tag_template_name(tagger_unit, alternate)
 	local target_type = self._target_type
 
 	if not target_type then
@@ -165,9 +165,9 @@ function SmartTagExtension:_contextual_tag_template_name(tagger_unit)
 
 			if veteran_tag then
 				return "enemy_over_here_veteran"
-			else
-				return "enemy_over_here"
 			end
+
+			return "enemy_over_here"
 		end
 	elseif target_type == "health_station" then
 		local health_station_extension = ScriptUnit.extension(unit, "health_station_system")

@@ -50,6 +50,10 @@ function DoorExtension:destroy()
 			self:_set_nav_block(false)
 		end
 	end
+
+	if self._nav_tag_volume then
+		Managers.state.nav_mesh:remove_nav_tag_volume(self._nav_tag_volume)
+	end
 end
 
 function DoorExtension:hot_join_sync(unit, sender)
@@ -165,9 +169,7 @@ function DoorExtension:_setup_nav_layer(unit, start_state)
 	end
 
 	local volume_points, volume_alt_min, volume_alt_max = NavTagVolumeBox.create_from_unit(self._nav_world, unit)
-
-	Managers.state.nav_mesh:add_nav_tag_volume(volume_points, volume_alt_min, volume_alt_max, layer_name, volume_layer_allowed)
-
+	self._nav_tag_volume = Managers.state.nav_mesh:add_nav_tag_volume(volume_points, volume_alt_min, volume_alt_max, layer_name, volume_layer_allowed)
 	self._volume_added = true
 	self._nav_layer_name = layer_name
 	self._entrance_nav_blocked = not volume_layer_allowed
@@ -464,7 +466,8 @@ end
 local bot_teleport_location_node_names = {
 	"bot_teleport_location_01",
 	"bot_teleport_location_02",
-	"bot_teleport_location_03"
+	"bot_teleport_location_03",
+	"bot_teleport_location_04"
 }
 
 function DoorExtension:teleport_bots()

@@ -4,7 +4,7 @@ local TargetUnits = class("TargetUnits")
 local OUTLINE_NAME_VALID = "buff"
 local OUTLINE_NAMES_INVALID = "knocked_down"
 
-function TargetUnits:init(context, slot, weapon_template, fx_sources)
+function TargetUnits:init(context, slot, weapon_template, fx_sources, item, unit_1p, unit_3p)
 	if DEDICATED_SERVER then
 		return
 	end

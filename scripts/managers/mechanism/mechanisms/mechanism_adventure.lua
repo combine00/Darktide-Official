@@ -1,3 +1,4 @@
+local CircumstanceTemplates = require("scripts/settings/circumstance/circumstance_templates")
 local Havoc = require("scripts/utilities/havoc")
 local MatchmakingConstants = require("scripts/settings/network/matchmaking_constants")
 local MechanismBase = require("scripts/managers/mechanism/mechanisms/mechanism_base")
@@ -52,6 +53,13 @@ function MechanismAdventure:init(...)
 			challenge = context.challenge or DevParameters.challenge
 			resistance = context.resistance or DevParameters.resistance
 			circumstance_name = context.circumstance_name or GameParameters.circumstance or DevParameters.circumstance
+
+			if not CircumstanceTemplates[circumstance_name] then
+				Log.error("MechanismAdventure", "[init] circumstance_name '%s' does not exists. Fallback to 'default'", circumstance_name)
+
+				circumstance_name = "default"
+			end
+
 			side_mission = context.side_mission or GameParameters.side_mission or DevParameters.side_mission
 
 			if GameParameters.havoc_rank and GameParameters.havoc_rank > 0 then

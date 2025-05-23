@@ -461,6 +461,21 @@ local interaction_templates = {
 		duration = 0,
 		interaction_class_name = "penance_collectible",
 		description = "loc_pickup_collectible"
+	},
+	tainted_skull = {
+		description = "loc_pickup_tainted_skull",
+		taggable = false,
+		stop_anim_event = "arms_down",
+		start_anim_event = "arms_down",
+		ui_interaction_type = "pickup",
+		start_anim_event_3p = "interaction_revive",
+		action_text = "loc_action_interaction_tainted_skull",
+		interaction_icon = "content/ui/materials/hud/interactions/icons/enemy",
+		stop_anim_event_3p = "interaction_end",
+		interaction_priority = 1,
+		duration = 0,
+		interaction_class_name = "pickup",
+		anim_duration_variable_name_3p = "assist_interaction_duration"
 	}
 }
 

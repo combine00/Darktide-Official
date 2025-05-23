@@ -137,6 +137,50 @@ local mutator_templates = {
 			}
 		}
 	},
+	mutator_headshot_parasite_enemies = {
+		class = "scripts/managers/mutator/mutators/mutator_minion_nurgle_blessing",
+		random_spawn_buff_templates = {
+			buffs = {
+				"headshot_parasite_enemies"
+			},
+			breed_chances = {
+				renegade_flamer = 0.05,
+				chaos_mutated_poxwalker = 0.1,
+				renegade_assault = 0.1,
+				cultist_grenadier = 0.1,
+				cultist_melee = 0.1,
+				chaos_lesser_mutated_poxwalker = 0.1,
+				cultist_flamer = 0.1,
+				chaos_beast_of_nurgle = 0,
+				cultist_mutant = 0,
+				chaos_poxwalker = 0.1,
+				renegade_rifleman = 0.1,
+				cultist_shocktrooper = 0.1,
+				chaos_ogryn_gunner = 0.2,
+				cultist_assault = 0.1,
+				renegade_shocktrooper = 0.1,
+				chaos_armored_infected = 0.05,
+				renegade_gunner = 0.1,
+				cultist_berzerker = 0.1,
+				chaos_newly_infected = 0.1,
+				chaos_spawn = 0,
+				renegade_melee = 0.1,
+				chaos_ogryn_executor = 0.2,
+				chaos_poxwalker_bomber = 0,
+				renegade_grenadier = 0.1,
+				chaos_daemonhost = 0,
+				chaos_plague_ogryn = 0,
+				renegade_berzerker = 0.25,
+				renegade_sniper = 0,
+				renegade_netgunner = 0,
+				renegade_captain = 0,
+				chaos_hound = 0,
+				chaos_ogryn_bulwark = 0.2,
+				cultist_gunner = 0.1,
+				renegade_executor = 0.05
+			}
+		}
+	},
 	mutator_bolstering_minions = {
 		class = "scripts/managers/mutator/mutators/mutator_minion_nurgle_blessing",
 		random_spawn_buff_templates = {
@@ -145,38 +189,39 @@ local mutator_templates = {
 			},
 			ignored_buff_keyword = buff_keywords.stimmed,
 			breed_chances = {
-				cultist_assault = 0.1,
-				cultist_flamer = 0.35,
+				renegade_flamer = 0.35,
+				renegade_rifleman = 0.1,
 				renegade_assault = 0.1,
-				chaos_spawn = 1,
-				chaos_poxwalker_bomber = 0.35,
+				chaos_beast_of_nurgle = 1,
+				cultist_melee = 0.1,
+				cultist_captain = 0.2,
+				cultist_grenadier = 0.35,
+				chaos_armored_infected = 0.05,
 				cultist_mutant = 0.35,
+				chaos_poxwalker = 0.05,
+				cultist_flamer = 0.35,
+				cultist_shocktrooper = 0.25,
+				chaos_ogryn_gunner = 0.25,
+				cultist_assault = 0.1,
+				renegade_shocktrooper = 0.25,
+				renegade_gunner = 0.25,
+				cultist_berzerker = 0.25,
+				chaos_newly_infected = 0.05,
+				chaos_spawn = 1,
+				renegade_melee = 0.1,
+				chaos_ogryn_executor = 0.35,
+				chaos_poxwalker_bomber = 0.35,
+				renegade_grenadier = 0.25,
 				chaos_daemonhost = 0.1,
 				chaos_plague_ogryn = 1,
-				cultist_melee = 0.1,
-				chaos_poxwalker = 0.05,
-				cultist_shocktrooper = 0.25,
-				chaos_beast_of_nurgle = 1,
-				chaos_ogryn_gunner = 0.25,
 				renegade_berzerker = 0.25,
-				chaos_newly_infected = 0.05,
 				renegade_sniper = 0.35,
-				renegade_flamer = 0.35,
-				chaos_armored_infected = 0.05,
-				renegade_gunner = 0.25,
-				renegade_grenadier = 0.25,
-				cultist_berzerker = 0.25,
 				renegade_netgunner = 0.35,
-				renegade_rifleman = 0.1,
-				cultist_grenadier = 0.35,
-				renegade_shocktrooper = 0.25,
-				chaos_hound = 0.35,
 				renegade_captain = 0.2,
+				chaos_hound = 0.35,
 				chaos_ogryn_bulwark = 0.35,
 				cultist_gunner = 0.1,
-				renegade_melee = 0.1,
-				renegade_executor = 0.25,
-				chaos_ogryn_executor = 0.35
+				renegade_executor = 0.25
 			}
 		}
 	},
@@ -241,7 +286,8 @@ local mutator_templates = {
 				"havoc_sticky_poxburster"
 			},
 			breed_chances = {
-				chaos_poxwalker_bomber = 1
+				chaos_poxwalker_bomber = 1,
+				chaos_armored_bomber = 1
 			}
 		},
 		compositions = {

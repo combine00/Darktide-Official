@@ -27,7 +27,7 @@ local CONFIG = {
 	}
 }
 
-function SyringeEffects:init(context, slot, weapon_template, fx_sources)
+function SyringeEffects:init(context, slot, weapon_template, fx_sources, item, unit_1p, unit_3p)
 	self._world = context.world
 	self._weapon_template = weapon_template
 	local fx_extension = context.fx_extension

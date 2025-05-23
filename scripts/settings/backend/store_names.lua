@@ -30,12 +30,6 @@ local StoreNames = {
 			zealot = "get_zealot_marks_store",
 			ogryn = "get_ogryn_marks_store"
 		},
-		debug = {
-			psyker = "get_debug_human_store",
-			veteran = "get_debug_human_store",
-			zealot = "get_debug_human_store",
-			ogryn = "get_debug_ogryn_store"
-		},
 		premium = {
 			psyker = "premium_store_skins_psyker",
 			veteran = "premium_store_skins_veteran",

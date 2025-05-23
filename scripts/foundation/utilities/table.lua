@@ -267,10 +267,11 @@ function table.merge_recursive_advanced(dest, source, allow_overwrites)
 	return dest, is_overwrite
 end
 
-function table.append(dest, source)
+function table.append(dest, source, optional_size)
 	local dest_size = #dest
+	local source_size = optional_size or #source
 
-	for i = 1, #source do
+	for i = 1, source_size do
 		dest_size = dest_size + 1
 		dest[dest_size] = source[i]
 	end
@@ -386,8 +387,8 @@ function table.index_of(t, element)
 	return -1
 end
 
-function table.index_of_condition(t, condition)
-	for i = 1, #t do
+function table.index_of_condition(t, condition, offset)
+	for i = offset or 1, #t do
 		if condition(t[i]) then
 			return i
 		end
@@ -986,7 +987,7 @@ function table.make_strict(t, name, optional_error_message__index, optional_erro
 	setmetatable(t, metatable)
 end
 
-function table.make_strict_with_interface(t, name, interface)
+function table.make_strict_with_interface(t, name, interface, optional_context)
 	local num_fields = #interface
 	local valid_keys = Script.new_map(num_fields)
 
@@ -1312,4 +1313,51 @@ function table.concat_arrays(...)
 	end
 
 	return t
+end
+
+function table.select_array(t, selector)
+	local new_t = {}
+
+	for i = 1, #t do
+		new_t[#new_t + 1] = selector(i, t[i])
+	end
+
+	return new_t
+end
+
+function table.select_map(t, selector)
+	local new_t = {}
+
+	for k, v in pairs(t) do
+		new_t[k] = selector(k, v)
+	end
+
+	return new_t
+end
+
+function table.array_to_map(t, converter)
+	local new_t = {}
+
+	for i, v in pairs(t) do
+		local new_k, new_v = converter(i, v)
+		new_t[new_k] = new_v
+	end
+
+	return new_t
+end
+
+function table.map_to_array(t, converter)
+	local new_t = {}
+	local n = 0
+
+	for k, v in pairs(t) do
+		local new_v = converter(k, v)
+
+		if new_v then
+			n = n + 1
+			new_t[n] = new_v
+		end
+	end
+
+	return new_t
 end

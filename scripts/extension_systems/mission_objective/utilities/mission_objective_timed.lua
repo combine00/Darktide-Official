@@ -5,10 +5,12 @@ local MissionObjectiveTimed = class("MissionObjectiveTimed", "MissionObjectiveBa
 function MissionObjectiveTimed:init()
 	MissionObjectiveTimed.super.init(self)
 
-	self._duration = 0
-	self._time_left = 0
 	self._time_elapsed = 0
 	self._paused = false
+end
+
+function MissionObjectiveTimed:get_time_left()
+	return self._max_incremented_progression - self._time_elapsed
 end
 
 function MissionObjectiveTimed:_get_duration(mission_objective_data)
@@ -35,31 +37,28 @@ function MissionObjectiveTimed:start_objective(mission_objective_data, registere
 	MissionObjectiveTimed.super.start_objective(self, mission_objective_data, registered_units, synchronizer_unit)
 
 	self._use_counter = false
-	self._duration = self:_get_duration(mission_objective_data)
-	self._time_left = mission_objective_data.duration
 	self._time_elapsed = 0
-
-	self:set_max_increment(self._duration)
+	self._mission_assigned_duration = self:_get_duration(mission_objective_data)
 end
 
 function MissionObjectiveTimed:start_stage(stage)
 	MissionObjectiveTimed.super.start_stage(self, stage)
-	self:set_max_increment(self._duration)
+	self:set_max_increment(self._mission_assigned_duration)
 end
 
 function MissionObjectiveTimed:update(dt)
 	MissionObjectiveTimed.super.update(self, dt)
 
 	if not self._paused then
+		local duration = self._max_incremented_progression
 		self._time_elapsed = self._time_elapsed + dt
-		self._time_elapsed = math.min(self._time_elapsed, self._duration)
-		self._time_left = self._duration - self._time_elapsed
+		self._time_elapsed = math.min(self._time_elapsed, duration)
 	end
 end
 
 function MissionObjectiveTimed:add_time(time)
-	self._time_elapsed = math.clamp(self._time_elapsed + time, 0, self._duration)
-	self._time_left = self._duration - self._time_elapsed
+	local duration = self._max_incremented_progression
+	self._time_elapsed = math.clamp(self._time_elapsed + time, 0, duration)
 end
 
 function MissionObjectiveTimed:pause()
@@ -77,8 +76,10 @@ end
 function MissionObjectiveTimed:update_progression()
 	MissionObjectiveTimed.super.update_progression(self)
 
-	if self._duration > 0 then
-		local progression = self._time_elapsed / self._duration
+	local duration = self._max_incremented_progression
+
+	if duration > 0 then
+		local progression = self._time_elapsed / duration
 		local timed_synchronizer_extension = self:synchronizer_extension()
 
 		if timed_synchronizer_extension then
@@ -99,7 +100,9 @@ function MissionObjectiveTimed:progression_to_flow()
 	local synchronizer_unit = self._synchronizer_unit
 
 	if synchronizer_unit and ALIVE[synchronizer_unit] then
-		Unit.set_flow_variable(synchronizer_unit, "lua_var_objective_time_remaining", self._duration * (1 - self._progression))
+		local duration = self._max_incremented_progression
+
+		Unit.set_flow_variable(synchronizer_unit, "lua_var_objective_time_remaining", duration * (1 - self._progression))
 	end
 
 	MissionObjectiveTimed.super.progression_to_flow(self)

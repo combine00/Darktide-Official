@@ -355,7 +355,7 @@ end
 function BuffExtensionBase:_add_buff(template, t, ...)
 	local local_index = self:_next_local_index()
 	local template_name = template.name
-	local can_stack = template.max_stacks and true or false
+	local can_stack = not not template.max_stacks
 	local buff_instance = nil
 
 	if can_stack then

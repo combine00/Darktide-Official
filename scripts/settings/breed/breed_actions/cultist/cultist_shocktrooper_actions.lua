@@ -192,9 +192,7 @@ local action_data = {
 			}
 		}
 	},
-	disable = {
-		disable_anims = {}
-	},
+	disable = {},
 	jump_across = {
 		stagger_immune = true,
 		rotation_duration = 0.1,

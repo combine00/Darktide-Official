@@ -48,7 +48,7 @@ function GrenadeInteraction:interactor_condition_func(interactor_unit, interacte
 	return not full_charges and GrenadeInteraction.super.interactor_condition_func(self, interactor_unit, interactee_unit)
 end
 
-function GrenadeInteraction:hud_block_text(interactor_unit, interactee_unit, interactable_actor_node_index)
+function GrenadeInteraction:hud_block_text(interactor_unit, interactee_unit)
 	local ability_extension = ScriptUnit.has_extension(interactor_unit, "ability_system")
 
 	if not ability_extension then
@@ -78,7 +78,7 @@ function GrenadeInteraction:hud_block_text(interactor_unit, interactee_unit, int
 		return "loc_action_interaction_inactive_grenades_full"
 	end
 
-	return GrenadeInteraction.super.hud_block_text(self, interactor_unit, interactee_unit, interactable_actor_node_index)
+	return GrenadeInteraction.super.hud_block_text(self, interactor_unit, interactee_unit)
 end
 
 function _grenades_disabled(interactor_unit)

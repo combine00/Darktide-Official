@@ -14,6 +14,7 @@ function DestructibleExtension:init(extension_init_context, unit, extension_init
 	self._despawn_timer_duration = nil
 	self._time_to_despawn = nil
 	self._is_nav_gate = false
+	self._nav_tag_volume = nil
 	self._nav_layer_name = nil
 	self._broadphase_radius = 0.5
 	self._visibility_info = {
@@ -26,6 +27,11 @@ end
 
 function DestructibleExtension:destroy()
 	self:_disable_nav_volume()
+
+	if self._nav_tag_volume then
+		Managers.state.nav_mesh:remove_nav_tag_volume(self._nav_tag_volume)
+	end
+
 	self:remove_from_broadphase()
 
 	self._broadphase = nil
@@ -235,8 +241,7 @@ function DestructibleExtension:_setup_nav_gate()
 		Unit.set_visibility(unit, "NavGate", false)
 	end
 
-	Managers.state.nav_mesh:add_nav_tag_volume(volume_points, volume_alt_min, volume_alt_max, layer_name, volume_layer_allowed)
-
+	self._nav_tag_volume = Managers.state.nav_mesh:add_nav_tag_volume(volume_points, volume_alt_min, volume_alt_max, layer_name, volume_layer_allowed)
 	self._nav_layer_name = layer_name
 end
 

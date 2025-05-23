@@ -972,32 +972,6 @@ local guidance_vo_zealot_male_b = {
 			0.1111111
 		},
 		randomize_indexes = {}
-	},
-	info_asset_nurgle_growth = {
-		randomize_indexes_n = 0,
-		sound_events_n = 5,
-		sound_events = {
-			"loc_zealot_male_b__asset_nurgle_growth_01",
-			"loc_zealot_male_b__asset_nurgle_growth_02",
-			"loc_zealot_male_b__asset_nurgle_growth_03",
-			"loc_zealot_male_b__asset_nurgle_growth_04",
-			"loc_zealot_male_b__asset_nurgle_growth_05"
-		},
-		sound_events_duration = {
-			4.984521,
-			5.458542,
-			3.579875,
-			5.292292,
-			4.892188
-		},
-		sound_event_weights = {
-			0.2,
-			0.2,
-			0.2,
-			0.2,
-			0.2
-		},
-		randomize_indexes = {}
 	}
 }
 

@@ -133,12 +133,6 @@ local mission_briefing_explicator_a = {
 			7.070833,
 			6.329125
 		},
-		sound_event_weights = {
-			0.25,
-			0.25,
-			0.25,
-			0.25
-		},
 		randomize_indexes = {}
 	},
 	mission_cargo_briefing_c = {
@@ -155,12 +149,6 @@ local mission_briefing_explicator_a = {
 			5.858146,
 			6.215375,
 			6.298875
-		},
-		sound_event_weights = {
-			0.25,
-			0.25,
-			0.25,
-			0.25
 		},
 		randomize_indexes = {}
 	},

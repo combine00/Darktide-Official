@@ -73,23 +73,24 @@ function PropHealthExtension:setup_from_component(create_health_game_object, hea
 	end
 end
 
-function PropHealthExtension:extensions_ready(world, unit)
+function PropHealthExtension:on_unit_id_resolved(world, unit)
 	if self._is_server and self._create_health_game_object then
 		self:_create_game_object()
 	end
 end
 
 function PropHealthExtension:destroy()
-	if self._is_server and self._create_health_game_object then
+	if self._is_server and self._game_object_id then
 		self:_destroy_game_object()
 	end
 end
 
 function PropHealthExtension:_create_game_object()
-	local level_unit_id = Managers.state.unit_spawner:level_index(self._unit)
+	local is_level_unit, unit_id = Managers.state.unit_spawner:game_object_id_or_level_index(self._unit)
 	local game_object_data = {
 		game_object_type = NetworkLookup.game_object_types.prop_health,
-		level_unit_id = level_unit_id,
+		is_level_unit = is_level_unit,
+		unit_id = unit_id,
 		health = self._health,
 		damage = self._damage,
 		is_dead = self._is_dead
@@ -101,12 +102,10 @@ function PropHealthExtension:_create_game_object()
 end
 
 function PropHealthExtension:_destroy_game_object()
-	if self._game_object_id then
-		GameSession.destroy_game_object(self._game_session, self._game_object_id)
+	GameSession.destroy_game_object(self._game_session, self._game_object_id)
 
-		self._game_session = nil
-		self._game_object_id = nil
-	end
+	self._game_session = nil
+	self._game_object_id = nil
 end
 
 function PropHealthExtension:on_game_object_created(game_session, game_object_id)

@@ -20,10 +20,10 @@ table.make_unique(templates)
 
 templates.cultist_flamer_hit_by_flame = {
 	interval = 0.5,
+	duration = 1,
 	predicted = false,
 	refresh_duration_on_stack = true,
 	max_stacks = 1,
-	duration = 1,
 	class_name = "interval_buff",
 	keywords = {
 		buff_keywords.burning
@@ -44,10 +44,10 @@ templates.cultist_flamer_hit_by_flame = {
 }
 templates.hit_by_common_enemy_flame = {
 	interval = 0.5,
+	duration = 1,
 	predicted = false,
 	refresh_duration_on_stack = true,
 	max_stacks = 1,
-	duration = 1,
 	class_name = "interval_buff",
 	keywords = {
 		buff_keywords.burning
@@ -91,18 +91,19 @@ templates.hit_by_poxburster_bile = {
 }
 templates.cultist_flamer_liquid_immunity = {
 	unique_buff_id = "cultist_flamer_liquid_immunity",
-	class_name = "buff",
 	unique_buff_priority = 1,
+	predicted = false,
+	class_name = "buff",
 	keywords = {
 		buff_keywords.cultist_flamer_liquid_immunity
 	}
 }
 templates.renegade_flamer_hit_by_flame = {
 	interval = 0.5,
+	duration = 1,
 	predicted = false,
 	refresh_duration_on_stack = true,
 	max_stacks = 1,
-	duration = 1,
 	class_name = "interval_buff",
 	keywords = {
 		buff_keywords.burning
@@ -123,24 +124,27 @@ templates.renegade_flamer_hit_by_flame = {
 }
 templates.renegade_flamer_liquid_immunity = {
 	unique_buff_id = "renegade_flamer_liquid_immunity",
-	class_name = "buff",
 	unique_buff_priority = 1,
+	predicted = false,
+	class_name = "buff",
 	keywords = {
 		buff_keywords.renegade_flamer_liquid_immunity
 	}
 }
 templates.renegade_grenadier_liquid_immunity = {
 	unique_buff_id = "renegade_grenadier_liquid_immunity",
-	class_name = "buff",
 	unique_buff_priority = 1,
+	predicted = false,
+	class_name = "buff",
 	keywords = {
 		buff_keywords.renegade_grenadier_liquid_immunity
 	}
 }
 templates.beast_of_nurgle_liquid_immunity = {
 	unique_buff_id = "beast_of_nurgle_liquid_immunity",
-	class_name = "buff",
 	unique_buff_priority = 1,
+	predicted = false,
+	class_name = "buff",
 	keywords = {
 		buff_keywords.beast_of_nurgle_liquid_immunity
 	}
@@ -158,11 +162,10 @@ local CORRUPTION_AURA_PERMANENT_PERCENT = {
 }
 templates.daemonhost_corruption_aura = {
 	interval = 1,
+	max_stacks = 1,
 	refresh_duration_on_stack = true,
 	predicted = false,
-	max_stacks = 1,
 	class_name = "interval_buff",
-	keywords = {},
 	duration = math.huge,
 	interval_func = function (template_data, template_context)
 		local unit = template_context.unit
@@ -463,6 +466,7 @@ templates.flamer_backpack_counter = {
 	end
 }
 templates.renegade_flamer_backpack_damaged = {
+	predicted = false,
 	max_stacks = 4,
 	class_name = "buff",
 	start_func = function (template_data, template_context)

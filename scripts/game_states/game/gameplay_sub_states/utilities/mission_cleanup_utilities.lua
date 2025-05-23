@@ -69,6 +69,7 @@ function MissionCleanupUtilies.cleanup(shared_state, gameplay_state, initialized
 	end
 
 	Managers.state:destroy()
+	Crashify.print_property("in_havoc_mission", "")
 
 	if world then
 		local world_name = shared_state.world_name

@@ -1,6 +1,7 @@
 local ClosestTargetingActionModule = class("ClosestTargetingActionModule")
 
-function ClosestTargetingActionModule:init(physics_world, player_unit, component, action_settings)
+function ClosestTargetingActionModule:init(is_server, physics_world, player_unit, component, action_settings)
+	self._is_server = is_server
 	self._physics_world = physics_world
 	self._player_unit = player_unit
 	self._component = component

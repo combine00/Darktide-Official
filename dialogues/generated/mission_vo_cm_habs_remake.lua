@@ -1,5 +1,37 @@
 return function ()
 	define_rule({
+		name = "info_extraction_response",
+		wwise_route = 0,
+		response = "info_extraction_response",
+		database = "mission_vo_cm_habs_remake",
+		category = "conversations_prio_0",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"level_hab_block_collapse"
+				}
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
 		name = "level_hab_block_apartments",
 		category = "conversations_prio_0",
 		wwise_route = 0,

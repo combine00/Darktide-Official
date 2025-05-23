@@ -269,9 +269,7 @@ local action_data = {
 			jump_over_gap_4m_2 = "jumping"
 		}
 	},
-	disable = {
-		disable_anims = {}
-	},
+	disable = {},
 	follow = {
 		idle_anim_events = "idle",
 		run_anim_event = "move_fwd",

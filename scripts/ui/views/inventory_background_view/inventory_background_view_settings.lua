@@ -7,15 +7,16 @@ local discard_items_popup_grid_size = {
 	discard_items_popup_window_size[2] - 100
 }
 local inventory_background_view = {
-	world_layer = 2,
-	total_blur_duration = 0.5,
 	timer_name = "ui",
+	total_blur_duration = 0.5,
+	world_layer = 2,
 	viewport_type = "default",
+	camera_time = 0.5,
+	default_slot = "slot_primary",
 	shading_environment = "content/shading_environments/ui/inventory",
 	viewport_name = "ui_inventory_viewport",
 	viewport_layer = 1,
 	level_name = "content/levels/ui/inventory/inventory",
-	default_slot = "slot_primary",
 	loadout_update_timeout = 3,
 	world_name = "ui_inventory",
 	discard_items_popup_window_size = discard_items_popup_window_size,

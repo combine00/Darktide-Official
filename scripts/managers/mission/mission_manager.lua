@@ -38,6 +38,10 @@ function MissionManager:init(mission_name, level, level_name, side_mission_name)
 	Crashify.print_property("num_missions_started", MissionManager._num_missions_started)
 end
 
+function MissionManager:num_missions_started()
+	return MissionManager._num_missions_started
+end
+
 function MissionManager:destroy()
 	rawset(_G, "SPAWNED_LEVEL_NAME", nil)
 end

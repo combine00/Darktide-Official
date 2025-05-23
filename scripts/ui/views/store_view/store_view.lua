@@ -396,7 +396,6 @@ end
 
 function StoreView:_setup_background_world()
 	self:_register_event("event_register_store_view_camera")
-	self:_register_event("event_store_view_set_camera_axis_offset")
 
 	local world_name = StoreViewSettings.world_name
 	local world_layer = StoreViewSettings.world_layer
@@ -422,12 +421,6 @@ function StoreView:event_register_store_view_camera(camera_unit)
 
 	self._world_spawner:create_viewport(camera_unit, viewport_name, viewport_type, viewport_layer, shading_environment)
 	self._world_spawner:set_listener(viewport_name)
-end
-
-function StoreView:event_store_view_set_camera_axis_offset(axis, value, animation_duration, func_ptr)
-	if self._world_spawner then
-		self._world_spawner:set_camera_position_axis_offset(axis, value, animation_duration, func_ptr)
-	end
 end
 
 function StoreView:_setup_element(element, reference_name, layer, additional_settings)
@@ -1216,10 +1209,9 @@ function StoreView:_fetch_storefront(storefront, on_complete_callback)
 		for i = 1, #category_pages_layout_data do
 			local page = category_pages_layout_data[i]
 			count = count + #page.elements
+			last_index = i
 
 			if target <= count then
-				last_index = i
-
 				break
 			end
 		end

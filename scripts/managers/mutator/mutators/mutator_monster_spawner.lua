@@ -26,13 +26,20 @@ function MutatorMonsterSpawner:init(is_server, network_event_delegate, mutator_t
 	self._buffs = {}
 	self._template = mutator_template
 	self._nav_world = nav_world
+	local asset_package = self._template.spawner_template.asset_package
+
+	if asset_package then
+		local package_manager = Managers.package
+		self._package_id = package_manager:load(asset_package, "MutatorMonsterSpawner", nil, nil)
+	end
 
 	if not self._is_server then
 		return
 	end
 
 	local mission_name = Managers.state.mission:mission_name()
-	self._dirty_spawn_locations = MutatorMonsterSpawnerSettings.spawn_locations[mission_name]
+	local spawn_locations = self._template.spawner_template.spawn_locations or "default_locations"
+	self._dirty_spawn_locations = MutatorMonsterSpawnerSettings[spawn_locations][mission_name]
 	self._template_data = self._template.spawner_template
 	self._injection_template = MonsterInjectionTemplates[self._template.spawner_template.injection_template]
 	self._spawn_point_sections = {}
@@ -41,6 +48,18 @@ function MutatorMonsterSpawner:init(is_server, network_event_delegate, mutator_t
 	self._allowed_per_section = {}
 	self._section_probabillity = {}
 	self._num_to_spawn = self._template_data.num_to_spawn or self._template_data.num_to_spawn_per_mission[mission_name]
+end
+
+function MutatorMonsterSpawner:destroy()
+	MutatorMonsterSpawner.super.destroy()
+
+	local package_id = self._package_id
+
+	if package_id then
+		local package_manager = Managers.package
+
+		package_manager:release(package_id, "MutatorMonsterSpawner")
+	end
 end
 
 function MutatorMonsterSpawner:on_spawn_points_generated(level, themes)

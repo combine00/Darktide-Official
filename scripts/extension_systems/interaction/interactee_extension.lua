@@ -142,7 +142,9 @@ function InteracteeExtension:can_interact(interactor_unit)
 		return false
 	end
 
-	if active_override_context.block_text then
+	local interaction = self._interactions[active_interaction_type]
+
+	if interaction:hud_block_text(interactor_unit, self._unit) then
 		return false
 	end
 
@@ -151,8 +153,6 @@ function InteracteeExtension:can_interact(interactor_unit)
 	if not is_active then
 		return false
 	end
-
-	local interaction = self._interactions[active_interaction_type]
 
 	return interaction:interactee_condition_func(self._unit)
 end

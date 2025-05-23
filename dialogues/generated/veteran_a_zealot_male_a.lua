@@ -6,7 +6,7 @@ local veteran_a_zealot_male_a = {
 			[1.0] = "loc_zealot_male_a__combat_pause_limited_bolt_on_a_veteran_a_02_b_01"
 		},
 		sound_events_duration = {
-			[1.0] = 4.698604
+			[1.0] = 4.698583
 		},
 		randomize_indexes = {}
 	},
@@ -17,7 +17,7 @@ local veteran_a_zealot_male_a = {
 			[1.0] = "loc_zealot_male_a__combat_pause_limited_bolt_on_a_veteran_a_04_b_01"
 		},
 		sound_events_duration = {
-			[1.0] = 4.31225
+			[1.0] = 4.312229
 		},
 		randomize_indexes = {}
 	},

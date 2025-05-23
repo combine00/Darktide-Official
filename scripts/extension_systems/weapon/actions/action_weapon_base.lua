@@ -221,6 +221,18 @@ function ActionWeaponBase:_add_weapon_blood(target_unit, amount)
 	Managers.state.blood:add_weapon_blood(self._player, wielded_slot, amount)
 end
 
+function ActionWeaponBase:_reference_attachment_id(fire_config)
+	local attachment_id_or_nil = nil
+
+	if fire_config.reference_attachment_id_func then
+		attachment_id_or_nil = fire_config.reference_attachment_id_func(self._inventory_component, self._weapon_extension)
+	else
+		attachment_id_or_nil = fire_config.reference_attachment_id
+	end
+
+	return attachment_id_or_nil
+end
+
 function ActionWeaponBase:_setup_charge_template(action_settings)
 	local weapon_tweak_templates_component = self._weapon_tweak_templates_component
 	local weapon_template = self._weapon_template

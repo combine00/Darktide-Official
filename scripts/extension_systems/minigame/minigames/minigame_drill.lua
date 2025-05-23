@@ -206,6 +206,10 @@ end
 function MinigameDrill:on_action_pressed(t)
 	MinigameDrill.super.on_action_pressed(self, t)
 
+	if not self._is_server then
+		return
+	end
+
 	if self._current_state ~= MinigameSettings.game_states.gameplay or not self._selected_index then
 		return
 	end
@@ -249,6 +253,10 @@ end
 
 function MinigameDrill:on_axis_set(t, x, y)
 	MinigameDrill.super.on_axis_set(self, t, x, y)
+
+	if not self._is_server then
+		return
+	end
 
 	if self._current_state ~= MinigameSettings.game_states.gameplay then
 		return

@@ -350,6 +350,10 @@ function GameModeManager:on_gameplay_init()
 	self._game_mode:on_gameplay_init()
 end
 
+function GameModeManager:on_gameplay_post_init()
+	self._game_mode:on_gameplay_post_init()
+end
+
 function GameModeManager:can_player_enter_game()
 	return self._game_mode:can_player_enter_game()
 end

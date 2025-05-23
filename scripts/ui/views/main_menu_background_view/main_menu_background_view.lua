@@ -25,7 +25,6 @@ function MainMenuBackgroundView:on_enter()
 	self:_register_event("event_main_menu_load_profile")
 	self:_register_event("event_main_menu_set_presentation_profile")
 	self:_register_event("event_main_menu_set_new_profile")
-	self:_register_event("event_main_menu_set_camera_axis_offset")
 
 	self._item_definitions = MasterItems.get_cached()
 
@@ -86,47 +85,36 @@ end
 function MainMenuBackgroundView:event_main_menu_set_presentation_profile(profile)
 	self._presentation_profile = profile
 	local loaded = false
-	local loading = false
 	local profiles_loading_data = self._profiles_loading_data
 
 	for i = 1, #profiles_loading_data do
 		local loading_data = profiles_loading_data[i]
 
-		if loading_data.profile == profile then
-			loading = true
+		if loading_data.profile == profile and loading_data.loaded then
+			loaded = true
 
-			if loading_data.loaded then
-				loaded = true
-
-				break
-			end
+			break
 		end
 	end
 
 	if loaded then
 		self:_spawn_profile(profile)
-	elseif loading then
+	else
 		local current_index = table.index_of(self._loading_profile_queue, profile)
 
 		if current_index > 1 then
 			table.remove(self._loading_profile_queue, current_index)
 			table.insert(self._loading_profile_queue, 1, profile)
-		end
-	else
-		local prioritized = true
+		elseif current_index == -1 then
+			local prioritized = true
 
-		self:_set_profile_in_loading_queue(profile, prioritized)
+			self:_set_profile_in_loading_queue(profile, prioritized)
+		end
 	end
 end
 
 function MainMenuBackgroundView:event_main_menu_set_new_profile()
 	self:_show_dummy_unit()
-end
-
-function MainMenuBackgroundView:event_main_menu_set_camera_axis_offset(axis, value, animation_duration, func_ptr)
-	if self._world_spawner then
-		self._world_spawner:set_camera_position_axis_offset(axis, value, animation_duration, func_ptr)
-	end
 end
 
 function MainMenuBackgroundView:_can_spawn_profile(profile)
@@ -168,17 +156,12 @@ function MainMenuBackgroundView:_spawn_profile(profile)
 end
 
 function MainMenuBackgroundView:_move_camera(is_ogryn)
-	local animation_duration = 0.01
 	local world_spawner = self._world_spawner
 
 	if is_ogryn == true then
-		world_spawner:set_camera_position_axis_offset("x", -0.15, animation_duration, math.easeOutCubic)
-		world_spawner:set_camera_position_axis_offset("y", -2.8, animation_duration, math.easeOutCubic)
-		world_spawner:set_camera_position_axis_offset("z", 0.4, animation_duration, math.easeOutCubic)
+		world_spawner:set_target_camera_offset(-0.15, -2.8, 0.4)
 	else
-		world_spawner:set_camera_position_axis_offset("x", 0, animation_duration, math.easeOutCubic)
-		world_spawner:set_camera_position_axis_offset("y", 0, animation_duration, math.easeOutCubic)
-		world_spawner:set_camera_position_axis_offset("z", 0, animation_duration, math.easeOutCubic)
+		world_spawner:set_target_camera_offset(0, 0, 0)
 	end
 end
 

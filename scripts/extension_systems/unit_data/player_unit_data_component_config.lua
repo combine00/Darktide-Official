@@ -317,26 +317,26 @@ for interaction_state_name_index = 1, #interaction_state_names do
 	end
 end
 
-local BUFF_TEMPLATES = {
+local PREDICTED_BUFF_TEMPLATES = {
 	"none"
 }
-local buff_template_names = {}
+local predicted_buff_template_names = {}
 
-for name, _ in pairs(BuffTemplates) do
-	if not table.find(BUFF_TEMPLATES, name) then
-		table.insert(buff_template_names, name)
+for name, _ in pairs(BuffTemplates.PREDICTED) do
+	if not table.find(PREDICTED_BUFF_TEMPLATES, name) then
+		table.insert(predicted_buff_template_names, name)
 	end
 end
 
-table.sort(buff_template_names)
+table.sort(predicted_buff_template_names)
 
-local BUFF_TEMPLATES = {
+local PREDICTED_BUFF_TEMPLATES = {
 	"none"
 }
 
-for buff_template_name_index = 1, #buff_template_names do
-	local buff_template_name = buff_template_names[buff_template_name_index]
-	BUFF_TEMPLATES[#BUFF_TEMPLATES + 1] = buff_template_name
+for buff_template_name_index = 1, #predicted_buff_template_names do
+	local buff_template_name = predicted_buff_template_names[buff_template_name_index]
+	PREDICTED_BUFF_TEMPLATES[#PREDICTED_BUFF_TEMPLATES + 1] = buff_template_name
 end
 
 local LUNGE_TEMPLATES = {
@@ -804,13 +804,13 @@ local PlayerComponentConfig = {
 		rotation = "Quaternion"
 	},
 	action_sweep = {
-		sweep_aborted = "bool",
-		sweep_rotation = "Quaternion",
-		sweep_aborted_unit = "Unit",
+		reference_position = "Vector3",
 		sweep_aborted_t = "fixed_frame_offset",
+		reference_rotation = "Quaternion",
+		sweep_aborted_unit = "Unit",
 		sweep_aborted_actor_index = "hit_zone_actor_index",
 		is_sticky = "bool",
-		sweep_position = "Vector3",
+		sweep_aborted_bit_array = "lookup_2bit0",
 		attack_direction = "Vector3",
 		sweep_state = {
 			"before_damage_window",
@@ -819,13 +819,14 @@ local PlayerComponentConfig = {
 		}
 	},
 	action_shoot = {
-		shooting_charge_level = "weapon_charge_level",
-		fire_last_t = "fixed_frame_offset_start_t_9bit",
 		started_from_sprint = "bool",
-		num_shots_fired = "ammunition_small",
+		fire_last_t = "fixed_frame_offset_start_t_9bit",
+		current_fire_config = "lookup_1bit",
+		shooting_rotation = "Quaternion",
 		shooting_position = "Vector3",
 		fire_at_time = "fixed_frame_offset",
-		shooting_rotation = "Quaternion",
+		shooting_charge_level = "weapon_charge_level",
+		num_shots_fired = "ammunition_small",
 		fire_state = {
 			"waiting_to_shoot",
 			"prepare_shooting",
@@ -1045,7 +1046,7 @@ for ii = 1, max_component_buffs do
 	local active_start_time_key = key_lookup.active_start_time_key
 	local stack_count_key = key_lookup.stack_count_key
 	local proc_count_key = key_lookup.proc_count_key
-	buff_component_config[template_name_key] = BUFF_TEMPLATES
+	buff_component_config[template_name_key] = PREDICTED_BUFF_TEMPLATES
 	buff_component_config[start_time_key] = "fixed_frame_offset"
 	buff_component_config[active_start_time_key] = "fixed_frame_offset"
 	buff_component_config[stack_count_key] = "buff_stack_count"

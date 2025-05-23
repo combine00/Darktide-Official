@@ -15,7 +15,7 @@ local STAGE_RANKING = {
 	low = 1
 }
 
-function ForceWeaponWindSlashStageEffects:init(context, slot, weapon_template, fx_sources)
+function ForceWeaponWindSlashStageEffects:init(context, slot, weapon_template, fx_sources, item, unit_1p, unit_3p)
 	self._world = context.world
 	self._wwise_world = context.wwise_world
 	self._weapon_special_tweak_data = weapon_template.weapon_special_tweak_data
@@ -35,8 +35,8 @@ function ForceWeaponWindSlashStageEffects:init(context, slot, weapon_template, f
 	self._looping_stage_effect_id = nil
 	self._looping_stage_playing_id = nil
 
-	_unit_components(self._weapon_material_variables_3p, slot.attachments_3p)
-	_unit_components(self._weapon_material_variables_1p, slot.attachments_1p)
+	_unit_components(self._weapon_material_variables_3p, slot.attachments_by_unit_3p[unit_3p])
+	_unit_components(self._weapon_material_variables_1p, slot.attachments_by_unit_1p[unit_1p])
 end
 
 function ForceWeaponWindSlashStageEffects:destroy()

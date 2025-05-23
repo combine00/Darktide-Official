@@ -199,6 +199,137 @@ return function ()
 		}
 	})
 	define_rule({
+		pre_wwise_event = "play_radio_static_start",
+		concurrent_wwise_event = "play_vox_static_loop",
+		name = "mission_stockpile_elevator_conversation_journey_02_a",
+		wwise_route = 1,
+		response = "mission_stockpile_elevator_conversation_journey_02_a",
+		database = "mission_vo_dm_stockpile",
+		category = "vox_prio_0",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"mission_info"
+			},
+			{
+				"query_context",
+				"trigger_id",
+				OP.EQ,
+				"mission_stockpile_elevator_conversation_journey_02_a"
+			},
+			{
+				"user_context",
+				"class_name",
+				OP.SET_INCLUDES,
+				args = {
+					"explicator"
+				}
+			},
+			{
+				"faction_memory",
+				"mission_stockpile_elevator_conversation_journey_02_a",
+				OP.EQ,
+				0
+			}
+		},
+		on_done = {
+			{
+				"faction_memory",
+				"mission_stockpile_elevator_conversation_journey_02_a",
+				OP.ADD,
+				1
+			}
+		},
+		heard_speak_routing = {
+			target = "self"
+		}
+	})
+	define_rule({
+		concurrent_wwise_event = "play_vox_static_loop",
+		wwise_route = 1,
+		name = "mission_stockpile_elevator_conversation_journey_02_b",
+		response = "mission_stockpile_elevator_conversation_journey_02_b",
+		database = "mission_vo_dm_stockpile",
+		category = "vox_prio_0",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"mission_stockpile_elevator_conversation_journey_02_a"
+				}
+			},
+			{
+				"user_context",
+				"class_name",
+				OP.SET_INCLUDES,
+				args = {
+					"explicator"
+				}
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "self"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.1
+			}
+		}
+	})
+	define_rule({
+		post_wwise_event = "play_radio_static_end",
+		concurrent_wwise_event = "play_vox_static_loop",
+		name = "mission_stockpile_elevator_conversation_journey_02_c",
+		wwise_route = 1,
+		response = "mission_stockpile_elevator_conversation_journey_02_c",
+		database = "mission_vo_dm_stockpile",
+		category = "vox_prio_0",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"mission_stockpile_elevator_conversation_journey_02_b"
+				}
+			},
+			{
+				"user_context",
+				"class_name",
+				OP.SET_INCLUDES,
+				args = {
+					"explicator"
+				}
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "disabled"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.1
+			}
+		}
+	})
+	define_rule({
 		name = "mission_stockpile_elevator_conversation_one_a",
 		category = "conversations_prio_0",
 		wwise_route = 0,

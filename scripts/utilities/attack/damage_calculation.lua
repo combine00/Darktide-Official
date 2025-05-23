@@ -1,4 +1,5 @@
 local AttackSettings = require("scripts/settings/damage/attack_settings")
+local AttackingUnitResolver = require("scripts/utilities/attack/attacking_unit_resolver")
 local Breed = require("scripts/utilities/breed")
 local ArmorSettings = require("scripts/settings/damage/armor_settings")
 local BuffSettings = require("scripts/settings/buff/buff_settings")

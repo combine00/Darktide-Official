@@ -1,7 +1,9 @@
 local MinionRoamerGroup = component("MinionRoamerGroup")
 
 function MinionRoamerGroup:init(unit)
-	Managers.state.main_path:add_group_location(unit)
+	local location = Unit.world_position(unit, 1)
+
+	Managers.state.main_path:add_group_location(location)
 end
 
 function MinionRoamerGroup:editor_init()

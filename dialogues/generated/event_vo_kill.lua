@@ -20,7 +20,8 @@ return function ()
 				"dialogue_name",
 				OP.SET_INCLUDES,
 				args = {
-					"renegade_captain_taunt"
+					"renegade_captain_taunt",
+					"cultist_captain_taunt"
 				}
 			},
 			{

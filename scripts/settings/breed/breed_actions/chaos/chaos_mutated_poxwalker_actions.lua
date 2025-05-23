@@ -249,9 +249,7 @@ local action_data = {
 			jump_up_1m = 0.2
 		}
 	},
-	disable = {
-		disable_anims = {}
-	},
+	disable = {},
 	jump_across = {
 		stagger_immune = true,
 		rotation_duration = 0.1,

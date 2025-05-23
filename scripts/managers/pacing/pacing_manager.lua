@@ -305,6 +305,10 @@ function PacingManager:is_enabled()
 	return not self._disabled
 end
 
+function PacingManager:is_using_heat()
+	return self._use_heat
+end
+
 function PacingManager:_event_intro_cinematic_played(cinematic_name)
 	if self._disabled then
 		self._disabled = not Managers.state.main_path:is_main_path_available()
