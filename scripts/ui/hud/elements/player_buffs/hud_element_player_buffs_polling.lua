@@ -44,6 +44,31 @@ function HudElementPlayerBuffs:event_player_buff_added(player, buff_instance)
 	end
 end
 
+function HudElementPlayerBuffs:event_player_buff_stack_added(player, buff_instance)
+	if not self._player or self._player ~= player then
+		return
+	end
+
+	local add_buff = buff_instance:has_hud()
+
+	if not add_buff then
+		return
+	end
+
+	local active_buffs_data = self._active_buffs_data
+
+	for i = 1, #active_buffs_data do
+		local buff_data = active_buffs_data[i]
+		local buff_already_exists_in_hud = buff_data.buff_instance == buff_instance
+
+		if buff_already_exists_in_hud then
+			return
+		end
+	end
+
+	self:_add_buff(buff_instance)
+end
+
 function HudElementPlayerBuffs:event_player_buff_removed(player, buff_instance)
 	if not self._player or self._player ~= player then
 		return

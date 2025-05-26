@@ -469,7 +469,12 @@ local function create_mission_objective_overarching(scenegraph_id)
 				text_horizontal_alignment = "left",
 				vertical_alignment = "top",
 				offset = {
-					header_size[1] - 90,
+					0,
+					0,
+					6
+				},
+				default_offset = {
+					header_size[1] - side_offset * 2,
 					0,
 					6
 				},

@@ -219,10 +219,17 @@ end
 
 function HordePlayView:_fetch_success(data)
 	local missions = data.missions
+	local num_mission_to_display = 4
+	local mission_difficulties_selected = {}
+	local num_mission_difficulties_selected = 0
 	local filtered_missions = {}
 
 	for _, mission in ipairs(missions) do
-		if mission.category == "horde" then
+		local difficulty_id = mission.challenge .. "-" .. mission.resistance
+
+		if mission.category == "horde" and not mission_difficulties_selected[difficulty_id] and Danger.calculate_danger(mission.challenge, mission.resistance) then
+			mission_difficulties_selected[difficulty_id] = true
+			num_mission_difficulties_selected = num_mission_difficulties_selected + 1
 			filtered_missions[#filtered_missions + 1] = mission
 		end
 	end
@@ -238,9 +245,10 @@ function HordePlayView:_fetch_success(data)
 
 	self._missions = filtered_missions
 	local option_widgets = {}
+	local num_missions_available = #self._missions
 
-	if #self._missions > 0 then
-		for i = 1, 4 do
+	if num_missions_available > 0 then
+		for i = 1, num_mission_to_display do
 			local mission = self._missions[math.min(i, #self._missions)]
 
 			self:_assign_option_data(i, mission)

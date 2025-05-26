@@ -356,6 +356,15 @@ function PlayerUnitBuffExtension:_on_add_buff(buff_instance)
 	Managers.event:trigger("event_player_buff_added", player, buff_instance)
 end
 
+function PlayerUnitBuffExtension:_on_add_buff_stack(existing_buff_instance, previous_stack_count)
+	PlayerUnitBuffExtension.super._on_add_buff_stack(self, existing_buff_instance, previous_stack_count)
+
+	local buff_context = self._buff_context
+	local player = buff_context.player
+
+	Managers.event:trigger("event_player_buff_stack_added", player, existing_buff_instance)
+end
+
 function PlayerUnitBuffExtension:_on_remove_buff(buff_instance)
 	local buff_context = self._buff_context
 	local player = buff_context.player

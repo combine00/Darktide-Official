@@ -112,8 +112,9 @@ function CutsceneCharacterSystem:initialize_characters_for_cinematic(cinematic_n
 			for j = 1, #extensions_list do
 				local extension = extensions_list[j]
 				local slot = extension:slot()
+				local slot_matches_character_requirements = extension:character_type() == "player" and extension:breed_name() == loadout_info.breed_name
 
-				if extension:character_type() == "player" and not extension:has_player_assigned() and extension:breed_name() == loadout_info.breed_name and (slot == none_slot or not slots_taken[slot]) then
+				if slot_matches_character_requirements and not extension:has_player_assigned() and (slot == none_slot or not slots_taken[slot]) then
 					local items = loadout_info.items
 
 					extension:assign_player_loadout(unique_id, items)
@@ -181,6 +182,7 @@ end
 local function create_loadout(cinematic_name, player)
 	local new_player_loadout = {}
 	local items = CutscenePlayerLoadout.fetch_player_items(cinematic_name, player)
+	new_player_loadout.archetype_name = player:archetype_name()
 	new_player_loadout.breed_name = player:breed_name()
 	new_player_loadout.items = items
 

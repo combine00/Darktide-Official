@@ -335,12 +335,29 @@ CutsceneCharacter.component_data = {
 		options_keys = {
 			"None",
 			"Human",
-			"Ogryn"
+			"Ogryn",
+			"Companion Dog"
 		},
 		options_values = {
 			"none",
 			"human",
-			"ogryn"
+			"ogryn",
+			"companion_dog"
+		}
+	},
+	companion_inclusion_setting = {
+		value = "any",
+		ui_type = "combo_box",
+		ui_name = "Companion Inclusion",
+		options_keys = {
+			"Any",
+			"With Companion Only",
+			"Without Companion Only"
+		},
+		options_values = {
+			"any",
+			"with_companion",
+			"without_companion"
 		}
 	},
 	prop_items = {

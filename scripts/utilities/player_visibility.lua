@@ -35,10 +35,10 @@ function PlayerVisibility.restore_remote_players()
 	for _, player in pairs(players) do
 		if player.remote then
 			local unit = player.player_unit
-			local player_visibility_ext = ScriptUnit.has_extension(unit, "player_visibility_system")
+			local player_visibility = ScriptUnit.has_extension(unit, "player_visibility_system")
 
-			if player_visibility_ext then
-				player_visibility_ext:show()
+			if player_visibility then
+				player_visibility:show()
 			end
 		end
 	end
@@ -51,10 +51,10 @@ function PlayerVisibility.store_and_hide_remote_players()
 	for _, player in pairs(players) do
 		if player.remote then
 			local unit = player.player_unit
-			local player_visibility_ext = ScriptUnit.has_extension(unit, "player_visibility_system")
+			local player_visibility = ScriptUnit.has_extension(unit, "player_visibility_system")
 
-			if player_visibility_ext then
-				player_visibility_ext:hide()
+			if player_visibility then
+				player_visibility:hide()
 			end
 		end
 	end

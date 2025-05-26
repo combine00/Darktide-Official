@@ -1091,13 +1091,17 @@ function ActionSweep:_pick_best_sweep_result_per_unit(sweep_results, num_sweep_r
 
 				local previous_result = sweep_results[previous_result_id]
 				local prev_actor = previous_result.actor
+				local prev_hit_zone_prio = math.huge
 				local prev_hit_zone = HitZone.get(hit_unit, prev_actor)
-				local prev_hit_zone_name = prev_hit_zone.name
-				local prev_hit_zone_prio = hit_zone_priority[prev_hit_zone_name]
-				local prev_hit_zone_priority_function = hit_zone_priority_functions[prev_hit_zone_name]
 
-				if prev_hit_zone_priority_function then
-					prev_hit_zone_prio = prev_hit_zone_priority_function(hit_unit, player_position, prev_hit_zone_prio)
+				if prev_hit_zone then
+					local prev_hit_zone_name = prev_hit_zone.name
+					prev_hit_zone_prio = hit_zone_priority[prev_hit_zone_name]
+					local prev_hit_zone_priority_function = hit_zone_priority_functions[prev_hit_zone_name]
+
+					if prev_hit_zone_priority_function then
+						prev_hit_zone_prio = prev_hit_zone_priority_function(hit_unit, player_position, prev_hit_zone_prio)
+					end
 				end
 
 				local disregarded_result = result
@@ -1106,7 +1110,7 @@ function ActionSweep:_pick_best_sweep_result_per_unit(sweep_results, num_sweep_r
 					unit_best_result[hit_unit] = i
 					disregarded_result = previous_result
 				end
-			elseif HitZone.get(hit_unit, hit_actor) then
+			else
 				unit_best_result[hit_unit] = i
 			end
 		until true

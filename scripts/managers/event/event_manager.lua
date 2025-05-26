@@ -45,8 +45,9 @@ function EventManager:register_with_parameters(object, function_name, event_name
 end
 
 local WARNING_SUPPRESSED = {
-	event_player_buff_removed = true,
+	event_player_buff_stack_added = true,
 	event_player_buff_proc_start = true,
+	event_player_buff_removed = true,
 	voip_manager_updated_channel_state = true,
 	event_player_buff_proc_stop = true,
 	event_player_buff_added = true
