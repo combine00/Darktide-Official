@@ -56,26 +56,38 @@ function ShockMine:disable(unit)
 end
 
 function ShockMine:destroy(unit)
+	if not self._has_setup then
+		return
+	end
+
+	local source_id = self._source_id
+
+	if self._source_id ~= nil and not WwiseWorld.has_source(self._wwise_world, source_id) then
+		source_id = nil
+	end
+
 	if self._arming_playing_id then
-		self:_stop_looping_sound(nil, self._arming_playing_id, nil)
+		self:_stop_looping_sound(source_id, self._arming_playing_id, RESOURCES.sfx.arming_loop.stop)
 
 		self._arming_playing_id = nil
 	end
 
 	if self._idle_playing_id then
-		self:_stop_looping_sound(nil, self._idle_playing_id, RESOURCES.sfx.idle_loop.stop)
+		self:_stop_looping_sound(source_id, self._idle_playing_id, RESOURCES.sfx.idle_loop.stop)
 
 		self._idle_playing_id = nil
 	end
 
 	if self._targets_loop_playing_id then
-		self:_stop_looping_sound(nil, self._targets_loop_playing_id, RESOURCES.sfx.target_loop.stop)
+		self:_stop_looping_sound(source_id, self._targets_loop_playing_id, RESOURCES.sfx.target_loop.stop)
 
 		self._targets_loop_playing_id = nil
 	end
 
-	if self._source_id then
-		WwiseWorld.destroy_manual_source(self._wwise_world, self._source_id)
+	if source_id then
+		WwiseWorld.destroy_manual_source(self._wwise_world, source_id)
+
+		self._source_id = nil
 	end
 
 	self:_stop_idle_vfx_loop()
@@ -202,8 +214,10 @@ end
 function ShockMine:_start_arming()
 	self:_setup()
 
-	local playing_id = self:_start_looping_sound(self._source_id, RESOURCES.sfx.arming_loop.start)
-	self._arming_playing_id = playing_id
+	if not self._arming_playing_id then
+		local playing_id = self:_start_looping_sound(self._source_id, RESOURCES.sfx.arming_loop.start)
+		self._arming_playing_id = playing_id
+	end
 end
 
 function ShockMine:_deploy()
@@ -223,11 +237,12 @@ function ShockMine:_deploy()
 	self:_start_idle_vfx_loop()
 
 	self._is_deployed = true
+
+	Unit.animation_event(self._unit, "activate")
 end
 
 function ShockMine:_start_looping_sound(source_id, event_name)
-	local wwise_world = self._wwise_world
-	local playing_id = WwiseWorld.trigger_resource_event(wwise_world, event_name, source_id)
+	local playing_id = WwiseWorld.trigger_resource_event(self._wwise_world, event_name, source_id)
 
 	return playing_id
 end

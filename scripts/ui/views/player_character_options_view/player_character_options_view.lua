@@ -108,7 +108,7 @@ function PlayerCharacterOptionsView:_generate_player_icon()
 	local profile = player:profile()
 	local profile_archetype = profile.archetype
 	local archetype_name = profile_archetype.name
-	local breed_name = profile_archetype and profile_archetype.breed or profile.breed
+	local breed_name = profile_archetype.breed
 	local breed_settings = Breeds[breed_name]
 	local portrait_state_machine = breed_settings.portrait_state_machine
 	local animation_event_by_archetype = PlayerCharacterOptionsViewSettings.animation_event_by_archetype

@@ -1,7 +1,7 @@
 local Promise = require("scripts/foundation/utilities/promise")
 local BackendError = require("scripts/foundation/managers/backend/backend_error")
+local NetworkLookup = require("scripts/network_lookup/network_lookup")
 local HavocService = class("HavocService")
-HavocService.HAVOC_UNLOCK_STATUS = table.index_lookup_table("locked", "awaiting_maelstrom_completion", "unlocked")
 
 function HavocService:init(backend_interface)
 	self._backend_interface = backend_interface
@@ -51,6 +51,82 @@ function HavocService:available_orders()
 	end)
 end
 
+function HavocService:default_havoc_cadence_status()
+	return {
+		active = true,
+		current_cadence = {}
+	}
+end
+
+function HavocService:refresh_havoc_cadence_status()
+	return Managers.data_service.havoc:summary():next(function (results)
+		local havoc_cadence_status = results.cadence_status
+		self._havoc_cadence_status = havoc_cadence_status
+
+		return havoc_cadence_status
+	end):catch(function (err)
+		Log.exception("HavocService", err)
+		Managers.data_service.havoc:_set_fallback_havoc_cadence_status()
+
+		return self._havoc_cadence_status
+	end)
+end
+
+function HavocService:get_havoc_cadence_status()
+	if self._havoc_cadence_status == nil then
+		local err = "HavocService:get_havoc_cadence_status() called before HavocService:refresh_havoc_cadence_status was ever called"
+
+		Log.error("HavocService", err)
+		self:_set_fallback_havoc_cadence_status()
+	end
+
+	return self._havoc_cadence_status
+end
+
+function HavocService:_set_fallback_havoc_cadence_status()
+	self._havoc_cadence_status = Managers.data_service.havoc:default_havoc_cadence_status()
+
+	Log.info("Using fallback havoc_cadence_status")
+end
+
+function HavocService:refresh_ever_received_havoc_order()
+	return Managers.data_service.havoc:latest():next(function (results)
+		local ever_received_havoc_order = nil
+
+		if results ~= nil and not table.is_empty(results) and results.id ~= nil then
+			ever_received_havoc_order = true
+		else
+			ever_received_havoc_order = false
+		end
+
+		self._ever_received_havoc_order = ever_received_havoc_order
+
+		return ever_received_havoc_order
+	end):catch(function (err)
+		Log.exception("HavocService", err)
+		self:_set_fallback_ever_received_havoc_order()
+
+		return self._ever_received_havoc_order
+	end)
+end
+
+function HavocService:get_ever_received_havoc_order()
+	if self._ever_received_havoc_order == nil then
+		local err = "HavocService:get_ever_received_havoc_order() called before HavocService:refresh_get_ever_received_havoc_order() was ever called"
+
+		Log.error("HavocService", err)
+		self:_set_fallback_ever_received_havoc_order()
+	end
+
+	return self._ever_received_havoc_order
+end
+
+function HavocService:_set_fallback_ever_received_havoc_order()
+	self._ever_received_havoc_order = false
+
+	Log.info("Using fallback ever_received_havoc_order")
+end
+
 function HavocService:refresh_havoc_unlock_status()
 	return Managers.backend.interfaces.account:get_havoc_unlock_status():next(function (value)
 		if value == nil then
@@ -71,8 +147,8 @@ function HavocService:refresh_havoc_unlock_status()
 			return
 		end
 
-		if adjusted_value > #HavocService.HAVOC_UNLOCK_STATUS then
-			local err = string.format("Backend provided index for havoc_unlock_status that was out of bounds for HavocService.HAVOC_UNLOCK_STATUS: %i\n", value)
+		if adjusted_value > #NetworkLookup.havoc_unlock_status then
+			local err = string.format("Backend provided index for havoc_unlock_status that was out of bounds for NetworkLookup.havoc_unlock_status: %i\n", value)
 
 			Log.exception("HavocService", err)
 			self:_set_fallback_havoc_unlock_status()
@@ -80,10 +156,15 @@ function HavocService:refresh_havoc_unlock_status()
 			return
 		end
 
-		self._havoc_unlock_status = self.HAVOC_UNLOCK_STATUS[adjusted_value]
+		local havoc_unlock_status = NetworkLookup.havoc_unlock_status[adjusted_value]
+		self._havoc_unlock_status = havoc_unlock_status
+
+		return havoc_unlock_status
 	end):catch(function (err)
 		Log.exception("HavocService", err)
 		self:_set_fallback_havoc_unlock_status()
+
+		return self._havoc_unlock_status
 	end)
 end
 
@@ -98,14 +179,8 @@ function HavocService:get_havoc_unlock_status()
 	return self._havoc_unlock_status
 end
 
-function HavocService:refresh_and_get_havoc_unlock_status()
-	return self:refresh_havoc_unlock_status():next(function ()
-		return self:get_havoc_unlock_status()
-	end)
-end
-
 function HavocService:_set_fallback_havoc_unlock_status()
-	self._havoc_unlock_status = self.HAVOC_UNLOCK_STATUS[1]
+	self._havoc_unlock_status = NetworkLookup.havoc_unlock_status[1]
 
 	Log.info("Using fallback havoc_unlock_status.")
 end
@@ -113,8 +188,8 @@ end
 function HavocService:set_havoc_unlock_status(value)
 	local backend_value = nil
 
-	for i = 1, #HavocService.HAVOC_UNLOCK_STATUS do
-		if value == HavocService.HAVOC_UNLOCK_STATUS[i] then
+	for i = 1, #NetworkLookup.havoc_unlock_status do
+		if value == NetworkLookup.havoc_unlock_status[i] then
 			backend_value = i - 1
 
 			break

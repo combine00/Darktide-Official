@@ -35,8 +35,6 @@ function PlayerCharacterStateKnockedDown:init(character_state_init_context, ...)
 	PlayerCharacterStateKnockedDown.super.init(self, character_state_init_context, ...)
 
 	local unit_data_extension = self._unit_data_extension
-	local looping_sound_component_name = PlayerUnitData.looping_sound_component_name(LOOPING_SOUND_ALIAS)
-	self._looping_sound_component = unit_data_extension:read_component(looping_sound_component_name)
 	self._force_look_rotation_component = unit_data_extension:write_component("force_look_rotation")
 	self._knocked_down_state_input = unit_data_extension:write_component("knocked_down_state_input")
 	self._next_vo_trigger_time = 0
@@ -66,7 +64,6 @@ function PlayerCharacterStateKnockedDown:on_enter(unit, dt, t, previous_state, p
 	local animation_extension = self._animation_extension
 	local fx_extension = self._fx_extension
 	local health_extension = self._health_extension
-	local looping_sound_component = self._looping_sound_component
 	local inventory_component = self._inventory_component
 	local visual_loadout_extension = self._visual_loadout_extension
 
@@ -81,10 +78,6 @@ function PlayerCharacterStateKnockedDown:on_enter(unit, dt, t, previous_state, p
 	Luggable.drop_luggable(t, unit, inventory_component, visual_loadout_extension, true)
 	PlayerUnitVisualLoadout.wield_slot(INVENTORY_SLOT_TO_WIELD, unit, t)
 	animation_extension:anim_event(ANIM_EVENT_ON_ENTER)
-
-	if not looping_sound_component.is_playing then
-		fx_extension:trigger_looping_wwise_event(LOOPING_SOUND_ALIAS, SFX_SOURCE)
-	end
 
 	if is_server then
 		self:_handle_on_enter_buffs(t)
@@ -125,16 +118,11 @@ function PlayerCharacterStateKnockedDown:on_exit(unit, t, next_state)
 	local health_extension = self._health_extension
 	local inventory_component = self._inventory_component
 	local knocked_down_state_input = self._knocked_down_state_input
-	local looping_sound_component = self._looping_sound_component
 
 	self:_exit_third_person_mode(t)
 
 	if next_state ~= nil and next_state ~= "dead" and inventory_component.wielded_slot == "slot_unarmed" then
 		PlayerUnitVisualLoadout.wield_previous_slot(inventory_component, unit, t)
-	end
-
-	if looping_sound_component.is_playing then
-		fx_extension:stop_looping_wwise_event(LOOPING_SOUND_ALIAS)
 	end
 
 	knocked_down_state_input.knock_down = false
@@ -174,6 +162,7 @@ function PlayerCharacterStateKnockedDown:on_exit(unit, t, next_state)
 end
 
 function PlayerCharacterStateKnockedDown:fixed_update(unit, dt, t, next_state_params, fixed_frame)
+	self._fx_extension:run_looping_sound(LOOPING_SOUND_ALIAS, SFX_SOURCE, nil, fixed_frame)
 	self:_update_vo(t)
 
 	local assist = self._assist

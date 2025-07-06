@@ -248,6 +248,12 @@ function XboxLiveUtils.get_mute_list()
 	end):catch(_handle_error)
 end
 
+function XboxLiveUtils.get_my_activity()
+	slot1[MULTRES] = Managers.account:xuid()
+
+	XboxLiveUtils.get_activity({})
+end
+
 function XboxLiveUtils.get_activity(xuid_string_array)
 	XboxLiveUtils.user_id():next(function (user_id)
 		local async_block, error_code, error_message = XboxLiveMPA.get_activity(user_id, xuid_string_array)
@@ -283,29 +289,34 @@ function XboxLiveUtils.get_activity(xuid_string_array)
 end
 
 function XboxLiveUtils.set_activity(connection_string, party_id, num_other_members, join_restriction)
-	local num_members = num_other_members + 1
+	if not join_restriction then
+		join_restriction = XblMultiplayerActivityJoinRestriction.JOIN_RESTRICTION_PUBLIC
+	end
 
-	Log.info("XboxLive", "Setting activity... connection_string: %s, party_id %s, num_members %s", connection_string, party_id, num_members)
+	local num_members = num_other_members + 1
+	local max_num_members = 4
+
+	Log.info("XboxLive", "Requesting activity... connection_string: %s, party_id %s, num_members %s / %s, join_restriction %s", connection_string, party_id, num_members, max_num_members, join_restriction)
+
+	if max_num_members <= num_members then
+		XboxLiveUtils.delete_activity()
+
+		return
+	end
+
 	XboxLiveUtils.user_id():next(function (user_id)
 		local group_id = party_id
-
-		if not join_restriction then
-			local max_num_members = XblMultiplayerActivityJoinRestriction.JOIN_RESTRICTION_PUBLIC
-		end
-
-		join_restriction = max_num_members
-		local max_num_members = 4
 		local allow_cross_platform_join = true
 		local async_block, error_code, error_message = XboxLiveMPA.set_activity(user_id, connection_string, group_id, join_restriction, num_members, max_num_members, allow_cross_platform_join)
 
 		if error_code then
-			slot8.error_code = error_code
+			slot7.error_code = error_code
 
 			return Promise.rejected({
 				header = "XboxLiveMPA.set_activity"
 			})
 		elseif error_message then
-			slot8.message = error_message
+			slot7.message = error_message
 
 			return Promise.rejected({
 				header = "XboxLiveMPA.set_activity"

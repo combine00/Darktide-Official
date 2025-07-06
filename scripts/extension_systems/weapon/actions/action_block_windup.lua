@@ -19,8 +19,8 @@ function ActionBlockWindup:start(action_settings, t, time_scale, params)
 	end
 end
 
-function ActionBlockWindup:fixed_update(dt, t, time_in_action)
-	ActionBlockWindup.super.fixed_update(self, dt, t, time_in_action)
+function ActionBlockWindup:fixed_update(dt, t, time_in_action, frame)
+	ActionBlockWindup.super.fixed_update(self, dt, t, time_in_action, frame)
 
 	if self._proc_trigger_time and self._proc_trigger_time <= time_in_action then
 		local action_settings = self._action_settings

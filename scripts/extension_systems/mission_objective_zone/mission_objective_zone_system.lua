@@ -52,13 +52,7 @@ function MissionObjectiveZoneSystem:on_gameplay_post_init(level)
 		self:_select_units_for_event()
 	end
 
-	local unit_to_extension_map = self._unit_to_extension_map
-
-	for unit, extension in pairs(unit_to_extension_map) do
-		if extension.on_gameplay_post_init then
-			extension:on_gameplay_post_init(level)
-		end
-	end
+	self:call_gameplay_post_init_on_extensions(level)
 end
 
 function MissionObjectiveZoneSystem:hot_join_sync(sender, channel)

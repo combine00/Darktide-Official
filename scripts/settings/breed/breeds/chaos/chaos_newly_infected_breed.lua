@@ -21,33 +21,33 @@ local stagger_types = StaggerSettings.stagger_types
 local weakspot_types = WeakspotSettings.types
 local breed_name = "chaos_newly_infected"
 local breed_data = {
-	display_name = "loc_breed_display_name_chaos_newly_infected",
-	run_speed = 5.159999999999999,
+	detection_radius = 15,
+	walk_speed = 2.4,
 	use_bone_lod = true,
-	power_level_type = "horde_default_melee",
-	spawn_anim_state = "to_melee",
+	sub_faction_name = "chaos",
+	spawn_inventory_slot = "slot_melee_weapon",
 	fx_proximity_culling_weight = 1,
 	unit_template_name = "minion",
-	faction_name = "chaos",
-	detection_radius = 15,
-	sub_faction_name = "chaos",
-	broadphase_radius = 1,
-	state_machine = "content/characters/enemy/chaos_traitor_guard/third_person/animations/chaos_newly_infected",
-	stagger_resistance = 0.5,
-	walk_speed = 2.4,
-	use_avoidance = true,
-	base_height = 1.7,
-	line_of_sight_collision_filter = "filter_minion_line_of_sight_check",
-	player_locomotion_constrain_radius = 0.3,
-	use_wounds = true,
-	spawn_inventory_slot = "slot_melee_weapon",
-	activate_slot_system_on_spawn = true,
-	game_object_type = "minion_melee",
-	explosion_power_multiplier = 0.3,
 	slot_template = "chaos_poxwalker",
-	base_unit = "content/characters/enemy/chaos_traitor_guard/third_person/base",
+	broadphase_radius = 1,
+	stagger_resistance = 0.5,
+	use_avoidance = true,
+	game_object_type = "minion_melee",
 	challenge_rating = 0.4,
 	bone_lod_radius = 1,
+	use_wounds = true,
+	power_level_type = "horde_default_melee",
+	display_name = "loc_breed_display_name_chaos_newly_infected",
+	run_speed = 5.159999999999999,
+	spawn_anim_state = "to_melee",
+	faction_name = "chaos",
+	base_height = 1.7,
+	state_machine = "content/characters/enemy/chaos_traitor_guard/third_person/animations/chaos_newly_infected",
+	line_of_sight_collision_filter = "filter_minion_line_of_sight_check",
+	player_locomotion_constrain_radius = 0.3,
+	activate_slot_system_on_spawn = true,
+	explosion_power_multiplier = 0.3,
+	base_unit = "content/characters/enemy/chaos_traitor_guard/third_person/base",
 	has_direct_ragdoll_flow_event = true,
 	name = breed_name,
 	breed_type = breed_types.minion,
@@ -391,7 +391,18 @@ local breed_data = {
 		}
 	},
 	outline_config = {},
-	blackboard_component_config = BreedBlackboardComponentTemplates.melee_can_be_suppressed
+	blackboard_component_config = BreedBlackboardComponentTemplates.melee_can_be_suppressed,
+	tokens = {},
+	companion_pounce_setting = {
+		pounce_anim_event = "leap_attack",
+		companion_pounce_action = "human",
+		damage_profile = DamageProfileTemplates.adamant_companion_human_pounce,
+		initial_damage_profile = DamageProfileTemplates.adamant_companion_initial_pounce,
+		required_token = {
+			free_target_on_assigned_token = true,
+			name = "pounced"
+		}
+	}
 }
 
 return breed_data

@@ -2,6 +2,7 @@ local ButtonPassTemplates = require("scripts/ui/pass_templates/button_pass_templ
 local CircumstanceTemplates = require("scripts/settings/circumstance/circumstance_templates")
 local ColorUtilities = require("scripts/utilities/ui/colors")
 local Danger = require("scripts/utilities/danger")
+local DangerSettings = require("scripts/settings/difficulty/danger_settings")
 local TextUtilities = require("scripts/utilities/ui/text")
 local UIFonts = require("scripts/managers/ui/ui_fonts")
 local UIFontSettings = require("scripts/managers/ui/ui_font_settings")
@@ -350,7 +351,7 @@ local function generate_blueprints_func(grid_size)
 				}
 			},
 			visibility_function = function (content, style)
-				return not content.element.level_requirement_met
+				return content.element.block_reason ~= nil
 			end
 		},
 		{
@@ -370,7 +371,7 @@ local function generate_blueprints_func(grid_size)
 				}
 			},
 			visibility_function = function (content, style)
-				return not content.element.level_requirement_met
+				return content.element.block_reason ~= nil
 			end
 		},
 		{
@@ -403,7 +404,7 @@ local function generate_blueprints_func(grid_size)
 				}
 			},
 			visibility_function = function (content, style)
-				return not content.element.level_requirement_met
+				return content.element.block_reason ~= nil
 			end
 		},
 		{
@@ -433,7 +434,7 @@ local function generate_blueprints_func(grid_size)
 				}
 			},
 			visibility_function = function (content, style)
-				return not content.element.level_requirement_met
+				return content.element.block_reason ~= nil
 			end
 		},
 		{
@@ -458,7 +459,7 @@ local function generate_blueprints_func(grid_size)
 				}
 			},
 			visibility_function = function (content, style)
-				return content.hotspot.disabled and content.element.level_requirement_met
+				return content.hotspot.disabled and content.element.block_reason == nil
 			end
 		},
 		{
@@ -531,14 +532,8 @@ local function generate_blueprints_func(grid_size)
 			style.text.offset[1] = 20
 		end
 
-		if not element.level_requirement_met then
-			local required_level = element.required_level
-
-			if required_level then
-				content.required_level_text = Localize("loc_group_finder_tag_level_requirement", true, {
-					level = required_level
-				})
-			end
+		if element.block_reason then
+			content.required_level_text = element.block_reason
 		end
 	end
 
@@ -807,7 +802,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return not content.element.level_requirement_met
+						return content.element.block_reason ~= nil
 					end
 				},
 				{
@@ -827,7 +822,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return not content.element.level_requirement_met
+						return content.element.block_reason ~= nil
 					end
 				},
 				{
@@ -860,7 +855,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return not content.element.level_requirement_met
+						return content.element.block_reason ~= nil
 					end
 				},
 				{
@@ -890,7 +885,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return not content.element.level_requirement_met
+						return content.element.block_reason ~= nil
 					end
 				},
 				{
@@ -915,7 +910,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return content.hotspot.disabled and content.element.level_requirement_met
+						return content.hotspot.disabled and content.element.block_reason == nil
 					end
 				},
 				{
@@ -1094,14 +1089,8 @@ local function generate_blueprints_func(grid_size)
 					style.text.offset[1] = 20
 				end
 
-				if not element.level_requirement_met then
-					local required_level = element.required_level
-
-					if required_level then
-						content.required_level_text = Localize("loc_group_finder_tag_level_requirement", true, {
-							level = required_level
-						})
-					end
+				if element.block_reason ~= nil then
+					content.required_level_text = element.block_reason
 				end
 
 				if not element.active_havoc_order and element.tag and element.tag.name == "my_havoc_order" then
@@ -1372,7 +1361,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return not content.element.level_requirement_met
+						return content.element.block_reason ~= nil
 					end
 				},
 				{
@@ -1392,7 +1381,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return not content.element.level_requirement_met
+						return content.element.block_reason ~= nil
 					end
 				},
 				{
@@ -1425,7 +1414,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return not content.element.level_requirement_met
+						return content.element.block_reason ~= nil
 					end
 				},
 				{
@@ -1455,7 +1444,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return not content.element.level_requirement_met
+						return content.element.block_reason ~= nil
 					end
 				},
 				{
@@ -1480,7 +1469,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return content.hotspot.disabled and content.element.level_requirement_met
+						return content.hotspot.disabled and content.element.block_reason == nil
 					end
 				},
 				{
@@ -1591,14 +1580,8 @@ local function generate_blueprints_func(grid_size)
 				content.text = element.text or "n/a"
 				content.hotspot.pressed_callback = element.pressed_callback
 
-				if not element.level_requirement_met then
-					local required_level = element.required_level
-
-					if required_level then
-						content.required_level_text = Localize("loc_group_finder_tag_level_requirement", true, {
-							level = required_level
-						})
-					end
+				if element.block_reason then
+					content.required_level_text = element.block_reason
 				end
 
 				if element.is_preview then
@@ -1881,7 +1864,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return not content.element.level_requirement_met
+						return content.element.block_reason ~= nil
 					end
 				},
 				{
@@ -1901,7 +1884,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return not content.element.level_requirement_met
+						return content.element.block_reason ~= nil
 					end
 				},
 				{
@@ -1934,7 +1917,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return not content.element.level_requirement_met
+						return content.element.block_reason ~= nil
 					end
 				},
 				{
@@ -1964,7 +1947,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return not content.element.level_requirement_met
+						return content.element.block_reason ~= nil
 					end
 				},
 				{
@@ -1989,7 +1972,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return content.hotspot.disabled and content.element.level_requirement_met
+						return content.hotspot.disabled and content.element.block_reason == nil
 					end
 				},
 				{
@@ -2101,14 +2084,8 @@ local function generate_blueprints_func(grid_size)
 				content.text = element.text or "n/a"
 				content.hotspot.pressed_callback = element.pressed_callback
 
-				if not element.level_requirement_met then
-					local required_level = element.required_level
-
-					if required_level then
-						content.required_level_text = Localize("loc_group_finder_tag_level_requirement", true, {
-							level = required_level
-						})
-					end
+				if element.block_reason then
+					content.required_level_text = element.block_reason
 				end
 
 				if element.is_preview then
@@ -2354,54 +2331,25 @@ local function generate_blueprints_func(grid_size)
 					end
 				},
 				{
-					style_id = "difficulty_text",
-					value_id = "difficulty_text",
-					pass_type = "text",
-					value = "",
+					value_id = "difficulty_icon",
+					style_id = "difficulty_icon",
+					pass_type = "texture",
+					value = "content/ui/materials/icons/difficulty/difficulty_skull_uprising",
 					style = {
-						font_type = "proxima_nova_bold",
-						font_size = 32,
-						text_vertical_alignment = "center",
-						text_horizontal_alignment = "left",
-						text_color = Color.black(255, true),
+						vertical_alignment = "center",
+						horizontal_alignment = "right",
+						visible = false,
+						color = Color.terminal_text_header(255, true),
 						offset = {
-							405,
-							0,
-							3
-						},
-						size_addition = {
-							0,
-							0
-						}
-					},
-					visibility_function = function (content)
-						return content.slot_filled
-					end
-				},
-				{
-					style_id = "difficulty_text_overlay",
-					value_id = "difficulty_text_overlay",
-					pass_type = "text",
-					value = "",
-					style = {
-						font_type = "proxima_nova_bold",
-						font_size = 32,
-						text_vertical_alignment = "center",
-						text_horizontal_alignment = "left",
-						text_color = Color.terminal_text_key_value(255, true),
-						offset = {
-							405,
+							-27,
 							0,
 							4
 						},
-						size_addition = {
-							0,
-							0
+						size = {
+							48,
+							48
 						}
-					},
-					visibility_function = function (content)
-						return content.slot_filled
-					end
+					}
 				},
 				{
 					value = "content/ui/materials/gradients/gradient_texture_diagonal",
@@ -2446,6 +2394,7 @@ local function generate_blueprints_func(grid_size)
 
 					if selected_tags and #selected_tags > 0 then
 						local sub_header_text = nil
+						local sub_header_color = Color.terminal_text_key_value(200, true)
 
 						if #selected_tags > 1 then
 							sub_header_text = Localize("loc_group_finder_slot_tag_multiple_selected_tags_text", true, {
@@ -2455,18 +2404,17 @@ local function generate_blueprints_func(grid_size)
 							local first_selected_tag = selected_tags[1]
 							sub_header_text = first_selected_tag and first_selected_tag.text or "-"
 							local difficulty_name = first_selected_tag.difficulty
-							local difficulty_board = first_selected_tag.difficulty_board
 							local difficulty_index = Danger.index_by_name(difficulty_name)
+							local danger_settings = DangerSettings[difficulty_index]
 
-							if difficulty_index then
-								content.difficulty_text = Danger.text_bars(difficulty_index)
-								local is_auric_board = difficulty_board and difficulty_board == "auric"
-								content.difficulty_text_overlay = is_auric_board and "" or content.difficulty_text_overlay
+							if danger_settings then
+								style.difficulty_icon.visible = true
+								content.difficulty_icon = danger_settings.icon
 							end
 						end
 
 						content.slot_filled = true
-						content.sub_header_filled = TextUtilities.apply_color_to_text(sub_header_text, Color.terminal_text_key_value(200, true))
+						content.sub_header_filled = TextUtilities.apply_color_to_text(sub_header_text, sub_header_color)
 					end
 				end
 			end
@@ -2561,7 +2509,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return not content.element.level_requirement_met
+						return content.element.block_reason ~= nil
 					end
 				},
 				{
@@ -2581,7 +2529,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return not content.element.level_requirement_met
+						return content.element.block_reason ~= nil
 					end
 				},
 				{
@@ -2614,7 +2562,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return not content.element.level_requirement_met
+						return content.element.block_reason ~= nil
 					end
 				},
 				{
@@ -2644,7 +2592,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return not content.element.level_requirement_met
+						return content.element.block_reason ~= nil
 					end
 				},
 				{
@@ -2669,7 +2617,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return content.hotspot.disabled and content.element.level_requirement_met
+						return content.hotspot.disabled and content.element.block_reason == nil
 					end
 				},
 				{
@@ -2810,14 +2758,8 @@ local function generate_blueprints_func(grid_size)
 				content.text = element.text or "n/a"
 				content.hotspot.pressed_callback = element.pressed_callback
 
-				if not element.level_requirement_met then
-					local required_level = element.required_level
-
-					if required_level then
-						content.required_level_text = Localize("loc_group_finder_tag_level_requirement", true, {
-							level = required_level
-						})
-					end
+				if element.block_reason then
+					content.required_level_text = element.block_reason
 				end
 			end
 		},
@@ -3080,7 +3022,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return not content.element.level_requirement_met
+						return content.element.block_reason ~= nil
 					end
 				},
 				{
@@ -3100,7 +3042,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return not content.element.level_requirement_met
+						return content.element.block_reason ~= nil
 					end
 				},
 				{
@@ -3133,7 +3075,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return not content.element.level_requirement_met
+						return content.element.block_reason ~= nil
 					end
 				},
 				{
@@ -3163,7 +3105,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return not content.element.level_requirement_met
+						return content.element.block_reason ~= nil
 					end
 				},
 				{
@@ -3188,7 +3130,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return content.hotspot.disabled and content.element.level_requirement_met
+						return content.hotspot.disabled and content.element.block_reason == nil
 					end
 				},
 				{
@@ -3248,53 +3190,26 @@ local function generate_blueprints_func(grid_size)
 					end
 				},
 				{
-					style_id = "difficulty_text",
-					value_id = "difficulty_text",
-					pass_type = "text",
-					value = "",
+					value_id = "difficulty_icon",
+					style_id = "difficulty_icon",
+					pass_type = "texture",
+					value = "content/ui/materials/icons/difficulty/difficulty_skull_uprising",
 					style = {
-						font_type = "proxima_nova_bold",
-						font_size = 32,
-						text_vertical_alignment = "center",
-						text_horizontal_alignment = "left",
-						text_color = Color.black(255, true),
+						vertical_alignment = "center",
+						horizontal_alignment = "right",
+						color = Color.terminal_text_header(255, true),
 						offset = {
-							405,
-							0,
-							3
-						},
-						size_addition = {
-							0,
-							0
-						}
-					},
-					visibility_function = function (content, style)
-						return content.element.level_requirement_met
-					end
-				},
-				{
-					style_id = "difficulty_text_overlay",
-					value_id = "difficulty_text_overlay",
-					pass_type = "text",
-					value = "",
-					style = {
-						font_type = "proxima_nova_bold",
-						font_size = 32,
-						text_vertical_alignment = "center",
-						text_horizontal_alignment = "left",
-						text_color = Color.terminal_text_key_value(255, true),
-						offset = {
-							405,
+							-27,
 							0,
 							4
 						},
-						size_addition = {
-							0,
-							0
+						size = {
+							48,
+							48
 						}
 					},
 					visibility_function = function (content, style)
-						return content.element.level_requirement_met
+						return content.element.block_reason == nil
 					end
 				}
 			},
@@ -3305,14 +3220,8 @@ local function generate_blueprints_func(grid_size)
 				content.text = element.text or "n/a"
 				content.hotspot.pressed_callback = element.pressed_callback
 
-				if not element.level_requirement_met then
-					local required_level = element.required_level
-
-					if required_level then
-						content.required_level_text = Localize("loc_group_finder_tag_level_requirement", true, {
-							level = required_level
-						})
-					end
+				if element.block_reason then
+					content.required_level_text = element.block_reason
 				end
 
 				if element.is_preview then
@@ -3322,13 +3231,11 @@ local function generate_blueprints_func(grid_size)
 
 				local tag = element.tag
 				local difficulty_name = tag.difficulty
-				local difficulty_board = tag.difficulty_board
 				local difficulty_index = Danger.index_by_name(difficulty_name)
+				local danger_settings = DangerSettings[difficulty_index]
 
-				if difficulty_index then
-					content.difficulty_text = Danger.text_bars(difficulty_index)
-					local is_auric_board = difficulty_board and difficulty_board == "auric"
-					content.difficulty_text_overlay = is_auric_board and "" or content.difficulty_text_overlay
+				if danger_settings then
+					content.difficulty_icon = danger_settings.icon
 				end
 			end
 		},
@@ -3626,46 +3533,23 @@ local function generate_blueprints_func(grid_size)
 					}
 				},
 				{
-					style_id = "difficulty_text",
-					value_id = "difficulty_text",
-					pass_type = "text",
-					value = "",
+					value_id = "difficulty_icon",
+					style_id = "difficulty_icon",
+					pass_type = "texture",
+					value = "content/ui/materials/icons/difficulty/difficulty_skull_uprising",
 					style = {
-						font_type = "proxima_nova_bold",
-						font_size = 32,
-						text_vertical_alignment = "bottom",
-						text_horizontal_alignment = "left",
-						text_color = Color.terminal_frame(255, true),
+						vertical_alignment = "bottom",
+						horizontal_alignment = "right",
+						visible = false,
+						color = Color.terminal_text_header(255, true),
 						offset = {
-							350,
-							-5,
-							4
-						},
-						size_addition = {
-							0,
-							0
-						}
-					}
-				},
-				{
-					style_id = "difficulty_text_overlay",
-					value_id = "difficulty_text_overlay",
-					pass_type = "text",
-					value = "",
-					style = {
-						font_type = "proxima_nova_bold",
-						font_size = 32,
-						text_vertical_alignment = "bottom",
-						text_horizontal_alignment = "left",
-						text_color = Color.terminal_text_key_value(255, true),
-						offset = {
-							350,
-							-5,
+							-10,
+							-10,
 							5
 						},
-						size_addition = {
-							0,
-							0
+						size = {
+							32,
+							32
 						}
 					}
 				},
@@ -3687,7 +3571,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return content.difficulty_text ~= ""
+						return style.difficulty_icon and style.difficulty_icon.visible
 					end
 				},
 				{
@@ -4110,7 +3994,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return not content.element.level_requirement_met
+						return content.element.block_reason ~= nil
 					end
 				},
 				{
@@ -4130,7 +4014,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return not content.element.level_requirement_met
+						return content.element.block_reason ~= nil
 					end
 				},
 				{
@@ -4161,7 +4045,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return not content.element.level_requirement_met
+						return content.element.block_reason ~= nil
 					end
 				},
 				{
@@ -4194,7 +4078,7 @@ local function generate_blueprints_func(grid_size)
 						}
 					},
 					visibility_function = function (content, style)
-						return not content.element.level_requirement_met
+						return content.element.block_reason ~= nil
 					end
 				},
 				{
@@ -4269,36 +4153,20 @@ local function generate_blueprints_func(grid_size)
 				content.hotspot.pressed_callback = element.pressed_callback
 				content.hotspot.disabled = element.disabled
 
-				if not element.level_requirement_met then
-					local required_level = element.required_level
-
-					if required_level then
-						content.required_level_text = Localize("loc_group_finder_tag_level_requirement", true, {
-							level = required_level
-						})
-					end
+				if element.block_reason then
+					content.required_level_text = element.block_reason
 				end
 
 				local tags = element.tags
 
 				if tags then
 					local background_texture = "content/ui/textures/backgrounds/group_finder/group_finder_generic_bg"
-					local difficulty_name, difficulty_text, difficulty_board = nil
+					local difficulty_name = nil
 
 					for i = 1, #tags do
 						local tag = tags[i]
-
-						if tag.background_texture then
-							background_texture = tag.background_texture
-						end
-
-						if tag.difficulty then
-							difficulty_name = tag.difficulty
-						end
-
-						if tag.difficulty_board then
-							difficulty_board = tag.difficulty_board
-						end
+						background_texture = tag.background_texture or background_texture
+						difficulty_name = tag.difficulty or difficulty_name
 					end
 
 					if background_texture then
@@ -4307,15 +4175,11 @@ local function generate_blueprints_func(grid_size)
 					end
 
 					local difficulty_index = Danger.index_by_name(difficulty_name)
+					local danger_settings = DangerSettings[difficulty_index]
 
-					if difficulty_index then
-						difficulty_text = Danger.text_bars(difficulty_index)
-					end
-
-					content.difficulty_text = difficulty_text or ""
-
-					if difficulty_board and difficulty_board == "auric" then
-						content.difficulty_text_overlay = ""
+					if danger_settings then
+						style.difficulty_icon.visible = true
+						content.difficulty_icon = danger_settings.icon
 					end
 
 					local metadata = element.metadata

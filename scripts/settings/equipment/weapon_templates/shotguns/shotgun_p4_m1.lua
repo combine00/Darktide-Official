@@ -36,7 +36,7 @@ local movement_curve_modifier_trait_templates = WeaponTraitTemplates[template_ty
 local weapon_template = {
 	action_inputs = {
 		shoot_pressed = {
-			buffer_time = 0.5,
+			buffer_time = 0.4,
 			max_queue = 2,
 			input_sequence = {
 				{
@@ -46,7 +46,7 @@ local weapon_template = {
 			}
 		},
 		zoom_shoot = {
-			buffer_time = 0.26,
+			buffer_time = 0.4,
 			max_queue = 2,
 			input_sequence = {
 				{
@@ -98,7 +98,7 @@ local weapon_template = {
 			}
 		},
 		wield = {
-			buffer_time = 0,
+			buffer_time = 0.5,
 			clear_input_queue = true,
 			input_sequence = {
 				{
@@ -204,12 +204,13 @@ weapon_template.actions = {
 		allowed_chain_actions = {}
 	},
 	action_wield = {
-		wield_reload_anim_event = "equip_reload",
-		allowed_during_sprint = true,
-		wield_anim_event = "equip_fast",
 		uninterruptible = true,
 		kind = "ranged_wield",
-		total_time = 1,
+		wield_anim_event = "equip_fast",
+		wield_reload_anim_event = "equip_reload",
+		weapon_handling_template = "time_scale_0_5",
+		allowed_during_sprint = true,
+		total_time = 0.6,
 		conditional_state_to_action_input = {
 			no_ammo = {
 				input_name = "reload"
@@ -225,26 +226,26 @@ weapon_template.actions = {
 			},
 			reload = {
 				action_name = "action_start_reload",
-				chain_time = 0.35
+				chain_time = 0.25
 			},
 			special_action = {
 				action_name = "action_weapon_special",
-				chain_time = 0.35
+				chain_time = 0.25
 			},
 			zoom = {
 				action_name = "action_zoom",
-				chain_time = 0.3
+				chain_time = 0.2
 			},
 			shoot_pressed = {
 				action_name = "action_shoot_hip",
-				chain_time = 0.35
+				chain_time = 0.25
 			}
 		}
 	},
 	action_shoot_hip = {
 		sprint_requires_press_to_interrupt = true,
-		kind = "shoot_pellets",
 		start_input = "shoot_pressed",
+		kind = "shoot_pellets",
 		weapon_handling_template = "immediate_single_shot",
 		sprint_ready_up_time = 0.3,
 		allowed_during_sprint = false,
@@ -255,42 +256,45 @@ weapon_template.actions = {
 		total_time = 1.2,
 		action_movement_curve = {
 			{
-				modifier = 0.8,
+				modifier = 0.7,
 				t = 0.05
 			},
 			{
-				modifier = 0.85,
+				modifier = 0.75,
 				t = 0.15
 			},
 			{
-				modifier = 0.875,
+				modifier = 0.775,
 				t = 0.175
 			},
 			{
-				modifier = 1.1,
+				modifier = 0.8,
 				t = 0.3
 			},
 			{
 				modifier = 1,
 				t = 0.5
 			},
-			start_modifier = 0.5
+			start_modifier = 0.7
 		},
 		fx = {
-			shoot_sfx_special_extra_alias = "ranged_single_shot_special_extra",
+			muzzle_flash_effect = "content/fx/particles/weapons/rifles/shotgun/shotgun_rifle_muzzle",
 			crit_shoot_sfx_alias = "critical_shot_extra",
 			shoot_tail_sfx_alias = "ranged_shot_tail",
 			shoot_sfx_alias = "ranged_single_shot",
-			muzzle_flash_effect = "content/fx/particles/weapons/rifles/shotgun/shotgun_rifle_muzzle",
+			shoot_sfx_special_extra_alias = "ranged_single_shot_special_extra",
+			shell_casing_effect = "content/fx/particles/weapons/shells/shell_casing_shotgun_01",
+			weapon_special_muzzle_flash_effect = "content/fx/particles/weapons/rifles/shotgun/shotgun_p4/shotgun_p4_weapon_special_muzzle",
 			out_of_ammo_sfx_alias = "ranged_out_of_ammo",
 			no_ammo_shoot_sfx_alias = "ranged_no_ammo",
-			shell_casing_effect = "content/fx/particles/weapons/shells/shell_casing_shotgun_01"
+			line_effect = LineEffects.pellet_trail,
+			weapon_special_line_effect = LineEffects.pellet_trail_shock
 		},
 		fire_configuration = {
 			anim_event = "attack_shoot_semi",
 			same_side_suppression_enabled = false,
 			shotshell = ShotshellTemplates.shotgun_p4_m1_hip,
-			shotshell_special = ShotshellTemplates.shotgun_p4_m1_ads_special,
+			shotshell_special = ShotshellTemplates.shotgun_p4_m1_hip_special,
 			damage_type = damage_types.pellet
 		},
 		conditional_state_to_action_input = {
@@ -298,13 +302,39 @@ weapon_template.actions = {
 				input_name = "reload"
 			}
 		},
+		action_condition_func = function (action_settings, condition_func_params, used_input, t)
+			if not condition_func_params then
+				return true
+			end
+
+			local weapon_extension = condition_func_params.weapon_extension
+			local last_shoot_action_t = weapon_extension.last_shoot_action_t
+			local next_allowed_shoot_action_t = last_shoot_action_t + 0.85
+
+			if t >= next_allowed_shoot_action_t then
+				return true
+			end
+
+			return false
+		end,
+		action_finish_func = function (reason, data, condition_func_params, t)
+			if not condition_func_params then
+				return
+			end
+
+			local weapon_extension = condition_func_params.weapon_extension
+			local weapon_action_component = condition_func_params.weapon_action_component
+			local start_t = weapon_action_component.start_t
+			weapon_extension.last_shoot_action_t = start_t
+		end,
 		allowed_chain_actions = {
 			combat_ability = {
 				action_name = "combat_ability"
 			},
 			grenade_ability = BaseTemplateSettings.generate_grenade_ability_chain_actions(),
 			wield = {
-				action_name = "action_unwield"
+				action_name = "action_unwield",
+				chain_time = 0
 			},
 			reload = {
 				action_name = "action_start_reload",
@@ -316,10 +346,10 @@ weapon_template.actions = {
 			},
 			shoot_pressed = {
 				action_name = "action_shoot_hip",
-				chain_time = 0.95
+				chain_time = 0.85
 			},
 			zoom = {
-				action_name = "action_zoom",
+				action_name = "action_zoom_from_shoot",
 				chain_time = 0.55
 			}
 		},
@@ -356,22 +386,25 @@ weapon_template.actions = {
 				modifier = 1,
 				t = 0.5
 			},
-			start_modifier = 0.3
+			start_modifier = 0.7
 		},
 		fx = {
-			shoot_sfx_special_extra_alias = "ranged_single_shot_special_extra",
-			crit_shoot_sfx_alias = "critical_shot_extra",
-			shoot_tail_sfx_alias = "ranged_shot_tail",
-			shoot_sfx_alias = "ranged_single_shot",
 			muzzle_flash_effect = "content/fx/particles/weapons/rifles/shotgun/shotgun_rifle_muzzle",
 			shell_casing_effect = "content/fx/particles/weapons/shells/shell_casing_shotgun_01",
-			no_ammo_shoot_sfx_alias = "ranged_no_ammo"
+			shoot_tail_sfx_alias = "ranged_shot_tail",
+			shoot_sfx_alias = "ranged_single_shot",
+			crit_shoot_sfx_alias = "critical_shot_extra",
+			shoot_sfx_special_extra_alias = "ranged_single_shot_special_extra",
+			weapon_special_muzzle_flash_effect = "content/fx/particles/weapons/rifles/shotgun/shotgun_p4/shotgun_p4_weapon_special_muzzle",
+			no_ammo_shoot_sfx_alias = "ranged_no_ammo",
+			line_effect = LineEffects.pellet_trail,
+			weapon_special_line_effect = LineEffects.pellet_trail_shock
 		},
 		fire_configuration = {
 			anim_event = "attack_shoot_semi",
 			same_side_suppression_enabled = false,
 			shotshell = ShotshellTemplates.shotgun_p4_m1_hip,
-			shotshell_special = ShotshellTemplates.shotgun_p4_m1_ads_special,
+			shotshell_special = ShotshellTemplates.shotgun_p4_m1_hip_special,
 			damage_type = damage_types.pellet
 		},
 		conditional_state_to_action_input = {
@@ -400,7 +433,7 @@ weapon_template.actions = {
 				chain_time = 0.95
 			},
 			zoom = {
-				action_name = "action_zoom",
+				action_name = "action_zoom_from_shoot",
 				chain_time = 0.6
 			}
 		},
@@ -410,33 +443,43 @@ weapon_template.actions = {
 
 			return current_clip_amount > 0
 		end,
+		action_finish_func = function (reason, data, condition_func_params, t)
+			if not condition_func_params then
+				return
+			end
+
+			local weapon_extension = condition_func_params.weapon_extension
+			local weapon_action_component = condition_func_params.weapon_action_component
+			local start_t = weapon_action_component.start_t
+			weapon_extension.last_shoot_action_t = start_t
+		end,
 		time_scale_stat_buffs = {
 			buff_stat_buffs.attack_speed,
 			buff_stat_buffs.ranged_attack_speed
 		}
 	},
 	action_shoot_zoomed = {
-		start_input = "zoom_shoot",
+		ammunition_usage = 1,
 		kind = "shoot_pellets",
 		spread_template = "default_spread_shotgun_p4_ads",
-		ammunition_usage = 1,
 		weapon_handling_template = "immediate_single_shot",
 		uninterruptible = true,
+		start_input = "zoom_shoot",
 		total_time = 1.2,
 		crosshair = {
 			crosshair_type = "shotgun_wide"
 		},
 		action_movement_curve = {
 			{
-				modifier = 0.5,
+				modifier = 0.6,
 				t = 0.05
 			},
 			{
-				modifier = 0.55,
+				modifier = 0.65,
 				t = 0.15
 			},
 			{
-				modifier = 0.575,
+				modifier = 0.675,
 				t = 0.175
 			},
 			{
@@ -444,19 +487,22 @@ weapon_template.actions = {
 				t = 0.3
 			},
 			{
-				modifier = 0.8,
+				modifier = 1,
 				t = 0.5
 			},
-			start_modifier = 0.4
+			start_modifier = 0.7
 		},
 		fx = {
-			shoot_sfx_special_extra_alias = "ranged_single_shot_special_extra",
-			crit_shoot_sfx_alias = "critical_shot_extra",
-			shoot_tail_sfx_alias = "ranged_shot_tail",
-			shoot_sfx_alias = "ranged_single_shot",
 			muzzle_flash_effect = "content/fx/particles/weapons/rifles/shotgun/shotgun_rifle_muzzle",
 			shell_casing_effect = "content/fx/particles/weapons/shells/shell_casing_shotgun_01",
-			no_ammo_shoot_sfx_alias = "ranged_no_ammo"
+			shoot_tail_sfx_alias = "ranged_shot_tail",
+			shoot_sfx_alias = "ranged_single_shot",
+			crit_shoot_sfx_alias = "critical_shot_extra",
+			shoot_sfx_special_extra_alias = "ranged_single_shot_special_extra",
+			weapon_special_muzzle_flash_effect = "content/fx/particles/weapons/rifles/shotgun/shotgun_p4/shotgun_p4_weapon_special_muzzle",
+			no_ammo_shoot_sfx_alias = "ranged_no_ammo",
+			line_effect = LineEffects.pellet_trail,
+			weapon_special_line_effect = LineEffects.pellet_trail_shock
 		},
 		fire_configuration = {
 			anim_event = "attack_shoot_semi",
@@ -470,6 +516,31 @@ weapon_template.actions = {
 				input_name = "reload"
 			}
 		},
+		action_condition_func = function (action_settings, condition_func_params, used_input, t)
+			if not condition_func_params then
+				return true
+			end
+
+			local weapon_extension = condition_func_params.weapon_extension
+			local last_shoot_action_t = weapon_extension.last_shoot_action_t
+			local next_allowed_shoot_action_t = last_shoot_action_t + 0.85
+
+			if t >= next_allowed_shoot_action_t then
+				return true
+			end
+
+			return false
+		end,
+		action_finish_func = function (reason, data, condition_func_params, t)
+			if not condition_func_params then
+				return
+			end
+
+			local weapon_extension = condition_func_params.weapon_extension
+			local weapon_action_component = condition_func_params.weapon_action_component
+			local start_t = weapon_action_component.start_t
+			weapon_extension.last_shoot_action_t = start_t
+		end,
 		allowed_chain_actions = {
 			combat_ability = {
 				action_name = "combat_ability"
@@ -480,11 +551,11 @@ weapon_template.actions = {
 			},
 			zoom_shoot = {
 				action_name = "action_shoot_zoomed",
-				chain_time = 0.95
+				chain_time = 0.85
 			},
 			zoom_release = {
-				action_name = "action_unzoom",
-				chain_time = 0.3
+				action_name = "action_unzoom_from_shoot",
+				chain_time = 0.55
 			},
 			reload = {
 				action_name = "action_start_reload",
@@ -503,7 +574,7 @@ weapon_template.actions = {
 	action_zoom = {
 		start_input = "zoom",
 		kind = "aim",
-		total_time = 0.4,
+		total_time = 0.25,
 		crosshair = {
 			crosshair_type = "shotgun_wide"
 		},
@@ -525,10 +596,36 @@ weapon_template.actions = {
 		},
 		smart_targeting_template = SmartTargetingTemplates.alternate_fire_assault
 	},
+	action_zoom_from_shoot = {
+		start_input = "nil",
+		kind = "aim",
+		action_priority = 1,
+		total_time = 0.46,
+		crosshair = {
+			crosshair_type = "shotgun_wide"
+		},
+		allowed_chain_actions = {
+			combat_ability = {
+				action_name = "combat_ability"
+			},
+			grenade_ability = BaseTemplateSettings.generate_grenade_ability_chain_actions(),
+			wield = {
+				action_name = "action_unwield"
+			},
+			zoom_shoot = {
+				action_name = "action_shoot_zoomed",
+				chain_time = 0.3
+			},
+			reload = {
+				action_name = "action_start_reload"
+			}
+		},
+		smart_targeting_template = SmartTargetingTemplates.alternate_fire_assault
+	},
 	action_unzoom = {
 		start_input = "zoom_release",
 		kind = "unaim",
-		total_time = 0.6,
+		total_time = 0.1,
 		crosshair = {
 			crosshair_type = "shotgun_wide"
 		},
@@ -546,6 +643,35 @@ weapon_template.actions = {
 			shoot_pressed = {
 				action_name = "action_shoot_hip",
 				chain_time = 0.65
+			},
+			zoom = {
+				action_name = "action_zoom",
+				chain_time = 0.2
+			}
+		}
+	},
+	action_unzoom_from_shoot = {
+		start_input = "nil",
+		kind = "unaim",
+		action_priority = 2,
+		total_time = 0.5,
+		crosshair = {
+			crosshair_type = "shotgun_wide"
+		},
+		allowed_chain_actions = {
+			combat_ability = {
+				action_name = "combat_ability"
+			},
+			grenade_ability = BaseTemplateSettings.generate_grenade_ability_chain_actions(),
+			wield = {
+				action_name = "action_unwield"
+			},
+			reload = {
+				action_name = "action_start_reload"
+			},
+			shoot_pressed = {
+				action_name = "action_shoot_hip",
+				chain_time = 0.3
 			},
 			zoom = {
 				action_name = "action_zoom",
@@ -652,7 +778,6 @@ weapon_template.actions = {
 			buff_stat_buffs.reload_speed
 		},
 		reload_settings = {
-			cost = 1,
 			refill_at_time = 0.79,
 			refill_amount = 1
 		},
@@ -708,11 +833,11 @@ weapon_template.actions = {
 	action_reload_loop = {
 		kind = "reload_shotgun",
 		anim_end_event = "reload_end",
-		weapon_handling_template = "time_scale_1_1",
+		weapon_handling_template = "time_scale_1",
 		sprint_requires_press_to_interrupt = true,
 		allowed_during_sprint = true,
 		anim_event = "reload_middle",
-		total_time = 0.45,
+		total_time = 0.55,
 		crosshair = {
 			crosshair_type = "none"
 		},
@@ -813,7 +938,7 @@ weapon_template.anim_state_machine_3p = "content/characters/player/human/third_p
 weapon_template.anim_state_machine_1p = "content/characters/player/human/first_person/animations/shotgun_assault"
 weapon_template.spread_template = "default_spread_shotgun_p4_hip"
 weapon_template.recoil_template = "shotgun_p4_m1_hip"
-weapon_template.special_recoil_template = "shotgun_special_recoil"
+weapon_template.special_recoil_template = "special_recoil_shotgun_p4"
 weapon_template.conditional_state_to_action_input = {
 	{
 		conditional_state = "no_ammo_with_delay",
@@ -829,11 +954,19 @@ weapon_template.hud_configuration = {
 weapon_template.weapon_special_class = "WeaponSpecialFakeSeparateAmmoPool"
 weapon_template.weapon_special_tweak_data = {
 	keep_active_until_shot_complete = true,
+	keep_active_on_unwield = true,
 	max_num_charges = 6,
+	keep_active_on_sprint = true,
+	keep_active_on_vault = true,
+	keep_active_on_stun = true,
 	set_inactive_func = function (inventory_slot_component, reason, tweak_data)
-		inventory_slot_component.special_active = false
+		local keep_special_active = reason == "started_sprint" or reason == "ledge_vaulting" or reason == "stunned" or reason == "unwield"
 
-		return true
+		if not keep_special_active then
+			inventory_slot_component.special_active = false
+		end
+
+		return not keep_special_active
 	end
 }
 weapon_template.special_rules = {
@@ -851,9 +984,9 @@ weapon_template.crosshair = {
 weapon_template.alternate_fire_settings = {
 	peeking_mechanics = true,
 	sway_template = "default_shotgun_killshot",
-	recoil_template = "default_shotgun_killshot",
+	recoil_template = "shotgun_p4_m1_ads",
 	stop_anim_event = "to_unaim_ironsight",
-	special_recoil_template = "shotgun_special_recoil",
+	special_recoil_template = "special_recoil_shotgun_p4",
 	spread_template = "default_spread_shotgun_p4_ads",
 	start_anim_event = "to_ironsight",
 	look_delta_template = "lasgun_holo_aiming",
@@ -867,32 +1000,20 @@ weapon_template.alternate_fire_settings = {
 	},
 	movement_speed_modifier = {
 		{
-			modifier = 0.475,
-			t = 0.45
-		},
-		{
-			modifier = 0.45,
-			t = 0.47500000000000003
-		},
-		{
-			modifier = 0.39,
-			t = 0.65
-		},
-		{
-			modifier = 0.4,
-			t = 0.7
-		},
-		{
-			modifier = 0.55,
-			t = 0.8
-		},
-		{
-			modifier = 0.6,
-			t = 0.9
-		},
-		{
 			modifier = 0.7,
-			t = 2
+			t = 0
+		},
+		{
+			modifier = 0.75,
+			t = 0.25
+		},
+		{
+			modifier = 0.8,
+			t = 0.35
+		},
+		{
+			modifier = 0.9,
+			t = 0.5
 		}
 	}
 }
@@ -907,9 +1028,10 @@ weapon_template.sprint_template = "killshot"
 weapon_template.stamina_template = "default"
 weapon_template.toughness_template = "default"
 weapon_template.footstep_intervals = FootstepIntervalsTemplates.default
-weapon_template.movement_curve_modifier_template = "default"
+weapon_template.movement_curve_modifier_template = "shotgun_p4"
 weapon_template.smart_targeting_template = SmartTargetingTemplates.killshot
 weapon_template.haptic_trigger_template = HapticTriggerTemplates.ranged.assault
+weapon_template.combo_reset_duration = 0.2
 weapon_template.overclocks = {
 	stability_up_ammo_down = {
 		shotgun_p1_m1_ammo_stat = -0.1,

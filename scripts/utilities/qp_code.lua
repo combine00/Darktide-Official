@@ -2,7 +2,8 @@ local QPCode = {}
 local accepted_keys = {
 	"challenge",
 	"resistance",
-	"auric"
+	"auric",
+	"category"
 }
 
 function QPCode.encode(keys)
@@ -14,7 +15,12 @@ function QPCode.encode(keys)
 		if value == true then
 			qp_entries[#qp_entries + 1] = key
 		elseif value ~= nil then
-			qp_entries[#qp_entries + 1] = string.format("%s=%s", key, tostring(value))
+			if type(value) == "table" then
+				value = table.concat(value, ",")
+				qp_entries[#qp_entries + 1] = string.format("%s=%s", key, value)
+			else
+				qp_entries[#qp_entries + 1] = string.format("%s=%s", key, tostring(value))
+			end
 		end
 	end
 

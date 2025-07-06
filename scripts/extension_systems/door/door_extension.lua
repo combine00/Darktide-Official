@@ -423,6 +423,8 @@ function DoorExtension:open(state, interactor_unit, optional_closing_time)
 		state = self:_get_open_state_from_interactor(interactor_unit)
 	end
 
+	self:_free_companions(self._unit)
+
 	local new_state = STATES[state]
 
 	self:_set_server_state(new_state)
@@ -502,6 +504,8 @@ function DoorExtension:teleport_bots()
 			index = index + 1
 		end
 	end
+
+	self:_teleport_companions(unit, index)
 end
 
 function DoorExtension:_set_current_state(state)
@@ -592,6 +596,58 @@ end
 function DoorExtension:rpc_sync_door_state(new_state)
 	self:_do_flow_calls(new_state)
 	self:_set_current_state(new_state)
+end
+
+function DoorExtension:_teleport_companions(unit, start_index)
+	local index = start_index
+	local current_node_name, has_node = nil
+	local human_players = Managers.player:human_players()
+
+	for _, human_player in pairs(human_players) do
+		local human_unit = human_player.player_unit
+
+		if human_unit then
+			local companion_spawner_extension = ScriptUnit.extension(human_unit, "companion_spawner_system")
+			local companion_unit = companion_spawner_extension:companion_unit()
+
+			if companion_unit then
+				local companion_blackboard = BLACKBOARDS[companion_unit]
+				local movable_platform_component = Blackboard.write_component(companion_blackboard, "movable_platform")
+				current_node_name = bot_teleport_location_node_names[index]
+				index = index + 1
+				has_node = Unit.has_node(unit, current_node_name)
+
+				if has_node then
+					local node = Unit.node(unit, current_node_name)
+					movable_platform_component.node = node
+					movable_platform_component.unit_reference = unit
+				end
+			end
+		end
+	end
+end
+
+function DoorExtension:_free_companions(unit)
+	local human_players = Managers.player:human_players()
+
+	for _, human_player in pairs(human_players) do
+		local human_unit = human_player.player_unit
+
+		if human_unit then
+			local companion_spawner_extension = ScriptUnit.extension(human_unit, "companion_spawner_system")
+			local companion_unit = companion_spawner_extension:companion_unit()
+
+			if companion_unit then
+				local companion_blackboard = BLACKBOARDS[companion_unit]
+				local movable_platform_component = Blackboard.write_component(companion_blackboard, "movable_platform")
+
+				if movable_platform_component.unit_reference == unit then
+					movable_platform_component.node = ""
+					movable_platform_component.unit_reference = nil
+				end
+			end
+		end
+	end
 end
 
 return DoorExtension

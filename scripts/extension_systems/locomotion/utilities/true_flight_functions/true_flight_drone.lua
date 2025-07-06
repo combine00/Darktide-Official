@@ -6,8 +6,8 @@ function TrueFlightDrone.drone_projectile_locomotion(physics_world, integration_
 	local position = integration_data.position
 	local new_position = position + velocity * dt
 	local new_rotation = Quaternion.look(velocity)
-	local rotation_speed = 9
-	local rotation_length = 22
+	local rotation_speed = 15
+	local rotation_length = 30
 	local sin_test = math.sin(t * rotation_speed + integration_data.time_since_start^2)
 	local cos_test = math.sin(t * rotation_speed * 0.55)
 	local test_vector = Vector3(sin_test, rotation_length, cos_test)
@@ -23,15 +23,8 @@ function TrueFlightDrone.drone_update_towards_position(target_position, physics_
 	local trigger_time = true_flight_template.trigger_time
 	local on_target_time = integration_data.on_target_time
 	local have_triggered = trigger_time < on_target_time
-	local velocity = integration_data.velocity
 	local position = integration_data.position
 	local towards_target = target_position - position
-	local wanted_direction = Vector3.normalize(towards_target)
-	local current_direction = Vector3.normalize(velocity)
-	local dot_product = Vector3.dot(wanted_direction, current_direction)
-	local slow_down_dot_product_threshold = true_flight_template.slow_down_dot_product_threshold
-	local slow_down_factor = true_flight_template.slow_down_factor
-	local should_slow_down = dot_product < slow_down_dot_product_threshold
 	local distance_squared = Vector3.length_squared(towards_target)
 	local should_integrate = distance_squared >= 0.25
 	integration_data.integrate = should_integrate

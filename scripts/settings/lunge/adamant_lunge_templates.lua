@@ -8,23 +8,26 @@ local damage_types = DamageSettings.damage_types
 local talent_settings = TalentSettings.adamant
 local adamant_lunge_templates = {
 	adamant_charge = {
-		on_screen_effect_delay = 0.13,
+		cancel_on_unwield = true,
+		disable_minion_collision = true,
 		is_dodging = true,
-		move_back_cancel_time_threshold = 0.4,
-		sensitivity_modifier = 0.1,
 		move_back_cancel = true,
+		move_back_cancel_time_threshold = 0.4,
 		on_screen_effect = "content/fx/particles/screenspace/screen_adamant_charge",
 		combat_ability = true,
-		disable_minion_collision = true,
+		on_screen_effect_delay = 0.01,
 		keep_slot_wielded_on_lunge_end = true,
 		block_input_cancel = true,
+		on_hit_gear_alias = "ability_bash",
 		slot_to_wield = "slot_primary",
 		block_input_cancel_time_threshold = 0.4,
+		on_exit_vfx = "content/fx/particles/abilities/adamant/adamant_charge_ability",
 		hit_dot_check = 0.7,
-		stop_sound_event = "wwise/events/player/play_ability_zealot_maniac_dash_exit",
+		sensitivity_modifier = 0.1,
 		directional_lunge = false,
+		disable_weapon_actions = true,
 		lunge_end_camera_shake = "adamant_charge_end",
-		start_sound_event = "wwise/events/player/play_ability_zealot_maniac_dash_enter",
+		start_sound_event = "wwise/events/player/play_player_ability_adamant_charge",
 		lunge_speed_at_times = {
 			{
 				speed = 8,
@@ -57,27 +60,37 @@ local adamant_lunge_templates = {
 		},
 		distance = talent_settings.combat_ability.charge.range,
 		damage_settings = {
-			radius = 2,
-			anim_event_1p_on_damage = "shake_medium",
+			radius = 1,
 			damage_profile = DamageProfileTemplates.adamant_charge_impact,
-			damage_profile_damage = DamageProfileTemplates.adamant_charge_damage,
 			damage_type = damage_types.physical
+		},
+		on_finish_directional_shout = {
+			shout_dot = -0.25,
+			force_stagger_type_if_not_staggered_duration = 2.5,
+			anim_event_1p = "shake_medium",
+			force_stagger_type_if_not_staggered = "heavy",
+			power_level = 0,
+			forward_range = 5,
+			damage_profile = DamageProfileTemplates.adamant_charge_impact
 		},
 		anim_settings = {
 			on_enter = {
 				"move_fwd",
-				"sprint"
+				"sprint",
+				"parry_pose"
+			},
+			on_exit = {
+				"parry_pose",
+				"parry_finished",
+				"attack_push"
 			}
 		},
-		wwise_state = {
-			group = "player_ability",
-			on_state = "adamant_charge",
-			off_state = "none"
-		},
 		stop_tags = {
-			elite = true,
+			monster = true,
+			cultist_captain = true,
 			special = true,
-			monster = true
+			captain = true,
+			elite = true
 		},
 		mood = MoodSettings.mood_types.adamant_combat_ability_charge
 	}

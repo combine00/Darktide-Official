@@ -9,6 +9,12 @@ local state_machine_settings = {
 	["content/characters/player/ogryn/third_person/animations/power_maul"] = {
 		blend_time = DEFAULT_BLEND_TIME
 	},
+	["content/characters/player/human/third_person/animations/assault_shield_maul"] = {
+		blend_time = DEFAULT_BLEND_TIME
+	},
+	["content/characters/player/human/third_person/animations/adamant_power_maul"] = {
+		blend_time = DEFAULT_BLEND_TIME
+	},
 	["content/characters/player/human/third_person/animations/power_sword"] = {
 		blend_time = DEFAULT_BLEND_TIME
 	},

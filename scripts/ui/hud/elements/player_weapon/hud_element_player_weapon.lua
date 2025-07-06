@@ -56,7 +56,7 @@ function HudElementPlayerWeapon:init(parent, draw_layer, start_scale, data)
 		self:set_icon(hud_icon, is_weapon)
 	end
 
-	local hud_configuration = weapon_template.hud_configuration
+	local hud_configuration = weapon_template and weapon_template.hud_configuration or self._ability.hud_configuration
 	local uses_ammo = hud_configuration and hud_configuration.uses_ammunition
 	local uses_overheat = hud_configuration and hud_configuration.uses_overheat
 	local infinite_ammo = not uses_ammo and uses_overheat

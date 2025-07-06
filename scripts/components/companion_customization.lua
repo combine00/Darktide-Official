@@ -1,4 +1,5 @@
-local LocalLoader = require("scripts/settings/equipment/local_items_loader")
+local CompanionVisualLoadout = require("scripts/utilities/companion_visual_loadout")
+local LocalItemsLoader = require("scripts/settings/equipment/local_items_loader")
 local MasterItems = require("scripts/backend/master_items")
 local VisualLoadoutCustomization = require("scripts/extension_systems/visual_loadout/utilities/visual_loadout_customization")
 local CompanionCustomization = component("CompanionCustomization")
@@ -10,7 +11,7 @@ function CompanionCustomization:editor_init(unit)
 	self._world = world
 	self._in_editor = in_editor
 	self._attach_settings = self:_construct_attach_settings(unit, world, in_editor)
-	self._slot_name_by_unit = {}
+	self._disable_fur_shells = self:get_data(unit, "disable_fur_shells")
 end
 
 function CompanionCustomization:editor_validate(unit)
@@ -28,7 +29,6 @@ function CompanionCustomization:init(unit)
 	self._world = world
 	self._in_editor = in_editor
 	self._attach_settings = self:_construct_attach_settings(unit, world, in_editor)
-	self._slot_name_by_unit = {}
 
 	if not DEDICATED_SERVER then
 		self:_customize(unit)
@@ -38,6 +38,7 @@ end
 function CompanionCustomization:_construct_attach_settings(unit, world, in_editor)
 	local attach_settings = {
 		from_script_component = true,
+		is_minion = true,
 		from_ui_profile_spawner = false,
 		is_first_person = false,
 		world = world,
@@ -53,7 +54,7 @@ function CompanionCustomization:_construct_attach_settings(unit, world, in_edito
 		local item_definitions = {}
 
 		if EditorMasterItems then
-			EditorMasterItems.memoize(LocalLoader.get_items_from_metadata_db):next(function (data)
+			EditorMasterItems.memoize(LocalItemsLoader.get_items_from_metadata_db):next(function (data)
 				self:_customize(unit, data)
 			end)
 		else
@@ -91,20 +92,10 @@ function CompanionCustomization:_customize(unit, item_definitions)
 		return
 	end
 
-	local weapon_skin_item = self:get_data(unit, "weapon_skin_item")
-	weapon_skin_item = weapon_skin_item or item_data.slot_weapon_skin
-	local skin_data = weapon_skin_item and weapon_skin_item ~= "" and rawget(attach_settings.item_definitions, weapon_skin_item)
-
-	self:_spawn_item_attachments(unit, item_data, skin_data)
+	self:_spawn_item_attachments(item_data)
 
 	if item_data.material_overrides then
 		for _, material_override in pairs(item_data.material_overrides) do
-			VisualLoadoutCustomization.apply_material_override(unit, unit, false, material_override, self._in_editor)
-		end
-	end
-
-	if skin_data then
-		for _, material_override in pairs(skin_data.material_overrides) do
 			VisualLoadoutCustomization.apply_material_override(unit, unit, false, material_override, self._in_editor)
 		end
 	end
@@ -125,14 +116,15 @@ function CompanionCustomization:_customize(unit, item_definitions)
 		end
 	end
 
-	local unit_material_overrides = self:get_data(unit, "material_override")
+	local material_override_table = self:get_data(unit, "material_override")
 
-	for _, material_override in pairs(unit_material_overrides) do
+	for _, material_override in pairs(material_override_table) do
 		VisualLoadoutCustomization.apply_material_override(unit, unit, false, material_override, self._in_editor)
 	end
 end
 
-function CompanionCustomization:_spawn_item_attachments(unit, item_data)
+function CompanionCustomization:_spawn_item_attachments(item_data)
+	local unit = self._unit
 	local attach_settings = self._attach_settings
 	local attachments = item_data.attachments
 	local skin_overrides = VisualLoadoutCustomization.generate_attachment_overrides_lookup(item_data)
@@ -142,21 +134,38 @@ function CompanionCustomization:_spawn_item_attachments(unit, item_data)
 
 		table.sort(sorted_attachments)
 
+		local num_item_names = 1
 		local num_attached_units = 0
 
-		for i = 1, #sorted_attachments do
-			local key = sorted_attachments[i]
+		for ii = 1, #sorted_attachments do
+			local key = sorted_attachments[ii]
 			local attachment_slot_data = attachments[key]
 			local map_attachments = false
 			local map_bind_poses = false
 			local map_item_names = false
 			local mission_template = nil
-			local attachments_by_unit = VisualLoadoutCustomization.attach_hierarchy(attachment_slot_data, skin_overrides, attach_settings, unit, item_data.name, key, map_attachments, map_bind_poses, map_item_names, mission_template)
-			local all_attachment_units = attachments_by_unit[unit]
+			local attachments_units_by_unit, _, _, _, _ = VisualLoadoutCustomization.attach_hierarchy(attachment_slot_data, skin_overrides, attach_settings, unit, item_data.name, key, map_attachments, map_bind_poses, map_item_names, mission_template)
+			local all_attachment_units = attachments_units_by_unit[unit]
 			local num_attachments = #all_attachment_units
 
-			for j = 1, num_attachments do
-				Unit.set_data(unit, "attached_items", num_attached_units + num_attachments - j + 1, all_attachment_units[j])
+			for jj = 1, num_attachments do
+				Unit.set_data(unit, "attached_items", num_attached_units + num_attachments - jj + 1, all_attachment_units[jj])
+			end
+
+			if not self._disable_fur_shells then
+				CompanionVisualLoadout.assign_fur_material(unit, attachments_units_by_unit)
+			end
+
+			local item_name = attachment_slot_data.item
+
+			if item_name ~= nil and item_name ~= "" then
+				Unit.set_data(unit, "attached_item_names", num_item_names, item_name)
+
+				for jj = 1, num_attachments do
+					Unit.set_data(unit, "attached_units_lookup", num_item_names, jj, all_attachment_units[jj])
+				end
+
+				num_item_names = num_item_names + 1
 			end
 
 			num_attached_units = num_attached_units + num_attachments
@@ -185,48 +194,23 @@ end
 
 function CompanionCustomization:destroy(unit, is_editor)
 	local world = self._world
-	local i = 1
+	local index = 1
 	local array_size = 0
-	local attachment = Unit.get_data(unit, "attached_items", i)
+	local attachment = Unit.get_data(unit, "attached_items", index)
 	local unit_array_size = Unit.data_table_size(unit, "attached_items") or 0
 
 	while array_size < unit_array_size do
 		if attachment ~= nil then
 			self:destroy(attachment, is_editor)
-
-			if self._slot_name_by_unit[unit] then
-				self._slot_name_by_unit[unit] = nil
-			end
-
 			World.destroy_unit(world, attachment)
-			Unit.set_data(unit, "attached_items", i, nil)
+			Unit.set_data(unit, "attached_items", index, nil)
 
 			array_size = array_size + 1
 		end
 
-		i = i + 1
-		attachment = Unit.get_data(unit, "attached_items", i)
+		index = index + 1
+		attachment = Unit.get_data(unit, "attached_items", index)
 	end
-end
-
-function CompanionCustomization:unit_in_slot(slot_name)
-	local slot_name_by_unit = self._slot_name_by_unit
-
-	for item_unit, item_slot_name in pairs(slot_name_by_unit) do
-		if item_slot_name == slot_name then
-			return item_unit
-		end
-	end
-
-	return nil
-end
-
-function CompanionCustomization:update(unit, dt, t)
-	return
-end
-
-function CompanionCustomization:changed(unit)
-	return
 end
 
 CompanionCustomization.component_config = {
@@ -239,6 +223,11 @@ CompanionCustomization.component_data = {
 		ui_type = "check_box",
 		value = true,
 		ui_name = "Editor Only"
+	},
+	disable_fur_shells = {
+		ui_type = "check_box",
+		value = false,
+		ui_name = "Disable Fur Shells"
 	},
 	item = {
 		ui_type = "resource",

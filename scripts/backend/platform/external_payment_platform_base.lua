@@ -2,11 +2,11 @@ local ExternalPaymentPlatformInterface = require("scripts/backend/platform/exter
 local Promise = require("scripts/foundation/utilities/promise")
 local ExternalPaymentPlatformBase = class("ExternalPaymentPlatformBase")
 
-function ExternalPaymentPlatformBase:_get_platform_token()
+function ExternalPaymentPlatformBase:get_platform_token()
 	return Promise.resolved(nil)
 end
 
-function ExternalPaymentPlatformBase:_get_payment_platform()
+function ExternalPaymentPlatformBase:get_payment_platform()
 	return "none"
 end
 
@@ -43,6 +43,10 @@ function ExternalPaymentPlatformBase:fail_txn(order_id)
 end
 
 function ExternalPaymentPlatformBase:show_empty_store_error()
+	return Promise.resolved(nil)
+end
+
+function ExternalPaymentPlatformBase:query_license_token(product_ids, signature_string)
 	return Promise.resolved(nil)
 end
 

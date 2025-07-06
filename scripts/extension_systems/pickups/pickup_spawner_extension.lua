@@ -90,7 +90,7 @@ function PickupSpawnerExtension:setup_from_component(component, spawn_method, ig
 	components[num_components + 1] = data
 end
 
-function PickupSpawnerExtension:on_gameplay_post_init()
+function PickupSpawnerExtension:on_gameplay_post_init(unit)
 	self._chest_extension = ScriptUnit.has_extension(self._unit, "chest_system")
 
 	self:calculate_percentage_through_level()

@@ -389,7 +389,18 @@ local breed_data = {
 	},
 	slot_template = breed_name,
 	outline_config = {},
-	blackboard_component_config = BreedBlackboardComponentTemplates.melee_patroller
+	blackboard_component_config = BreedBlackboardComponentTemplates.melee_patroller,
+	tokens = {},
+	companion_pounce_setting = {
+		pounce_anim_event = "leap_attack",
+		companion_pounce_action = "human",
+		damage_profile = DamageProfileTemplates.adamant_companion_human_pounce,
+		initial_damage_profile = DamageProfileTemplates.adamant_companion_initial_pounce,
+		required_token = {
+			free_target_on_assigned_token = true,
+			name = "pounced"
+		}
+	}
 }
 
 return breed_data

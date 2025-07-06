@@ -3,6 +3,7 @@ require("scripts/extension_systems/behavior/nodes/bt_node")
 local MinionMovement = require("scripts/utilities/minion_movement")
 local Blackboard = require("scripts/extension_systems/blackboard/utilities/blackboard")
 local CompanionDogSettings = require("scripts/utilities/companion/companion_dog_settings")
+local MinionAttack = require("scripts/utilities/minion_attack")
 local BtCompanionMoveAroundEnemyAction = class("BtCompanionMoveAroundEnemyAction", "BtNode")
 local lean_settings = CompanionDogSettings.leaning
 
@@ -28,8 +29,12 @@ function BtCompanionMoveAroundEnemyAction:enter(unit, breed, blackboard, scratch
 	scratchpad.force_idle = false
 	local nav_world = navigation_extension:nav_world()
 	scratchpad.nav_world = nav_world
-
-	MinionMovement.init_find_ranged_position(scratchpad, action_data)
+	scratchpad.distance_sign = math.random(0, 1) == 0 and -1 or 1
+	scratchpad.angle_sign = math.random(0, 1) == 0 and -1 or 1
+	scratchpad.position_found = true
+	scratchpad.switched_angle = 0
+	scratchpad.distance_from_path = math.huge
+	scratchpad.pushed_enemies = {}
 end
 
 function BtCompanionMoveAroundEnemyAction:leave(unit, breed, blackboard, scratchpad, action_data, t, reason, destroy)
@@ -41,46 +46,17 @@ function BtCompanionMoveAroundEnemyAction:leave(unit, breed, blackboard, scratch
 	scratchpad.navigation_extension:set_enabled(false)
 end
 
-local IDLE_DURATION = 2
+local MAX_ANGLE_SWITCH = 1
 
 function BtCompanionMoveAroundEnemyAction:run(unit, breed, blackboard, scratchpad, action_data, dt, t)
+	if action_data.push_enemies_damage_profile then
+		MinionAttack.push_nearby_enemies(unit, scratchpad, action_data, unit, nil, action_data.push_ignored_breeds)
+	end
+
 	local behavior_component = scratchpad.behavior_component
 	local perception_component = scratchpad.perception_component
 	local move_state = behavior_component.move_state
 	local target_unit = perception_component.target_unit
-	local navigation_extension = scratchpad.navigation_extension
-	local find_move_position_attempts = scratchpad.find_move_position_attempts
-
-	if scratchpad.move_to_cooldown < t then
-		local force_move = true
-
-		MinionMovement.update_move_to_ranged_position(unit, t, scratchpad, action_data, target_unit, nil, nil, nil, force_move)
-
-		if find_move_position_attempts == 0 then
-			if behavior_component.move_state ~= "moving" then
-				behavior_component.move_state = ""
-				scratchpad.force_idle = false
-			end
-		else
-			scratchpad.force_idle = true
-		end
-	end
-
-	local should_start_idle, should_be_idling = MinionMovement.should_start_idle(scratchpad, behavior_component)
-
-	if scratchpad.force_idle or should_start_idle or should_be_idling then
-		if should_start_idle then
-			MinionMovement.start_idle(scratchpad, behavior_component, action_data)
-
-			scratchpad.idle_duration = t + IDLE_DURATION
-		end
-
-		return "running"
-	end
-
-	if move_state ~= "moving" then
-		self:_start_move_anim(unit, scratchpad, action_data, t)
-	end
 
 	if scratchpad.is_anim_driven and scratchpad.start_rotation_timing and scratchpad.start_rotation_timing <= t then
 		MinionMovement.update_anim_driven_start_rotation(unit, scratchpad, action_data, t)
@@ -88,15 +64,19 @@ function BtCompanionMoveAroundEnemyAction:run(unit, breed, blackboard, scratchpa
 
 	if scratchpad.start_move_event_anim_speed_duration then
 		if t < scratchpad.start_move_event_anim_speed_duration then
-			MinionMovement.apply_animation_wanted_movement_speed(unit, navigation_extension, dt)
+			MinionMovement.apply_animation_wanted_movement_speed(unit, scratchpad.navigation_extension, dt)
 		else
-			navigation_extension:set_max_speed(action_data.speed)
+			if not action_data.adapt_speed then
+				scratchpad.navigation_extension:set_max_speed(action_data.speed)
+			end
 
 			scratchpad.start_move_event_anim_speed_duration = nil
 		end
 	end
 
-	if not scratchpad.is_anim_driven and not scratchpad.start_move_event_anim_speed_duration and breed.animation_speed_thresholds then
+	local animation_speed_thresholds = breed.get_animation_speed_thresholds and breed.get_animation_speed_thresholds() or breed.animation_speed_thresholds
+
+	if not scratchpad.is_anim_driven and not scratchpad.start_move_event_anim_speed_duration and animation_speed_thresholds then
 		MinionMovement.companion_select_movement_animation(unit, scratchpad, dt, action_data, breed)
 	end
 
@@ -106,7 +86,61 @@ function BtCompanionMoveAroundEnemyAction:run(unit, breed, blackboard, scratchpa
 		self:_update_anim_lean_variable(unit, scratchpad, action_data, dt)
 	end
 
-	MinionMovement.update_ground_normal_rotation(unit, scratchpad)
+	MinionMovement.update_ground_normal_rotation(unit, scratchpad, nil, 0.7)
+
+	if not scratchpad.force_move_to_target and (not scratchpad.new_position_cooldown_t or scratchpad.new_position_cooldown_t < t) then
+		local navigation_extension = scratchpad.navigation_extension
+
+		if not scratchpad.position_found then
+			scratchpad.angle_sign = -scratchpad.angle_sign
+			scratchpad.position_found = false
+
+			if MAX_ANGLE_SWITCH <= scratchpad.switched_angle then
+				local pounce_component = Blackboard.write_component(blackboard, "pounce")
+				pounce_component.pounce_cooldown = 0
+
+				return "failed"
+			end
+
+			scratchpad.switched_angle = scratchpad.switched_angle + 1
+		elseif navigation_extension:is_following_path() then
+			local path_distance = navigation_extension:remaining_distance_from_progress_to_end_of_path()
+			scratchpad.angle_sign = scratchpad.distance_from_path < path_distance and -scratchpad.angle_sign or scratchpad.angle_sign
+
+			if scratchpad.distance_from_path < path_distance then
+				if MAX_ANGLE_SWITCH < scratchpad.switched_angle then
+					local pounce_component = Blackboard.write_component(blackboard, "pounce")
+					pounce_component.pounce_cooldown = 0
+
+					return "failed"
+				end
+
+				scratchpad.switched_angle = scratchpad.switched_angle + 1
+			end
+		end
+
+		local position_found = MinionMovement.update_move_around_target(unit, t, scratchpad, action_data, target_unit, scratchpad.distance_sign, scratchpad.angle_sign, scratchpad.force_move_to_target)
+
+		if position_found then
+			scratchpad.new_position_cooldown_t = t + action_data.new_position_cooldown
+		end
+
+		scratchpad.position_found = position_found
+	end
+
+	local should_start_idle, should_be_idling = MinionMovement.should_start_idle(scratchpad, behavior_component)
+
+	if scratchpad.force_idle or should_start_idle or should_be_idling then
+		if should_start_idle then
+			MinionMovement.start_idle(scratchpad, behavior_component, action_data)
+		end
+
+		return "running"
+	end
+
+	if move_state ~= "moving" then
+		self:_start_move_anim(unit, scratchpad, action_data, t)
+	end
 
 	return "running"
 end

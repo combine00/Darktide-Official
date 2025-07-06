@@ -67,7 +67,8 @@ WorldMarker.component_data = {
 			"suppression_indicator",
 			"training_grounds",
 			"unit_threat",
-			"unit_threat_veteran"
+			"unit_threat_veteran",
+			"unit_threat_adamant"
 		},
 		options_values = {
 			"beacon",
@@ -87,7 +88,8 @@ WorldMarker.component_data = {
 			"suppression_indicator",
 			"training_grounds",
 			"unit_threat",
-			"unit_threat_veteran"
+			"unit_threat_veteran",
+			"unit_threat_adamant"
 		}
 	}
 }

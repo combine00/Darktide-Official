@@ -84,9 +84,22 @@ local function _style_text_height(text, style, ui_renderer)
 	local text_font_data = UIFonts.data_by_type(style.font_type)
 	local text_font = text_font_data.path
 	local text_size = style.size
+	local text_additional_size = style.size_addition
+	local calculate_size = {
+		text_size[1] or 0,
+		text_size[2] or 0
+	}
+
+	if text_additional_size then
+		calculate_size = {
+			calculate_size[1] + text_additional_size[1],
+			calculate_size[2] + text_additional_size[2]
+		}
+	end
+
 	local use_max_extents = true
 	local text_options = UIFonts.get_font_options_by_style(style)
-	local _, text_height = UIRenderer.text_size(ui_renderer, text, style.font_type, style.font_size, text_size, text_options, use_max_extents)
+	local _, text_height = UIRenderer.text_size(ui_renderer, text, style.font_type, style.font_size, calculate_size, text_options, use_max_extents)
 
 	return text_height
 end
@@ -95,9 +108,19 @@ local function _style_text_width(text, style, ui_renderer)
 	local text_font_data = UIFonts.data_by_type(style.font_type)
 	local text_font = text_font_data.path
 	local text_size = style.size
+	local text_additional_size = style.size_addition
+	local calculate_size = text_size
+
+	if text_additional_size then
+		calculate_size = {
+			text_size[1] + text_additional_size[1],
+			text_size[2] + text_additional_size[2]
+		}
+	end
+
 	local use_max_extents = true
 	local text_options = UIFonts.get_font_options_by_style(style)
-	local text_width, _ = UIRenderer.text_size(ui_renderer, text, style.font_type, style.font_size, text_size, text_options, use_max_extents)
+	local text_width, _ = UIRenderer.text_size(ui_renderer, text, style.font_type, style.font_size, calculate_size, text_options, use_max_extents)
 
 	return text_width
 end
@@ -2655,11 +2678,15 @@ local function generate_blueprints_function(grid_size, optional_item)
 					local slot_name = slots[1]
 					local item_state_machine = item.state_machine
 					local item_animation_event = item.animation_event
+					local item_companion_state_machine = item.companion_state_machine ~= nil and item.companion_state_machine ~= "" and item.companion_state_machine or nil
+					local item_companion_animation_event = item.companion_animation_event ~= nil and item.companion_animation_event ~= "" and item.companion_animation_event or nil
 					local profile = element.profile
 					local render_context = {
 						camera_focus_slot_name = slot_name,
 						state_machine = item_state_machine,
 						animation_event = item_animation_event,
+						companion_state_machine = item_companion_state_machine,
+						companion_animation_event = item_companion_animation_event,
 						size = {
 							grid_width,
 							350
@@ -3415,8 +3442,6 @@ local function generate_blueprints_function(grid_size, optional_item)
 			},
 			init = function (parent, widget, element, callback_name, secondary_callback_name, ui_renderer)
 				local content = widget.content
-				local style = widget.style
-				local rating_value = element.rating
 				local header = element.header
 				content.header = header or ""
 			end
@@ -4517,9 +4542,9 @@ local function generate_blueprints_function(grid_size, optional_item)
 					style = table.merge_recursive(table.clone(weapon_display_name_header_style), {
 						text_vertical_alignment = "top",
 						horizontal_alignment = "left",
-						size = {
-							1920,
-							100
+						size_addition = {
+							0,
+							0
 						}
 					})
 				},
@@ -4540,9 +4565,14 @@ local function generate_blueprints_function(grid_size, optional_item)
 					pass_type = "text",
 					value = "N/A",
 					style = table.merge_recursive(table.clone(weapon_rarity_header_style), {
-						font_size = 25,
 						text_vertical_alignment = "top",
+						font_size = 25,
+						horizontal_alignment = "right",
 						text_horizontal_alignment = "right",
+						size = {
+							0,
+							0
+						},
 						offset = {
 							0,
 							0,
@@ -4565,7 +4595,7 @@ local function generate_blueprints_function(grid_size, optional_item)
 					})
 				}
 			},
-			init = function (parent, widget, element, callback_name)
+			init = function (parent, widget, element, callback_name, _, ui_renderer)
 				local content = widget.content
 				local style = widget.style
 				local item = element.item
@@ -4574,13 +4604,30 @@ local function generate_blueprints_function(grid_size, optional_item)
 				content.display_name = Items.weapon_card_display_name(item)
 				content.sub_display_name = Items.weapon_card_sub_display_name(item)
 				content.rarity_name = Items.rarity_display_name(item)
+				local rarity_name_style = style.rarity_name
+				rarity_name_style.size[1] = widget.content.size[1]
+				local rarity_name_text_width = _style_text_width(content.rarity_name, rarity_name_style, ui_renderer)
+				local display_name_style = style.display_name
+				display_name_style.size_addition[1] = -(rarity_name_text_width + 10)
+				local display_name_text_height = _style_text_height(content.display_name, display_name_style, ui_renderer)
+				local sub_display_name_style = style.sub_display_name
+				local sub_display_name_name_text_height = _style_text_height(content.sub_display_name, sub_display_name_style, ui_renderer)
+				local spacing = 5
+				style.sub_display_name.offset[2] = display_name_text_height + spacing
 				style.rarity_name.text_color = table.clone(rarity_color)
+				local calculated_height = style.sub_display_name.offset[2] + sub_display_name_name_text_height
 				local item_description = item.description
 
 				if item_description then
 					content.text_description = Localize(item_description)
 					style.text_description.text_color[1] = 255
+					local text_description_style = style.text_description
+					style.text_description.offset[2] = style.sub_display_name.offset[2] + sub_display_name_name_text_height + spacing
+					local text_description_text_height = _style_text_height(content.text_description, text_description_style, ui_renderer)
+					calculated_height = style.text_description.offset[2] + text_description_text_height
 				end
+
+				content.size[2] = calculated_height
 			end
 		},
 		extended_weapon_stats = {

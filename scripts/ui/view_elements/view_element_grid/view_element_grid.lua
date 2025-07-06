@@ -1382,6 +1382,14 @@ function ViewElementGrid:grid_length()
 	end
 end
 
+function ViewElementGrid:grid_area_length()
+	local grid = self._grid
+
+	if grid then
+		return grid:area_length()
+	end
+end
+
 function ViewElementGrid:menu_settings()
 	return self._menu_settings
 end

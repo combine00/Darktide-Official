@@ -108,6 +108,18 @@ local behavior_tree = {
 	},
 	COMBAT,
 	{
+		"BtAlertedAction",
+		name = "alerted",
+		condition = "is_alerted",
+		action_data = action_data.alerted
+	},
+	{
+		"BtPatrolAction",
+		name = "patrol",
+		condition = "should_patrol",
+		action_data = action_data.patrol
+	},
+	{
 		"BtIdleAction",
 		name = "idle",
 		action_data = action_data.idle

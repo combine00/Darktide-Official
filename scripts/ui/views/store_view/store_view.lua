@@ -1,3 +1,4 @@
+local Archetypes = require("scripts/settings/archetype/archetypes")
 local ButtonPassTemplates = require("scripts/ui/pass_templates/button_pass_templates")
 local Items = require("scripts/utilities/items")
 local LoadingStateData = require("scripts/ui/loading_state_data")
@@ -54,7 +55,14 @@ local STORE_LAYOUT = {
 		telemetry_name = "ogryn",
 		display_name = "loc_premium_store_category_skins_title_ogryn",
 		storefront = "premium_store_skins_ogryn",
-		template = ButtonPassTemplates.terminal_tab_menu_button
+		template = ButtonPassTemplates.terminal_tab_menu_with_divider_button
+	},
+	{
+		display_name = "loc_premium_store_category_skins_title_adamant",
+		telemetry_name = "adamant",
+		storefront = "premium_store_skins_adamant",
+		template = ButtonPassTemplates.terminal_tab_menu_button,
+		require_archetype_ownership = Archetypes.adamant
 	}
 }
 local AQUILA_STORE_LAYOUT = {
@@ -90,6 +98,12 @@ end
 
 function StoreView:on_enter()
 	StoreView.super.on_enter(self)
+
+	self._options_voice_fx = Application.user_setting("sound_settings", "voice_fx_setting") ~= false
+
+	if not self._options_voice_fx then
+		Wwise.set_state("options_voice_fx", "on")
+	end
 
 	self._account_items = {}
 	self._url_textures = {}
@@ -286,6 +300,8 @@ function StoreView:_register_button_callbacks()
 end
 
 function StoreView:setup_aquila_store()
+	self._widgets_by_name.get_dlc_button.content.hotspot.disabled = true
+	self._widgets_by_name.get_dlc_button.content.visible = false
 	self._selected_page_index = 1
 	local category_pages_layout_data = self._category_pages_layout_data
 
@@ -500,6 +516,21 @@ function StoreView:_on_category_index_selected(index, on_complete_callback)
 	local category_layout = STORE_LAYOUT[index]
 	self._selected_category_layout = category_layout
 	local storefront = category_layout.storefront
+	local widgets_by_name = self._widgets_by_name
+	widgets_by_name.get_dlc_button.content.hotspot.disabled = true
+	widgets_by_name.get_dlc_button.content.visible = false
+
+	if category_layout.require_archetype_ownership then
+		category_layout.require_archetype_ownership:is_available():next(function (result)
+			widgets_by_name.get_dlc_button.content.hotspot.disabled = result.available
+			widgets_by_name.get_dlc_button.content.visible = not result.available
+			widgets_by_name.get_dlc_button.content.hotspot.pressed_callback = callback(category_layout.require_archetype_ownership, "acquire_callback", function (is_success)
+				if is_success then
+					self:_on_category_index_selected(index, on_complete_callback)
+				end
+			end)
+		end)
+	end
 
 	return self:_fetch_storefront(storefront, on_complete_callback)
 end
@@ -1374,6 +1405,10 @@ end
 function StoreView:on_exit()
 	self:_clear_telemetry_name()
 
+	if not self._options_voice_fx then
+		Wwise.set_state("options_voice_fx", "off")
+	end
+
 	if self._world_spawner then
 		self._world_spawner:release_listener()
 		self._world_spawner:destroy()
@@ -1441,6 +1476,10 @@ function StoreView:_handle_input(input_service)
 	local using_cursor = self._using_cursor_navigation
 
 	if not using_cursor then
+		if input_service:get("hotkey_menu_special_2") and not self._aquila_open and not self._widgets_by_name.get_dlc_button.content.hotspot.disabled then
+			self._widgets_by_name.get_dlc_button.content.hotspot.pressed_callback()
+		end
+
 		if input_service:get("hotkey_menu_special_1") and not self._aquila_open and not self._widgets_by_name.aquila_button.content.hotspot.disabled then
 			self:_play_sound(UISoundEvents.default_click)
 

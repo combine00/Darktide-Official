@@ -97,7 +97,7 @@ function PlayerHuskVisualLoadoutExtension:init(extension_init_context, unit, ext
 	self._item_definitions = MasterItems.get_cached()
 	local equipment_component = EquipmentComponent:new(world, self._item_definitions, unit_spawner, unit, extension_manager, item_streaming_settings, nil, nil)
 	self._equipment_component = equipment_component
-	local breed_name = self._player:profile()
+	local breed_name = extension_init_data.archetype.breed
 	local breed_settings = Breeds[breed_name]
 	local equipment = equipment_component.initialize_equipment(slot_configuration, breed_settings)
 	self._equipment = equipment
@@ -139,6 +139,7 @@ function PlayerHuskVisualLoadoutExtension:init(extension_init_context, unit, ext
 	self._selected_voice_property = extension_init_data.selected_voice
 	self._profile_properties = equipment_component.resolve_profile_properties(equipment, self._wielded_slot, self._archetype_property, self._selected_voice_property)
 	self._dialogue_extension = ScriptUnit.extension(unit, "dialogue_system")
+	self._companion_slots = {}
 
 	for slot_name, config in pairs(slot_configuration) do
 		if config.wieldable then
@@ -484,6 +485,10 @@ function PlayerHuskVisualLoadoutExtension:resolve_gear_particle(particle_alias, 
 	return PlayerCharacterParticles.resolve_particle(particle_alias, properties, optional_external_properties)
 end
 
+function PlayerHuskVisualLoadoutExtension:profile_properties()
+	return self._profile_properties
+end
+
 function PlayerHuskVisualLoadoutExtension:current_wielded_slot_scripts()
 	local current_wielded_slot = self._wielded_slot
 
@@ -515,6 +520,32 @@ function PlayerHuskVisualLoadoutExtension:set_force_hide_wieldable_slot(slot_nam
 	slot.wants_hidden_by_gameplay_3p = third_person
 
 	self:_update_item_visibility(self._is_in_first_person_mode)
+end
+
+function PlayerHuskVisualLoadoutExtension:companion_slots()
+	local gear_full = self._equipment.slot_companion_gear_full.item_name_by_unit_3p
+	self._companion_slots = {}
+
+	for unit, path in pairs(gear_full) do
+		table.insert(self._companion_slots, {
+			use_outline = true,
+			unit = unit
+		})
+	end
+
+	return self._companion_slots
+end
+
+function PlayerHuskVisualLoadoutExtension:is_slot_unit_spawned(slot_name)
+	local gear_full = self._equipment[slot_name]
+
+	return gear_full and gear_full.attachment_spawn_status == "fully_spawned"
+end
+
+function PlayerHuskVisualLoadoutExtension:is_slot_unit_valid(slot_name)
+	local gear_full = self._equipment[slot_name]
+
+	return gear_full and ALIVE[gear_full.unit_3p]
 end
 
 return PlayerHuskVisualLoadoutExtension

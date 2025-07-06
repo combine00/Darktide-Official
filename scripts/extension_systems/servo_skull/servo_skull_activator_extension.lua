@@ -20,7 +20,7 @@ function ServoSkullActivatorExtension:extensions_ready(world, unit)
 	self._mission_objective_target_extension = mission_objective_target_extension
 end
 
-function ServoSkullActivatorExtension:on_gameplay_post_init(unit, level)
+function ServoSkullActivatorExtension:on_gameplay_post_init(unit)
 	local mission_objective_system = Managers.state.extension:system("mission_objective_system")
 	local synchronizer_unit = mission_objective_system:objective_synchronizer_unit(self._objective_name)
 

@@ -64,12 +64,13 @@ local VALID_END_ZONE_STATES = {
 	hub_emote = false,
 	dead = true,
 	ledge_hanging = false,
-	netted = false,
+	hub_companion_interaction = false,
 	ledge_hanging_pull_up = true,
+	hub_jog = false,
 	knocked_down = false,
 	exploding = false,
 	ledge_hanging_falling = false,
-	hub_jog = false
+	netted = false
 }
 local MISSION_FAILURE_DEAD_STATES = {
 	hogtied = true,

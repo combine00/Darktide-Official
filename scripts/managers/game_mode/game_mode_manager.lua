@@ -255,6 +255,12 @@ function GameModeManager:is_prologue()
 	return is_prologue
 end
 
+function GameModeManager:is_prologue_hub()
+	local game_mode_settings = self._game_mode:settings()
+
+	return game_mode_settings.name == "prologue_hub"
+end
+
 function GameModeManager:is_social_hub()
 	local game_mode_settings = self._game_mode:settings()
 

@@ -25,6 +25,14 @@ chaos_spawn.behavior = {
 chaos_spawn.statistics = {
 	num_grabs_done = "number"
 }
+chaos_spawn.patrol = {
+	patrol_leader_unit = "Unit",
+	patrol_index = "number",
+	should_patrol = "boolean",
+	patrol_id = "number",
+	walk_position = "Vector3Box",
+	auto_patrol = "boolean"
+}
 local templates = {
 	monster = monster,
 	chaos_spawn = chaos_spawn

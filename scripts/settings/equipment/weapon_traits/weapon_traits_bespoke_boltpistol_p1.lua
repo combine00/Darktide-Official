@@ -61,7 +61,7 @@ templates.weapon_trait_bespoke_boltpistol_p1_crit_chance_bonus_on_melee_kills = 
 templates.weapon_trait_bespoke_boltpistol_p1_hipfire_while_sprinting = {
 	format_values = {
 		weapon_spread = {
-			prefix = "+",
+			prefix = "",
 			format_type = "percentage",
 			find_value = {
 				buff_template_name = "weapon_trait_bespoke_boltpistol_p1_hipfire_while_sprinting",
@@ -73,7 +73,7 @@ templates.weapon_trait_bespoke_boltpistol_p1_hipfire_while_sprinting = {
 			}
 		},
 		damage_near = {
-			prefix = "-",
+			prefix = "+",
 			format_type = "percentage",
 			find_value = {
 				buff_template_name = "weapon_trait_bespoke_boltpistol_p1_hipfire_while_sprinting",

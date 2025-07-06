@@ -28,12 +28,6 @@ local circumstance_vo_darkness_veteran_female_c = {
 			2.202594,
 			1.911615
 		},
-		sound_event_weights = {
-			0.25,
-			0.25,
-			0.25,
-			0.25
-		},
 		randomize_indexes = {}
 	}
 }

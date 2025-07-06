@@ -32,14 +32,14 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__away_from_squad_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.766073,
+			2.720094,
+			2.869073,
+			1.729344,
+			4.02524,
+			2.194813,
+			4.231688,
+			2.999938
 		},
 		randomize_indexes = {}
 	},
@@ -84,7 +84,7 @@ local gameplay_vo_adamant_female_c = {
 			1.203354,
 			1.087823,
 			1.304396,
-			1.90275,
+			2.038594,
 			1.466219
 		},
 		sound_event_weights = {
@@ -114,7 +114,7 @@ local gameplay_vo_adamant_female_c = {
 			2.091865,
 			1.868646,
 			1.890448,
-			2.313813
+			2.004813
 		},
 		sound_event_weights = {
 			0.1666667,
@@ -170,9 +170,9 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__combat_monster_release_a_03"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678
+			3.176896,
+			4.251625,
+			3.58126
 		},
 		randomize_indexes = {}
 	},
@@ -192,16 +192,16 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__combat_pause_one_liner_a_10"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.53074,
+			1.934333,
+			5.092896,
+			4.859375,
+			2.871375,
+			3.870625,
+			4.082375,
+			5.118323,
+			4.421813,
+			3.72274
 		},
 		randomize_indexes = {}
 	},
@@ -280,14 +280,14 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__come_back_to_squad_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.263792,
+			2.107917,
+			4.558177,
+			3.59874,
+			1.041469,
+			2.098594,
+			3.238792,
+			3.015438
 		},
 		randomize_indexes = {}
 	},
@@ -312,7 +312,7 @@ local gameplay_vo_adamant_female_c = {
 			[2.0] = "loc_adamant_female_c__conversation_beast_of_nurgle_weakpoint_b_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.059219,
+			[1.0] = 2.524302,
 			[2.0] = 3.471125
 		},
 		randomize_indexes = {}
@@ -325,7 +325,7 @@ local gameplay_vo_adamant_female_c = {
 			[2.0] = "loc_adamant_female_c__conversation_beast_of_nurgle_weakpoint_c_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.063448,
+			[1.0] = 2.162813,
 			[2.0] = 2.886521
 		},
 		randomize_indexes = {}
@@ -338,8 +338,8 @@ local gameplay_vo_adamant_female_c = {
 			[2.0] = "loc_adamant_female_c__conversation_combat_beast_of_nurgle_swallow_a_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 1.724948,
+			[2.0] = 2.306385
 		},
 		randomize_indexes = {}
 	},
@@ -351,8 +351,8 @@ local gameplay_vo_adamant_female_c = {
 			[2.0] = "loc_adamant_female_c__conversation_combat_beast_of_nurgle_swallow_b_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 2.12726,
+			[2.0] = 1.706438
 		},
 		randomize_indexes = {}
 	},
@@ -364,8 +364,8 @@ local gameplay_vo_adamant_female_c = {
 			[2.0] = "loc_adamant_female_c__conversation_combat_beast_of_nurgle_swallow_c_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 3.217198,
+			[2.0] = 2.647635
 		},
 		randomize_indexes = {}
 	},
@@ -377,8 +377,8 @@ local gameplay_vo_adamant_female_c = {
 			[2.0] = "loc_adamant_female_c__conversation_combat_chaos_spawn_a_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 2.317021,
+			[2.0] = 3.111938
 		},
 		randomize_indexes = {}
 	},
@@ -390,8 +390,8 @@ local gameplay_vo_adamant_female_c = {
 			[2.0] = "loc_adamant_female_c__conversation_combat_chaos_spawn_b_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 3.629885,
+			[2.0] = 3.006719
 		},
 		randomize_indexes = {}
 	},
@@ -403,8 +403,8 @@ local gameplay_vo_adamant_female_c = {
 			[2.0] = "loc_adamant_female_c__conversation_combat_chaos_spawn_c_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 1.852073,
+			[2.0] = 3.148719
 		},
 		randomize_indexes = {}
 	},
@@ -416,8 +416,8 @@ local gameplay_vo_adamant_female_c = {
 			[2.0] = "loc_adamant_female_c__conversation_combat_chaos_spawn_chew_a_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 5.386521,
+			[2.0] = 4.349417
 		},
 		randomize_indexes = {}
 	},
@@ -429,8 +429,8 @@ local gameplay_vo_adamant_female_c = {
 			[2.0] = "loc_adamant_female_c__conversation_combat_chaos_spawn_chew_b_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 2.522792,
+			[2.0] = 1.981073
 		},
 		randomize_indexes = {}
 	},
@@ -442,8 +442,8 @@ local gameplay_vo_adamant_female_c = {
 			[2.0] = "loc_adamant_female_c__conversation_combat_chaos_spawn_chew_c_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 2.559979,
+			[2.0] = 1.877646
 		},
 		randomize_indexes = {}
 	},
@@ -455,7 +455,7 @@ local gameplay_vo_adamant_female_c = {
 			[2.0] = "loc_adamant_female_c__conversation_plague_ogryn_weakpoint_01_02"
 		},
 		sound_events_duration = {
-			[1.0] = 2.92676,
+			[1.0] = 2.796177,
 			[2.0] = 2.229646
 		},
 		randomize_indexes = {}
@@ -481,8 +481,8 @@ local gameplay_vo_adamant_female_c = {
 			[2.0] = "loc_adamant_female_c__conversation_plague_ogryn_weakpoint_03_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.17749,
-			[2.0] = 3.335229
+			[1.0] = 2.540479,
+			[2.0] = 2.877927
 		},
 		randomize_indexes = {}
 	},
@@ -525,14 +525,14 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__critical_health_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			3.619469,
+			4.216281,
+			3.682646,
+			4.062948,
+			5.906167,
+			5.229594,
+			4.025104,
+			4.22399
 		},
 		randomize_indexes = {}
 	},
@@ -722,7 +722,7 @@ local gameplay_vo_adamant_female_c = {
 			1.353646,
 			1.288656,
 			1.421542,
-			1.54451,
+			1.87199,
 			1.424229,
 			1.300604,
 			1.822656,
@@ -776,7 +776,7 @@ local gameplay_vo_adamant_female_c = {
 			1.194188,
 			1.969438,
 			2.256969,
-			1.789531
+			1.835417
 		},
 		randomize_indexes = {}
 	},
@@ -824,6 +824,25 @@ local gameplay_vo_adamant_female_c = {
 		},
 		randomize_indexes = {}
 	},
+	event_one_down = {
+		randomize_indexes_n = 0,
+		sound_events_n = 5,
+		sound_events = {
+			"loc_adamant_female_c__info_event_one_down_01",
+			"loc_adamant_female_c__info_event_one_down_02",
+			"loc_adamant_female_c__info_event_one_down_03",
+			"loc_adamant_female_c__info_event_one_down_04",
+			"loc_adamant_female_c__info_event_one_down_05"
+		},
+		sound_events_duration = {
+			0.622469,
+			1.034302,
+			1.002344,
+			1.076729,
+			1.744448
+		},
+		randomize_indexes = {}
+	},
 	found_ammo_low_on_ammo = {
 		randomize_indexes_n = 0,
 		sound_events_n = 8,
@@ -838,14 +857,14 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__look_at_ammo_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			0.728104,
+			1.241813,
+			1.522896,
+			1.939844,
+			1.547302,
+			1.469792,
+			1.238281,
+			2.224188
 		},
 		sound_event_weights = {
 			0.125,
@@ -869,10 +888,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__found_ammo_ogryn_low_on_ammo_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.53674,
+			1.93799,
+			2.114292,
+			2.346208
 		},
 		randomize_indexes = {}
 	},
@@ -886,10 +905,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__found_ammo_psyker_low_on_ammo_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.98975,
+			3.956208,
+			1.796156,
+			2.733042
 		},
 		randomize_indexes = {}
 	},
@@ -903,10 +922,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__found_ammo_veteran_low_on_ammo_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.656583,
+			2.277906,
+			3.246646,
+			2.080573
 		},
 		randomize_indexes = {}
 	},
@@ -920,10 +939,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__found_ammo_zealot_low_on_ammo_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.313615,
+			3.172052,
+			1.878979,
+			2.450635
 		},
 		randomize_indexes = {}
 	},
@@ -940,7 +959,7 @@ local gameplay_vo_adamant_female_c = {
 			3.090365,
 			4.32449,
 			5.280823,
-			2.758385
+			2.643688
 		},
 		randomize_indexes = {}
 	},
@@ -1051,14 +1070,14 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__heal_start_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.928833,
+			4.986458,
+			4.673167,
+			2.714354,
+			3.228146,
+			2.95375,
+			3.180646,
+			3.173948
 		},
 		randomize_indexes = {}
 	},
@@ -1098,7 +1117,7 @@ local gameplay_vo_adamant_female_c = {
 			0.982823,
 			1.654552,
 			1.963094,
-			2.652906,
+			2.086188,
 			1.706333,
 			2.719865
 		},
@@ -1116,12 +1135,12 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__heard_enemy_daemonhost_06"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			0.92024,
+			2.970521,
+			1.986781,
+			2.792177,
+			2.288594,
+			2.572292
 		},
 		sound_event_weights = {
 			0.1666667,
@@ -1168,10 +1187,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__heard_enemy_plague_ogryn_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.796708,
+			2.250125,
+			2.46701,
+			1.9785
 		},
 		randomize_indexes = {}
 	},
@@ -1258,8 +1277,8 @@ local gameplay_vo_adamant_female_c = {
 			[2.0] = "loc_adamant_female_c__info_door_open_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 1.02276,
+			[2.0] = 1.435167
 		},
 		randomize_indexes = {}
 	},
@@ -1274,11 +1293,11 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__info_event_almost_done_05"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.799427,
+			2.168594,
+			1.117833,
+			2.101719,
+			1.959896
 		},
 		randomize_indexes = {}
 	},
@@ -1296,10 +1315,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__knocked_down_1_08"
 		},
 		sound_events_duration = {
-			0.97274,
-			0.970719,
-			0.936,
-			1.952708,
+			1.061729,
+			1.272188,
+			1.000781,
+			2.11051,
 			1.554198,
 			1.079469,
 			1.5135,
@@ -1318,7 +1337,7 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__knocked_down_2_05"
 		},
 		sound_events_duration = {
-			1.457438,
+			1.678938,
 			1.458552,
 			2.314781,
 			3.350385,
@@ -1355,10 +1374,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__knocked_down_multiple_times_ogryn_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.163385,
+			2.433344,
+			2.333344,
+			2.669458
 		},
 		randomize_indexes = {}
 	},
@@ -1372,10 +1391,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__knocked_down_multiple_times_psyker_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			4.237115,
+			2.581021,
+			2.905979,
+			3.406156
 		},
 		randomize_indexes = {}
 	},
@@ -1389,10 +1408,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__knocked_down_multiple_times_veteran_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			3.533094,
+			5.509833,
+			4.125156,
+			4.232615
 		},
 		randomize_indexes = {}
 	},
@@ -1406,10 +1425,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__knocked_down_multiple_times_zealot_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			5.966677,
+			3.012677,
+			2.958771,
+			3.17149
 		},
 		randomize_indexes = {}
 	},
@@ -1427,14 +1446,14 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__ledge_hanging_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.915208,
+			3.607458,
+			2.835875,
+			1.733854,
+			2.692813,
+			2.742667,
+			3.332021,
+			2.874167
 		},
 		randomize_indexes = {}
 	},
@@ -1452,14 +1471,14 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__look_at_grenade_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			0.73524,
+			1.183135,
+			1.163615,
+			2.405156,
+			1.667115,
+			1.023198,
+			2.276375,
+			1.389031
 		},
 		randomize_indexes = {}
 	},
@@ -1477,14 +1496,14 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__look_at_healthstation_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.244188,
+			2.0625,
+			1.395146,
+			1.234698,
+			1.86726,
+			1.569198,
+			3.037271,
+			3.303917
 		},
 		randomize_indexes = {}
 	},
@@ -1524,11 +1543,11 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__need_rescue_05"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			3.647188,
+			4.648646,
+			7.99801,
+			4.58749,
+			3.945063
 		},
 		randomize_indexes = {}
 	},
@@ -1546,14 +1565,14 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__pinned_by_enemies_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.151875,
+			1.348385,
+			1.911677,
+			1.210031,
+			1.089135,
+			1.960667,
+			4.307167,
+			3.999417
 		},
 		randomize_indexes = {}
 	},
@@ -1567,10 +1586,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__player_death_ogryn_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			4.106469,
+			4.101948,
+			4.330052,
+			1.904802
 		},
 		randomize_indexes = {}
 	},
@@ -1584,10 +1603,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__player_death_psyker_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			3.345281,
+			3.010417,
+			2.833344,
+			2.573698
 		},
 		randomize_indexes = {}
 	},
@@ -1601,10 +1620,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__player_death_veteran_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			3.027531,
+			1.855271,
+			4.386542,
+			4.564458
 		},
 		randomize_indexes = {}
 	},
@@ -1618,10 +1637,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__player_death_zealot_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.495792,
+			4.618688,
+			4.40001,
+			3.192323
 		},
 		randomize_indexes = {}
 	},
@@ -1665,13 +1684,65 @@ local gameplay_vo_adamant_female_c = {
 		},
 		sound_events_duration = {
 			2.39449,
-			1.95499,
-			0.969969,
-			2.086271,
-			1.502052,
+			2.138542,
+			1.133042,
+			1.856313,
+			1.649917,
 			3.768063,
 			1.812094,
 			1.304615
+		},
+		randomize_indexes = {}
+	},
+	reloading = {
+		randomize_indexes_n = 0,
+		sound_events_n = 5,
+		sound_events = {
+			"loc_adamant_female_c__reloading_01",
+			"loc_adamant_female_c__reloading_02",
+			"loc_adamant_female_c__reloading_03",
+			"loc_adamant_female_c__reloading_04",
+			"loc_adamant_female_c__reloading_05"
+		},
+		sound_events_duration = {
+			0.940323,
+			0.908625,
+			1.036927,
+			1.259698,
+			1.776635
+		},
+		sound_event_weights = {
+			0.2,
+			0.2,
+			0.2,
+			0.2,
+			0.2
+		},
+		randomize_indexes = {}
+	},
+	reloading_empty = {
+		randomize_indexes_n = 0,
+		sound_events_n = 5,
+		sound_events = {
+			"loc_adamant_female_c__reloading_empty_01",
+			"loc_adamant_female_c__reloading_empty_02",
+			"loc_adamant_female_c__reloading_empty_03",
+			"loc_adamant_female_c__reloading_empty_04",
+			"loc_adamant_female_c__reloading_empty_05"
+		},
+		sound_events_duration = {
+			1.754323,
+			1.86074,
+			1.583021,
+			1.872219,
+			1.252938
+		},
+		sound_event_weights = {
+			0.2,
+			0.2,
+			0.2,
+			0.2,
+			0.2
 		},
 		randomize_indexes = {}
 	},
@@ -1689,14 +1760,14 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_calling_for_help_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.735927,
+			1.359667,
+			1.568823,
+			1.293771,
+			1.459052,
+			2.670188,
+			1.225792,
+			2.307906
 		},
 		randomize_indexes = {}
 	},
@@ -1714,14 +1785,14 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_cover_me_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.671677,
+			1.447,
+			1.153969,
+			2.026406,
+			1.840958,
+			2.214448,
+			1.762729,
+			2.870177
 		},
 		randomize_indexes = {}
 	},
@@ -1740,7 +1811,7 @@ local gameplay_vo_adamant_female_c = {
 		},
 		sound_events_duration = {
 			2.364844,
-			2.299229,
+			2.134583,
 			1.774313,
 			1.807833,
 			2.537,
@@ -1762,12 +1833,12 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_enemy_kill_monster_06"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.98625,
+			1.954896,
+			2.798594,
+			2.378708,
+			1.579729,
+			2.50475
 		},
 		randomize_indexes = {}
 	},
@@ -1807,11 +1878,11 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_info_incoming_enemies_05"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.71474,
+			2.431083,
+			2.258344,
+			2.27351,
+			2.484219
 		},
 		randomize_indexes = {}
 	},
@@ -1842,10 +1913,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_ogryn_disabled_by_chaos_hound_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.541385,
+			2.150896,
+			1.944594,
+			2.380771
 		},
 		randomize_indexes = {}
 	},
@@ -1861,12 +1932,12 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_ogryn_disabled_by_enemy_06"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.387865,
+			1.503531,
+			1.157781,
+			2.015823,
+			2.084865,
+			3.820646
 		},
 		randomize_indexes = {}
 	},
@@ -1880,10 +1951,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_ogryn_enemy_kill_monster_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.439844,
+			1.869896,
+			2.073063,
+			2.348292
 		},
 		randomize_indexes = {}
 	},
@@ -1897,10 +1968,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_ogryn_knocked_down_3_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.049802,
+			2.296563,
+			2.446625,
+			2.446625
 		},
 		randomize_indexes = {}
 	},
@@ -1916,12 +1987,12 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_ogryn_ledge_hanging_06"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.837854,
+			1.587802,
+			2.294,
+			2.135125,
+			2.528896,
+			3.697042
 		},
 		randomize_indexes = {}
 	},
@@ -1937,12 +2008,12 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_pinned_by_enemies_ogryn_06"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.988208,
+			1.526104,
+			1.42625,
+			3.493677,
+			1.679792,
+			1.557208
 		},
 		randomize_indexes = {}
 	},
@@ -1958,12 +2029,12 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_pinned_by_enemies_psyker_06"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.08674,
+			1.394708,
+			1.433375,
+			2.64276,
+			2.582677,
+			1.838719
 		},
 		randomize_indexes = {}
 	},
@@ -1979,12 +2050,12 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_pinned_by_enemies_veteran_06"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			3.815833,
+			2.040781,
+			1.83124,
+			2.001344,
+			2.220354,
+			2.032938
 		},
 		randomize_indexes = {}
 	},
@@ -2000,12 +2071,12 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_pinned_by_enemies_zealot_06"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.335635,
+			2.596813,
+			2.52899,
+			1.56401,
+			1.393219,
+			4.587469
 		},
 		randomize_indexes = {}
 	},
@@ -2019,10 +2090,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_psyker_cover_me_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.022667,
+			2.540802,
+			1.337729,
+			2.373396
 		},
 		randomize_indexes = {}
 	},
@@ -2036,10 +2107,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_psyker_critical_health_04"
 		},
 		sound_events_duration = {
-			2.802229,
-			2.534531,
-			2.668052,
-			1.768969
+			2.572542,
+			2.678583,
+			2.871833,
+			1.916844
 		},
 		randomize_indexes = {}
 	},
@@ -2053,10 +2124,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_psyker_disabled_by_chaos_hound_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.918104,
+			2.4,
+			1.847344,
+			3.063125
 		},
 		randomize_indexes = {}
 	},
@@ -2072,12 +2143,12 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_psyker_disabled_by_enemy_06"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.482604,
+			1.990104,
+			1.981729,
+			2.567448,
+			1.476917,
+			2.829063
 		},
 		randomize_indexes = {}
 	},
@@ -2091,10 +2162,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_psyker_enemy_kill_monster_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.564646,
+			3.123156,
+			2.086688,
+			2.43626
 		},
 		randomize_indexes = {}
 	},
@@ -2108,10 +2179,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_psyker_knocked_down_3_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			3.692583,
+			2.539052,
+			2.10001,
+			2.45975
 		},
 		randomize_indexes = {}
 	},
@@ -2127,12 +2198,12 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_psyker_ledge_hanging_06"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.156302,
+			2.441688,
+			2.139427,
+			1.988875,
+			2.013448,
+			2.018198
 		},
 		randomize_indexes = {}
 	},
@@ -2163,10 +2234,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_veteran_disabled_by_chaos_hound_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.085698,
+			1.762469,
+			2.73924,
+			1.967573
 		},
 		randomize_indexes = {}
 	},
@@ -2182,12 +2253,12 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_veteran_disabled_by_enemy_06"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.207552,
+			0.910073,
+			0.984917,
+			1.708094,
+			2.538438,
+			2.66999
 		},
 		randomize_indexes = {}
 	},
@@ -2201,10 +2272,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_veteran_enemy_kill_monster_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.259927,
+			1.438771,
+			3.619208,
+			1.855521
 		},
 		randomize_indexes = {}
 	},
@@ -2218,10 +2289,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_veteran_knocked_down_3_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.438802,
+			2.077635,
+			2.526396,
+			2.780406
 		},
 		randomize_indexes = {}
 	},
@@ -2237,12 +2308,12 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_veteran_ledge_hanging_06"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.215521,
+			2.382104,
+			2.536385,
+			2.474688,
+			2.738885,
+			3.437073
 		},
 		randomize_indexes = {}
 	},
@@ -2256,10 +2327,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_zealot_cover_me_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.630458,
+			1.969375,
+			1.542479,
+			2.05099
 		},
 		randomize_indexes = {}
 	},
@@ -2296,10 +2367,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_zealot_disabled_by_chaos_hound_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.385125,
+			1.769302,
+			2.816323,
+			2.554438
 		},
 		randomize_indexes = {}
 	},
@@ -2315,12 +2386,12 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_zealot_disabled_by_enemy_06"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.54875,
+			2.80076,
+			1.755052,
+			1.86025,
+			2.144385,
+			2.773125
 		},
 		randomize_indexes = {}
 	},
@@ -2334,10 +2405,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_zealot_enemy_kill_monster_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.448969,
+			2.176542,
+			2.802719,
+			4.521917
 		},
 		randomize_indexes = {}
 	},
@@ -2351,10 +2422,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_zealot_knocked_down_3_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.707344,
+			1.779,
+			3.942417,
+			2.823771
 		},
 		randomize_indexes = {}
 	},
@@ -2370,12 +2441,12 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__response_for_zealot_ledge_hanging_06"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.614177,
+			3.386219,
+			1.353667,
+			2.382583,
+			1.574865,
+			3.107948
 		},
 		randomize_indexes = {}
 	},
@@ -2389,10 +2460,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__seen_enemy_beast_of_nurgle_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.380375,
+			3.192313,
+			1.142948,
+			2.330146
 		},
 		randomize_indexes = {}
 	},
@@ -2406,10 +2477,102 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__seen_enemy_berserker_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.220344,
+			1.534479,
+			1.444917,
+			2.85725
+		},
+		randomize_indexes = {}
+	},
+	seen_enemy_bulwark = {
+		randomize_indexes_n = 0,
+		sound_events_n = 2,
+		sound_events = {
+			[1.0] = "loc_adamant_female_c__smart_tag_vo_enemy_chaos_ogryn_bulwark_01",
+			[2.0] = "loc_adamant_female_c__smart_tag_vo_enemy_chaos_ogryn_bulwark_02"
+		},
+		sound_events_duration = {
+			[1.0] = 0.841281,
+			[2.0] = 0.783667
+		},
+		sound_event_weights = {
+			[1.0] = 0.5,
+			[2.0] = 0.5
+		},
+		randomize_indexes = {}
+	},
+	seen_enemy_cultist_grenadier = {
+		randomize_indexes_n = 0,
+		sound_events_n = 4,
+		sound_events = {
+			"loc_adamant_female_c__seen_enemy_grenadier_05",
+			"loc_adamant_female_c__seen_enemy_grenadier_06",
+			"loc_adamant_female_c__seen_enemy_grenadier_07",
+			"loc_adamant_female_c__seen_enemy_grenadier_08"
+		},
+		sound_events_duration = {
+			2.746,
+			1.934927,
+			1.527854,
+			2.659448
+		},
+		sound_event_weights = {
+			0.25,
+			0.25,
+			0.25,
+			0.25
+		},
+		randomize_indexes = {}
+	},
+	seen_enemy_cultist_heavy_gunner = {
+		randomize_indexes_n = 0,
+		sound_events_n = 5,
+		sound_events = {
+			"loc_adamant_female_c__seen_enemy_heavy_gunner_01",
+			"loc_adamant_female_c__seen_enemy_heavy_gunner_02",
+			"loc_adamant_female_c__seen_enemy_heavy_gunner_03",
+			"loc_adamant_female_c__seen_enemy_heavy_gunner_04",
+			"loc_adamant_female_c__seen_enemy_heavy_gunner_05"
+		},
+		sound_events_duration = {
+			0.716625,
+			1.425021,
+			2.546927,
+			1.125219,
+			3.196969
+		},
+		sound_event_weights = {
+			0.2,
+			0.2,
+			0.2,
+			0.2,
+			0.2
+		},
+		randomize_indexes = {}
+	},
+	seen_enemy_cultist_shocktrooper = {
+		randomize_indexes_n = 0,
+		sound_events_n = 5,
+		sound_events = {
+			"loc_adamant_female_c__seen_enemy_shocktrooper_01",
+			"loc_adamant_female_c__seen_enemy_shocktrooper_02",
+			"loc_adamant_female_c__seen_enemy_shocktrooper_03",
+			"loc_adamant_female_c__seen_enemy_shocktrooper_04",
+			"loc_adamant_female_c__seen_enemy_shocktrooper_05"
+		},
+		sound_events_duration = {
+			0.973948,
+			2.540302,
+			1.822688,
+			1.484531,
+			3.083115
+		},
+		sound_event_weights = {
+			0.2,
+			0.2,
+			0.2,
+			0.2,
+			0.2
 		},
 		randomize_indexes = {}
 	},
@@ -2425,12 +2588,38 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__seen_enemy_daemonhost_06"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.395677,
+			2.05349,
+			2.200521,
+			2.680354,
+			1.814094,
+			2.790906
+		},
+		randomize_indexes = {}
+	},
+	seen_enemy_executor = {
+		randomize_indexes_n = 0,
+		sound_events_n = 5,
+		sound_events = {
+			"loc_adamant_female_c__seen_enemy_executor_01",
+			"loc_adamant_female_c__seen_enemy_executor_02",
+			"loc_adamant_female_c__seen_enemy_executor_03",
+			"loc_adamant_female_c__seen_enemy_executor_04",
+			"loc_adamant_female_c__seen_enemy_executor_05"
+		},
+		sound_events_duration = {
+			0.93126,
+			1.630656,
+			1.446552,
+			3.041531,
+			1.402854
+		},
+		sound_event_weights = {
+			0.2,
+			0.2,
+			0.2,
+			0.2,
+			0.2
 		},
 		randomize_indexes = {}
 	},
@@ -2444,10 +2633,10 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__seen_enemy_grenadier_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.746,
+			1.934927,
+			1.527854,
+			2.659448
 		},
 		randomize_indexes = {}
 	},
@@ -2465,14 +2654,14 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__seen_enemy_group_assaulting_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.804573,
+			2.059802,
+			1.803521,
+			3.417073,
+			1.942,
+			2.618219,
+			3.017677,
+			4.277563
 		},
 		randomize_indexes = {}
 	},
@@ -2490,14 +2679,40 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__seen_enemy_group_far_range_shooting_behind_cover_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.168531,
+			1.255094,
+			2.517031,
+			2.477719,
+			2.076354,
+			1.846688,
+			1.418823,
+			1.70001
+		},
+		randomize_indexes = {}
+	},
+	seen_enemy_heavy_gunner = {
+		randomize_indexes_n = 0,
+		sound_events_n = 5,
+		sound_events = {
+			"loc_adamant_female_c__seen_enemy_heavy_gunner_01",
+			"loc_adamant_female_c__seen_enemy_heavy_gunner_02",
+			"loc_adamant_female_c__seen_enemy_heavy_gunner_03",
+			"loc_adamant_female_c__seen_enemy_heavy_gunner_04",
+			"loc_adamant_female_c__seen_enemy_heavy_gunner_05"
+		},
+		sound_events_duration = {
+			0.716625,
+			1.425021,
+			2.546927,
+			1.125219,
+			3.196969
+		},
+		sound_event_weights = {
+			0.2,
+			0.2,
+			0.2,
+			0.2,
+			0.2
 		},
 		randomize_indexes = {}
 	},
@@ -2511,10 +2726,82 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__seen_enemy_mutant_charger_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			3.099656,
+			1.590958,
+			2.206635,
+			2.2135
+		},
+		randomize_indexes = {}
+	},
+	seen_enemy_poxwalker_bomber = {
+		randomize_indexes_n = 0,
+		sound_events_n = 4,
+		sound_events = {
+			"loc_adamant_female_c__seen_enemy_poxwalker_bomber_05",
+			"loc_adamant_female_c__seen_enemy_poxwalker_bomber_06",
+			"loc_adamant_female_c__seen_enemy_poxwalker_bomber_07",
+			"loc_adamant_female_c__seen_enemy_poxwalker_bomber_08"
+		},
+		sound_events_duration = {
+			2.17675,
+			1.892729,
+			2.317719,
+			1.734313
+		},
+		sound_event_weights = {
+			0.25,
+			0.25,
+			0.25,
+			0.25
+		},
+		randomize_indexes = {}
+	},
+	seen_enemy_renegade_berserker = {
+		randomize_indexes_n = 0,
+		sound_events_n = 4,
+		sound_events = {
+			"loc_adamant_female_c__seen_enemy_berserker_05",
+			"loc_adamant_female_c__seen_enemy_berserker_06",
+			"loc_adamant_female_c__seen_enemy_berserker_07",
+			"loc_adamant_female_c__seen_enemy_berserker_08"
+		},
+		sound_events_duration = {
+			2.220344,
+			1.534479,
+			1.444917,
+			2.85725
+		},
+		sound_event_weights = {
+			0.25,
+			0.25,
+			0.25,
+			0.25
+		},
+		randomize_indexes = {}
+	},
+	seen_enemy_renegade_shocktrooper = {
+		randomize_indexes_n = 0,
+		sound_events_n = 5,
+		sound_events = {
+			"loc_adamant_female_c__seen_enemy_shocktrooper_01",
+			"loc_adamant_female_c__seen_enemy_shocktrooper_02",
+			"loc_adamant_female_c__seen_enemy_shocktrooper_03",
+			"loc_adamant_female_c__seen_enemy_shocktrooper_04",
+			"loc_adamant_female_c__seen_enemy_shocktrooper_05"
+		},
+		sound_events_duration = {
+			0.973948,
+			2.540302,
+			1.822688,
+			1.484531,
+			3.083115
+		},
+		sound_event_weights = {
+			0.2,
+			0.2,
+			0.2,
+			0.2,
+			0.2
 		},
 		randomize_indexes = {}
 	},
@@ -2529,11 +2816,11 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__seen_enemy_sniper_05"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			0.795052,
+			1.162177,
+			2.853646,
+			2.261396,
+			1.538958
 		},
 		randomize_indexes = {}
 	},
@@ -2548,11 +2835,54 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__seen_enemy_tox_flamer_05"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.107917,
+			1.750521,
+			1.898885,
+			2.186677,
+			1.668125
+		},
+		randomize_indexes = {}
+	},
+	seen_enemy_traitor_heavy_gunner = {
+		randomize_indexes_n = 0,
+		sound_events_n = 5,
+		sound_events = {
+			"loc_adamant_female_c__seen_enemy_heavy_gunner_01",
+			"loc_adamant_female_c__seen_enemy_heavy_gunner_02",
+			"loc_adamant_female_c__seen_enemy_heavy_gunner_03",
+			"loc_adamant_female_c__seen_enemy_heavy_gunner_04",
+			"loc_adamant_female_c__seen_enemy_heavy_gunner_05"
+		},
+		sound_events_duration = {
+			0.716625,
+			1.425021,
+			2.546927,
+			1.125219,
+			3.196969
+		},
+		sound_event_weights = {
+			0.2,
+			0.2,
+			0.2,
+			0.2,
+			0.2
+		},
+		randomize_indexes = {}
+	},
+	seen_netgunner = {
+		randomize_indexes_n = 0,
+		sound_events_n = 4,
+		sound_events = {
+			"loc_adamant_female_c__seen_netgunner_05",
+			"loc_adamant_female_c__seen_netgunner_06",
+			"loc_adamant_female_c__seen_netgunner_07",
+			"loc_adamant_female_c__seen_netgunner_08"
+		},
+		sound_events_duration = {
+			1.356052,
+			1.24226,
+			2.053365,
+			1.421833
 		},
 		randomize_indexes = {}
 	},
@@ -2570,14 +2900,14 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__surrounded_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.915375,
+			3.988698,
+			3.045583,
+			3.114052,
+			3.404208,
+			2.625906,
+			2.890958,
+			2.9785
 		},
 		randomize_indexes = {}
 	},
@@ -2595,14 +2925,14 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__surrounded_response_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.813979,
+			3.19349,
+			2.407115,
+			2.176063,
+			3.179698,
+			2.924885,
+			3.068594,
+			3.015115
 		},
 		randomize_indexes = {}
 	},
@@ -2617,11 +2947,11 @@ local gameplay_vo_adamant_female_c = {
 			"loc_adamant_female_c__warning_exploding_barrel_05"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.6,
+			1.71425,
+			1.469594,
+			1.840135,
+			1.583448
 		},
 		randomize_indexes = {}
 	}

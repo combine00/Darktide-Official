@@ -344,6 +344,811 @@ return function ()
 		}
 	})
 	define_rule({
+		name = "bonding_conversation_hammersmith_moaning_a",
+		category = "conversations_prio_1",
+		wwise_route = 0,
+		response = "bonding_conversation_hammersmith_moaning_a",
+		database = "ogryn_b",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"story_talk"
+			},
+			{
+				"user_context",
+				"friends_close",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.LT,
+				1
+			},
+			{
+				"global_context",
+				"team_threat_level",
+				OP.SET_INCLUDES,
+				args = {
+					"low"
+				}
+			},
+			{
+				"global_context",
+				"level_time",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_b"
+				}
+			},
+			{
+				"global_context",
+				"player_voice_profiles",
+				OP.SET_INTERSECTS,
+				args = {
+					"psyker_male_a"
+				}
+			},
+			{
+				"faction_memory",
+				"bonding_conversation_hammersmith_moaning_a",
+				OP.EQ,
+				0
+			},
+			{
+				"faction_memory",
+				"time_since_last_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				220
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				20
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"bonding_conversation_hammersmith_moaning_a_user",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"bonding_conversation_hammersmith_moaning_a",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"time_since_last_conversation",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		}
+	})
+	define_rule({
+		name = "bonding_conversation_hammersmith_moaning_b",
+		wwise_route = 0,
+		response = "bonding_conversation_hammersmith_moaning_b",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"bonding_conversation_hammersmith_moaning_a"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"psyker_male_a"
+				}
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"bonding_conversation_hammersmith_moaning_b_user",
+				OP.ADD,
+				1
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "bonding_conversation_hammersmith_moaning_c",
+		wwise_route = 0,
+		response = "bonding_conversation_hammersmith_moaning_c",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"bonding_conversation_hammersmith_moaning_b"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_b"
+				}
+			},
+			{
+				"user_memory",
+				"bonding_conversation_hammersmith_moaning_a_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "bonding_conversation_hammersmith_moaning_d",
+		wwise_route = 0,
+		response = "bonding_conversation_hammersmith_moaning_d",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"bonding_conversation_hammersmith_moaning_c"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"psyker_male_a"
+				}
+			},
+			{
+				"user_memory",
+				"bonding_conversation_hammersmith_moaning_b_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "disabled"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "bonding_conversation_hammersmith_monsters_a",
+		category = "conversations_prio_1",
+		wwise_route = 0,
+		response = "bonding_conversation_hammersmith_monsters_a",
+		database = "ogryn_b",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"short_story_talk"
+			},
+			{
+				"user_context",
+				"friends_close",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.LT,
+				1
+			},
+			{
+				"global_context",
+				"level_time",
+				OP.GT,
+				90
+			},
+			{
+				"global_context",
+				"is_decaying_tension",
+				OP.EQ,
+				"true"
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_b"
+				}
+			},
+			{
+				"global_context",
+				"player_voice_profiles",
+				OP.SET_INTERSECTS,
+				args = {
+					"psyker_male_a"
+				}
+			},
+			{
+				"faction_memory",
+				"bonding_conversation_hammersmith_monsters_a",
+				OP.EQ,
+				0
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				120
+			},
+			{
+				"faction_memory",
+				"time_since_last_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				20
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"bonding_conversation_hammersmith_monsters_a_user",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"bonding_conversation_hammersmith_monsters_a",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMESET,
+				"0"
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		}
+	})
+	define_rule({
+		name = "bonding_conversation_hammersmith_monsters_b",
+		wwise_route = 0,
+		response = "bonding_conversation_hammersmith_monsters_b",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"bonding_conversation_hammersmith_monsters_a"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"psyker_male_a"
+				}
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"bonding_conversation_hammersmith_monsters_b_user",
+				OP.ADD,
+				1
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "bonding_conversation_hammersmith_monsters_c",
+		wwise_route = 0,
+		response = "bonding_conversation_hammersmith_monsters_c",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"bonding_conversation_hammersmith_monsters_b"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_b"
+				}
+			},
+			{
+				"user_memory",
+				"bonding_conversation_hammersmith_monsters_a_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "bonding_conversation_hammersmith_monsters_d",
+		wwise_route = 0,
+		response = "bonding_conversation_hammersmith_monsters_d",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"bonding_conversation_hammersmith_monsters_c"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"psyker_male_a"
+				}
+			},
+			{
+				"user_memory",
+				"bonding_conversation_hammersmith_monsters_b_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "disabled"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "bonding_conversation_lex_three_a",
+		category = "conversations_prio_1",
+		wwise_route = 0,
+		response = "bonding_conversation_lex_three_a",
+		database = "ogryn_b",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"story_talk"
+			},
+			{
+				"user_context",
+				"friends_close",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.LT,
+				1
+			},
+			{
+				"global_context",
+				"team_threat_level",
+				OP.SET_INCLUDES,
+				args = {
+					"low"
+				}
+			},
+			{
+				"global_context",
+				"level_time",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_b"
+				}
+			},
+			{
+				"global_context",
+				"player_voice_profiles",
+				OP.SET_INTERSECTS,
+				args = {
+					"psyker_female_c"
+				}
+			},
+			{
+				"faction_memory",
+				"bonding_conversation_lex_three_a",
+				OP.EQ,
+				0
+			},
+			{
+				"faction_memory",
+				"time_since_last_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				220
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				20
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"bonding_conversation_lex_three_a_user",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"bonding_conversation_lex_three_a",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"time_since_last_conversation",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		}
+	})
+	define_rule({
+		name = "bonding_conversation_lex_three_b",
+		wwise_route = 0,
+		response = "bonding_conversation_lex_three_b",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"bonding_conversation_lex_three_a"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"psyker_female_c"
+				}
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"bonding_conversation_lex_three_b_user",
+				OP.ADD,
+				1
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "bonding_conversation_lex_three_c",
+		wwise_route = 0,
+		response = "bonding_conversation_lex_three_c",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"bonding_conversation_lex_three_b"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_b"
+				}
+			},
+			{
+				"user_memory",
+				"bonding_conversation_lex_three_a_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "bonding_conversation_lex_three_d",
+		wwise_route = 0,
+		response = "bonding_conversation_lex_three_d",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"bonding_conversation_lex_three_c"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"psyker_female_c"
+				}
+			},
+			{
+				"user_memory",
+				"bonding_conversation_lex_three_b_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "bonding_conversation_lex_three_e",
+		wwise_route = 0,
+		response = "bonding_conversation_lex_three_e",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"bonding_conversation_lex_three_d"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_b"
+				}
+			},
+			{
+				"user_memory",
+				"bonding_conversation_lex_three_a_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "bonding_conversation_lex_three_f",
+		wwise_route = 0,
+		response = "bonding_conversation_lex_three_f",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"bonding_conversation_lex_three_e"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"psyker_female_c"
+				}
+			},
+			{
+				"user_memory",
+				"bonding_conversation_lex_three_b_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "disabled"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
 		name = "bonding_conversation_like_a",
 		wwise_route = 0,
 		response = "bonding_conversation_like_a",
@@ -655,7 +1460,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -895,6 +1700,13 @@ return function ()
 				OP.TIMEDIFF,
 				OP.GT,
 				220
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				20
 			}
 		},
 		on_done = {
@@ -1176,7 +1988,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -1462,6 +2274,13 @@ return function ()
 				OP.TIMEDIFF,
 				OP.GT,
 				220
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				20
 			}
 		},
 		on_done = {
@@ -1690,7 +2509,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -2022,6 +2841,13 @@ return function ()
 				OP.TIMEDIFF,
 				OP.GT,
 				220
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				20
 			}
 		},
 		on_done = {
@@ -2640,6 +3466,13 @@ return function ()
 				OP.TIMEDIFF,
 				OP.GT,
 				220
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				20
 			}
 		},
 		on_done = {
@@ -3123,7 +3956,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -3409,6 +4242,13 @@ return function ()
 				OP.TIMEDIFF,
 				OP.GT,
 				220
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				20
 			}
 		},
 		on_done = {
@@ -3644,7 +4484,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -3976,6 +4816,13 @@ return function ()
 				OP.TIMEDIFF,
 				OP.GT,
 				220
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				20
 			}
 		},
 		on_done = {
@@ -4253,6 +5100,13 @@ return function ()
 				OP.TIMEDIFF,
 				OP.GT,
 				220
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				20
 			}
 		},
 		on_done = {
@@ -4774,7 +5628,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -5011,7 +5865,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -5545,6 +6399,13 @@ return function ()
 				OP.TIMEDIFF,
 				OP.GT,
 				220
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				20
 			}
 		},
 		on_done = {
@@ -5975,7 +6836,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -6350,7 +7211,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -6836,7 +7697,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -7275,7 +8136,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -7515,6 +8376,13 @@ return function ()
 				OP.TIMEDIFF,
 				OP.GT,
 				220
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				20
 			}
 		},
 		on_done = {
@@ -7927,7 +8795,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -8613,7 +9481,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -8896,7 +9764,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -9629,7 +10497,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -10445,7 +11313,11 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -10459,7 +11331,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -10525,7 +11397,11 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			}
 		},
@@ -10605,7 +11481,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -10734,7 +11610,9 @@ return function ()
 					"psyker_female_a",
 					"psyker_male_a",
 					"veteran_female_a",
-					"veteran_male_a"
+					"veteran_male_a",
+					"adamant_male_a",
+					"adamant_female_a"
 				}
 			},
 			{
@@ -10748,7 +11626,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -10811,7 +11689,9 @@ return function ()
 					"psyker_female_a",
 					"psyker_male_a",
 					"veteran_female_a",
-					"veteran_male_a"
+					"veteran_male_a",
+					"adamant_male_a",
+					"adamant_female_a"
 				}
 			}
 		},
@@ -10875,7 +11755,11 @@ return function ()
 					"psyker_female_b",
 					"psyker_male_b",
 					"zealot_female_a",
-					"zealot_male_a"
+					"zealot_male_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -10889,7 +11773,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -10951,7 +11835,11 @@ return function ()
 					"psyker_female_b",
 					"psyker_male_b",
 					"zealot_female_a",
-					"zealot_male_a"
+					"zealot_male_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			}
 		},
@@ -11031,7 +11919,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -11161,7 +12049,9 @@ return function ()
 					"veteran_female_b",
 					"veteran_male_b",
 					"veteran_female_c",
-					"veteran_male_c"
+					"veteran_male_c",
+					"adamant_male_a",
+					"adamant_female_a"
 				}
 			},
 			{
@@ -11175,7 +12065,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -11239,7 +12129,9 @@ return function ()
 					"veteran_female_b",
 					"veteran_male_b",
 					"veteran_female_c",
-					"veteran_male_c"
+					"veteran_male_c",
+					"adamant_male_a",
+					"adamant_female_a"
 				}
 			}
 		},
@@ -11307,7 +12199,11 @@ return function ()
 					"veteran_female_b",
 					"veteran_male_b",
 					"veteran_female_c",
-					"veteran_male_c"
+					"veteran_male_c",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -11321,7 +12217,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -11387,7 +12283,11 @@ return function ()
 					"veteran_female_b",
 					"veteran_male_b",
 					"veteran_female_c",
-					"veteran_male_c"
+					"veteran_male_c",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			}
 		},
@@ -11466,7 +12366,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -11609,7 +12509,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -11749,7 +12649,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -11876,7 +12776,9 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a"
 				}
 			},
 			{
@@ -11890,7 +12792,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -11954,7 +12856,9 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a"
 				}
 			}
 		},
@@ -12020,7 +12924,13 @@ return function ()
 					"psyker_female_b",
 					"psyker_male_b",
 					"psyker_female_c",
-					"psyker_male_c"
+					"psyker_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -12034,7 +12944,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -12098,7 +13008,13 @@ return function ()
 					"psyker_female_b",
 					"psyker_male_b",
 					"psyker_female_c",
-					"psyker_male_c"
+					"psyker_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			}
 		},
@@ -12178,7 +13094,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -12449,7 +13365,9 @@ return function ()
 					"psyker_female_a",
 					"psyker_male_a",
 					"zealot_female_a",
-					"zealot_male_a"
+					"zealot_male_a",
+					"adamant_male_a",
+					"adamant_female_a"
 				}
 			},
 			{
@@ -12463,7 +13381,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -12525,7 +13443,9 @@ return function ()
 					"psyker_female_a",
 					"psyker_male_a",
 					"zealot_female_a",
-					"zealot_male_a"
+					"zealot_male_a",
+					"adamant_male_a",
+					"adamant_female_a"
 				}
 			}
 		},
@@ -12590,7 +13510,11 @@ return function ()
 					"psyker_female_b",
 					"psyker_male_b",
 					"psyker_female_c",
-					"psyker_male_c"
+					"psyker_male_c",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -12604,7 +13528,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -12668,7 +13592,11 @@ return function ()
 					"psyker_female_b",
 					"psyker_male_b",
 					"psyker_female_c",
-					"psyker_male_c"
+					"psyker_male_c",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			}
 		},
@@ -12734,7 +13662,11 @@ return function ()
 					"psyker_female_c",
 					"psyker_male_c",
 					"veteran_female_a",
-					"veteran_male_a"
+					"veteran_male_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -12748,7 +13680,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -12812,7 +13744,11 @@ return function ()
 					"psyker_female_c",
 					"psyker_male_c",
 					"veteran_female_a",
-					"veteran_male_a"
+					"veteran_male_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			}
 		},
@@ -12878,7 +13814,9 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a"
 				}
 			},
 			{
@@ -12892,7 +13830,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -12956,7 +13894,9 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a"
 				}
 			}
 		},
@@ -13034,7 +13974,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -13175,7 +14115,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -13319,7 +14259,13 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -13333,7 +14279,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -13465,7 +14411,13 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -13485,7 +14437,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -13624,7 +14576,13 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -13638,7 +14596,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -13773,7 +14731,13 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -13787,7 +14751,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -13919,7 +14883,13 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -13933,7 +14903,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -14068,7 +15038,13 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -14082,7 +15058,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -14214,7 +15190,13 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -14228,7 +15210,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -14284,6 +15266,2080 @@ return function ()
 			}
 		},
 		on_done = {},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_bad_a",
+		category = "conversations_prio_1",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_bad_a",
+		database = "ogryn_b",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"short_story_talk"
+			},
+			{
+				"user_context",
+				"friends_close",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.LT,
+				1
+			},
+			{
+				"global_context",
+				"level_time",
+				OP.GT,
+				90
+			},
+			{
+				"global_context",
+				"is_decaying_tension",
+				OP.EQ,
+				"true"
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_b"
+				}
+			},
+			{
+				"global_context",
+				"player_voice_profiles",
+				OP.SET_INTERSECTS,
+				args = {}
+			},
+			{
+				"faction_memory",
+				"oval_bonding_conversation_bad_a",
+				OP.EQ,
+				0
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				120
+			},
+			{
+				"faction_memory",
+				"time_since_last_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				20
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"oval_bonding_conversation_bad_a_user",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"oval_bonding_conversation_bad_a",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMESET,
+				"0"
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_bad_b",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_bad_b",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_bad_a"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {}
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"oval_bonding_conversation_bad_b_user",
+				OP.ADD,
+				1
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_bad_c",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_bad_c",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_bad_b"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_b"
+				}
+			},
+			{
+				"user_memory",
+				"oval_bonding_conversation_bad_a_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_bad_d",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_bad_d",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_bad_c"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {}
+			},
+			{
+				"user_memory",
+				"oval_bonding_conversation_bad_b_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "disabled"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_boom_a",
+		category = "conversations_prio_1",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_boom_a",
+		database = "ogryn_b",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"story_talk"
+			},
+			{
+				"user_context",
+				"friends_close",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.LT,
+				1
+			},
+			{
+				"global_context",
+				"team_threat_level",
+				OP.SET_INCLUDES,
+				args = {
+					"low"
+				}
+			},
+			{
+				"global_context",
+				"level_time",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_b"
+				}
+			},
+			{
+				"global_context",
+				"player_voice_profiles",
+				OP.SET_INTERSECTS,
+				args = {
+					"ogryn_c"
+				}
+			},
+			{
+				"faction_memory",
+				"oval_bonding_conversation_boom_a",
+				OP.EQ,
+				0
+			},
+			{
+				"faction_memory",
+				"time_since_last_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				220
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				20
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"oval_bonding_conversation_boom_a_user",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"oval_bonding_conversation_boom_a",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"time_since_last_conversation",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_boom_b",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_boom_b",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_boom_a"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_c"
+				}
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"oval_bonding_conversation_boom_b_user",
+				OP.ADD,
+				1
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_boom_c",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_boom_c",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_boom_b"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_b"
+				}
+			},
+			{
+				"user_memory",
+				"oval_bonding_conversation_boom_a_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_boom_d",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_boom_d",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_boom_c"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_c"
+				}
+			},
+			{
+				"user_memory",
+				"oval_bonding_conversation_boom_b_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "disabled"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_boring_a",
+		category = "conversations_prio_1",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_boring_a",
+		database = "ogryn_b",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"story_talk"
+			},
+			{
+				"user_context",
+				"friends_close",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.LT,
+				1
+			},
+			{
+				"global_context",
+				"team_threat_level",
+				OP.SET_INCLUDES,
+				args = {
+					"low"
+				}
+			},
+			{
+				"global_context",
+				"level_time",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_b"
+				}
+			},
+			{
+				"global_context",
+				"player_voice_profiles",
+				OP.SET_INTERSECTS,
+				args = {
+					"veteran_male_b"
+				}
+			},
+			{
+				"faction_memory",
+				"oval_bonding_conversation_boring_a",
+				OP.EQ,
+				0
+			},
+			{
+				"faction_memory",
+				"time_since_last_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				220
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				20
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"oval_bonding_conversation_boring_a_user",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"oval_bonding_conversation_boring_a",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"time_since_last_conversation",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_boring_b",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_boring_b",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_boring_a"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"veteran_male_b"
+				}
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"oval_bonding_conversation_boring_b_user",
+				OP.ADD,
+				1
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_boring_c",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_boring_c",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_boring_b"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_b"
+				}
+			},
+			{
+				"user_memory",
+				"oval_bonding_conversation_boring_a_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_boring_d",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_boring_d",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_boring_c"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"veteran_male_b"
+				}
+			},
+			{
+				"user_memory",
+				"oval_bonding_conversation_boring_b_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "disabled"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_bother_a",
+		category = "conversations_prio_1",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_bother_a",
+		database = "ogryn_b",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"sound_event",
+				OP.SET_INCLUDES,
+				args = {
+					"loc_ogryn_d__combat_pause_one_liner_01",
+					"loc_ogryn_d__combat_pause_one_liner_02",
+					"loc_ogryn_d__combat_pause_quirk_discipline_b_02",
+					"loc_ogryn_d__combat_pause_quirk_dream_b_01",
+					"loc_ogryn_d__combat_pause_quirk_restore_b_01"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_b"
+				}
+			},
+			{
+				"faction_memory",
+				"oval_bonding_conversation_bother_a",
+				OP.EQ,
+				0
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"oval_bonding_conversation_bother_a_user",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"oval_bonding_conversation_bother_a",
+				OP.ADD,
+				1
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_bother_b",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_bother_b",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_bother_a"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {}
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"oval_bonding_conversation_bother_b_user",
+				OP.ADD,
+				1
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_bother_c",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_bother_c",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_bother_b"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_b"
+				}
+			},
+			{
+				"user_memory",
+				"oval_bonding_conversation_bother_a_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_bother_d",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_bother_d",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_bother_c"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {}
+			},
+			{
+				"user_memory",
+				"oval_bonding_conversation_bother_b_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "disabled"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_broke_a",
+		category = "conversations_prio_1",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_broke_a",
+		database = "ogryn_b",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"story_talk"
+			},
+			{
+				"user_context",
+				"friends_close",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.LT,
+				1
+			},
+			{
+				"global_context",
+				"team_threat_level",
+				OP.SET_INCLUDES,
+				args = {
+					"low"
+				}
+			},
+			{
+				"global_context",
+				"level_time",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_b"
+				}
+			},
+			{
+				"global_context",
+				"player_voice_profiles",
+				OP.SET_INTERSECTS,
+				args = {
+					"ogryn_c"
+				}
+			},
+			{
+				"faction_memory",
+				"oval_bonding_conversation_broke_a",
+				OP.EQ,
+				0
+			},
+			{
+				"faction_memory",
+				"time_since_last_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				220
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				20
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"oval_bonding_conversation_broke_a_user",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"oval_bonding_conversation_broke_a",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"time_since_last_conversation",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_broke_b",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_broke_b",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_broke_a"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_c"
+				}
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"oval_bonding_conversation_broke_b_user",
+				OP.ADD,
+				1
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_broke_c",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_broke_c",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_broke_b"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_b"
+				}
+			},
+			{
+				"user_memory",
+				"oval_bonding_conversation_broke_a_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_broke_d",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_broke_d",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_broke_c"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_c"
+				}
+			},
+			{
+				"user_memory",
+				"oval_bonding_conversation_broke_b_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_broke_e",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_broke_e",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_broke_d"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_b"
+				}
+			},
+			{
+				"user_memory",
+				"oval_bonding_conversation_broke_a_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "disabled"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_everywhere_a",
+		category = "conversations_prio_1",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_everywhere_a",
+		database = "ogryn_b",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"short_story_talk"
+			},
+			{
+				"user_context",
+				"friends_close",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.LT,
+				1
+			},
+			{
+				"global_context",
+				"level_time",
+				OP.GT,
+				90
+			},
+			{
+				"global_context",
+				"is_decaying_tension",
+				OP.EQ,
+				"true"
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_b"
+				}
+			},
+			{
+				"global_context",
+				"player_voice_profiles",
+				OP.SET_INTERSECTS,
+				args = {}
+			},
+			{
+				"faction_memory",
+				"oval_bonding_conversation_everywhere_a",
+				OP.EQ,
+				0
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				120
+			},
+			{
+				"faction_memory",
+				"time_since_last_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				20
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"oval_bonding_conversation_everywhere_a_user",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"oval_bonding_conversation_everywhere_a",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMESET,
+				"0"
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_everywhere_b",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_everywhere_b",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_everywhere_a"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {}
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"oval_bonding_conversation_everywhere_b_user",
+				OP.ADD,
+				1
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_everywhere_c",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_everywhere_c",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_everywhere_b"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_b"
+				}
+			},
+			{
+				"user_memory",
+				"oval_bonding_conversation_everywhere_a_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_everywhere_d",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_everywhere_d",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_everywhere_c"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {}
+			},
+			{
+				"user_memory",
+				"oval_bonding_conversation_everywhere_b_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_everywhere_e",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_everywhere_e",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_everywhere_d"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_b"
+				}
+			},
+			{
+				"user_memory",
+				"oval_bonding_conversation_everywhere_a_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "disabled"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_eyeball_a",
+		category = "conversations_prio_1",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_eyeball_a",
+		database = "ogryn_b",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"short_story_talk"
+			},
+			{
+				"user_context",
+				"friends_close",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.LT,
+				1
+			},
+			{
+				"global_context",
+				"level_time",
+				OP.GT,
+				90
+			},
+			{
+				"global_context",
+				"is_decaying_tension",
+				OP.EQ,
+				"true"
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_b"
+				}
+			},
+			{
+				"global_context",
+				"player_voice_profiles",
+				OP.SET_INTERSECTS,
+				args = {
+					"ogryn_c"
+				}
+			},
+			{
+				"faction_memory",
+				"oval_bonding_conversation_eyeball_a",
+				OP.EQ,
+				0
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				120
+			},
+			{
+				"faction_memory",
+				"time_since_last_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				20
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"oval_bonding_conversation_eyeball_a_user",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"oval_bonding_conversation_eyeball_a",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMESET,
+				"0"
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_eyeball_b",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_eyeball_b",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_eyeball_a"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_c"
+				}
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"oval_bonding_conversation_eyeball_b_user",
+				OP.ADD,
+				1
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_eyeball_c",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_eyeball_c",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_eyeball_b"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_b"
+				}
+			},
+			{
+				"user_memory",
+				"oval_bonding_conversation_eyeball_a_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_eyeball_d",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_eyeball_d",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_eyeball_c"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_c"
+				}
+			},
+			{
+				"user_memory",
+				"oval_bonding_conversation_eyeball_b_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_eyeball_e",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_eyeball_e",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_eyeball_d"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_b"
+				}
+			},
+			{
+				"user_memory",
+				"oval_bonding_conversation_eyeball_a_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_eyeball_f",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_eyeball_f",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_eyeball_e"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_c"
+				}
+			},
+			{
+				"user_memory",
+				"oval_bonding_conversation_eyeball_b_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_eyeball_g",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_eyeball_g",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_eyeball_f"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_b"
+				}
+			},
+			{
+				"user_memory",
+				"oval_bonding_conversation_eyeball_a_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "disabled"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_gun_a",
+		category = "conversations_prio_1",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_gun_a",
+		database = "ogryn_b",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"story_talk"
+			},
+			{
+				"user_context",
+				"friends_close",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.LT,
+				1
+			},
+			{
+				"global_context",
+				"team_threat_level",
+				OP.SET_INCLUDES,
+				args = {
+					"low"
+				}
+			},
+			{
+				"global_context",
+				"level_time",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_b"
+				}
+			},
+			{
+				"global_context",
+				"player_voice_profiles",
+				OP.SET_INTERSECTS,
+				args = {
+					"veteran_female_a"
+				}
+			},
+			{
+				"faction_memory",
+				"oval_bonding_conversation_gun_a",
+				OP.EQ,
+				0
+			},
+			{
+				"faction_memory",
+				"time_since_last_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				220
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				20
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"oval_bonding_conversation_gun_a_user",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"oval_bonding_conversation_gun_a",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"time_since_last_conversation",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_gun_b",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_gun_b",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_gun_a"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"veteran_female_a"
+				}
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"oval_bonding_conversation_gun_b_user",
+				OP.ADD,
+				1
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_gun_c",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_gun_c",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_gun_b"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_b"
+				}
+			},
+			{
+				"user_memory",
+				"oval_bonding_conversation_gun_a_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "oval_bonding_conversation_gun_d",
+		wwise_route = 0,
+		response = "oval_bonding_conversation_gun_d",
+		database = "ogryn_b",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"oval_bonding_conversation_gun_c"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"veteran_female_a"
+				}
+			},
+			{
+				"user_memory",
+				"oval_bonding_conversation_gun_b_user",
+				OP.EQ,
+				1
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "disabled"
+		},
 		on_pre_rule_execution = {
 			delay_vo = {
 				duration = 0.2

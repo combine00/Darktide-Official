@@ -18,11 +18,7 @@ function MissionObjectiveZoneScannableSystem:init(context, system_init_data, ...
 end
 
 function MissionObjectiveZoneScannableSystem:on_gameplay_post_init(level)
-	local unit_to_extension_map = self._unit_to_extension_map
-
-	for unit, extension in pairs(unit_to_extension_map) do
-		extension:on_gameplay_post_init(level)
-	end
+	self:call_gameplay_post_init_on_extensions(level)
 end
 
 function MissionObjectiveZoneScannableSystem:destroy()

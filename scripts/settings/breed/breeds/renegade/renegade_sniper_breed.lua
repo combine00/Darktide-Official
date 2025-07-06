@@ -406,7 +406,18 @@ local breed_data = {
 		[hit_zone_names.head] = weakspot_types.headshot
 	},
 	outline_config = {},
-	blackboard_component_config = BreedBlackboardComponentTemplates.sniper
+	blackboard_component_config = BreedBlackboardComponentTemplates.sniper,
+	tokens = {},
+	companion_pounce_setting = {
+		pounce_anim_event = "leap_attack",
+		companion_pounce_action = "human",
+		damage_profile = DamageProfileTemplates.adamant_companion_human_pounce,
+		initial_damage_profile = DamageProfileTemplates.adamant_companion_initial_pounce,
+		required_token = {
+			free_target_on_assigned_token = true,
+			name = "pounced"
+		}
+	}
 }
 
 return breed_data

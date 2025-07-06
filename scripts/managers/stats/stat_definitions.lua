@@ -1,12 +1,12 @@
 local AchievementWeaponGroups = require("scripts/settings/achievements/achievement_weapon_groups")
-local Archetypes = require("scripts/settings/archetype/archetypes")
+local ArchetypeSettings = require("scripts/settings/archetype/archetype_settings")
 local Blackboard = require("scripts/extension_systems/blackboard/utilities/blackboard")
 local Breeds = require("scripts/settings/breed/breeds")
 local DamageSettings = require("scripts/settings/damage/damage_settings")
 local MechanicusEventWeapons = require("scripts/settings/live_event/mechanicus_event_weapons")
+local MissionBuffsAllowed = require("scripts/managers/mission_buffs/mission_buffs_allowed_buffs")
 local MissionTemplates = require("scripts/settings/mission/mission_templates")
 local MissionTypes = require("scripts/settings/mission/mission_types")
-local MissionBuffsAllowed = require("scripts/managers/mission_buffs/mission_buffs_allowed_buffs")
 local StaggerSettings = require("scripts/settings/damage/stagger_settings")
 local StatFlags = require("scripts/managers/stats/stat_flags")
 local StatMacros = require("scripts/managers/stats/stat_macros")
@@ -58,7 +58,7 @@ for breed_name, breed in pairs(Breeds) do
 	breed_name_to_sub_faction_lookup[breed_name] = sub_faction_name
 end
 
-local archetype_names = _sorted(table.keys(Archetypes))
+local archetype_names = _sorted(table.clone(ArchetypeSettings.archetype_names_array))
 local breed_names = _sorted(table.keys(table.conditional_copy(Breeds, function (_, value)
 	return value.faction_name == "chaos"
 end)))
@@ -1013,6 +1013,11 @@ StatDefinitions.hook_blocked_damage = {
 		StatFlags.hook
 	}
 }
+StatDefinitions.hook_blocked_damage_from_unique_enemy = {
+	flags = {
+		StatFlags.hook
+	}
+}
 StatDefinitions.team_blocked_damage = {
 	flags = {
 		StatFlags.team,
@@ -1474,7 +1479,7 @@ StatDefinitions.mission_circumstance = {
 	},
 	include_condition = function (self, config)
 		local circumstance_name = config.circumstance_name
-		local hidden_circumstance_name = circumstance_name == "toxic_gas_twins_01"
+		local hidden_circumstance_name = circumstance_name == "player_journey_010"
 		local eligible_circumstance_name = circumstance_name ~= nil and circumstance_name ~= "default" and not hidden_circumstance_name
 
 		return eligible_circumstance_name
@@ -1493,7 +1498,7 @@ StatDefinitions.mission_twins = {
 	include_condition = function (self, config)
 		local circumstance_name = config.circumstance_name
 
-		return circumstance_name ~= nil and circumstance_name == "toxic_gas_twins_01"
+		return circumstance_name ~= nil and circumstance_name == "player_journey_010"
 	end
 }
 StatDefinitions.mission_twins_hard_mode = {
@@ -1514,7 +1519,7 @@ StatDefinitions.mission_twins_hard_mode = {
 	},
 	include_condition = function (self, config)
 		local circumstance_name = config.circumstance_name
-		local has_correct_circumstance = circumstance_name ~= nil and circumstance_name == "toxic_gas_twins_01"
+		local has_correct_circumstance = circumstance_name ~= nil and circumstance_name == "player_journey_010"
 
 		return has_correct_circumstance
 	end
@@ -1537,7 +1542,7 @@ StatDefinitions.mission_twins_secret_puzzle_trigger = {
 	},
 	include_condition = function (self, config)
 		local circumstance_name = config.circumstance_name
-		local has_correct_circumstance = circumstance_name ~= nil and circumstance_name == "toxic_gas_twins_01"
+		local has_correct_circumstance = circumstance_name ~= nil and circumstance_name == "player_journey_010"
 
 		return has_correct_circumstance
 	end
@@ -1568,7 +1573,7 @@ StatDefinitions.mission_twins_kills_within_x = {
 	include_condition = function (self, config)
 		local circumstance_name = config.circumstance_name
 
-		return circumstance_name and circumstance_name == "toxic_gas_twins_01"
+		return circumstance_name and circumstance_name == "player_journey_010"
 	end
 }
 StatDefinitions.mission_twins_killed_successfully_within_x = {
@@ -1589,7 +1594,7 @@ StatDefinitions.mission_twins_killed_successfully_within_x = {
 	include_condition = function (self, config)
 		local circumstance_name = config.circumstance_name
 
-		return circumstance_name and circumstance_name == "toxic_gas_twins_01"
+		return circumstance_name and circumstance_name == "player_journey_010"
 	end
 }
 StatDefinitions.hook_mission_twins_mine_triggered = {
@@ -1619,7 +1624,7 @@ StatDefinitions.team_twins_boss_fight_started = {
 	include_condition = function (self, config)
 		local circumstance_name = config.circumstance_name
 
-		return circumstance_name and circumstance_name == "toxic_gas_twins_01"
+		return circumstance_name and circumstance_name == "player_journey_010"
 	end
 }
 StatDefinitions.mission_twins_mine_triggered_count = {
@@ -1642,7 +1647,7 @@ StatDefinitions.mission_twins_mine_triggered_count = {
 	include_condition = function (self, config)
 		local circumstance_name = config.circumstance_name
 
-		return circumstance_name and circumstance_name == "toxic_gas_twins_01"
+		return circumstance_name and circumstance_name == "player_journey_010"
 	end
 }
 StatDefinitions.mission_twins_no_mines_triggered = {
@@ -1664,7 +1669,7 @@ StatDefinitions.mission_twins_no_mines_triggered = {
 	include_condition = function (self, config)
 		local circumstance_name = config.circumstance_name
 
-		return circumstance_name and circumstance_name == "toxic_gas_twins_01"
+		return circumstance_name and circumstance_name == "player_journey_010"
 	end
 }
 StatDefinitions.team_knocked_down_timer_stat = {
@@ -2730,6 +2735,10 @@ local vo_stats = {
 	{
 		num_parts = 7,
 		name = "hook_backstory_zola_part_"
+	},
+	{
+		num_parts = 10,
+		name = "hook_backstory_brahms_part_"
 	}
 }
 
@@ -5620,7 +5629,7 @@ StatDefinitions.max_ogryn_2_lunge_number_of_enemies_hit = {
 	triggers = {
 		{
 			id = "hook_lunge_stop",
-			trigger = function (self, stat_data, units_hit, ranged_units_hit, ogryns_hit)
+			trigger = function (self, stat_data, units_hit, ranged_units_hit, ogryns_hit, elites_hit, specials_hit)
 				return set_to_max(self, stat_data, units_hit)
 			end
 		}
@@ -5677,7 +5686,7 @@ StatDefinitions.max_ogryns_bullrushed = {
 	triggers = {
 		{
 			id = "hook_lunge_stop",
-			trigger = function (self, stat_data, units_hit, ranged_units_hit, ogryns_hit)
+			trigger = function (self, stat_data, units_hit, ranged_units_hit, ogryns_hit, elites_hit, specials_hit)
 				return set_to_max(self, stat_data, ogryns_hit)
 			end
 		}
@@ -5938,7 +5947,7 @@ StatDefinitions.ogryn_2_bullrushed_group_of_ranged_enemies = {
 	triggers = {
 		{
 			id = "hook_lunge_stop",
-			trigger = function (self, stat_data, units_hit, ranged_units_hit, ogryns_hit)
+			trigger = function (self, stat_data, units_hit, ranged_units_hit, ogryns_hit, elites_hit, specials_hit)
 				if ranged_units_hit >= 3 then
 					return increment(self, stat_data)
 				end
@@ -6041,6 +6050,397 @@ StatDefinitions.ogryn_2_grenade_box_kills_without_missing = {
 		}
 	},
 	include_condition = include_condition
+}
+local archetype_condition = archetype_include_condition("adamant")
+StatDefinitions.hook_adamant_companion_pounce_enemy = {
+	flags = {
+		StatFlags.hook
+	}
+}
+StatDefinitions.hook_adamant_companion_knock_enemy = {
+	flags = {
+		StatFlags.hook
+	}
+}
+StatDefinitions.hook_adamant_wield_speed_aura_kill = {
+	flags = {
+		StatFlags.hook
+	}
+}
+StatDefinitions.hook_adamant_staggered_enemy_aura_kill = {
+	flags = {
+		StatFlags.hook
+	}
+}
+StatDefinitions.hook_adamant_companion_coherency_aura_kill = {
+	flags = {
+		StatFlags.hook
+	}
+}
+StatDefinitions.hook_adamant_enemy_affected_by_buff_drone = {
+	flags = {
+		StatFlags.hook
+	}
+}
+StatDefinitions.hook_adamant_ally_affected_by_buff_drone = {
+	flags = {
+		StatFlags.hook
+	}
+}
+StatDefinitions.hook_adamant_time_ally_buffed_by_buff_drone = {
+	flags = {
+		StatFlags.hook
+	}
+}
+StatDefinitions.hook_adamant_time_enemy_electrocuted_by_shockmine = {
+	flags = {
+		StatFlags.hook
+	}
+}
+StatDefinitions.hook_adamant_whistle_explosion_stagger_monster = {
+	flags = {
+		StatFlags.hook
+	}
+}
+StatDefinitions.hook_adamant_killed_cluster_of_enemies_with_grenade = {
+	flags = {
+		StatFlags.hook
+	}
+}
+StatDefinitions.hook_adamant_killed_enemy_marked_by_execution_order = {
+	flags = {
+		StatFlags.hook
+	}
+}
+StatDefinitions.hook_adamant_exited_max_forceful_stacks = {
+	flags = {
+		StatFlags.hook
+	}
+}
+StatDefinitions.adamant_team_wield_speed_aura_kills = {
+	flags = {
+		StatFlags.backend
+	},
+	data = {},
+	triggers = {
+		{
+			id = "hook_adamant_wield_speed_aura_kill",
+			trigger = StatMacros.increment
+		}
+	},
+	include_condition = archetype_condition
+}
+StatDefinitions.adamant_team_staggered_enemies_aura_kills = {
+	flags = {
+		StatFlags.backend
+	},
+	data = {},
+	triggers = {
+		{
+			id = "hook_adamant_staggered_enemy_aura_kill",
+			trigger = StatMacros.increment
+		}
+	},
+	include_condition = archetype_condition
+}
+StatDefinitions.adamant_team_companion_in_coherency_kills = {
+	flags = {
+		StatFlags.backend
+	},
+	data = {},
+	triggers = {
+		{
+			id = "hook_adamant_companion_coherency_aura_kill",
+			trigger = StatMacros.increment
+		}
+	},
+	include_condition = archetype_condition
+}
+StatDefinitions.adamant_time_enemies_electrocuted_by_shockmine = {
+	flags = {
+		StatFlags.backend
+	},
+	data = {},
+	triggers = {
+		{
+			id = "hook_adamant_time_enemy_electrocuted_by_shockmine",
+			trigger = function (self, stat_data, count)
+				return increment_by(self, stat_data, count)
+			end
+		}
+	},
+	include_condition = archetype_condition
+}
+StatDefinitions.adamant_enemies_affected_by_buff_drone = {
+	flags = {
+		StatFlags.backend
+	},
+	data = {},
+	triggers = {
+		{
+			id = "hook_adamant_enemy_affected_by_buff_drone",
+			trigger = StatMacros.increment
+		}
+	},
+	include_condition = archetype_condition
+}
+StatDefinitions.adamant_cluster_of_enemies_killed_with_grenade = {
+	flags = {
+		StatFlags.backend
+	},
+	data = {},
+	triggers = {
+		{
+			id = "hook_adamant_killed_cluster_of_enemies_with_grenade",
+			trigger = StatMacros.increment
+		}
+	},
+	include_condition = archetype_condition
+}
+StatDefinitions.adamant_time_allies_buffed_by_buff_drone = {
+	flags = {
+		StatFlags.backend
+	},
+	data = {},
+	triggers = {
+		{
+			id = "hook_adamant_time_ally_buffed_by_buff_drone",
+			trigger = function (self, stat_data, count)
+				return increment_by(self, stat_data, count)
+			end
+		}
+	},
+	include_condition = archetype_condition
+}
+StatDefinitions.adamant_enemies_killed_during_stance = {
+	flags = {
+		StatFlags.backend
+	},
+	data = {},
+	triggers = {
+		{
+			id = "hook_kill",
+			trigger = function (self, stat_data, attack_data)
+				local is_attacker_owner_in_stance = attack_data.attacker_owner_buff_keywords.adamant_hunt_stance
+
+				if is_attacker_owner_in_stance then
+					return increment(self, stat_data)
+				end
+			end
+		}
+	},
+	include_condition = archetype_condition
+}
+StatDefinitions.adamant_enemies_staggered_during_charge = {
+	flags = {
+		StatFlags.backend
+	},
+	data = {},
+	triggers = {
+		{
+			id = "hook_lunge_stop",
+			trigger = function (self, stat_data, units_hit, ranged_units_hit, ogryns_hit, elites_hit, specials_hit)
+				local elites_and_specials_hit = elites_hit + specials_hit
+
+				return increment_by(self, stat_data, elites_and_specials_hit)
+			end
+		}
+	},
+	include_condition = archetype_condition
+}
+StatDefinitions.adamant_monsters_staggered_by_whistle_explosion = {
+	flags = {
+		StatFlags.backend
+	},
+	data = {},
+	triggers = {
+		{
+			id = "hook_adamant_whistle_explosion_stagger_monster",
+			trigger = StatMacros.increment
+		}
+	},
+	include_condition = archetype_condition
+}
+StatDefinitions.adamant_killed_enemies_pounced_by_companion = {
+	flags = {
+		StatFlags.backend
+	},
+	data = {},
+	triggers = {
+		{
+			id = "hook_kill",
+			trigger = function (self, stat_data, attack_data)
+				local attacking_unit = attack_data.attacking_unit
+				local target_blackboard = attack_data.target_blackboard
+				local is_in_pounced_state = target_blackboard and target_blackboard.disable.type == "pounced"
+
+				if is_in_pounced_state then
+					local pouncing_unit = target_blackboard.disable.attacker_unit
+					local pouncing_unit_owner = Managers.state.player_unit_spawn:owner(pouncing_unit)
+					local is_killer_owner_of_pouncing_companion = pouncing_unit_owner and pouncing_unit_owner.player_unit and pouncing_unit_owner.player_unit == attacking_unit
+
+					if is_killer_owner_of_pouncing_companion then
+						return increment(self, stat_data)
+					end
+				end
+			end
+		}
+	},
+	include_condition = archetype_condition
+}
+StatDefinitions.adamant_killed_electrocuted_enemies = {
+	flags = {
+		StatFlags.backend
+	},
+	data = {},
+	triggers = {
+		{
+			id = "hook_kill",
+			trigger = function (self, stat_data, attack_data)
+				local is_electrocuted = attack_data.target_buff_keywords.electrocuted
+
+				if is_electrocuted then
+					return increment(self, stat_data)
+				end
+			end
+		}
+	},
+	include_condition = archetype_condition
+}
+StatDefinitions.adamant_blocked_attack_from_unique_enemies = {
+	flags = {
+		StatFlags.backend
+	},
+	data = {},
+	triggers = {
+		{
+			id = "hook_blocked_damage_from_unique_enemy",
+			trigger = StatMacros.increment
+		}
+	},
+	include_condition = archetype_condition
+}
+local valid_companion_pounce_target_breeds = {
+	renegade_netgunner = true,
+	renegade_sniper = true,
+	renegade_grenadier = true,
+	cultist_grenadier = true
+}
+StatDefinitions.adamant_companion_pounced_special_enemies = {
+	flags = {
+		StatFlags.backend
+	},
+	data = {},
+	triggers = {
+		{
+			id = "hook_adamant_companion_pounce_enemy",
+			trigger = function (self, stat_data, companion_unit, companion_breed_name, pounced_unit, pounced_unit_breed, previously_pounced)
+				if valid_companion_pounce_target_breeds[pounced_unit_breed] then
+					return increment(self, stat_data)
+				end
+			end
+		}
+	},
+	include_condition = archetype_condition
+}
+local valid_companion_knock_away_target_breeds = {
+	cultist_mutant = true,
+	chaos_poxwalker_bomber = true
+}
+StatDefinitions.adamant_companion_knocked_away_special_enemies = {
+	flags = {
+		StatFlags.backend
+	},
+	data = {},
+	triggers = {
+		{
+			id = "hook_adamant_companion_knock_enemy",
+			trigger = function (self, stat_data, companion_unit, companion_breed_name, pounced_unit, pounced_unit_breed, previously_pounced, has_companion_saved_disabled_owner)
+				if not previously_pounced and valid_companion_knock_away_target_breeds[pounced_unit_breed] then
+					return increment(self, stat_data)
+				end
+			end
+		}
+	},
+	include_condition = archetype_condition
+}
+StatDefinitions.adamant_killed_enemies_marked_by_execution_order = {
+	flags = {
+		StatFlags.backend
+	},
+	data = {
+		difficulty = 3
+	},
+	triggers = {
+		{
+			id = "hook_adamant_killed_enemy_marked_by_execution_order",
+			trigger = function (self, stat_data, attack_data)
+				return increment(self, stat_data)
+			end
+		}
+	},
+	include_condition = archetype_condition
+}
+StatDefinitions.adamant_melee_kills_with_terminus_warrant = {
+	flags = {
+		StatFlags.backend
+	},
+	data = {
+		difficulty = 3
+	},
+	triggers = {
+		{
+			id = "hook_kill",
+			trigger = function (self, stat_data, attack_data)
+				local is_ranged_attack = attack_data.attack_type == "melee"
+				local is_attacker_owner_in_terminus_warrant = attack_data.attacker_owner_buff_keywords.adamant_terminus_warrant
+
+				if is_ranged_attack and is_attacker_owner_in_terminus_warrant then
+					return increment(self, stat_data)
+				end
+			end
+		}
+	},
+	include_condition = archetype_condition
+}
+StatDefinitions.adamant_ranged_kills_with_terminus_warrant = {
+	flags = {
+		StatFlags.backend
+	},
+	data = {
+		difficulty = 3
+	},
+	triggers = {
+		{
+			id = "hook_kill",
+			trigger = function (self, stat_data, attack_data)
+				local is_ranged_attack = attack_data.attack_type == "ranged"
+				local is_attacker_owner_in_terminus_warrant = attack_data.attacker_owner_buff_keywords.adamant_terminus_warrant
+
+				if is_ranged_attack and is_attacker_owner_in_terminus_warrant then
+					return increment(self, stat_data)
+				end
+			end
+		}
+	},
+	include_condition = archetype_condition
+}
+StatDefinitions.adamant_time_at_max_forceful_stacks = {
+	flags = {
+		StatFlags.backend
+	},
+	data = {
+		difficulty = 3
+	},
+	triggers = {
+		{
+			id = "hook_adamant_exited_max_forceful_stacks",
+			trigger = function (self, stat_data, count)
+				return increment_by(self, stat_data, count)
+			end
+		}
+	},
+	include_condition = archetype_condition
 }
 
 local function template_name_to_id(template_name)
@@ -6177,24 +6577,6 @@ StatDefinitions.crafting_unique_traits_seen = {
 		StatFlags.no_sync
 	},
 	data = {}
-}
-StatDefinitions.survival_currency = {
-	flags = {
-		StatFlags.team
-	},
-	triggers = {
-		{
-			id = "team_kill",
-			trigger = function (self, stat_data, attack_data)
-				return increment_by(self, stat_data, 10)
-			end
-		}
-	},
-	include_condition = function (self, config)
-		local game_mode_name = config.game_mode_name
-
-		return game_mode_name == "survival"
-	end
 }
 StatDefinitions.game_mode_survival_waves_score = {
 	flags = {
@@ -6355,6 +6737,10 @@ local vo_stats = {
 	{
 		num_parts = 7,
 		name = "backstory_zola_part_"
+	},
+	{
+		num_parts = 10,
+		name = "backstory_brahms_part_"
 	}
 }
 
@@ -6610,6 +6996,31 @@ StatDefinitions.live_event_skulls_count = {
 			skulls_event_01_05 = true,
 			skulls_event_01_04 = true,
 			skulls_event_01_07 = true
+		}
+	},
+	include_condition = function (self, config)
+		local circumstance_name = config.circumstance_name
+
+		return self.data.circumstances[circumstance_name]
+	end
+}
+StatDefinitions.ember_mission_won = {
+	flags = {
+		StatFlags.team,
+		StatFlags.no_sync
+	},
+	data = {
+		circumstances = {
+			ember_01 = true,
+			ember_01_waves_spec = true,
+			ember_01_more_res = true,
+			ember_01_hunt_grou = true
+		}
+	},
+	triggers = {
+		{
+			id = "mission_won",
+			trigger = StatMacros.increment
 		}
 	},
 	include_condition = function (self, config)

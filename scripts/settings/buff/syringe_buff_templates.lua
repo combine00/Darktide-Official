@@ -41,8 +41,9 @@ local function _calulcate_coruption_buff_healing(template_data, heal_settings, h
 end
 
 templates.syringe_heal_corruption_buff = {
-	hud_icon = "content/ui/textures/icons/buffs/hud/syringe_corruption_buff_hud",
+	skip_tactical_overlay = true,
 	predicted = false,
+	hud_icon = "content/ui/textures/icons/buffs/hud/syringe_corruption_buff_hud",
 	duration = 8,
 	class_name = "buff",
 	heal_settings = {
@@ -165,6 +166,7 @@ templates.syringe_heal_corruption_buff = {
 templates.syringe_ability_boost_buff = {
 	unique_buff_id = "syringe_stimm",
 	predicted = false,
+	skip_tactical_overlay = true,
 	hud_icon = "content/ui/textures/icons/buffs/hud/syringe_ability_buff_hud",
 	unique_buff_priority = 1,
 	duration = 15,
@@ -214,6 +216,7 @@ templates.syringe_power_boost_buff = {
 	unique_buff_id = "syringe_stimm",
 	duration = 15,
 	predicted = false,
+	skip_tactical_overlay = true,
 	hud_icon = "content/ui/textures/icons/buffs/hud/syringe_power_buff_hud",
 	unique_buff_priority = 1,
 	class_name = "buff",
@@ -245,6 +248,7 @@ templates.syringe_speed_boost_buff = {
 	unique_buff_id = "syringe_stimm",
 	duration = 15,
 	predicted = false,
+	skip_tactical_overlay = true,
 	hud_icon = "content/ui/textures/icons/buffs/hud/syringe_speed_buff_hud",
 	unique_buff_priority = 1,
 	class_name = "buff",

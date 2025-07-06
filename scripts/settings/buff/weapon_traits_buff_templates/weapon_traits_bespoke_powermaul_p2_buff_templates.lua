@@ -1,8 +1,11 @@
+local AttackSettings = require("scripts/settings/damage/attack_settings")
 local BaseWeaponTraitBuffTemplates = require("scripts/settings/buff/weapon_traits_buff_templates/base_weapon_trait_buff_templates")
-local ConditionalFunctions = require("scripts/settings/buff/helper_functions/conditional_functions")
 local BuffSettings = require("scripts/settings/buff/buff_settings")
-local stat_buffs = BuffSettings.stat_buffs
+local ConditionalFunctions = require("scripts/settings/buff/helper_functions/conditional_functions")
+local damage_efficiencies = AttackSettings.damage_efficiencies
 local proc_events = BuffSettings.proc_events
+local stagger_results = AttackSettings.stagger_results
+local stat_buffs = BuffSettings.stat_buffs
 local templates = {}
 
 table.make_unique(templates)
@@ -67,6 +70,9 @@ templates.weapon_trait_bespoke_powermaul_p2_block_has_chance_to_stun = {
 		return ConditionalFunctions.is_item_slot_wielded(template_data, template_context, t)
 	end,
 	conditional_stat_buffs_func = ConditionalFunctions.is_item_slot_wielded,
+	check_proc_func = function (params, template_data, template_context)
+		return params.attack_type == "melee"
+	end,
 	proc_func = function (params, template_data, template_context, t)
 		local attacking_unit = params.attacking_unit
 		local attacking_unit_buff_extension = ScriptUnit.has_extension(attacking_unit, "buff_system")

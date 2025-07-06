@@ -1,18 +1,29 @@
 local Blackboard = require("scripts/extension_systems/blackboard/utilities/blackboard")
 local CompanionDogSettings = require("scripts/utilities/companion/companion_dog_settings")
 local NavQueries = require("scripts/utilities/nav_queries")
+local Sprint = require("scripts/extension_systems/character_state_machine/character_states/utilities/sprint")
 local CompanionFollowUtility = {}
 local MOVEMENT_DIRECTION = table.enum("none", "right", "left")
-CompanionFollowUtility.buffer_velocities = {}
+local valid_prioritized_positions = {}
 
 function CompanionFollowUtility.companion_has_follow_position(unit, blackboard, scratchpad, condition_args, action_data, is_running, dt)
 	local follow_component = Blackboard.write_component(blackboard, "follow")
 	local behavior_component = Blackboard.write_component(blackboard, "behavior")
+	local locomotion_extension = ScriptUnit.extension(blackboard.behavior.owner_unit, "locomotion_system")
+	local dog_owner_follow_config = action_data.dog_owner_follow_config
+	local dog_forward_follow_config = action_data.dog_forward_follow_config
+	local dog_lrb_follow_config = action_data.dog_lrb_follow_config
 
-	if follow_component.current_movement_type == "forward" then
-		CompanionFollowUtility.store_velocity(unit, blackboard, scratchpad, action_data)
-	else
-		CompanionFollowUtility.reset_buffer_velocities(unit, blackboard, scratchpad, action_data)
+	if follow_component.current_movement_type == "none" then
+		follow_component.speed_reference = 0
+	end
+
+	local gameplay_time = Managers.time:time("gameplay")
+
+	if (follow_component.current_adaptive_angle_check_left > 0 or follow_component.current_adaptive_angle_check_right > 0) and follow_component.adaptive_angle_enlarge_t < gameplay_time then
+		follow_component.current_adaptive_angle_check_left = math.max(follow_component.current_adaptive_angle_check_left - 1, 0)
+		follow_component.current_adaptive_angle_check_right = math.max(follow_component.current_adaptive_angle_check_right - 1, 0)
+		follow_component.adaptive_angle_enlarge_t = gameplay_time + dog_forward_follow_config.seconds_to_enlarge_adaptive_angle
 	end
 
 	local movement_vector = nil
@@ -21,7 +32,7 @@ function CompanionFollowUtility.companion_has_follow_position(unit, blackboard, 
 		local t = Managers.time:time("gameplay")
 
 		if t <= follow_component.current_position_cooldown then
-			return true
+			return is_running and behavior_component.has_move_to_position or false
 		else
 			follow_component.current_position_cooldown = -1
 		end
@@ -30,14 +41,15 @@ function CompanionFollowUtility.companion_has_follow_position(unit, blackboard, 
 	local current_owner_cooldown = blackboard.follow.current_owner_cooldown
 	local found_position = false
 	local current_scratchpad = nil
+	local owner_unit_data_extension = ScriptUnit.extension(behavior_component.owner_unit, "unit_data_system")
 
 	if current_owner_cooldown == -1 then
 		current_scratchpad = CompanionFollowUtility._create_scratchpad_follow_flrb(unit, blackboard, scratchpad, condition_args, action_data, is_running, dt)
 
 		if CompanionFollowUtility._owner_has_forward_velocity(unit, blackboard, scratchpad, condition_args, action_data, is_running) then
 			behavior_component.should_skip_start_anim = false
-			current_scratchpad.follow_config = CompanionDogSettings.dog_forward_follow_config
-			movement_vector = CompanionFollowUtility.calculate_average_velocity(unit, blackboard, scratchpad, action_data)
+			current_scratchpad.follow_config = dog_forward_follow_config
+			movement_vector = Vector3.flat(locomotion_extension:current_velocity())
 
 			if follow_component.current_movement_type ~= "forward" then
 				follow_component.last_referenced_vector:store(movement_vector)
@@ -45,12 +57,16 @@ function CompanionFollowUtility.companion_has_follow_position(unit, blackboard, 
 
 			follow_component.current_movement_type = "forward"
 		else
-			behavior_component.should_skip_start_anim = true
-			current_scratchpad.follow_config = CompanionDogSettings.dog_lrb_follow_config
-			local owner_unit_data_extension = ScriptUnit.extension(behavior_component.owner_unit, "unit_data_system")
-			local first_person = owner_unit_data_extension:read_component("first_person")
-			local look_rotation = first_person.rotation
-			movement_vector = Vector3.normalize(Vector3.flat(Quaternion.forward(look_rotation)))
+			if action_data.override_lrb_to_use_owner_speed then
+				current_scratchpad.follow_config = dog_lrb_follow_config
+				movement_vector = Vector3.flat(locomotion_extension:current_velocity())
+			else
+				behavior_component.should_skip_start_anim = true
+				current_scratchpad.follow_config = dog_lrb_follow_config
+				local first_person = owner_unit_data_extension:read_component("first_person")
+				local look_rotation = first_person.rotation
+				movement_vector = Vector3.normalize(Vector3.flat(Quaternion.forward(look_rotation)))
+			end
 
 			if follow_component.current_movement_type ~= "lrb" then
 				follow_component.last_referenced_vector:store(movement_vector)
@@ -60,23 +76,33 @@ function CompanionFollowUtility.companion_has_follow_position(unit, blackboard, 
 		end
 
 		current_scratchpad.max_angle_per_check = current_scratchpad.follow_config.max_angle_per_second * action_data.reset_position_timer
-		found_position = CompanionFollowUtility.calculate_flrb_position(unit, current_scratchpad, dt, movement_vector, action_data)
+		local sprint_character_state_component = owner_unit_data_extension:read_component("sprint_character_state")
 
-		if not found_position then
-			follow_component.current_owner_cooldown = 0
+		if not Sprint.is_in_start_slowdown(behavior_component.owner_unit, sprint_character_state_component) then
+			follow_component.speed_reference = Vector3.length(movement_vector)
+		end
+
+		found_position = CompanionFollowUtility.calculate_flrb_position(unit, current_scratchpad, dt, movement_vector, action_data)
+	end
+
+	if not found_position and follow_component.current_movement_type == "lrb" then
+		if action_data.override_lrb_to_use_owner_speed then
+			follow_component.current_movement_type = "none"
+		else
+			current_scratchpad = CompanionFollowUtility._create_scratchpad_follow_owner(unit, blackboard, scratchpad, condition_args, action_data, is_running)
+			current_scratchpad.follow_config = dog_owner_follow_config
+			found_position = CompanionFollowUtility.calculate_follow_owner_position(unit, blackboard, current_scratchpad, condition_args, action_data, is_running, dt)
+
+			if found_position then
+				follow_component.current_movement_type = "owner"
+			else
+				follow_component.current_movement_type = "none"
+			end
 		end
 	end
 
-	if not found_position then
-		current_scratchpad = CompanionFollowUtility._create_scratchpad_follow_owner(unit, blackboard, scratchpad, condition_args, action_data, is_running)
-		current_scratchpad.follow_config = CompanionDogSettings.dog_owner_follow_config
-		found_position = CompanionFollowUtility.calculate_follow_owner_position(unit, blackboard, current_scratchpad, condition_args, action_data, is_running, dt)
-
-		if found_position then
-			follow_component.current_movement_type = "owner"
-		else
-			follow_component.current_movement_type = "none"
-		end
+	if not found_position and follow_component.current_movement_type == "forward" then
+		follow_component.current_movement_type = "none"
 	end
 
 	local t = Managers.time:time("gameplay")
@@ -102,18 +128,12 @@ function CompanionFollowUtility.calculate_flrb_position(unit, scratchpad, dt, ve
 	local angle_between_velocities = Vector3.angle(last_referenced_vector, velocity, true)
 
 	if scratchpad.max_angle_per_check < math.radians_to_degrees(angle_between_velocities) then
-		if CompanionFollowUtility._is_inside_inner_cone(owner_unit, self_position, velocity, scratchpad.follow_config) then
-			move_to_position, current_direction, new_position_calculated = CompanionFollowUtility._calculate_new_flrb_position(owner_unit, unit, velocity, scratchpad.follow_config, scratchpad.locomotion_extension:current_velocity(), scratchpad.last_direction, scratchpad, action_data)
+		local rotation = CompanionFollowUtility._calculate_rotation_given_velocities(scratchpad, velocity)
+		local new_stored_velocity = Quaternion.rotate(rotation, last_referenced_vector)
 
-			follow_component.last_referenced_vector:store(velocity)
-		else
-			local rotation = CompanionFollowUtility._calculate_rotation_given_velocities(scratchpad, velocity)
-			local new_stored_velocity = Quaternion.rotate(rotation, last_referenced_vector)
+		follow_component.last_referenced_vector:store(new_stored_velocity)
 
-			follow_component.last_referenced_vector:store(new_stored_velocity)
-
-			move_to_position, current_direction, new_position_calculated = CompanionFollowUtility._calculate_new_flrb_position(owner_unit, unit, new_stored_velocity, scratchpad.follow_config, scratchpad.locomotion_extension:current_velocity(), scratchpad.last_direction, scratchpad, action_data)
-		end
+		move_to_position, current_direction, new_position_calculated = CompanionFollowUtility._calculate_new_flrb_position(owner_unit, unit, new_stored_velocity, scratchpad.follow_config, scratchpad.locomotion_extension:current_velocity(), scratchpad.last_direction, scratchpad, action_data)
 	else
 		follow_component.last_referenced_vector:store(velocity)
 
@@ -122,7 +142,13 @@ function CompanionFollowUtility.calculate_flrb_position(unit, scratchpad, dt, ve
 
 	if move_to_position then
 		behavior_component.move_to_position:store(move_to_position)
-		scratchpad.aim_component.controlled_aim_position:store(move_to_position)
+
+		behavior_component.has_move_to_position = true
+		local owner_unit_position = POSITION_LOOKUP[behavior_component.owner_unit]
+		local follow_aim_entry = CompanionFollowUtility.follow_aim_entry(scratchpad, action_data, velocity)
+		local aim_target_position = follow_aim_entry == "player" and owner_unit_position or move_to_position
+
+		CompanionFollowUtility.set_up_aim_target(unit, scratchpad, aim_target_position)
 	end
 
 	return new_position_calculated
@@ -131,36 +157,102 @@ end
 function CompanionFollowUtility._calculate_new_flrb_position(owner_unit, companion_unit, current_velocity, follow_config, companion_velocity, current_movement_direction, scratchpad, action_data)
 	local initial_position = POSITION_LOOKUP[owner_unit]
 	local normalized_velocity = Vector3.normalize(current_velocity)
-	local speed_length = Vector3.length(current_velocity)
+	local speed_length = scratchpad.follow_component.speed_reference
 	local speed_length_normalized = math.normalize_01(speed_length, follow_config.min_owner_speed, follow_config.max_owner_speed)
 	local speed_length_normalized_for_angle = 1 - speed_length_normalized
-	local min_angle = follow_config.front_angle
-	local max_angle = 90 - follow_config.side_angle
-	local movement_angle = math.degrees_to_radians(math.lerp(min_angle, max_angle, speed_length_normalized_for_angle))
-	local left_rotation = Quaternion(Vector3.up(), movement_angle)
-	local right_rotation = Quaternion(Vector3.up(), -movement_angle)
-	local inner_circle_distance = math.lerp(follow_config.inner_circle_min_distance, follow_config.inner_circle_max_distance, speed_length_normalized)
-	local outer_circle_distance = math.lerp(follow_config.outer_circle_min_distance, follow_config.outer_circle_max_distance, speed_length_normalized)
-	local distance_offset = (outer_circle_distance - inner_circle_distance) * 0.5
-	local distance = inner_circle_distance + distance_offset
-	local left_vector = Vector3.normalize(Quaternion.rotate(left_rotation, normalized_velocity)) * distance
-	local left_position = left_vector + initial_position
-	local right_vector = Vector3.normalize(Quaternion.rotate(right_rotation, normalized_velocity)) * distance
-	local right_position = right_vector + initial_position
 	local current_move_to_position = scratchpad.behavior_component.move_to_position:unbox()
 	local companion_position = current_move_to_position + companion_velocity * follow_config.seconds_for_movement_prediction
+	local follow_component = scratchpad.follow_component
+	local current_adaptive_angle_check_left = follow_component.current_adaptive_angle_check_left
+	local current_adaptive_angle_check_right = follow_component.current_adaptive_angle_check_right
+	local numbers_of_adaptive_angle_checks = follow_config.numbers_of_adaptive_angle_checks
+	local has_found_left_angle = false
+	local has_found_right_angle = false
+	local has_left_hit = false
+	local has_right_hit = false
+	local left_position = Vector3.zero()
+	local right_position = Vector3.zero()
+
+	while true do
+		local min_angle_left, max_angle_left, min_angle_right, max_angle_right = CompanionFollowUtility.get_max_front_side_angle(scratchpad, nil, follow_config)
+		local movement_angle_left = math.degrees_to_radians(math.lerp(min_angle_left, max_angle_left, speed_length_normalized_for_angle))
+		local movement_angle_right = math.degrees_to_radians(math.lerp(min_angle_right, max_angle_right, speed_length_normalized_for_angle))
+		local left_rotation = Quaternion(Vector3.up(), movement_angle_left)
+		local right_rotation = Quaternion(Vector3.up(), -movement_angle_right)
+		local inner_circle_distance = math.lerp(follow_config.inner_circle_min_distance, follow_config.inner_circle_max_distance, speed_length_normalized)
+		local outer_circle_distance = math.lerp(follow_config.outer_circle_min_distance, follow_config.outer_circle_max_distance, speed_length_normalized)
+		local distance_offset = (outer_circle_distance - inner_circle_distance) * 0.5
+		local distance = inner_circle_distance + distance_offset
+		local left_vector = Vector3.normalize(Quaternion.rotate(left_rotation, normalized_velocity)) * distance
+
+		if not has_found_left_angle then
+			left_position = left_vector + initial_position
+		end
+
+		local right_vector = Vector3.normalize(Quaternion.rotate(right_rotation, normalized_velocity)) * distance
+
+		if not has_found_right_angle then
+			right_position = right_vector + initial_position
+		end
+
+		local temp_has_left_hit, temp_has_right_hit = CompanionFollowUtility._ray_trace_movement_check(scratchpad, initial_position, left_position, right_position)
+
+		if not has_found_left_angle then
+			has_left_hit = temp_has_left_hit
+		end
+
+		if not has_found_right_angle then
+			has_right_hit = temp_has_right_hit
+		end
+
+		if not has_left_hit or not has_right_hit then
+			local nav_distances = {
+				4,
+				4,
+				0.25,
+				0
+			}
+			local new_positions_after_check = CompanionFollowUtility._look_for_valid_position(owner_unit, action_data, scratchpad, not has_left_hit, not has_right_hit, left_position, right_position, nav_distances)
+			local size = table.size(new_positions_after_check)
+
+			if size > 0 then
+				has_found_left_angle = has_found_left_angle or new_positions_after_check.first_position ~= nil
+				has_found_right_angle = has_found_right_angle or new_positions_after_check.second_position ~= nil
+			end
+		end
+
+		local should_continue = numbers_of_adaptive_angle_checks and current_adaptive_angle_check_left < numbers_of_adaptive_angle_checks and current_adaptive_angle_check_right < numbers_of_adaptive_angle_checks
+
+		if has_found_left_angle and has_found_right_angle then
+			break
+		elseif not numbers_of_adaptive_angle_checks then
+			return nil, nil, false
+		elseif should_continue then
+			if not has_found_left_angle then
+				current_adaptive_angle_check_left = math.clamp(current_adaptive_angle_check_left + 1, 0, numbers_of_adaptive_angle_checks) or current_adaptive_angle_check_left
+			end
+
+			if not has_found_right_angle then
+				current_adaptive_angle_check_right = math.clamp(current_adaptive_angle_check_right + 1, 0, numbers_of_adaptive_angle_checks) or current_adaptive_angle_check_right
+			end
+
+			follow_component.current_adaptive_angle_check_left = current_adaptive_angle_check_left
+			follow_component.current_adaptive_angle_check_right = current_adaptive_angle_check_right
+			local gameplay_time = Managers.time:time("gameplay")
+			follow_component.adaptive_angle_enlarge_t = gameplay_time + follow_config.seconds_to_enlarge_adaptive_angle
+		elseif not should_continue and not has_found_left_angle and not has_found_right_angle then
+			return nil, nil, false
+		else
+			break
+		end
+	end
+
 	local nav_distances = {
-		2,
-		2,
+		4,
+		4,
 		0.25,
 		0
 	}
-	local has_left_hit, has_right_hit = CompanionFollowUtility._ray_trace_movement_check(scratchpad, initial_position, left_position, right_position)
-
-	if has_left_hit and has_right_hit then
-		return nil, nil, false
-	end
-
 	local is_left_valid = true
 	local is_right_valid = true
 	is_left_valid = is_left_valid and not has_left_hit
@@ -204,8 +296,8 @@ function CompanionFollowUtility.calculate_follow_owner_position(unit, blackboard
 	end
 
 	local nav_distances = {
-		2,
-		2,
+		4,
+		4,
 		0.25,
 		0
 	}
@@ -229,7 +321,13 @@ function CompanionFollowUtility.calculate_follow_owner_position(unit, blackboard
 		end
 
 		behavior_component.move_to_position:store(new_position)
-		scratchpad.aim_component.controlled_aim_position:store(new_position)
+
+		behavior_component.has_move_to_position = true
+		local owner_unit_position = POSITION_LOOKUP[behavior_component.owner_unit]
+		local follow_aim_entry = CompanionFollowUtility.follow_aim_entry(scratchpad, action_data, Vector3.zero())
+		local aim_target_position = follow_aim_entry == "player" and owner_unit_position or new_position
+
+		CompanionFollowUtility.set_up_aim_target(unit, scratchpad, aim_target_position)
 	else
 		return false
 	end
@@ -259,14 +357,15 @@ function CompanionFollowUtility._calculate_position_around_owner(unit, scratchpa
 	local owner_position = POSITION_LOOKUP[scratchpad.owner_unit]
 	local outer_circle_distance = action_data.idle_circle_distances.outer_circle_distance
 	local inner_circle_distance = action_data.idle_circle_distances.inner_circle_distance
-	local distance_from_owner = inner_circle_distance + (outer_circle_distance - inner_circle_distance) * 0.5
+	local distance_from_owner = action_data.distance_from_owner or inner_circle_distance + (outer_circle_distance - inner_circle_distance) * 0.5
 	local nav_distances = {
-		0.25,
-		0.25,
+		4,
+		4,
 		0.25,
 		0
 	}
-	local valid_positions = CompanionFollowUtility.select_points_around_center_with_owner_forward(unit, scratchpad, action_data, owner_position, distance_from_owner, nav_distances, false, 1)
+	local valid_positions = nil
+	valid_positions, valid_prioritized_positions = CompanionFollowUtility.select_points_around_center_with_owner_forward(unit, scratchpad, action_data, owner_position, distance_from_owner, nav_distances, false, 1)
 	local behavior_component = scratchpad.behavior_component
 	local num_valid_positions = #valid_positions
 	local new_position = nil
@@ -276,6 +375,7 @@ function CompanionFollowUtility._calculate_position_around_owner(unit, scratchpa
 
 		if num_valid_positions ~= 1 then
 			local owner_velocity = Vector3.flat(ScriptUnit.extension(scratchpad.owner_unit, "locomotion_system"):current_velocity())
+			local index_new_position = nil
 
 			if not Vector3.equal(owner_velocity, Vector3.zero()) then
 				owner_velocity = Vector3.normalize(owner_velocity) * distance_from_owner
@@ -283,10 +383,20 @@ function CompanionFollowUtility._calculate_position_around_owner(unit, scratchpa
 				local index_point_to_avoid = CompanionFollowUtility._calculate_index_of_closest_point_to_reference_point(valid_positions, position_to_avoid)
 
 				table.remove(valid_positions, index_point_to_avoid)
-			end
 
-			local index_new_position = CompanionFollowUtility._calculate_index_of_closest_point_to_reference_point(valid_positions, POSITION_LOOKUP[unit])
-			new_position = valid_positions[index_new_position]
+				index_new_position = CompanionFollowUtility._calculate_index_of_closest_point_to_reference_point(valid_positions, POSITION_LOOKUP[unit])
+				new_position = valid_positions[index_new_position]
+			else
+				local num_valid_prioritized_positions = #valid_prioritized_positions
+
+				if num_valid_prioritized_positions > 0 then
+					index_new_position = CompanionFollowUtility._calculate_index_of_closest_point_to_reference_point(valid_prioritized_positions, POSITION_LOOKUP[unit])
+					new_position = valid_prioritized_positions[index_new_position]
+				else
+					index_new_position = CompanionFollowUtility._calculate_index_of_closest_point_to_reference_point(valid_positions, POSITION_LOOKUP[unit])
+					new_position = valid_positions[index_new_position]
+				end
+			end
 		end
 
 		behavior_component.has_move_to_position = true
@@ -310,26 +420,51 @@ end
 
 function CompanionFollowUtility.select_points_around_another_center(unit, scratchpad, action_data, center, forward_vector, nav_distances, stop_at_first, debug_draw_timer)
 	local valid_positions = {}
+	valid_prioritized_positions = {}
 	local angle_checks = 360 / (action_data.angle_rotation_for_check or scratchpad.follow_config.angle_rotation_for_check)
 	local angle_radians = math.degrees_to_radians(action_data.angle_rotation_for_check or scratchpad.follow_config.angle_rotation_for_check)
+	local nav_world = scratchpad.navigation_extension:nav_world()
+	local traverse_logic = scratchpad.navigation_extension:traverse_logic()
+	local owner_nav_new_position = NavQueries.position_on_mesh(nav_world, POSITION_LOOKUP[scratchpad.owner_unit], nav_distances[1], nav_distances[2], traverse_logic)
 
 	for i = 1, angle_checks do
-		local rotation = Quaternion(Vector3.up(), angle_radians * i)
+		local current_angle = math.fmod(angle_radians * i, 2 * math.pi)
+		local rotation = Quaternion(Vector3.up(), current_angle)
 		local pos_before_nav_check = center + Quaternion.rotate(rotation, forward_vector)
-		local nav_world = scratchpad.navigation_extension:nav_world()
-		local traverse_logic = scratchpad.navigation_extension:traverse_logic()
 		local new_position = NavQueries.position_on_mesh_with_outside_position(nav_world, traverse_logic, pos_before_nav_check, nav_distances[1], nav_distances[2], nav_distances[3], nav_distances[4])
 
 		if new_position then
-			table.insert(valid_positions, new_position)
+			local ray_can_go = owner_nav_new_position and GwNavQueries.raycango(nav_world, owner_nav_new_position, new_position, traverse_logic)
+
+			if ray_can_go then
+				table.insert(valid_positions, new_position)
+			end
+		end
+
+		if new_position and action_data.angle_to_prioritize then
+			local lower_degree_angle = action_data.angle_to_prioritize[1]
+			local upper_degree_angle = action_data.angle_to_prioritize[2]
+			local lower_angle = lower_degree_angle > 0 and math.degrees_to_radians(lower_degree_angle) or math.degrees_to_radians(lower_degree_angle + 360)
+			local higher_angle = upper_degree_angle > 0 and math.degrees_to_radians(upper_degree_angle) or math.degrees_to_radians(upper_degree_angle + 360)
+			local is_angle_valid = nil
+
+			if lower_angle <= higher_angle then
+				is_angle_valid = lower_angle <= current_angle and current_angle <= higher_angle
+			else
+				is_angle_valid = lower_angle <= current_angle or current_angle <= higher_angle
+			end
+
+			if is_angle_valid then
+				table.insert(valid_prioritized_positions, new_position)
+			end
 		end
 
 		if stop_at_first and new_position then
-			return valid_positions
+			return valid_positions, valid_prioritized_positions
 		end
 	end
 
-	return valid_positions
+	return valid_positions, valid_prioritized_positions
 end
 
 function CompanionFollowUtility.select_points_around_center_with_owner_forward(unit, scratchpad, action_data, center, distance, nav_distances, stop_at_first, draw_debug_timer)
@@ -360,13 +495,7 @@ function CompanionFollowUtility._look_for_valid_position(owner_unit, action_data
 		local new_position = new_positions[key]
 		local nav_world = scratchpad.navigation_extension:nav_world()
 		local traverse_logic = scratchpad.navigation_extension:traverse_logic()
-		local nav_new_position = NavQueries.position_on_mesh_with_outside_position(nav_world, traverse_logic, new_position, nav_distances[1], nav_distances[2], nav_distances[3], nav_distances[4])
-
-		if not nav_new_position then
-			local distance_from_point = 1
-			local valid_positions = CompanionFollowUtility.select_points_around_center_with_owner_forward(owner_unit, scratchpad, action_data, new_position, distance_from_point, nav_distances, true, 1)
-			nav_new_position = #valid_positions > 0 and valid_positions[1] or nil
-		end
+		local nav_new_position = NavQueries.position_on_mesh(nav_world, new_position, nav_distances[1], nav_distances[2], traverse_logic)
 
 		if nav_new_position then
 			new_positions_after_check[key] = nav_new_position
@@ -376,43 +505,8 @@ function CompanionFollowUtility._look_for_valid_position(owner_unit, action_data
 	return new_positions_after_check
 end
 
-function CompanionFollowUtility.store_velocity(unit, blackboard, scratchpad, action_data)
-	local owner_velocity = ScriptUnit.extension(blackboard.behavior.owner_unit, "locomotion_system"):current_velocity()
-
-	table.insert(CompanionFollowUtility.buffer_velocities, 1, Vector3Box(owner_velocity))
-
-	if #CompanionFollowUtility.buffer_velocities > 50 then
-		table.remove(CompanionFollowUtility.buffer_velocities, 51)
-	end
-end
-
-function CompanionFollowUtility.reset_buffer_velocities(unit, blackboard, scratchpad, action_data)
-	CompanionFollowUtility.buffer_velocities = {}
-end
-
-function CompanionFollowUtility.calculate_average_velocity(unit, blackboard, scratchpad, action_data)
-	local average_vector = Vector3.zero()
-
-	for i = 1, #CompanionFollowUtility.buffer_velocities do
-		local vector = Vector3Box.unbox(CompanionFollowUtility.buffer_velocities[i])
-		average_vector = average_vector + vector
-	end
-
-	local num_velocities = #CompanionFollowUtility.buffer_velocities
-
-	if num_velocities > 0 then
-		average_vector = average_vector / num_velocities
-	end
-
-	if Vector3.equal(average_vector, Vector3.zero()) then
-		average_vector = ScriptUnit.extension(blackboard.behavior.owner_unit, "locomotion_system"):current_velocity()
-	end
-
-	return average_vector
-end
-
 function CompanionFollowUtility._ray_trace_movement_check(scratchpad, initial_position, first_position, second_position)
-	local position_offset = Vector3(0, 0, 1.5)
+	local position_offset = Vector3(0, 0, 0.5)
 	local trace_position = initial_position + position_offset
 	local first_trace_position = first_position + position_offset
 	local second_trace_position = second_position + position_offset
@@ -420,8 +514,20 @@ function CompanionFollowUtility._ray_trace_movement_check(scratchpad, initial_po
 	local physics_world = spawn_component.physics_world
 	local first_trace_direction = first_trace_position - trace_position
 	local second_trace_direction = second_trace_position - trace_position
-	local has_first_hit = PhysicsWorld.raycast(physics_world, trace_position, first_trace_direction, Vector3.length(first_trace_direction), "closest", "collision_filter", "filter_simple_geometry")
-	local has_second_hit = PhysicsWorld.raycast(physics_world, trace_position, second_trace_direction, Vector3.length(second_trace_direction), "closest", "collision_filter", "filter_simple_geometry")
+	local has_first_hit, _, _, first_hit_normal = PhysicsWorld.raycast(physics_world, trace_position, first_trace_direction, Vector3.length(first_trace_direction), "closest", "collision_filter", "filter_simple_geometry")
+	local has_second_hit, _, _, second_hit_normal = PhysicsWorld.raycast(physics_world, trace_position, second_trace_direction, Vector3.length(second_trace_direction), "closest", "collision_filter", "filter_simple_geometry")
+
+	if has_first_hit and first_hit_normal then
+		local dot_product = Vector3.dot(first_hit_normal, Vector3.up())
+		local cone_cos = math.cos(math.degrees_to_radians(70))
+		has_first_hit = cone_cos > dot_product
+	end
+
+	if has_second_hit and second_hit_normal then
+		local dot_product = Vector3.dot(second_hit_normal, Vector3.up())
+		local cone_cos = math.cos(math.degrees_to_radians(70))
+		has_second_hit = cone_cos > dot_product
+	end
 
 	return has_first_hit, has_second_hit
 end
@@ -516,7 +622,6 @@ function CompanionFollowUtility._create_scratchpad_follow_flrb(unit, blackboard,
 	current_scratchpad.owner_locomotion_extension = ScriptUnit.extension(owner_unit, "locomotion_system")
 	current_scratchpad.current_direction_timer = 0
 	current_scratchpad.last_direction = MOVEMENT_DIRECTION.none
-	current_scratchpad.last_referenced_vector = Vector3Box(Vector3.zero())
 
 	return current_scratchpad
 end
@@ -540,6 +645,70 @@ function CompanionFollowUtility._create_scratchpad_follow_owner(unit, blackboard
 	current_scratchpad.owner_unit = owner_unit
 
 	return current_scratchpad
+end
+
+function CompanionFollowUtility.set_up_aim_target(unit, scratchpad, aim_target_position)
+	local unit_data_extension = ScriptUnit.extension(unit, "unit_data_system")
+	local unit_breed = unit_data_extension:breed()
+	local aim_node_name = unit_breed.aim_config.target_node
+	local aim_node = Unit.node(unit, aim_node_name)
+	local aim_node_position = Unit.world_position(unit, aim_node)
+	local aim_position = Vector3(aim_target_position.x, aim_target_position.y, aim_node_position.z)
+
+	scratchpad.aim_component.controlled_aim_position:store(aim_position)
+end
+
+function CompanionFollowUtility.follow_aim_entry(scratchpad, action_data, velocity)
+	local follow_config = scratchpad.follow_config
+	local follow_aim = follow_config and follow_config.follow_aim or action_data.follow_aim
+	local companion_speed = Vector3.length(velocity)
+	local follow_aim_entry = nil
+
+	for key, value in pairs(follow_aim) do
+		if value[1] <= companion_speed and companion_speed < value[2] then
+			follow_aim_entry = key
+
+			break
+		end
+	end
+
+	return follow_aim_entry
+end
+
+function CompanionFollowUtility.get_max_front_side_angle(scratchpad, blackboard, follow_config)
+	local front_angle_left = follow_config.front_angle
+	local side_angle_left = 90 - follow_config.side_angle
+	local front_angle_right = follow_config.front_angle
+	local side_angle_right = 90 - follow_config.side_angle
+	local numbers_of_adaptive_angle_checks = follow_config.numbers_of_adaptive_angle_checks
+
+	if not numbers_of_adaptive_angle_checks then
+		return front_angle_left, side_angle_left, front_angle_right, side_angle_right
+	end
+
+	local front_angle_adaptive_angle = front_angle_left / numbers_of_adaptive_angle_checks
+	local side_angle_adaptive_angle = side_angle_left / numbers_of_adaptive_angle_checks
+	local follow_component = scratchpad and scratchpad.follow_component or blackboard and blackboard.follow
+	local current_adaptive_angle_check_left = follow_component.current_adaptive_angle_check_left
+	local current_adaptive_angle_check_right = follow_component.current_adaptive_angle_check_right
+	front_angle_left = front_angle_left - front_angle_adaptive_angle * current_adaptive_angle_check_left
+	side_angle_left = side_angle_left - side_angle_adaptive_angle * current_adaptive_angle_check_left
+	front_angle_right = front_angle_right - front_angle_adaptive_angle * current_adaptive_angle_check_right
+	side_angle_right = side_angle_right - side_angle_adaptive_angle * current_adaptive_angle_check_right
+
+	return front_angle_left, side_angle_left, front_angle_right, side_angle_right
+end
+
+function CompanionFollowUtility.follow_config(blackboard, action_data)
+	local follow_component = blackboard.follow
+
+	if not follow_component then
+		return nil
+	end
+
+	local current_movement_type = follow_component.current_movement_type
+
+	return current_movement_type == "forward" and action_data.dog_forward_follow_config or current_movement_type == "lrb" and action_data.dog_lrb_follow_config or current_movement_type == "owner" and action_data.dog_owner_follow_config
 end
 
 return CompanionFollowUtility

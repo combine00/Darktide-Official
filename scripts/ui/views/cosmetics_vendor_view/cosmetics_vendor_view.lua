@@ -2,6 +2,7 @@ require("scripts/ui/views/vendor_view_base/vendor_view_base")
 
 local Definitions = require("scripts/ui/views/cosmetics_vendor_view/cosmetics_vendor_view_definitions")
 local Archetypes = require("scripts/settings/archetype/archetypes")
+local ArchetypeSettings = require("scripts/settings/archetype/archetype_settings")
 local Breeds = require("scripts/settings/breed/breeds")
 local ButtonPassTemplates = require("scripts/ui/pass_templates/button_pass_templates")
 local CosmeticsVendorViewSettings = require("scripts/ui/views/cosmetics_vendor_view/cosmetics_vendor_view_settings")
@@ -37,6 +38,12 @@ end
 
 function CosmeticsVendorView:on_enter()
 	CosmeticsVendorView.super.on_enter(self)
+
+	self._options_voice_fx = Application.user_setting("sound_settings", "voice_fx_setting") ~= false
+
+	if not self._options_voice_fx then
+		Wwise.set_state("options_voice_fx", "on")
+	end
 
 	self._render_settings.alpha_multiplier = 0
 	local context = self._context
@@ -78,10 +85,12 @@ function CosmeticsVendorView:_setup_tabs()
 	end
 
 	for archetype_name, archetype in pairs(Archetypes) do
-		cosmetic_tabs[#cosmetic_tabs + 1] = {
-			display_name = archetype.archetype_name,
-			ui_selection_order = archetype.ui_selection_order
-		}
+		if table.contains(ArchetypeSettings.archetype_cosmetics_whitelist, archetype_name) then
+			cosmetic_tabs[#cosmetic_tabs + 1] = {
+				display_name = archetype.archetype_name,
+				ui_selection_order = archetype.ui_selection_order
+			}
+		end
 	end
 
 	table.sort(cosmetic_tabs, function (a, b)
@@ -504,6 +513,10 @@ end
 function CosmeticsVendorView:on_exit()
 	self:_destroy_side_panel()
 
+	if not self._options_voice_fx then
+		Wwise.set_state("options_voice_fx", "off")
+	end
+
 	if self._on_enter_anim_id then
 		self:_stop_animation(self._on_enter_anim_id)
 
@@ -651,7 +664,7 @@ function CosmeticsVendorView:present_items(optional_context)
 
 	local context = self._context
 	local optional_camera_breed_name = context and context.optional_camera_breed_name
-	local breed_name = active_archetype and active_archetype.breed or presentation_profile.breed
+	local breed_name = active_archetype.breed
 	local default_camera_settings = self._breeds_default_camera_settings and self._breeds_default_camera_settings[optional_camera_breed_name or breed_name]
 
 	if default_camera_settings then

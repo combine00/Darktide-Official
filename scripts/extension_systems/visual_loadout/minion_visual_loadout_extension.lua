@@ -10,6 +10,7 @@ local CLIENT_RPCS = {
 	"rpc_minion_unwield_slot",
 	"rpc_minion_drop_slot",
 	"rpc_minion_send_on_death_event",
+	"rpc_minion_send_on_show_hide_weapon_event",
 	"rpc_minion_unequip_slot",
 	"rpc_minion_set_slot_visibility",
 	"rpc_minion_gib"
@@ -423,6 +424,40 @@ function MinionVisualLoadoutExtension:drop_slot(slot_name)
 	Managers.state.game_session:send_rpc_clients("rpc_minion_drop_slot", game_object_id, slot_id)
 end
 
+function MinionVisualLoadoutExtension:_send_on_show_hide_weapon_event(should_hide)
+	for slot_name, slot_data in pairs(self._slots) do
+		if slot_data.state ~= "unequipped" then
+			local item_unit = slot_data.unit
+
+			if item_unit then
+				if should_hide then
+					Unit.flow_event(item_unit, "hide_weapon")
+				else
+					Unit.flow_event(item_unit, "show_weapon")
+				end
+			end
+		end
+
+		if slot_data.attachments then
+			for _, attachment in pairs(slot_data.attachments) do
+				if should_hide then
+					Unit.flow_event(attachment, "hide_weapon")
+				else
+					Unit.flow_event(attachment, "show_weapon")
+				end
+			end
+		end
+	end
+end
+
+function MinionVisualLoadoutExtension:send_on_show_hide_weapon_event(should_hide)
+	self:_send_on_show_hide_weapon_event(should_hide)
+
+	local game_object_id = self._game_object_id
+
+	Managers.state.game_session:send_rpc_clients("rpc_minion_send_on_show_hide_weapon_event", game_object_id, should_hide)
+end
+
 function MinionVisualLoadoutExtension:_send_on_death_event()
 	for slot_name, slot_data in pairs(self._slots) do
 		if slot_data.state ~= "unequipped" then
@@ -819,6 +854,10 @@ end
 
 function MinionVisualLoadoutExtension:rpc_minion_send_on_death_event(channel_id, go_id)
 	self:_send_on_death_event()
+end
+
+function MinionVisualLoadoutExtension:rpc_minion_send_on_show_hide_weapon_event(channel_id, go_id, should_hide)
+	self:_send_on_show_hide_weapon_event(should_hide)
 end
 
 function MinionVisualLoadoutExtension:rpc_minion_unequip_slot(channel_id, go_id, slot_id)

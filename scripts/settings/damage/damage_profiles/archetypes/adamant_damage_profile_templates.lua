@@ -178,6 +178,7 @@ damage_templates.adamant_companion_pounce = {
 	companion_pounce = true,
 	stagger_category = "melee",
 	ogryn_disorientation_type = "ogryn_medium",
+	instant_ragdoll_delay = 0.05,
 	interrupt_alternate_fire = true,
 	disorientation_type = "medium",
 	armor_damage_modifier = {
@@ -203,7 +204,7 @@ damage_templates.adamant_companion_pounce = {
 		}
 	},
 	power_distribution = {
-		attack = 200,
+		attack = 100,
 		impact = 10
 	},
 	cleave_distribution = {
@@ -221,12 +222,17 @@ damage_templates.adamant_companion_pounce = {
 }
 damage_templates.adamant_companion_human_pounce = table.clone(damage_templates.adamant_companion_pounce)
 damage_templates.adamant_companion_ogryn_pounce = table.clone(damage_templates.adamant_companion_pounce)
-damage_templates.adamant_companion_ogryn_pounce.power_distribution.attack = 250
+damage_templates.adamant_companion_ogryn_pounce.power_distribution.attack = 200
+damage_templates.adamant_companion_ogryn_pounce.initial_pounce = true
+damage_templates.adamant_companion_monster_pounce = table.clone(damage_templates.adamant_companion_pounce)
+damage_templates.adamant_companion_monster_pounce.power_distribution.attack = 300
+damage_templates.adamant_companion_monster_pounce.initial_pounce = true
 damage_templates.adamant_companion_initial_pounce = {
 	companion_pounce = true,
 	stagger_category = "melee",
 	ogryn_disorientation_type = "ogryn_medium",
 	initial_pounce = true,
+	instant_ragdoll_delay = 0.05,
 	interrupt_alternate_fire = true,
 	disorientation_type = "medium",
 	armor_damage_modifier = {
@@ -268,10 +274,6 @@ damage_templates.adamant_companion_initial_pounce = {
 		}
 	}
 }
-damage_templates.adamant_companion_human_initial_pounce = table.clone(damage_templates.adamant_companion_initial_pounce)
-damage_templates.adamant_companion_ogryn_initial_pounce = table.clone(damage_templates.adamant_companion_initial_pounce)
-damage_templates.adamant_companion_insta_kill = table.clone(damage_templates.adamant_companion_initial_pounce)
-damage_templates.adamant_companion_insta_kill.instakill = true
 damage_templates.adamant_companion_no_damage_pounce = table.clone(damage_templates.adamant_companion_initial_pounce)
 damage_templates.adamant_companion_no_damage_pounce.power_distribution = {
 	attack = 0,

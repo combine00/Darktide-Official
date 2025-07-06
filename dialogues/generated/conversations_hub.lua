@@ -1,5 +1,109 @@
 return function ()
 	define_rule({
+		name = "adamant_officer_hub_greeting_dislikes_character",
+		category = "npc_prio_0",
+		wwise_route = 40,
+		response = "adamant_officer_hub_greeting_dislikes_character",
+		database = "conversations_hub",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"npc_interacting_vo"
+			},
+			{
+				"query_context",
+				"vo_event",
+				OP.EQ,
+				"adamant_officer_hub_greeting_dislikes_character"
+			},
+			{
+				"query_context",
+				"interactor_voice_profile",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_a",
+					"veteran_female_a"
+				}
+			},
+			{
+				"user_context",
+				"class_name",
+				OP.SET_INCLUDES,
+				args = {
+					"adamant_officer"
+				}
+			},
+			{
+				"user_memory",
+				"last_adamant_officer_likes_character",
+				OP.TIMEDIFF,
+				OP.GT,
+				5
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"last_adamant_officer_likes_character",
+				OP.TIMESET
+			}
+		}
+	})
+	define_rule({
+		name = "adamant_officer_hub_greeting_likes_character",
+		category = "npc_prio_0",
+		wwise_route = 40,
+		response = "adamant_officer_hub_greeting_likes_character",
+		database = "conversations_hub",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"npc_interacting_vo"
+			},
+			{
+				"query_context",
+				"vo_event",
+				OP.EQ,
+				"adamant_officer_hub_greeting"
+			},
+			{
+				"query_context",
+				"interactor_voice_profile",
+				OP.SET_INCLUDES,
+				args = {
+					"psyker_female_a",
+					"psyker_male_a"
+				}
+			},
+			{
+				"user_context",
+				"class_name",
+				OP.SET_INCLUDES,
+				args = {
+					"adamant_officer"
+				}
+			},
+			{
+				"user_memory",
+				"adamant_officer_hub_greeting",
+				OP.TIMEDIFF,
+				OP.GT,
+				5
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"adamant_officer_hub_greeting",
+				OP.TIMESET
+			}
+		}
+	})
+	define_rule({
 		name = "barber_distance",
 		category = "npc_prio_0",
 		response = "barber_distance",
@@ -14547,6 +14651,91 @@ return function ()
 				OP.TIMESET
 			}
 		},
+		heard_speak_routing = {
+			target = "disabled"
+		}
+	})
+	define_rule({
+		pre_wwise_event = "play_radio_static_start",
+		concurrent_wwise_event = "play_vox_static_loop",
+		name = "hub_onboarding_03_a",
+		wwise_route = 1,
+		response = "hub_onboarding_03_a",
+		database = "conversations_hub",
+		category = "vox_prio_0",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"mission_info"
+			},
+			{
+				"query_context",
+				"trigger_id",
+				OP.EQ,
+				"hub_onboarding_03_a"
+			},
+			{
+				"user_context",
+				"class_name",
+				OP.SET_INCLUDES,
+				args = {
+					"adamant_officer"
+				}
+			},
+			{
+				"faction_memory",
+				"prologue_hub_mourningstar_intro",
+				OP.EQ,
+				0
+			}
+		},
+		on_done = {
+			{
+				"faction_memory",
+				"prologue_hub_mourningstar_intro",
+				OP.ADD,
+				1
+			}
+		},
+		heard_speak_routing = {
+			target = "self"
+		}
+	})
+	define_rule({
+		post_wwise_event = "play_radio_static_end",
+		concurrent_wwise_event = "play_vox_static_loop",
+		name = "hub_onboarding_03_b",
+		wwise_route = 1,
+		response = "hub_onboarding_03_b",
+		database = "conversations_hub",
+		category = "vox_prio_0",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"hub_onboarding_03_a"
+				}
+			},
+			{
+				"user_context",
+				"class_name",
+				OP.SET_INCLUDES,
+				args = {
+					"adamant_officer"
+				}
+			}
+		},
+		on_done = {},
 		heard_speak_routing = {
 			target = "disabled"
 		}

@@ -32,14 +32,14 @@ local gameplay_vo_adamant_male_a = {
 			"loc_adamant_male_a__away_from_squad_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.202,
+			3.39601,
+			4.57801,
+			5.320677,
+			4.165344,
+			3.798677,
+			2.83801,
+			4.221344
 		},
 		randomize_indexes = {}
 	},
@@ -170,9 +170,9 @@ local gameplay_vo_adamant_male_a = {
 			"loc_adamant_male_a__combat_monster_release_a_03"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678
+			4.022469,
+			4.173521,
+			5.221563
 		},
 		randomize_indexes = {}
 	},
@@ -192,16 +192,16 @@ local gameplay_vo_adamant_male_a = {
 			"loc_adamant_male_a__combat_pause_one_liner_a_10"
 		},
 		sound_events_duration = {
-			3.663333,
-			2.418677,
-			2.12401,
-			2.80001,
-			3.85601,
-			2.974677,
-			4.14001,
-			2.933344,
-			3.88901,
-			3.224667
+			3.263333,
+			2.018677,
+			1.72401,
+			2.40001,
+			3.45601,
+			2.574677,
+			3.74001,
+			2.533344,
+			3.48901,
+			2.824667
 		},
 		randomize_indexes = {}
 	},
@@ -214,9 +214,9 @@ local gameplay_vo_adamant_male_a = {
 			"loc_adamant_male_a__combat_pause_quirk_ammo_hog_a_03"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678
+			2.21801,
+			2.90001,
+			2.719344
 		},
 		randomize_indexes = {}
 	},
@@ -228,8 +228,8 @@ local gameplay_vo_adamant_male_a = {
 			[2.0] = "loc_adamant_male_a__combat_pause_quirk_ammo_hog_b_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 4.00201,
+			[2.0] = 2.144667
 		},
 		randomize_indexes = {}
 	},
@@ -242,9 +242,9 @@ local gameplay_vo_adamant_male_a = {
 			"loc_adamant_male_a__combat_pause_quirk_health_hog_a_03"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678
+			3.637344,
+			2.903344,
+			2.17201
 		},
 		sound_event_weights = {
 			0.3333333,
@@ -261,8 +261,8 @@ local gameplay_vo_adamant_male_a = {
 			[2.0] = "loc_adamant_male_a__combat_pause_quirk_health_hog_b_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 2.322677,
+			[2.0] = 2.01201
 		},
 		randomize_indexes = {}
 	},
@@ -338,8 +338,8 @@ local gameplay_vo_adamant_male_a = {
 			[2.0] = "loc_adamant_male_a__conversation_combat_beast_of_nurgle_swallow_a_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 2.194417,
+			[2.0] = 2.794563
 		},
 		randomize_indexes = {}
 	},
@@ -351,8 +351,8 @@ local gameplay_vo_adamant_male_a = {
 			[2.0] = "loc_adamant_male_a__conversation_combat_beast_of_nurgle_swallow_b_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 1.46976,
+			[2.0] = 2.037833
 		},
 		randomize_indexes = {}
 	},
@@ -364,8 +364,8 @@ local gameplay_vo_adamant_male_a = {
 			[2.0] = "loc_adamant_male_a__conversation_combat_beast_of_nurgle_swallow_c_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 3.366302,
+			[2.0] = 3.82451
 		},
 		randomize_indexes = {}
 	},
@@ -377,8 +377,8 @@ local gameplay_vo_adamant_male_a = {
 			[2.0] = "loc_adamant_male_a__conversation_combat_chaos_spawn_a_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 4.870583,
+			[2.0] = 3.436594
 		},
 		randomize_indexes = {}
 	},
@@ -390,8 +390,8 @@ local gameplay_vo_adamant_male_a = {
 			[2.0] = "loc_adamant_male_a__conversation_combat_chaos_spawn_b_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 3.502323,
+			[2.0] = 3.607333
 		},
 		randomize_indexes = {}
 	},
@@ -403,8 +403,8 @@ local gameplay_vo_adamant_male_a = {
 			[2.0] = "loc_adamant_male_a__conversation_combat_chaos_spawn_c_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 3.839177,
+			[2.0] = 4.214302
 		},
 		randomize_indexes = {}
 	},
@@ -416,8 +416,8 @@ local gameplay_vo_adamant_male_a = {
 			[2.0] = "loc_adamant_male_a__conversation_combat_chaos_spawn_chew_a_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 6.204656,
+			[2.0] = 5.100135
 		},
 		randomize_indexes = {}
 	},
@@ -429,8 +429,8 @@ local gameplay_vo_adamant_male_a = {
 			[2.0] = "loc_adamant_male_a__conversation_combat_chaos_spawn_chew_b_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 2.49474,
+			[2.0] = 4.099979
 		},
 		randomize_indexes = {}
 	},
@@ -442,8 +442,8 @@ local gameplay_vo_adamant_male_a = {
 			[2.0] = "loc_adamant_male_a__conversation_combat_chaos_spawn_chew_c_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 3.049229,
+			[2.0] = 3.524115
 		},
 		randomize_indexes = {}
 	},
@@ -824,6 +824,25 @@ local gameplay_vo_adamant_male_a = {
 		},
 		randomize_indexes = {}
 	},
+	event_one_down = {
+		randomize_indexes_n = 0,
+		sound_events_n = 5,
+		sound_events = {
+			"loc_adamant_male_a__info_event_one_down_01",
+			"loc_adamant_male_a__info_event_one_down_02",
+			"loc_adamant_male_a__info_event_one_down_03",
+			"loc_adamant_male_a__info_event_one_down_04",
+			"loc_adamant_male_a__info_event_one_down_05"
+		},
+		sound_events_duration = {
+			2.056667,
+			0.872667,
+			0.869333,
+			1.733333,
+			2.144
+		},
+		randomize_indexes = {}
+	},
 	found_ammo_low_on_ammo = {
 		randomize_indexes_n = 0,
 		sound_events_n = 8,
@@ -1028,7 +1047,7 @@ local gameplay_vo_adamant_male_a = {
 		sound_events_duration = {
 			1.665021,
 			1.929115,
-			1.304167,
+			1.304156,
 			2.155135,
 			1.494198,
 			2.441302,
@@ -1072,8 +1091,8 @@ local gameplay_vo_adamant_male_a = {
 			"loc_adamant_male_a__heard_enemy_chaos_hound_08"
 		},
 		sound_events_duration = {
-			1.275177,
-			1.955156,
+			1.275167,
+			1.955146,
 			1.910677,
 			1.604656
 		},
@@ -1675,6 +1694,58 @@ local gameplay_vo_adamant_male_a = {
 		},
 		randomize_indexes = {}
 	},
+	reloading = {
+		randomize_indexes_n = 0,
+		sound_events_n = 5,
+		sound_events = {
+			"loc_adamant_male_a__reloading_01",
+			"loc_adamant_male_a__reloading_02",
+			"loc_adamant_male_a__reloading_03",
+			"loc_adamant_male_a__reloading_04",
+			"loc_adamant_male_a__reloading_05"
+		},
+		sound_events_duration = {
+			0.906427,
+			0.932865,
+			1.923729,
+			1.263615,
+			1.49974
+		},
+		sound_event_weights = {
+			0.2,
+			0.2,
+			0.2,
+			0.2,
+			0.2
+		},
+		randomize_indexes = {}
+	},
+	reloading_empty = {
+		randomize_indexes_n = 0,
+		sound_events_n = 5,
+		sound_events = {
+			"loc_adamant_male_a__reloading_empty_01",
+			"loc_adamant_male_a__reloading_empty_02",
+			"loc_adamant_male_a__reloading_empty_03",
+			"loc_adamant_male_a__reloading_empty_04",
+			"loc_adamant_male_a__reloading_empty_05"
+		},
+		sound_events_duration = {
+			2.424531,
+			2.43349,
+			2.393844,
+			1.926052,
+			2.772646
+		},
+		sound_event_weights = {
+			0.2,
+			0.2,
+			0.2,
+			0.2,
+			0.2
+		},
+		randomize_indexes = {}
+	},
 	response_for_calling_for_help = {
 		randomize_indexes_n = 0,
 		sound_events_n = 8,
@@ -2163,10 +2234,10 @@ local gameplay_vo_adamant_male_a = {
 			"loc_adamant_male_a__response_for_veteran_disabled_by_chaos_hound_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.873344,
+			2.076531,
+			3.017833,
+			2.475656
 		},
 		randomize_indexes = {}
 	},
@@ -2182,12 +2253,12 @@ local gameplay_vo_adamant_male_a = {
 			"loc_adamant_male_a__response_for_veteran_disabled_by_enemy_06"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.940042,
+			1.952365,
+			2.710896,
+			1.624792,
+			1.616146,
+			2.073125
 		},
 		randomize_indexes = {}
 	},
@@ -2201,10 +2272,10 @@ local gameplay_vo_adamant_male_a = {
 			"loc_adamant_male_a__response_for_veteran_enemy_kill_monster_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.972458,
+			2.046802,
+			2.388365,
+			1.737823
 		},
 		randomize_indexes = {}
 	},
@@ -2218,10 +2289,10 @@ local gameplay_vo_adamant_male_a = {
 			"loc_adamant_male_a__response_for_veteran_knocked_down_3_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.868531,
+			4.015677,
+			3.146396,
+			1.687438
 		},
 		randomize_indexes = {}
 	},
@@ -2237,12 +2308,12 @@ local gameplay_vo_adamant_male_a = {
 			"loc_adamant_male_a__response_for_veteran_ledge_hanging_06"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			3.891406,
+			2.078292,
+			1.992729,
+			2.163479,
+			1.263698,
+			2.030688
 		},
 		randomize_indexes = {}
 	},
@@ -2296,10 +2367,10 @@ local gameplay_vo_adamant_male_a = {
 			"loc_adamant_male_a__response_for_zealot_disabled_by_chaos_hound_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.204875,
+			2.205073,
+			2.7735,
+			2.586229
 		},
 		randomize_indexes = {}
 	},
@@ -2315,12 +2386,12 @@ local gameplay_vo_adamant_male_a = {
 			"loc_adamant_male_a__response_for_zealot_disabled_by_enemy_06"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.51776,
+			2.993917,
+			1.852917,
+			1.851906,
+			2.417135,
+			2.986167
 		},
 		randomize_indexes = {}
 	},
@@ -2334,10 +2405,10 @@ local gameplay_vo_adamant_male_a = {
 			"loc_adamant_male_a__response_for_zealot_enemy_kill_monster_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.987594,
+			2.309198,
+			1.946802,
+			3.080094
 		},
 		randomize_indexes = {}
 	},
@@ -2351,10 +2422,10 @@ local gameplay_vo_adamant_male_a = {
 			"loc_adamant_male_a__response_for_zealot_knocked_down_3_04"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.340885,
+			2.052188,
+			2.622604,
+			2.572365
 		},
 		randomize_indexes = {}
 	},
@@ -2370,12 +2441,12 @@ local gameplay_vo_adamant_male_a = {
 			"loc_adamant_male_a__response_for_zealot_ledge_hanging_06"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.30524,
+			1.947073,
+			3.640771,
+			2.536365,
+			3.478688,
+			4.947563
 		},
 		randomize_indexes = {}
 	},
@@ -2389,10 +2460,10 @@ local gameplay_vo_adamant_male_a = {
 			"loc_adamant_male_a__seen_enemy_beast_of_nurgle_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.235865,
+			3.46949,
+			2.003604,
+			3.127906
 		},
 		randomize_indexes = {}
 	},
@@ -2406,10 +2477,105 @@ local gameplay_vo_adamant_male_a = {
 			"loc_adamant_male_a__seen_enemy_berserker_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.745635,
+			1.692646,
+			2.331938,
+			3.326698
+		},
+		randomize_indexes = {}
+	},
+	seen_enemy_bulwark = {
+		randomize_indexes_n = 0,
+		sound_events_n = 3,
+		sound_events = {
+			"loc_adamant_male_a__smart_tag_vo_enemy_chaos_ogryn_bulwark_01",
+			"loc_adamant_male_a__smart_tag_vo_enemy_chaos_ogryn_bulwark_02",
+			"loc_adamant_male_a__smart_tag_vo_enemy_chaos_ogryn_bulwark_03"
+		},
+		sound_events_duration = {
+			0.79526,
+			0.831615,
+			0.976417
+		},
+		sound_event_weights = {
+			0.3333333,
+			0.3333333,
+			0.3333333
+		},
+		randomize_indexes = {}
+	},
+	seen_enemy_cultist_grenadier = {
+		randomize_indexes_n = 0,
+		sound_events_n = 4,
+		sound_events = {
+			"loc_adamant_male_a__seen_enemy_grenadier_05",
+			"loc_adamant_male_a__seen_enemy_grenadier_06",
+			"loc_adamant_male_a__seen_enemy_grenadier_07",
+			"loc_adamant_male_a__seen_enemy_grenadier_08"
+		},
+		sound_events_duration = {
+			1.758083,
+			2.550365,
+			1.57099,
+			2.704896
+		},
+		sound_event_weights = {
+			0.25,
+			0.25,
+			0.25,
+			0.25
+		},
+		randomize_indexes = {}
+	},
+	seen_enemy_cultist_heavy_gunner = {
+		randomize_indexes_n = 0,
+		sound_events_n = 5,
+		sound_events = {
+			"loc_adamant_male_a__seen_enemy_heavy_gunner_01",
+			"loc_adamant_male_a__seen_enemy_heavy_gunner_02",
+			"loc_adamant_male_a__seen_enemy_heavy_gunner_03",
+			"loc_adamant_male_a__seen_enemy_heavy_gunner_04",
+			"loc_adamant_male_a__seen_enemy_heavy_gunner_05"
+		},
+		sound_events_duration = {
+			0.955146,
+			2.759104,
+			1.601729,
+			4.232823,
+			1.54075
+		},
+		sound_event_weights = {
+			0.2,
+			0.2,
+			0.2,
+			0.2,
+			0.2
+		},
+		randomize_indexes = {}
+	},
+	seen_enemy_cultist_shocktrooper = {
+		randomize_indexes_n = 0,
+		sound_events_n = 5,
+		sound_events = {
+			"loc_adamant_male_a__seen_enemy_shocktrooper_01",
+			"loc_adamant_male_a__seen_enemy_shocktrooper_02",
+			"loc_adamant_male_a__seen_enemy_shocktrooper_03",
+			"loc_adamant_male_a__seen_enemy_shocktrooper_04",
+			"loc_adamant_male_a__seen_enemy_shocktrooper_05"
+		},
+		sound_events_duration = {
+			1.158229,
+			1.609385,
+			2.314167,
+			2.79075,
+			2.822448
+		},
+		sound_event_weights = {
+			0.2,
+			0.2,
+			0.2,
+			0.2,
+			0.2
 		},
 		randomize_indexes = {}
 	},
@@ -2425,12 +2591,38 @@ local gameplay_vo_adamant_male_a = {
 			"loc_adamant_male_a__seen_enemy_daemonhost_06"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			0.942677,
+			1.67201,
+			3.02201,
+			2.49201,
+			2.376677,
+			2.78401
+		},
+		randomize_indexes = {}
+	},
+	seen_enemy_executor = {
+		randomize_indexes_n = 0,
+		sound_events_n = 5,
+		sound_events = {
+			"loc_adamant_male_a__seen_enemy_executor_01",
+			"loc_adamant_male_a__seen_enemy_executor_02",
+			"loc_adamant_male_a__seen_enemy_executor_03",
+			"loc_adamant_male_a__seen_enemy_executor_04",
+			"loc_adamant_male_a__seen_enemy_executor_05"
+		},
+		sound_events_duration = {
+			1.684833,
+			2.176833,
+			2.500708,
+			1.853083,
+			2.005021
+		},
+		sound_event_weights = {
+			0.2,
+			0.2,
+			0.2,
+			0.2,
+			0.2
 		},
 		randomize_indexes = {}
 	},
@@ -2444,10 +2636,10 @@ local gameplay_vo_adamant_male_a = {
 			"loc_adamant_male_a__seen_enemy_grenadier_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.758083,
+			2.550365,
+			1.57099,
+			2.704896
 		},
 		randomize_indexes = {}
 	},
@@ -2465,14 +2657,14 @@ local gameplay_vo_adamant_male_a = {
 			"loc_adamant_male_a__seen_enemy_group_assaulting_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.613052,
+			2.887688,
+			3.882958,
+			3.336458,
+			3.67574,
+			3.207635,
+			3.803542,
+			3.648406
 		},
 		randomize_indexes = {}
 	},
@@ -2490,14 +2682,40 @@ local gameplay_vo_adamant_male_a = {
 			"loc_adamant_male_a__seen_enemy_group_far_range_shooting_behind_cover_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.858333,
+			2.655063,
+			1.736135,
+			2.485146,
+			2.273531,
+			2.705823,
+			3.272333,
+			3.647344
+		},
+		randomize_indexes = {}
+	},
+	seen_enemy_heavy_gunner = {
+		randomize_indexes_n = 0,
+		sound_events_n = 5,
+		sound_events = {
+			"loc_adamant_male_a__seen_enemy_heavy_gunner_01",
+			"loc_adamant_male_a__seen_enemy_heavy_gunner_02",
+			"loc_adamant_male_a__seen_enemy_heavy_gunner_03",
+			"loc_adamant_male_a__seen_enemy_heavy_gunner_04",
+			"loc_adamant_male_a__seen_enemy_heavy_gunner_05"
+		},
+		sound_events_duration = {
+			0.955146,
+			2.759104,
+			1.601729,
+			4.232823,
+			1.54075
+		},
+		sound_event_weights = {
+			0.2,
+			0.2,
+			0.2,
+			0.2,
+			0.2
 		},
 		randomize_indexes = {}
 	},
@@ -2511,10 +2729,82 @@ local gameplay_vo_adamant_male_a = {
 			"loc_adamant_male_a__seen_enemy_mutant_charger_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.677385,
+			2.495281,
+			1.481,
+			2.651771
+		},
+		randomize_indexes = {}
+	},
+	seen_enemy_poxwalker_bomber = {
+		randomize_indexes_n = 0,
+		sound_events_n = 4,
+		sound_events = {
+			"loc_adamant_male_a__seen_enemy_poxwalker_bomber_05",
+			"loc_adamant_male_a__seen_enemy_poxwalker_bomber_06",
+			"loc_adamant_male_a__seen_enemy_poxwalker_bomber_07",
+			"loc_adamant_male_a__seen_enemy_poxwalker_bomber_08"
+		},
+		sound_events_duration = {
+			1.626896,
+			1.981677,
+			2.091073,
+			1.686688
+		},
+		sound_event_weights = {
+			0.25,
+			0.25,
+			0.25,
+			0.25
+		},
+		randomize_indexes = {}
+	},
+	seen_enemy_renegade_berserker = {
+		randomize_indexes_n = 0,
+		sound_events_n = 4,
+		sound_events = {
+			"loc_adamant_male_a__seen_enemy_berserker_05",
+			"loc_adamant_male_a__seen_enemy_berserker_06",
+			"loc_adamant_male_a__seen_enemy_berserker_07",
+			"loc_adamant_male_a__seen_enemy_berserker_08"
+		},
+		sound_events_duration = {
+			1.745635,
+			1.692646,
+			2.331938,
+			3.326698
+		},
+		sound_event_weights = {
+			0.25,
+			0.25,
+			0.25,
+			0.25
+		},
+		randomize_indexes = {}
+	},
+	seen_enemy_renegade_shocktrooper = {
+		randomize_indexes_n = 0,
+		sound_events_n = 5,
+		sound_events = {
+			"loc_adamant_male_a__seen_enemy_shocktrooper_01",
+			"loc_adamant_male_a__seen_enemy_shocktrooper_02",
+			"loc_adamant_male_a__seen_enemy_shocktrooper_03",
+			"loc_adamant_male_a__seen_enemy_shocktrooper_04",
+			"loc_adamant_male_a__seen_enemy_shocktrooper_05"
+		},
+		sound_events_duration = {
+			1.158229,
+			1.609385,
+			2.314167,
+			2.79075,
+			2.822448
+		},
+		sound_event_weights = {
+			0.2,
+			0.2,
+			0.2,
+			0.2,
+			0.2
 		},
 		randomize_indexes = {}
 	},
@@ -2529,11 +2819,11 @@ local gameplay_vo_adamant_male_a = {
 			"loc_adamant_male_a__seen_enemy_sniper_05"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.349719,
+			2.842917,
+			1.598833,
+			2.327219,
+			2.41026
 		},
 		randomize_indexes = {}
 	},
@@ -2548,11 +2838,54 @@ local gameplay_vo_adamant_male_a = {
 			"loc_adamant_male_a__seen_enemy_tox_flamer_05"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.255719,
+			1.453479,
+			2.284594,
+			1.810969,
+			2.986573
+		},
+		randomize_indexes = {}
+	},
+	seen_enemy_traitor_heavy_gunner = {
+		randomize_indexes_n = 0,
+		sound_events_n = 5,
+		sound_events = {
+			"loc_adamant_male_a__seen_enemy_heavy_gunner_01",
+			"loc_adamant_male_a__seen_enemy_heavy_gunner_02",
+			"loc_adamant_male_a__seen_enemy_heavy_gunner_03",
+			"loc_adamant_male_a__seen_enemy_heavy_gunner_04",
+			"loc_adamant_male_a__seen_enemy_heavy_gunner_05"
+		},
+		sound_events_duration = {
+			0.955146,
+			2.759104,
+			1.601729,
+			4.232823,
+			1.54075
+		},
+		sound_event_weights = {
+			0.2,
+			0.2,
+			0.2,
+			0.2,
+			0.2
+		},
+		randomize_indexes = {}
+	},
+	seen_netgunner = {
+		randomize_indexes_n = 0,
+		sound_events_n = 4,
+		sound_events = {
+			"loc_adamant_male_a__seen_netgunner_05",
+			"loc_adamant_male_a__seen_netgunner_06",
+			"loc_adamant_male_a__seen_netgunner_07",
+			"loc_adamant_male_a__seen_netgunner_08"
+		},
+		sound_events_duration = {
+			2.216229,
+			1.542979,
+			2.031458,
+			2.207938
 		},
 		randomize_indexes = {}
 	},
@@ -2570,14 +2903,14 @@ local gameplay_vo_adamant_male_a = {
 			"loc_adamant_male_a__surrounded_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.385271,
+			2.002156,
+			1.328094,
+			2.724479,
+			2.642198,
+			2.069188,
+			2.154438,
+			3.159896
 		},
 		randomize_indexes = {}
 	},
@@ -2595,14 +2928,14 @@ local gameplay_vo_adamant_male_a = {
 			"loc_adamant_male_a__surrounded_response_08"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			1.536052,
+			2.739635,
+			2.606302,
+			3.02426,
+			3.806417,
+			2.491854,
+			3.350427,
+			2.736438
 		},
 		randomize_indexes = {}
 	},
@@ -2617,11 +2950,11 @@ local gameplay_vo_adamant_male_a = {
 			"loc_adamant_male_a__warning_exploding_barrel_05"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678,
-			3.45678
+			2.12325,
+			1.833313,
+			2.26474,
+			2.701708,
+			1.433635
 		},
 		randomize_indexes = {}
 	}

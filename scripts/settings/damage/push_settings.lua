@@ -69,6 +69,10 @@ local push_settings = {
 			speed = 4,
 			max_speed_override = 4
 		},
+		cyber_mastiff_push = {
+			speed = 2,
+			max_speed_override = 2
+		},
 		chaos_ogryn_gunner_bullet = {
 			speed = 2,
 			max_speed_override = 2

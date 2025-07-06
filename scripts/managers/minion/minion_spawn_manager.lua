@@ -11,6 +11,7 @@ function MinionSpawnManager:init(level_seed, soft_cap_out_of_bounds_units, netwo
 	self._spawned_minions = {}
 	self._spawned_minions_index_lookup = {}
 	self._num_spawned_minions = 0
+	self._minions_with_owners = {}
 	self._side_system = Managers.state.extension:system("side_system")
 	self._soft_cap_out_of_bounds_units = soft_cap_out_of_bounds_units
 	local spawn_queue = Script.new_array(MINION_QUEUE_RING_BUFFER_SIZE)
@@ -67,6 +68,14 @@ function MinionSpawnManager:update(dt, t)
 		if soft_cap_out_of_bounds_units[unit] then
 			Log.info("MinionSpawnManager", "%s is out-of-bounds, despawning (%s).", unit, tostring(POSITION_LOOKUP[unit]))
 			self:despawn_minion(unit)
+
+			if self._minions_with_owners[unit] then
+				local unit_blackboard = BLACKBOARDS[unit]
+				local behavior_component = Blackboard.write_component(unit_blackboard, "behavior")
+				behavior_component.is_out_of_bound = true
+
+				Managers.state.out_of_bounds:unregister_soft_oob_unit(unit, self)
+			end
 		end
 	end
 end
@@ -100,6 +109,13 @@ function MinionSpawnManager:spawn_minion(breed_name, position, rotation, side_id
 
 	if game_mode_name == "survival" then
 		additional_health_modifier = game_mode:get_minion_health_modifier(breed)
+	elseif game_mode_name == "coop_complete_objective" then
+		local circumstance_template = Managers.state.circumstance:template()
+		local circumstance_health_modifier = circumstance_template and circumstance_template.minion_health_modifier
+
+		if circumstance_health_modifier then
+			additional_health_modifier = circumstance_health_modifier
+		end
 	end
 
 	if additional_health_modifier then
@@ -113,6 +129,11 @@ function MinionSpawnManager:spawn_minion(breed_name, position, rotation, side_id
 	self._spawned_minions[spawned_index] = unit
 	self._spawned_minions_index_lookup[unit] = spawned_index
 	self._num_spawned_minions = self._num_spawned_minions + 1
+
+	if temp_data.optional_owner_player_unit then
+		self._minions_with_owners[unit] = true
+	end
+
 	local spawn_anim_state = breed.spawn_anim_state
 
 	if spawn_anim_state then
@@ -273,6 +294,10 @@ function MinionSpawnManager:despawn_all_minions()
 end
 
 function MinionSpawnManager:despawn_minion(unit)
+	if self._minions_with_owners[unit] then
+		return
+	end
+
 	local success = self:unregister_unit(unit)
 
 	if success then

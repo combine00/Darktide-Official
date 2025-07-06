@@ -42,6 +42,8 @@ function CacheWrapper:refresh(version, url)
 
 		if self._current_metadata.version ~= metadata.version then
 			return self._refresh_fn(metadata.version, metadata.url):next(function (v)
+				Crashify.print_property("masterdata_version", metadata.version)
+
 				self._current_metadata = metadata
 				self._current_value = v
 

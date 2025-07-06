@@ -1,14 +1,16 @@
 require("scripts/extension_systems/behavior/nodes/bt_node")
 
+local Animation = require("scripts/utilities/animation")
 local Attack = require("scripts/utilities/attack/attack")
 local AttackSettings = require("scripts/settings/damage/attack_settings")
 local Blackboard = require("scripts/extension_systems/blackboard/utilities/blackboard")
-local Stagger = require("scripts/utilities/attack/stagger")
-local NavQueries = require("scripts/utilities/nav_queries")
-local MinionMovement = require("scripts/utilities/minion_movement")
-local Animation = require("scripts/utilities/animation")
+local BuffSettings = require("scripts/settings/buff/buff_settings")
 local HitScan = require("scripts/utilities/attack/hit_scan")
 local ImpactEffect = require("scripts/utilities/attack/impact_effect")
+local MinionMovement = require("scripts/utilities/minion_movement")
+local NavQueries = require("scripts/utilities/nav_queries")
+local Stagger = require("scripts/utilities/attack/stagger")
+local proc_events = BuffSettings.proc_events
 local BtCompanionTargetPounceAndEscapeAction = class("BtCompanionTargetPounceAndEscapeAction", "BtNode")
 
 function BtCompanionTargetPounceAndEscapeAction:enter(unit, breed, blackboard, scratchpad, action_data, t)
@@ -39,6 +41,8 @@ function BtCompanionTargetPounceAndEscapeAction:enter(unit, breed, blackboard, s
 	scratchpad.target_stagger_component = target_blackboard.stagger
 
 	self:_initial_set_up(unit, scratchpad, action_data, t)
+	self:_handle_knock_away_enemy_stats(unit, breed, pounce_target, target_unit_breed)
+	self:_trigger_knock_away_enemy_proc_event(unit, breed, pounce_target, target_unit_breed)
 end
 
 function BtCompanionTargetPounceAndEscapeAction:init_values(blackboard)
@@ -57,6 +61,14 @@ function BtCompanionTargetPounceAndEscapeAction:leave(unit, breed, blackboard, s
 	pounce_component.has_pounce_started = false
 	pounce_component.target_hit_zone_name = ""
 	pounce_component.leap_node = ""
+	local companion_pounce_setting = scratchpad.companion_pounce_setting
+	local hurt_effect_template = companion_pounce_setting.hurt_effect_template
+
+	if hurt_effect_template and scratchpad.global_effect_id then
+		local fx_system = scratchpad.fx_system
+
+		fx_system:stop_template_effect(scratchpad.global_effect_id)
+	end
 end
 
 local SPEED_THRESHOLD = 0.01
@@ -116,7 +128,7 @@ function BtCompanionTargetPounceAndEscapeAction:run(unit, breed, blackboard, scr
 		scratchpad._is_jump_off_set_up = true
 	end
 
-	if not scratchpad.has_jump_off_direction then
+	if not scratchpad.pounce_component.has_jump_off_direction then
 		return "running"
 	end
 
@@ -125,13 +137,12 @@ function BtCompanionTargetPounceAndEscapeAction:run(unit, breed, blackboard, scr
 			MinionMovement.set_anim_driven(scratchpad, false)
 		end
 
-		local sound_event = companion_pounce_setting.escape_sound_event
+		local fx_system = scratchpad.fx_system
+		local hurt_effect_template = companion_pounce_setting.hurt_effect_template
 
-		if sound_event then
-			local fx_node_name = "fx_jaw"
-			local fx_node = Unit.node(unit, fx_node_name)
-
-			scratchpad.fx_system:trigger_wwise_event(sound_event, nil, unit, fx_node)
+		if hurt_effect_template and not fx_system:has_running_template_of_name(unit, hurt_effect_template.name) then
+			local global_effect_id = fx_system:start_template_effect(hurt_effect_template, unit)
+			scratchpad.global_effect_id = global_effect_id
 		end
 
 		local mover = Unit.mover(unit)
@@ -141,7 +152,7 @@ function BtCompanionTargetPounceAndEscapeAction:run(unit, breed, blackboard, scr
 			local traverse_logic = scratchpad.traverse_logic
 			local above = 0.2
 			local below = 0.2
-			local lateral = 0.2
+			local lateral = 0.3
 			local has_nav_land_position = NavQueries.position_on_mesh_with_outside_position(nav_world, traverse_logic, POSITION_LOOKUP[unit], above, below, lateral)
 			local locomotion_extension = scratchpad.locomotion_extension
 			local velocity = Vector3.flat(locomotion_extension:current_velocity())
@@ -151,7 +162,6 @@ function BtCompanionTargetPounceAndEscapeAction:run(unit, breed, blackboard, scr
 				local land_anim_event = Animation.random_event(companion_pounce_setting.land_anim_events)
 
 				scratchpad.animation_extension:anim_event(land_anim_event.name)
-				scratchpad.locomotion_extension:set_gravity(nil)
 				MinionMovement.set_anim_driven(scratchpad, true)
 				scratchpad.locomotion_extension:set_movement_type("snap_to_navmesh")
 
@@ -167,7 +177,7 @@ function BtCompanionTargetPounceAndEscapeAction:run(unit, breed, blackboard, scr
 
 		if not scratchpad.land_anim_duration and not scratchpad.is_anim_driven then
 			if not scratchpad.is_affected_by_gravity then
-				scratchpad.locomotion_extension:set_gravity(scratchpad.pounce_back_gravity)
+				scratchpad.locomotion_extension:set_gravity(nil)
 				scratchpad.locomotion_extension:set_affected_by_gravity(true)
 
 				scratchpad.is_affected_by_gravity = true
@@ -183,6 +193,7 @@ function BtCompanionTargetPounceAndEscapeAction:run(unit, breed, blackboard, scr
 
 	if scratchpad.land_anim_duration and scratchpad.land_anim_duration <= t then
 		MinionMovement.set_anim_driven(scratchpad, false)
+		scratchpad.locomotion_extension:set_affected_by_gravity(false)
 
 		scratchpad.pounce_component.pounce_cooldown = t + action_data.leap_cooldown
 		scratchpad.pounce_component.has_pounce_target = false
@@ -212,10 +223,10 @@ function BtCompanionTargetPounceAndEscapeAction:_initial_set_up(unit, scratchpad
 	local pounce_target = pounce_component.pounce_target
 	local damage_profile = companion_pounce_setting.damage_profile
 	local damage_dealt, attack_result, damage_efficiency, stagger_result, _ = self:_damage_target(unit, pounce_target, action_data, damage_profile)
-	local attack_direction = Vector3.normalize(Vector3.flat(POSITION_LOOKUP[pounce_target] - POSITION_LOOKUP[unit]))
+	local attack_direction = Vector3.normalize(Quaternion.forward(Unit.local_rotation(unit, 1)))
 	local hit_position = Unit.world_position(unit, Unit.node(unit, pounce_component.leap_node))
 
-	ImpactEffect.play(pounce_target, nil, damage_dealt, "companion_dog", pounce_component.target_hit_zone_name, attack_result, hit_position, nil, attack_direction, unit, nil, nil, nil, damage_efficiency, damage_profile)
+	ImpactEffect.play(pounce_target, nil, damage_dealt, "companion_dog_pounce", pounce_component.target_hit_zone_name, attack_result, hit_position, nil, attack_direction, unit, nil, nil, nil, damage_efficiency, damage_profile)
 
 	local target_current_stagger = scratchpad.target_stagger_component.type
 	local force_stagger_settings = companion_pounce_setting.force_stagger_settings
@@ -271,6 +282,8 @@ function BtCompanionTargetPounceAndEscapeAction:_select_jump_off_direction(unit,
 	local random_initial_offset = math.random(1, numbers_of_checks)
 	local max_distance_check = select_jump_off_direction_settings.max_distance_check
 	local sweep_radius = select_jump_off_direction_settings.sweep_radius
+	local above = 0.2
+	local below = 0.2
 	local valid_nav_angles = {}
 
 	for i = 0, numbers_of_checks do
@@ -285,7 +298,7 @@ function BtCompanionTargetPounceAndEscapeAction:_select_jump_off_direction(unit,
 		local nav_pos = nil
 
 		if left_hits and #left_hits > 0 then
-			nav_pos = NavQueries.position_on_mesh(scratchpad.nav_world, left_hits[1].position, 0.2, 0.2, scratchpad.traverse_logic)
+			nav_pos = NavQueries.position_on_mesh(scratchpad.nav_world, left_hits[1].position, above, below, scratchpad.traverse_logic)
 
 			if nav_pos then
 				table.insert(valid_nav_angles, angle_trace_rotation)
@@ -293,7 +306,7 @@ function BtCompanionTargetPounceAndEscapeAction:_select_jump_off_direction(unit,
 		end
 
 		if right_hits and #right_hits > 0 then
-			nav_pos = NavQueries.position_on_mesh(scratchpad.nav_world, right_hits[1].position, 0.2, 0.2, scratchpad.traverse_logic)
+			nav_pos = NavQueries.position_on_mesh(scratchpad.nav_world, right_hits[1].position, above, below, scratchpad.traverse_logic)
 
 			if nav_pos then
 				table.insert(valid_nav_angles, -angle_trace_rotation)
@@ -309,14 +322,11 @@ function BtCompanionTargetPounceAndEscapeAction:_select_jump_off_direction(unit,
 
 			scratchpad.animation_extension:set_variable(select_jump_off_direction_settings.animation_variable_name, animation_value)
 
-			scratchpad.has_jump_off_direction = true
-
 			return true
 		end
 	end
 
 	scratchpad.pounce_component.has_jump_off_direction = false
-	scratchpad.has_jump_off_direction = false
 
 	return false
 end
@@ -376,12 +386,58 @@ function BtCompanionTargetPounceAndEscapeAction:_free_token(unit, scratchpad)
 
 	if pounce_target and HEALTH_ALIVE[pounce_target] then
 		local token_extension = ScriptUnit.has_extension(pounce_target, "token_system")
+		local required_token = scratchpad.companion_pounce_setting.required_token
 
-		if token_extension then
-			local required_token = scratchpad.companion_pounce_setting.required_token
-
+		if token_extension and token_extension:is_token_free_or_mine(unit, required_token.name) then
 			token_extension:free_token(required_token.name)
 		end
+	end
+end
+
+function BtCompanionTargetPounceAndEscapeAction:_has_companion_saved_owner_in_disabled_state(player_owner, pounced_unit)
+	local player_unit = player_owner.player_unit
+	local hit_unit_data_extension = ScriptUnit.has_extension(player_unit, "unit_data_system")
+	local owner_disabled_state_component = hit_unit_data_extension and hit_unit_data_extension:read_component("disabled_state_input")
+
+	if not owner_disabled_state_component then
+		return false
+	end
+
+	local is_owner_disabled = owner_disabled_state_component.disabling_type ~= "none"
+	local is_pounced_unit_disabling_owner = owner_disabled_state_component.disabling_unit == pounced_unit
+
+	return is_owner_disabled and is_pounced_unit_disabling_owner
+end
+
+function BtCompanionTargetPounceAndEscapeAction:_trigger_knock_away_enemy_proc_event(companion_unit, companion_breed, pounced_unit, pounced_unit_breed)
+	local player_owner = Managers.state.player_unit_spawn:owner(companion_unit)
+	local player_unit_buff_extension = player_owner.player_unit and ScriptUnit.has_extension(player_owner.player_unit, "buff_system")
+	local proc_event_param_table = player_unit_buff_extension and player_unit_buff_extension:request_proc_event_param_table()
+
+	if proc_event_param_table then
+		proc_event_param_table.owner_unit = player_owner.player_unit
+		proc_event_param_table.companion_breed = companion_breed.name
+		proc_event_param_table.companion_unit = companion_unit
+		proc_event_param_table.target_unit_breed_name = pounced_unit_breed.name
+
+		player_unit_buff_extension:add_proc_event(proc_events.on_player_companion_knock_away, proc_event_param_table)
+	end
+end
+
+function BtCompanionTargetPounceAndEscapeAction:_handle_knock_away_enemy_stats(companion_unit, companion_breed, pounced_unit, pounced_unit_breed)
+	local pounced_unit_behaviour_extension = ScriptUnit.has_extension(pounced_unit, "behavior_system")
+	local previously_pounced = pounced_unit_behaviour_extension and pounced_unit_behaviour_extension.pounced_by_companion_before and pounced_unit_behaviour_extension:pounced_by_companion_before(companion_unit)
+	local player_owner = Managers.state.player_unit_spawn:owner(companion_unit)
+	local companion_breed_name = companion_breed.name
+	local pounced_unit_breed_name = pounced_unit_breed.name
+	local has_companion_saved_disabled_owner = self:_has_companion_saved_owner_in_disabled_state(player_owner, pounced_unit)
+
+	if player_owner and has_companion_saved_disabled_owner and pounced_unit_breed_name == "chaos_hound" then
+		Managers.achievements:unlock_achievement(player_owner, "adamant_saved_by_companion_from_disabling_hound")
+	end
+
+	if player_owner then
+		Managers.stats:record_private("hook_adamant_companion_knock_enemy", player_owner, companion_unit, companion_breed_name, pounced_unit, pounced_unit_breed_name, previously_pounced, has_companion_saved_disabled_owner)
 	end
 end
 

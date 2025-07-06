@@ -7,7 +7,7 @@ table.make_unique(templates)
 templates.weapon_trait_bespoke_ogryn_thumper_p1_hipfire_while_sprinting = {
 	format_values = {
 		weapon_spread = {
-			prefix = "-",
+			prefix = "",
 			format_type = "percentage",
 			find_value = {
 				buff_template_name = "weapon_trait_bespoke_ogryn_thumper_p1_hipfire_while_sprinting",

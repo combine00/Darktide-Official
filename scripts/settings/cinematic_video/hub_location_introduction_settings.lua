@@ -1,7 +1,10 @@
 local hub_location_introduction_settings = {
 	mission_board_view = {
 		video_template = "hli_mission_board",
-		narrative_event_name = "hli_mission_board_viewed"
+		narrative_event_name = "hli_mission_board_viewed",
+		video_template_by_archetype = {
+			adamant = "hli_mission_board_adamant"
+		}
 	},
 	barber_vendor_background_view = {
 		video_template = "hli_barbershop",

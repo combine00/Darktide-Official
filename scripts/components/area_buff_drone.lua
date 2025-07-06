@@ -35,20 +35,32 @@ function AreaBuffDrone:disable(unit)
 end
 
 function AreaBuffDrone:destroy(unit)
+	if not self._has_setup then
+		return
+	end
+
+	local source_id = self._source_id
+
+	if self._source_id ~= nil and not WwiseWorld.has_source(self._wwise_world, source_id) then
+		source_id = nil
+	end
+
 	if self._arming_playing_id then
-		self:_stop_looping_sound(nil, self._arming_playing_id, nil)
+		self:_stop_looping_sound(source_id, self._arming_playing_id, RESOURCES.sfx.idle_loop.stop)
 
 		self._arming_playing_id = nil
 	end
 
 	if self._idle_playing_id then
-		self:_stop_looping_sound(nil, self._idle_playing_id, RESOURCES.sfx.deployed_loop.stop)
+		self:_stop_looping_sound(source_id, self._idle_playing_id, RESOURCES.sfx.deployed_loop.stop)
 
 		self._idle_playing_id = nil
 	end
 
-	if self._source_id then
-		WwiseWorld.destroy_manual_source(self._wwise_world, self._source_id)
+	if source_id then
+		WwiseWorld.destroy_manual_source(self._wwise_world, source_id)
+
+		self._source_id = nil
 	end
 end
 
@@ -74,8 +86,12 @@ end
 function AreaBuffDrone:_set_active()
 	self:_setup()
 
-	local playing_id = self:_start_looping_sound(self._source_id, RESOURCES.sfx.idle_loop.start)
-	self._arming_playing_id = playing_id
+	if not self._arming_playing_id then
+		local playing_id = self:_start_looping_sound(self._source_id, RESOURCES.sfx.idle_loop.start)
+		self._arming_playing_id = playing_id
+	end
+
+	Unit.animation_event(self._unit, "hover_fwd")
 end
 
 function AreaBuffDrone:_deploy()
@@ -89,13 +105,16 @@ function AreaBuffDrone:_deploy()
 		self._arming_playing_id = nil
 	end
 
+	local unit = self._unit
+
+	Unit.animation_event(unit, "idle")
+
 	local playing_id = self:_start_looping_sound(source_id, RESOURCES.sfx.deployed_loop.start)
 	self._idle_playing_id = playing_id
 end
 
 function AreaBuffDrone:_start_looping_sound(source_id, event_name)
-	local wwise_world = self._wwise_world
-	local playing_id = WwiseWorld.trigger_resource_event(wwise_world, event_name, source_id)
+	local playing_id = WwiseWorld.trigger_resource_event(self._wwise_world, event_name, source_id)
 
 	return playing_id
 end

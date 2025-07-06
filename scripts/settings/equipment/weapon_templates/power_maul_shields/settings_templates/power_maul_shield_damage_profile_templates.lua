@@ -545,7 +545,28 @@ damage_templates.powermaul_shield_light_smiter = {
 		0.1,
 		2.5
 	},
-	armor_damage_modifier = smiter_light_default_am,
+	armor_damage_modifier = {
+		attack = {
+			[armor_types.unarmored] = damage_lerp_values.lerp_1,
+			[armor_types.armored] = damage_lerp_values.lerp_1,
+			[armor_types.resistant] = damage_lerp_values.lerp_0_9,
+			[armor_types.player] = damage_lerp_values.lerp_1,
+			[armor_types.berserker] = damage_lerp_values.lerp_0_9,
+			[armor_types.super_armor] = damage_lerp_values.lerp_0_6,
+			[armor_types.disgustingly_resilient] = damage_lerp_values.lerp_1,
+			[armor_types.void_shield] = damage_lerp_values.lerp_1_33
+		},
+		impact = {
+			[armor_types.unarmored] = damage_lerp_values.lerp_1,
+			[armor_types.armored] = damage_lerp_values.lerp_1,
+			[armor_types.resistant] = damage_lerp_values.lerp_1,
+			[armor_types.player] = damage_lerp_values.lerp_1,
+			[armor_types.berserker] = damage_lerp_values.lerp_0_6,
+			[armor_types.super_armor] = damage_lerp_values.lerp_1,
+			[armor_types.disgustingly_resilient] = damage_lerp_values.lerp_1,
+			[armor_types.void_shield] = damage_lerp_values.lerp_1
+		}
+	},
 	targets = {
 		{
 			power_distribution = {
@@ -683,8 +704,8 @@ damage_templates.powermaul_shield_heavy_smiter = {
 		{
 			power_distribution = {
 				attack = {
-					140,
-					380
+					180,
+					400
 				},
 				impact = {
 					12,
@@ -768,12 +789,12 @@ damage_templates.powermaul_shield_heavy_smiter_shield = {
 		{
 			power_distribution = {
 				attack = {
-					140,
-					380
+					180,
+					400
 				},
 				impact = {
-					14,
-					28
+					20,
+					35
 				}
 			},
 			boost_curve_multiplier_finesse = {
@@ -784,7 +805,7 @@ damage_templates.powermaul_shield_heavy_smiter_shield = {
 		{
 			power_distribution = {
 				attack = {
-					90,
+					100,
 					200
 				},
 				impact = {
@@ -796,12 +817,24 @@ damage_templates.powermaul_shield_heavy_smiter_shield = {
 		{
 			power_distribution = {
 				attack = {
-					50,
-					100
+					60,
+					120
 				},
 				impact = {
 					6,
 					16
+				}
+			}
+		},
+		{
+			power_distribution = {
+				attack = {
+					40,
+					80
+				},
+				impact = {
+					5,
+					14
 				}
 			}
 		},

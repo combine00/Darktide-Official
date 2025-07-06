@@ -1290,6 +1290,19 @@ local CameraEffectSettings = {
 			fade_out = 0.1,
 			octaves = 7
 		},
+		adamant_charge_impact = {
+			persistance = 1,
+			duration = 0.1,
+			amplitude = 0.3,
+			octaves = 3
+		},
+		adamant_charge_end = {
+			persistance = 0.9,
+			amplitude = 0.2,
+			duration = 0.2,
+			fade_out = 0.1,
+			octaves = 5
+		},
 		spiral_staircase_shake = {
 			persistance = 1,
 			fade_out = 1,

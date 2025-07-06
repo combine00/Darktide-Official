@@ -1,5 +1,6 @@
 require("scripts/extension_systems/behavior/nodes/bt_node")
 
+local AttackingUnitResolver = require("scripts/utilities/attack/attacking_unit_resolver")
 local Explosion = require("scripts/utilities/attack/explosion")
 local BtChaosPoxwalkerExplodeAction = class("BtChaosPoxwalkerExplodeAction", "BtNode")
 
@@ -24,6 +25,11 @@ function BtChaosPoxwalkerExplodeAction:enter(unit, breed, blackboard, scratchpad
 	elseif death_component.damage_profile_name ~= nil and death_component.damage_profile_name ~= "default" then
 		local health_extension = ScriptUnit.extension(unit, "health_system")
 		optional_attacking_unit_owner_unit = health_extension:last_damaging_unit()
+	end
+
+	if optional_attacking_unit_owner_unit then
+		local attacking_unit_owner_unit = AttackingUnitResolver.resolve(optional_attacking_unit_owner_unit)
+		optional_attacking_unit_owner_unit = attacking_unit_owner_unit
 	end
 
 	Explosion.create_explosion(world, physics_world, position, impact_normal, unit, explosion_template, power_level, charge_level, attack_type, false, nil, nil, nil, nil, optional_attacking_unit_owner_unit, optional_apply_owner_buffs)

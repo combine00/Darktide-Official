@@ -36,6 +36,7 @@ local AchievementBreedGroups = {
 		"renegade_captain",
 		"renegade_executor",
 		"renegade_flamer",
+		"renegade_flamer_mutator",
 		"renegade_grenadier",
 		"renegade_gunner",
 		"renegade_melee",
@@ -95,7 +96,6 @@ local AchievementBreedGroups = {
 		"renegade_gunner",
 		"renegade_melee",
 		"renegade_netgunner",
-		"renegade_radio_operator",
 		"renegade_rifleman",
 		"renegade_shocktrooper",
 		"renegade_sniper"
@@ -110,7 +110,6 @@ local AchievementBreedGroups = {
 		"renegade_berzerker",
 		"renegade_executor",
 		"renegade_gunner",
-		"renegade_radio_operator",
 		"renegade_shocktrooper"
 	},
 	special_and_elite_breed_lookup = {
@@ -296,6 +295,9 @@ local AchievementBreedGroups = {
 				250
 			}
 		}
+	},
+	companion = {
+		"companion_dog"
 	}
 }
 

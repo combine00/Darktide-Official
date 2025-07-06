@@ -10,9 +10,10 @@ local circumstance_templates = {
 		},
 		ui = {
 			description = "loc_circumstance_hunting_grounds_description",
-			icon = "content/ui/materials/icons/circumstances/hunting_grounds_01",
+			happening_display_name = "loc_happening_hunting_grounds",
 			display_name = "loc_circumstance_hunting_grounds_title",
-			happening_display_name = "loc_happening_hunting_grounds"
+			mission_board_icon = "content/ui/materials/mission_board/circumstances/hunting_grounds_01",
+			icon = "content/ui/materials/icons/circumstances/hunting_grounds_01"
 		}
 	},
 	hunting_grounds_more_resistance_01 = {
@@ -27,9 +28,10 @@ local circumstance_templates = {
 		},
 		ui = {
 			description = "loc_circumstance_hunting_grounds_more_resistance_description",
-			icon = "content/ui/materials/icons/circumstances/hunting_grounds_02",
+			happening_display_name = "loc_happening_hunting_grounds",
 			display_name = "loc_circumstance_hunting_grounds_more_resistance_title",
-			happening_display_name = "loc_happening_hunting_grounds"
+			mission_board_icon = "content/ui/materials/mission_board/circumstances/hunting_grounds_02",
+			icon = "content/ui/materials/icons/circumstances/hunting_grounds_02"
 		}
 	},
 	hunting_grounds_less_resistance_01 = {
@@ -44,9 +46,10 @@ local circumstance_templates = {
 		},
 		ui = {
 			description = "loc_circumstance_hunting_grounds_less_resistance_description",
-			icon = "content/ui/materials/icons/circumstances/hunting_grounds_03",
+			happening_display_name = "loc_happening_hunting_grounds",
 			display_name = "loc_circumstance_hunting_grounds_less_resistance_title",
-			happening_display_name = "loc_happening_hunting_grounds"
+			mission_board_icon = "content/ui/materials/mission_board/circumstances/hunting_grounds_03",
+			icon = "content/ui/materials/icons/circumstances/hunting_grounds_03"
 		}
 	}
 }

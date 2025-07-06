@@ -7,8 +7,8 @@ table.make_unique(overrides)
 spread_templates.default_shotpistol_shield_hip = {
 	still = {
 		max_spread = {
-			yaw = 5,
-			pitch = 5
+			yaw = 2,
+			pitch = 2
 		},
 		decay = {
 			from_shooting_grace_time = 0.075,
@@ -17,22 +17,22 @@ spread_templates.default_shotpistol_shield_hip = {
 				pitch = 0.15
 			},
 			idle = {
-				yaw = 4.5,
-				pitch = 4.5
+				yaw = 3.5,
+				pitch = 3.5
 			}
 		},
 		randomized_spread = {
-			random_ratio = 0.5,
+			random_ratio = 0.3,
 			first_shot_min_ratio = 0.3,
-			first_shot_random_ratio = 0.6,
+			first_shot_random_ratio = 0.3,
 			min_ratio = 0.15
 		},
 		continuous_spread = {
-			min_yaw = 1.5,
-			min_pitch = 1.5
+			min_yaw = 0.7,
+			min_pitch = 0.7
 		},
 		immediate_spread = {
-			num_shots_clear_time = 0.5,
+			num_shots_clear_time = 1.1,
 			suppression_hit = {
 				{
 					yaw = 0.25,
@@ -47,8 +47,20 @@ spread_templates.default_shotpistol_shield_hip = {
 			},
 			shooting = {
 				{
-					yaw = 7.5,
-					pitch = 7.5
+					yaw = 0.3,
+					pitch = 0.3
+				},
+				{
+					yaw = 1,
+					pitch = 1.4
+				},
+				{
+					yaw = 1.5,
+					pitch = 1.6
+				},
+				{
+					yaw = 1.7,
+					pitch = 1.3
 				}
 			}
 		}
@@ -59,8 +71,8 @@ spread_templates.default_shotpistol_shield_hip = {
 			"still"
 		},
 		continuous_spread = {
-			min_yaw = 3,
-			min_pitch = 3
+			min_yaw = 1.2,
+			min_pitch = 1.2
 		}
 	},
 	crouch_still = {
@@ -69,8 +81,8 @@ spread_templates.default_shotpistol_shield_hip = {
 			"still"
 		},
 		continuous_spread = {
-			min_yaw = 2.25,
-			min_pitch = 2.25
+			min_yaw = 0.25,
+			min_pitch = 0.25
 		}
 	},
 	crouch_moving = {
@@ -79,8 +91,8 @@ spread_templates.default_shotpistol_shield_hip = {
 			"still"
 		},
 		continuous_spread = {
-			min_yaw = 2.75,
-			min_pitch = 2.75
+			min_yaw = 0.75,
+			min_pitch = 0.75
 		}
 	}
 }

@@ -30,7 +30,17 @@ function BtCompanionDogSelectorNode:evaluate(unit, blackboard, scratchpad, dt, t
 	local node_identifier = self.identifier
 	local last_running_node = old_running_child_nodes[node_identifier]
 	local children = self._children
-	local node_companion_unstuck = children[1]
+	local node_manual_teleport = children[1]
+	local teleport_component = blackboard.teleport
+	local condition_result = teleport_component.has_teleport_position
+
+	if condition_result then
+		new_running_child_nodes[node_identifier] = node_manual_teleport
+
+		return node_manual_teleport
+	end
+
+	local node_companion_unstuck = children[2]
 	local condition_result = blackboard.behavior.is_out_of_bound
 
 	if condition_result then
@@ -39,7 +49,7 @@ function BtCompanionDogSelectorNode:evaluate(unit, blackboard, scratchpad, dt, t
 		return node_companion_unstuck
 	end
 
-	local node_move_with_platform = children[2]
+	local node_move_with_platform = children[3]
 	local condition_result = blackboard.movable_platform.unit_reference ~= nil
 
 	if condition_result then
@@ -48,7 +58,7 @@ function BtCompanionDogSelectorNode:evaluate(unit, blackboard, scratchpad, dt, t
 		return node_move_with_platform
 	end
 
-	local node_smart_object = children[3]
+	local node_smart_object = children[4]
 	local condition_result = nil
 
 	repeat
@@ -96,7 +106,7 @@ function BtCompanionDogSelectorNode:evaluate(unit, blackboard, scratchpad, dt, t
 		end
 	end
 
-	local node_combat = children[4]
+	local node_combat = children[5]
 	local is_running = last_leaf_node_running and last_running_node == node_combat
 	local sub_condition_result_01, condition_result = nil
 
@@ -132,6 +142,11 @@ function BtCompanionDogSelectorNode:evaluate(unit, blackboard, scratchpad, dt, t
 	local owner_unit = behavior_component.owner_unit
 	local owner_attack_intensity_extension = ScriptUnit.has_extension(owner_unit, "attack_intensity_system")
 	local in_combat = not owner_attack_intensity_extension or owner_attack_intensity_extension:in_combat_for_companion()
+	local PlayerUnitStatus = require("scripts/utilities/attack/player_unit_status")
+	local owner_unit_data_extension = ScriptUnit.has_extension(owner_unit, "unit_data_system")
+	local character_state = owner_unit_data_extension and owner_unit_data_extension:read_component("character_state")
+	local owner_unit_is_disabled = character_state and PlayerUnitStatus.is_disabled(character_state)
+	in_combat = in_combat or owner_unit_is_disabled
 	local companion_whistle_target = nil
 	local smart_tag_system = Managers.state.extension:system("smart_tag_system")
 	local tag_target, tag = smart_tag_system:unit_tagged_by_player_unit(owner_unit)
@@ -170,39 +185,34 @@ function BtCompanionDogSelectorNode:evaluate(unit, blackboard, scratchpad, dt, t
 		end
 	end
 
-	local node_follow = children[5]
+	local node_follow = children[6]
 	local tree_node = node_follow.tree_node
-	local condition_args = tree_node.condition_args
 	local action_data = tree_node.action_data
-	local is_running = last_leaf_node_running and last_running_node == node_follow
-	local condition_result = nil
-
-	repeat
-		local behavior_component = blackboard.behavior
-		local owner_unit = behavior_component.owner_unit
-		local owner_position = POSITION_LOOKUP[owner_unit]
-		local current_state = behavior_component.current_state
-		local outer_circle_distance = action_data.idle_circle_distances.outer_circle_distance
-		local inner_circle_distance = action_data.idle_circle_distances.inner_circle_distance
-		local companion_position = POSITION_LOOKUP[unit]
-		local distance_from_owner = Vector3.length(companion_position - owner_position)
-		local sub_condition_result_01 = nil
-		local behavior_component = blackboard.behavior
-		local owner_unit = behavior_component.owner_unit
-		local owner_locomotion_extension = ScriptUnit.extension(owner_unit, "locomotion_system")
-		local owner_speed = Vector3.length(Vector3.flat(owner_locomotion_extension:current_velocity()))
-		local condition_result = owner_speed > 0.05
-		sub_condition_result_01 = condition_result
-		local is_owner_moving = sub_condition_result_01
-
-		if is_owner_moving and (current_state == "follow" or outer_circle_distance < distance_from_owner) then
-			local CompanionFollowUtility = require("scripts/utilities/companion_follow_utility")
-			local companion_has_follow_position = CompanionFollowUtility.companion_has_follow_position(unit, blackboard, scratchpad, condition_args, action_data, is_running)
-			condition_result = companion_has_follow_position
-		else
-			condition_result = false
-		end
-	until true
+	local behavior_component = blackboard.behavior
+	local owner_unit = behavior_component.owner_unit
+	local owner_position = POSITION_LOOKUP[owner_unit]
+	local current_state = behavior_component.current_state
+	local outer_circle_distance = action_data.idle_circle_distances.outer_circle_distance
+	local inner_circle_distance = action_data.idle_circle_distances.inner_circle_distance
+	local companion_position = POSITION_LOOKUP[unit]
+	local companion_owner_vector = Vector3.flat(companion_position - owner_position)
+	local distance_from_owner = Vector3.length(companion_owner_vector)
+	local sub_condition_result_01 = nil
+	local behavior_component = blackboard.behavior
+	local owner_unit = behavior_component.owner_unit
+	local owner_locomotion_extension = ScriptUnit.extension(owner_unit, "locomotion_system")
+	local owner_speed = Vector3.length(Vector3.flat(owner_locomotion_extension:current_velocity()))
+	local condition_result = owner_speed > 0.05
+	sub_condition_result_01 = condition_result
+	local is_owner_moving = sub_condition_result_01
+	local owner_locomotion_extension = ScriptUnit.extension(owner_unit, "locomotion_system")
+	local owner_speed_normalized = Vector3.normalize(Vector3.flat(owner_locomotion_extension:current_velocity()))
+	local companion_owner_vector_normalized = Vector3.normalize(companion_owner_vector)
+	local cos = Vector3.dot(companion_owner_vector_normalized, owner_speed_normalized)
+	local far_distance = action_data.far_distance
+	local cone_cos = action_data.cone_angle and math.cos(action_data.cone_angle * 0.5) or math.huge
+	local far_distance_check = not far_distance or far_distance < distance_from_owner or cos < cone_cos
+	local condition_result = is_owner_moving and (current_state == "follow" or outer_circle_distance < distance_from_owner and far_distance_check)
 
 	if condition_result then
 		local leaf_node = node_follow:evaluate(unit, blackboard, scratchpad, dt, t, evaluate_utility, node_data, old_running_child_nodes, new_running_child_nodes, last_leaf_node_running)
@@ -214,7 +224,7 @@ function BtCompanionDogSelectorNode:evaluate(unit, blackboard, scratchpad, dt, t
 		end
 	end
 
-	local node_rest = children[6]
+	local node_rest = children[7]
 	local leaf_node = node_rest:evaluate(unit, blackboard, scratchpad, dt, t, evaluate_utility, node_data, old_running_child_nodes, new_running_child_nodes, last_leaf_node_running)
 
 	if leaf_node then

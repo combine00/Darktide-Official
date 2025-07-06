@@ -330,11 +330,6 @@ local function generate_blueprints_function(grid_size)
 			if hotspot and item then
 				local gear_id = item.gear_id or item.name
 				local favorite_state = Items.is_item_id_favorited(gear_id)
-
-				if not hotspot.is_hover and hotspot.is_selected then
-					-- Nothing
-				end
-
 				content.favorite = favorite_state
 			end
 
@@ -616,10 +611,14 @@ local function generate_blueprints_function(grid_size)
 				local cb = callback(_apply_live_item_icon_cb_func, widget)
 				local item_state_machine = item.state_machine
 				local item_animation_event = item.animation_event
+				local item_companion_state_machine = item.companion_state_machine ~= nil and item.companion_state_machine ~= "" and item.companion_state_machine or nil
+				local item_companion_animation_event = item.companion_animation_event ~= nil and item.companion_animation_event ~= "" and item.companion_animation_event or nil
 				local render_context = {
 					camera_focus_slot_name = slot_name,
 					state_machine = item_state_machine,
-					animation_event = item_animation_event
+					animation_event = item_animation_event,
+					companion_state_machine = item_companion_state_machine,
+					companion_animation_event = item_companion_animation_event
 				}
 				content.icon_load_id = Managers.ui:load_item_icon(item, cb, render_context, dummy_profile, prioritize)
 			end
@@ -1103,7 +1102,7 @@ local function generate_blueprints_function(grid_size)
 
 			local item_type = item and item.item_type
 
-			if item_type == UISettings.ITEM_TYPES.GEAR_LOWERBODY or item_type == UISettings.ITEM_TYPES.GEAR_UPPERBODY or item_type == UISettings.ITEM_TYPES.GEAR_HEAD or item_type == UISettings.ITEM_TYPES.GEAR_EXTRA_COSMETIC or item_type == UISettings.ITEM_TYPES.END_OF_ROUND then
+			if item_type == UISettings.ITEM_TYPES.GEAR_LOWERBODY or item_type == UISettings.ITEM_TYPES.GEAR_UPPERBODY or item_type == UISettings.ITEM_TYPES.GEAR_HEAD or item_type == UISettings.ITEM_TYPES.GEAR_EXTRA_COSMETIC or item_type == UISettings.ITEM_TYPES.COMPANION_GEAR_FULL or item_type == UISettings.ITEM_TYPES.END_OF_ROUND then
 				local icon_style = style.icon
 				local icon_size = icon_style.size
 				local icon_offset = icon_style.offset
@@ -1190,12 +1189,16 @@ local function generate_blueprints_function(grid_size)
 				if item_type == ui_item_types.GEAR_HEAD or item_type == ui_item_types.GEAR_LOWERBODY or item_type == ui_item_types.GEAR_UPPERBODY or item_type == ui_item_types.GEAR_EXTRA_COSMETIC or item_type == ui_item_types.END_OF_ROUND then
 					local item_state_machine = item.state_machine
 					local item_animation_event = item.animation_event
+					local item_companion_state_machine = item.companion_state_machine ~= nil and item.companion_state_machine ~= "" and item.companion_state_machine or nil
+					local item_companion_animation_event = item.companion_animation_event ~= nil and item.companion_animation_event ~= "" and item.companion_animation_event or nil
 					local slots = item.slots
 					local slot_name = slots and slots[1]
 					render_context = {
 						camera_focus_slot_name = slot_name,
 						state_machine = item_state_machine,
-						animation_event = item_animation_event
+						animation_event = item_animation_event,
+						companion_state_machine = item_companion_state_machine,
+						companion_animation_event = item_companion_animation_event
 					}
 				end
 
@@ -1528,21 +1531,22 @@ local function generate_blueprints_function(grid_size)
 	}
 	local WIDGET_TYPE_BY_SLOT = {
 		slot_gear_lowerbody = "gear_item",
-		slot_animation_end_of_round = "gear_item",
-		slot_animation_emote_4 = "ui_item",
+		slot_companion_gear_full = "gear_item",
 		slot_gear_extra_cosmetic = "gear_item",
-		slot_animation_emote_1 = "ui_item",
 		slot_insignia = "ui_item",
-		slot_gear_head = "gear_item",
 		slot_character_title = "character_title_item",
 		slot_animation_emote_3 = "ui_item",
-		slot_portrait_frame = "ui_item",
 		slot_trinket_1 = "gear_item",
+		slot_gear_upperbody = "gear_item",
+		slot_animation_end_of_round = "gear_item",
+		slot_animation_emote_4 = "ui_item",
+		slot_animation_emote_1 = "ui_item",
+		slot_gear_head = "gear_item",
+		slot_trinket_2 = "gear_item",
 		slot_weapon_skin = "gear_item",
 		slot_animation_emote_5 = "ui_item",
-		slot_gear_upperbody = "gear_item",
-		slot_animation_emote_2 = "ui_item",
-		slot_trinket_2 = "gear_item"
+		slot_portrait_frame = "ui_item",
+		slot_animation_emote_2 = "ui_item"
 	}
 
 	return blueprints, WIDGET_TYPE_BY_SLOT

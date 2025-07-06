@@ -11,15 +11,6 @@ local material_overrides = {
 	dog_skin_light_02 = {
 		property_overrides = {
 			skin_hsv = {
-				0.99,
-				0.981,
-				1.3
-			}
-		}
-	},
-	dog_skin_light_03 = {
-		property_overrides = {
-			skin_hsv = {
 				0.005,
 				1.09,
 				1.2
@@ -36,15 +27,6 @@ local material_overrides = {
 		}
 	},
 	dog_skin_warm_02 = {
-		property_overrides = {
-			skin_hsv = {
-				0.025,
-				1.08,
-				0.957
-			}
-		}
-	},
-	dog_skin_warm_03 = {
 		property_overrides = {
 			skin_hsv = {
 				0.027,
@@ -65,18 +47,9 @@ local material_overrides = {
 	dog_skin_dark_02 = {
 		property_overrides = {
 			skin_hsv = {
-				0.008,
-				0.882,
-				0.271
-			}
-		}
-	},
-	dog_skin_dark_03 = {
-		property_overrides = {
-			skin_hsv = {
-				0.97,
+				0.96,
 				0.895,
-				0.243
+				0.11
 			}
 		}
 	},
@@ -92,17 +65,8 @@ local material_overrides = {
 	dog_skin_tan_02 = {
 		property_overrides = {
 			skin_hsv = {
-				0,
-				1.118,
-				0.529
-			}
-		}
-	},
-	dog_skin_tan_03 = {
-		property_overrides = {
-			skin_hsv = {
 				0.02,
-				1.08,
+				1.34,
 				0.629
 			}
 		}
@@ -117,15 +81,6 @@ local material_overrides = {
 		}
 	},
 	dog_skin_pale_02 = {
-		property_overrides = {
-			skin_hsv = {
-				0.026,
-				0.894,
-				1.271
-			}
-		}
-	},
-	dog_skin_pale_03 = {
 		property_overrides = {
 			skin_hsv = {
 				0.036,

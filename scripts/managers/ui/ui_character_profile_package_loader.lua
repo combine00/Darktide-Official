@@ -87,7 +87,7 @@ function UICharacterProfilePackageLoader:load_slot_item(slot_id, item, complete_
 
 	self:_unload_slot(slot_id, packages_to_unload)
 
-	if not item then
+	if not item or table.is_empty(item) then
 		if complete_callback then
 			complete_callback()
 		end

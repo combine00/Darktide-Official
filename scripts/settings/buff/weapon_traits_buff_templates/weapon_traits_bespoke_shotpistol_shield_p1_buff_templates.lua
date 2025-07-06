@@ -29,32 +29,8 @@ templates.weapon_trait_bespoke_shotpistol_shield_p1_windup_increases_power.condi
 	[stat_buffs.power_level_modifier] = 0.05
 }
 
-function templates.weapon_trait_bespoke_shotpistol_shield_p1_windup_increases_power.bonus_step_func(template_data, template_context)
-	local alternate_fire_component = template_data.alternate_fire_component
-	local action_shoot_component = template_data.action_shoot_component
-	local is_aiming = alternate_fire_component.is_active
-	local alternate_fire_time = alternate_fire_component.start_t
-	local last_shoot_time = action_shoot_component.fire_last_t
-	local check_time = math.max(alternate_fire_time, last_shoot_time)
-	local t = FixedFrame.get_latest_fixed_time()
-
-	if math.abs(t - last_shoot_time) < 0.8 then
-		return template_data.old_steps
-	end
-
-	local template = template_context.template
-	local override_data = template_context.template_override_data
-	local time_lapsed = t - check_time
-	local duration_per_stack = override_data.duration_per_stack or template.duration_per_stack
-
-	if not is_aiming then
-		return 0
-	end
-
-	local steps = math.floor(time_lapsed / duration_per_stack)
-	template_data.old_steps = steps
-
-	return steps
+function templates.weapon_trait_bespoke_shotpistol_shield_p1_windup_increases_power.min_max_step_func(template_data, template_context)
+	return 0, 5
 end
 
 templates.weapon_trait_bespoke_shotpistol_shield_p1_increase_power_on_close_kill_parent = table.clone(BaseWeaponTraitBuffTemplates.increase_power_on_close_kill_parent)

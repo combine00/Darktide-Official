@@ -78,10 +78,7 @@ function Havoc:summary(optional_account_id)
 					}
 				end
 
-				local cadence_status = {
-					active = true,
-					current_cadence = {}
-				}
+				local cadence_status = Managers.data_service.havoc:default_havoc_cadence_status()
 
 				if data.body.cadenceStatus ~= nil then
 					if not table.is_empty(data.body.cadenceStatus) then

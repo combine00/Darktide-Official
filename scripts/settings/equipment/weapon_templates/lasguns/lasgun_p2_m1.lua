@@ -140,7 +140,7 @@ local weapon_template = {
 			}
 		},
 		special_action_hold = {
-			buffer_time = 0.2,
+			buffer_time = 0.4,
 			input_sequence = {
 				{
 					value = true,
@@ -357,11 +357,12 @@ weapon_template.actions = {
 		allowed_chain_actions = {}
 	},
 	action_wield = {
-		wield_reload_anim_event = "equip_reload",
-		allowed_during_sprint = true,
-		wield_anim_event = "equip",
 		uninterruptible = true,
 		kind = "ranged_wield",
+		wield_anim_event = "equip",
+		wield_reload_anim_event = "equip_reload",
+		weapon_handling_template = "time_scale_1_5",
+		allowed_during_sprint = true,
 		total_time = 1.8,
 		conditional_state_to_action_input = {
 			started_reload = {

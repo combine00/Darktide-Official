@@ -452,6 +452,15 @@ local interaction_templates = {
 		duration = 0,
 		interaction_class_name = "player_hub_inspect"
 	},
+	companion_hub_interact = {
+		action_text = "loc_companion_hub_interaction_pet",
+		ui_interaction_type = "player_interaction",
+		interaction_icon = "content/ui/materials/hud/interactions/icons/default",
+		interaction_input = "interact_inspect_pressed",
+		interaction_priority = 2,
+		duration = 0,
+		interaction_class_name = "companion_hub_interact"
+	},
 	penance_collectible = {
 		action_text = "loc_action_interaction_pickup",
 		ui_interaction_type = "pickup",

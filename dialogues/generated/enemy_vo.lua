@@ -3814,6 +3814,9 @@ return function ()
 				"faction_memory_take_cover",
 				OP.TIMESET
 			}
+		},
+		heard_speak_routing = {
+			target = "players"
 		}
 	})
 	define_rule({
@@ -4272,6 +4275,9 @@ return function ()
 				"faction_memory_take_cover",
 				OP.TIMESET
 			}
+		},
+		heard_speak_routing = {
+			target = "players"
 		}
 	})
 	define_rule({

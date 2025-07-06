@@ -14,11 +14,6 @@ function PlayerHuskToughnessExtension:init(extension_init_context, unit, extensi
 	self._toughness_template = toughness_template
 	local is_local_unit = extension_init_data.is_local_unit
 	self._is_local_unit = is_local_unit
-
-	if is_local_unit then
-		local component_name = PlayerUnitData.looping_sound_component_name("toughness_loop")
-		self._looping_sound_component = unit_data_extension:read_component(component_name)
-	end
 end
 
 function PlayerHuskToughnessExtension:toughness_templates()

@@ -37,6 +37,7 @@ function ExtensionSystemBase:init(extension_system_creation_context, system_init
 	end
 
 	self._unit_to_extension_map = {}
+	self._uninitiated_units = {}
 	self._hot_join_sync_list = {}
 
 	for i = 1, #extension_list do
@@ -89,6 +90,7 @@ function ExtensionSystemBase:on_add_extension(world, unit, extension_name, exten
 	end
 
 	self._unit_to_extension_map[unit] = extension
+	self._uninitiated_units[unit] = extension
 
 	return extension
 end
@@ -147,6 +149,19 @@ function ExtensionSystemBase:on_remove_extension(unit, extension_name)
 	ScriptUnit.remove_extension(unit, self._name)
 
 	self._unit_to_extension_map[unit] = nil
+	self._uninitiated_units[unit] = nil
+end
+
+function ExtensionSystemBase:call_gameplay_post_init_on_extensions()
+	local uninitiated_units = self._uninitiated_units
+
+	for unit, extension in pairs(uninitiated_units) do
+		if extension.on_gameplay_post_init then
+			extension:on_gameplay_post_init(unit)
+		end
+	end
+
+	table.clear(uninitiated_units)
 end
 
 function ExtensionSystemBase:enable_update_function(extension_name, update_function_name, unit, extension)

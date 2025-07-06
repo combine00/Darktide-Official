@@ -1,6 +1,5 @@
 local ButtonPassTemplates = require("scripts/ui/pass_templates/button_pass_templates")
-local ColorUtilities = require("scripts/utilities/ui/colors")
-local ItemUtils = require("scripts/utilities/items")
+local Colors = require("scripts/utilities/ui/colors")
 local UIFontSettings = require("scripts/managers/ui/ui_font_settings")
 local UISettings = require("scripts/settings/ui/ui_settings")
 local UISoundEvents = require("scripts/settings/ui/ui_sound_events")
@@ -64,7 +63,7 @@ local function item_change_function(content, style)
 
 	local progress = math.max(math.max(hotspot.anim_hover_progress or 0, hotspot.anim_select_progress or 0), hotspot.anim_focus_progress or 0)
 
-	ColorUtilities.color_lerp(style.color, color, progress, style.color)
+	Colors.color_lerp(style.color, color, progress, style.color)
 end
 
 local item_display_name_text_style = table.clone(UIFontSettings.header_3)
@@ -356,7 +355,7 @@ local function _symbol_text_change_function(content, style)
 
 	local progress = math.max(math.max(hotspot.anim_hover_progress or 0, hotspot.anim_select_progress or 0), hotspot.anim_focus_progress or 0)
 
-	ColorUtilities.color_lerp(text_color, color, progress, text_color)
+	Colors.color_lerp(text_color, color, progress, text_color)
 end
 
 ItemPassTemplates.gear_item = {
@@ -787,7 +786,7 @@ ItemPassTemplates.gear_item_slot = {
 			local text_color = style.text_color
 			local progress = math.max(math.max(hotspot.anim_hover_progress, hotspot.anim_select_progress), hotspot.anim_focus_progress)
 
-			ColorUtilities.color_lerp(default_text_color, hover_color, progress, text_color)
+			Colors.color_lerp(default_text_color, hover_color, progress, text_color)
 		end
 	},
 	{
@@ -1036,7 +1035,7 @@ ItemPassTemplates.character_title_item = {
 			local text_color = style.text_color
 			local progress = math.max(math.max(hotspot.anim_hover_progress, hotspot.anim_select_progress), hotspot.anim_focus_progress)
 
-			ColorUtilities.color_lerp(default_text_color, hover_color, progress, text_color)
+			Colors.color_lerp(default_text_color, hover_color, progress, text_color)
 		end,
 		visibility_function = function (content, style)
 			return not content.show_icon
@@ -1335,7 +1334,7 @@ ItemPassTemplates.character_title_item_slot = {
 			local text_color = style.text_color
 			local progress = math.max(math.max(hotspot.anim_hover_progress, hotspot.anim_select_progress), hotspot.anim_focus_progress)
 
-			ColorUtilities.color_lerp(default_text_color, hover_color, progress, text_color)
+			Colors.color_lerp(default_text_color, hover_color, progress, text_color)
 		end
 	},
 	{
@@ -1351,7 +1350,7 @@ ItemPassTemplates.character_title_item_slot = {
 			local text_color = style.text_color
 			local progress = math.max(math.max(hotspot.anim_hover_progress, hotspot.anim_select_progress), hotspot.anim_focus_progress)
 
-			ColorUtilities.color_lerp(default_text_color, hover_color, progress, text_color)
+			Colors.color_lerp(default_text_color, hover_color, progress, text_color)
 		end
 	},
 	{
@@ -1899,7 +1898,7 @@ ItemPassTemplates.ui_item_slot = {
 			local text_color = style.text_color
 			local progress = math.max(math.max(hotspot.anim_hover_progress, hotspot.anim_select_progress), hotspot.anim_focus_progress)
 
-			ColorUtilities.color_lerp(default_text_color, hover_color, progress, text_color)
+			Colors.color_lerp(default_text_color, hover_color, progress, text_color)
 		end
 	},
 	{
@@ -2167,7 +2166,7 @@ ItemPassTemplates.ui_item_emote_slot = {
 			local text_color = style.text_color
 			local progress = math.max(math.max(hotspot.anim_hover_progress, hotspot.anim_select_progress), hotspot.anim_focus_progress)
 
-			ColorUtilities.color_lerp(default_text_color, hover_color, progress, text_color)
+			Colors.color_lerp(default_text_color, hover_color, progress, text_color)
 		end
 	},
 	{
@@ -2435,7 +2434,7 @@ ItemPassTemplates.ui_item_pose_slot = {
 			local text_color = style.text_color
 			local progress = math.max(math.max(hotspot.anim_hover_progress, hotspot.anim_select_progress), hotspot.anim_focus_progress)
 
-			ColorUtilities.color_lerp(default_text_color, hover_color, progress, text_color)
+			Colors.color_lerp(default_text_color, hover_color, progress, text_color)
 		end
 	},
 	{
@@ -2834,7 +2833,7 @@ ItemPassTemplates.item_slot = {
 			local text_color = style.text_color
 			local progress = math.max(math.max(hotspot.anim_hover_progress, hotspot.anim_select_progress), hotspot.anim_focus_progress)
 
-			ColorUtilities.color_lerp(default_text_color, hover_color, progress, text_color)
+			Colors.color_lerp(default_text_color, hover_color, progress, text_color)
 		end
 	},
 	{
@@ -2864,7 +2863,7 @@ ItemPassTemplates.item_slot = {
 			local text_color = style.text_color
 			local progress = math.max(math.max(hotspot.anim_hover_progress, hotspot.anim_select_progress), hotspot.anim_focus_progress)
 
-			ColorUtilities.color_lerp(default_text_color, hover_color, progress, text_color)
+			Colors.color_lerp(default_text_color, hover_color, progress, text_color)
 		end
 	},
 	{
@@ -3205,7 +3204,7 @@ ItemPassTemplates.item = {
 			local text_color = style.text_color
 			local progress = math.max(math.max(hotspot.anim_hover_progress, hotspot.anim_select_progress), hotspot.anim_focus_progress)
 
-			ColorUtilities.color_lerp(default_text_color, hover_color, progress, text_color)
+			Colors.color_lerp(default_text_color, hover_color, progress, text_color)
 		end
 	},
 	{
@@ -3235,7 +3234,7 @@ ItemPassTemplates.item = {
 			local text_color = style.text_color
 			local progress = math.max(math.max(hotspot.anim_hover_progress, hotspot.anim_select_progress), hotspot.anim_focus_progress)
 
-			ColorUtilities.color_lerp(default_text_color, hover_color, progress, text_color)
+			Colors.color_lerp(default_text_color, hover_color, progress, text_color)
 		end
 	},
 	{
@@ -3734,7 +3733,7 @@ ItemPassTemplates.general_goods_item = {
 			local text_color = style.text_color
 			local progress = math.max(math.max(hotspot.anim_hover_progress, hotspot.anim_select_progress), hotspot.anim_focus_progress)
 
-			ColorUtilities.color_lerp(default_text_color, hover_color, progress, text_color)
+			Colors.color_lerp(default_text_color, hover_color, progress, text_color)
 		end
 	},
 	{
@@ -3750,7 +3749,7 @@ ItemPassTemplates.general_goods_item = {
 			local text_color = style.text_color
 			local progress = math.max(math.max(hotspot.anim_hover_progress, hotspot.anim_select_progress), hotspot.anim_focus_progress)
 
-			ColorUtilities.color_lerp(default_text_color, hover_color, progress, text_color)
+			Colors.color_lerp(default_text_color, hover_color, progress, text_color)
 		end
 	},
 	{
@@ -3982,7 +3981,7 @@ ItemPassTemplates.credits_goods_item = {
 			local text_color = style.text_color
 			local progress = math.max(math.max(hotspot.anim_hover_progress, hotspot.anim_select_progress), hotspot.anim_focus_progress)
 
-			ColorUtilities.color_lerp(default_text_color, hover_color, progress, text_color)
+			Colors.color_lerp(default_text_color, hover_color, progress, text_color)
 		end,
 		visibility_function = function (content, style)
 			return content.level_requirement_met
@@ -4953,7 +4952,7 @@ ItemPassTemplates.gadget_item_slot = {
 			local text_color = style.text_color
 			local progress = math.max(math.max(hotspot.anim_hover_progress or 0, hotspot.anim_select_progress or 0), hotspot.anim_focus_progress or 0)
 
-			ColorUtilities.color_lerp(default_text_color, hover_color, progress, text_color)
+			Colors.color_lerp(default_text_color, hover_color, progress, text_color)
 		end
 	},
 	{
@@ -5068,7 +5067,7 @@ ItemPassTemplates.gadget_item_slot = {
 			local text_color = style.text_color
 			local progress = math.max(math.max(hotspot.anim_hover_progress or 0, hotspot.anim_select_progress or 0), hotspot.anim_focus_progress or 0)
 
-			ColorUtilities.color_lerp(default_text_color, hover_color, progress, text_color)
+			Colors.color_lerp(default_text_color, hover_color, progress, text_color)
 		end
 	},
 	{
@@ -5085,7 +5084,7 @@ ItemPassTemplates.gadget_item_slot = {
 			local text_color = style.text_color
 			local progress = math.max(math.max(hotspot.anim_hover_progress or 0, hotspot.anim_select_progress or 0), hotspot.anim_focus_progress or 0)
 
-			ColorUtilities.color_lerp(default_text_color, hover_color, progress, text_color)
+			Colors.color_lerp(default_text_color, hover_color, progress, text_color)
 		end
 	},
 	{
@@ -5103,7 +5102,7 @@ ItemPassTemplates.gadget_item_slot = {
 			local text_color = style.text_color
 			local progress = math.max(math.max(hotspot.anim_hover_progress or 0, hotspot.anim_select_progress or 0), hotspot.anim_focus_progress or 0)
 
-			ColorUtilities.color_lerp(default_text_color, hover_color, progress, text_color)
+			Colors.color_lerp(default_text_color, hover_color, progress, text_color)
 		end
 	},
 	{
@@ -5120,7 +5119,7 @@ ItemPassTemplates.gadget_item_slot = {
 			local text_color = style.text_color
 			local progress = math.max(math.max(hotspot.anim_hover_progress or 0, hotspot.anim_select_progress or 0), hotspot.anim_focus_progress or 0)
 
-			ColorUtilities.color_lerp(default_text_color, hover_color, progress, text_color)
+			Colors.color_lerp(default_text_color, hover_color, progress, text_color)
 		end
 	}
 }

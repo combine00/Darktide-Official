@@ -160,13 +160,55 @@ function NarrativeManager:chapter_by_name(story_name, chapter_name)
 	end
 end
 
+function NarrativeManager:_complete_story_chapters_until_valid_chapter(story_name, chapters, starting_index)
+	local profile = _player_profile()
+	local archetype = profile.archetype
+
+	for i = starting_index, #chapters do
+		local chapter = chapters[i]
+		local archetype_skip_func = chapter.archetype_skip_func
+		local should_skip_chapter = archetype_skip_func and archetype_skip_func(chapter, archetype) or false
+
+		if should_skip_chapter then
+			if chapter.on_skip then
+				chapter.on_skip()
+			end
+
+			if chapter.on_complete then
+				chapter.on_complete()
+			end
+		else
+			return i
+		end
+	end
+
+	return nil
+end
+
+function NarrativeManager:_update_last_completed_chapter_id(player_profile, story_name, chapters, current_chapter_id)
+	local character_id = player_profile.character_id
+	local last_completed_index = self._character_narrative_data[character_id].stories[story_name]
+	local new_completed_index = current_chapter_id and current_chapter_id - 1 or #chapters
+	local chapter_id = chapters[new_completed_index] and chapters[new_completed_index].backend_id
+
+	if chapter_id and last_completed_index < chapter_id then
+		self._character_narrative_data[character_id].stories[story_name] = chapter_id
+
+		Managers.backend.interfaces.characters:set_narrative_story_chapter(character_id, story_name, chapter_id)
+	end
+end
+
 function NarrativeManager:current_chapter(story_name, ignore_all_requirements, ignore_mission_requirement)
 	local chapters = Stories[story_name]
 	local profile = _player_profile()
 	local character_id = profile.character_id
 	local last_completed_index = self._character_narrative_data[character_id].stories[story_name]
 	local index = last_completed_index + 1
-	local chapter = chapters[index]
+	index = self:_complete_story_chapters_until_valid_chapter(story_name, chapters, index)
+
+	self:_update_last_completed_chapter_id(profile, story_name, chapters, index)
+
+	local chapter = index and chapters[index]
 
 	if not chapter then
 		return nil
@@ -282,6 +324,10 @@ function NarrativeManager:skip_story(story_name)
 
 		if chapter.on_complete then
 			chapter.on_complete()
+		end
+
+		if chapter.on_skip then
+			chapter.on_skip()
 		end
 	end
 
@@ -414,26 +460,6 @@ function NarrativeManager:complete_event(event_name)
 	end
 
 	return true
-end
-
-function NarrativeManager:get_ever_received_havoc_order()
-	return self._ever_received_havoc_order
-end
-
-function NarrativeManager:set_ever_received_havoc_order(data)
-	if data ~= nil and not table.is_empty(data) and data.id ~= nil then
-		self._ever_received_havoc_order = true
-	else
-		self._ever_received_havoc_order = false
-	end
-end
-
-function NarrativeManager:get_havoc_cadence_status()
-	return self._havoc_cadence_status
-end
-
-function NarrativeManager:set_havoc_cadence_status(cadence_status)
-	self._havoc_cadence_status = cadence_status
 end
 
 return NarrativeManager

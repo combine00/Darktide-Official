@@ -376,14 +376,15 @@ weapon_template.actions = {
 			start_modifier = 0.45
 		},
 		fx = {
-			double_barrel_shotgun_muzzle_flashes = true,
+			muzzle_flash_effect = "content/fx/particles/weapons/rifles/shotgun/shotgun_p2_m1/shotgun_p2_m1_muzzle_single",
 			crit_shoot_sfx_alias = "critical_shot_extra",
 			shoot_tail_sfx_alias = "ranged_shot_tail",
 			shoot_sfx_alias = "ranged_single_shot",
-			muzzle_flash_effect = "content/fx/particles/weapons/rifles/shotgun/shotgun_p2_m1/shotgun_p2_m1_muzzle_single",
+			double_barrel_shotgun_muzzle_flashes = true,
+			shoot_sfx_special_extra_alias = "ranged_single_shot_special_extra",
 			out_of_ammo_sfx_alias = "ranged_out_of_ammo",
 			no_ammo_shoot_sfx_alias = "ranged_no_ammo",
-			shoot_sfx_special_extra_alias = "ranged_single_shot_special_extra"
+			line_effect = LineEffects.pellet_trail
 		},
 		fire_configuration = {
 			anim_event_3p = "attack_shoot_semi",
@@ -481,7 +482,8 @@ weapon_template.actions = {
 			double_barrel_shotgun_muzzle_flashes = true,
 			weapon_special_muzzle_flash_effect = "content/fx/particles/weapons/rifles/shotgun/shotgun_p2_m1/shotgun_p2_m1_muzzle_double",
 			out_of_ammo_sfx_alias = "ranged_out_of_ammo",
-			no_ammo_shoot_sfx_alias = "ranged_no_ammo"
+			no_ammo_shoot_sfx_alias = "ranged_no_ammo",
+			line_effect = LineEffects.pellet_trail
 		},
 		fire_configuration = {
 			same_side_suppression_enabled = false,
@@ -829,7 +831,7 @@ weapon_template.actions = {
 			},
 			shoot_pressed = {
 				action_name = "action_shoot_hip",
-				chain_time = 0.5
+				chain_time = 0.4
 			},
 			zoom = {
 				action_name = "action_zoom",

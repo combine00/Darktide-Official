@@ -6,6 +6,10 @@ local NO_TRANSITION_UI = {
 local LOADING_ICON = {
 	loading_icon = true
 }
+local DELAYED_LOADING_ICON = {
+	loading_icon = true,
+	loading_icon_delay = 3
+}
 local VIEW_SETTINGS = {
 	{
 		view_name = "mission_intro_view",
@@ -96,6 +100,56 @@ local VIEW_SETTINGS = {
 
 			if mission_outro_played then
 				return true, nil, NO_TRANSITION_UI
+			end
+		end
+	},
+	{
+		view_name = "video_view",
+		valid_states = {
+			"StateLoading",
+			"StateExitToMainMenu",
+			"StateMissionServerExit",
+			"GameplayStateInit",
+			"StateError"
+		},
+		validation_func = function ()
+			if Managers.ui:view_active("lobby_view") then
+				return false
+			end
+
+			if Managers.ui:view_active("video_view") then
+				return true
+			end
+
+			local video_manager = Managers.video
+
+			if video_manager and video_manager:queued_video() then
+				video_manager:play_queued_video()
+
+				return true
+			end
+		end
+	},
+	{
+		view_name = "blank_view",
+		valid_states = {
+			"GameplayStateInit",
+			"GameplayStateRun"
+		},
+		validation_func = function ()
+			if Managers.ui:view_active("lobby_view") then
+				return false
+			end
+
+			if Managers.ui:view_active("loading_view") then
+				return false
+			end
+
+			local unit_spawner_manager = Managers.state.unit_spawner
+			local fully_hot_join_synced = unit_spawner_manager and unit_spawner_manager:fully_hot_join_synced()
+
+			if not fully_hot_join_synced then
+				return true, DELAYED_LOADING_ICON
 			end
 		end
 	},

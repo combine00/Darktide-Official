@@ -1,346 +1,580 @@
-local personalities = {
-	male_veteran_1 = {
-		description = "loc_veteran_male_a__intro_01",
-		gender = "male",
-		display_name = "loc_personality_name_male_veteran_1",
-		archetype = "veteran",
-		sample_sound_event = "wwise/events/vo/play_preview_veteran_male_a",
+local personality_options = {
+	{
 		preview_sound_event = "wwise/events/vo/play_preview_mask_veteran_male_a",
+		display_name = "loc_personality_name_male_veteran_1",
 		character_voice = "veteran_male_a",
-		breed = "human",
+		description = "loc_veteran_male_a__intro_01",
+		sample_sound_event = "wwise/events/vo/play_preview_veteran_male_a",
 		unlocks = {
 			{
 				text = "loc_personality_effect_description",
 				type = "text"
 			}
+		},
+		visibility = {
+			genders = {
+				"male"
+			},
+			archetypes = {
+				"veteran"
+			}
 		}
 	},
-	male_veteran_2 = {
-		description = "loc_veteran_male_b__intro_01",
-		gender = "male",
-		display_name = "loc_personality_name_male_veteran_2",
-		archetype = "veteran",
-		sample_sound_event = "wwise/events/vo/play_preview_veteran_male_b",
+	{
 		preview_sound_event = "wwise/events/vo/play_preview_mask_veteran_male_b",
+		display_name = "loc_personality_name_male_veteran_2",
 		character_voice = "veteran_male_b",
-		breed = "human",
+		description = "loc_veteran_male_b__intro_01",
+		sample_sound_event = "wwise/events/vo/play_preview_veteran_male_b",
 		unlocks = {
 			{
 				text = "loc_personality_effect_description",
 				type = "text"
 			}
+		},
+		visibility = {
+			genders = {
+				"male"
+			},
+			archetypes = {
+				"veteran"
+			}
 		}
 	},
-	male_veteran_3 = {
-		description = "loc_veteran_male_c__intro_01",
-		gender = "male",
-		display_name = "loc_personality_name_male_veteran_3",
-		archetype = "veteran",
-		sample_sound_event = "wwise/events/vo/play_preview_veteran_male_c",
+	{
 		preview_sound_event = "wwise/events/vo/play_preview_mask_veteran_male_c",
+		display_name = "loc_personality_name_male_veteran_3",
 		character_voice = "veteran_male_c",
-		breed = "human",
-		home_planets = {
-			"option_7"
-		},
+		description = "loc_veteran_male_c__intro_01",
+		sample_sound_event = "wwise/events/vo/play_preview_veteran_male_c",
 		unlocks = {
 			{
 				text = "loc_personality_effect_description",
 				type = "text"
 			}
+		},
+		visibility = {
+			genders = {
+				"male"
+			},
+			archetypes = {
+				"veteran"
+			}
+		},
+		restrictions = {
+			home_planets = {
+				"option_7"
+			}
 		}
 	},
-	female_veteran_1 = {
-		description = "loc_veteran_female_a__intro_01",
-		gender = "female",
-		display_name = "loc_personality_name_female_veteran_1",
-		archetype = "veteran",
-		sample_sound_event = "wwise/events/vo/play_preview_veteran_female_a",
+	{
 		preview_sound_event = "wwise/events/vo/play_preview_mask_veteran_female_a",
+		display_name = "loc_personality_name_female_veteran_1",
 		character_voice = "veteran_female_a",
-		breed = "human",
+		description = "loc_veteran_female_a__intro_01",
+		sample_sound_event = "wwise/events/vo/play_preview_veteran_female_a",
 		unlocks = {
 			{
 				text = "loc_personality_effect_description",
 				type = "text"
 			}
-		}
-	},
-	female_veteran_2 = {
-		description = "loc_veteran_female_b__intro_01",
-		gender = "female",
-		display_name = "loc_personality_name_female_veteran_2",
-		archetype = "veteran",
-		sample_sound_event = "wwise/events/vo/play_preview_veteran_female_b",
-		preview_sound_event = "wwise/events/vo/play_preview_mask_veteran_female_b",
-		character_voice = "veteran_female_b",
-		breed = "human",
-		unlocks = {
-			{
-				text = "loc_personality_effect_description",
-				type = "text"
-			}
-		}
-	},
-	female_veteran_3 = {
-		description = "loc_veteran_female_c__intro_01",
-		gender = "female",
-		display_name = "loc_personality_name_female_veteran_3",
-		archetype = "veteran",
-		sample_sound_event = "wwise/events/vo/play_preview_veteran_female_c",
-		preview_sound_event = "wwise/events/vo/play_preview_mask_veteran_female_c",
-		character_voice = "veteran_female_c",
-		breed = "human",
-		home_planets = {
-			"option_7"
 		},
+		visibility = {
+			genders = {
+				"female"
+			},
+			archetypes = {
+				"veteran"
+			}
+		}
+	},
+	{
+		preview_sound_event = "wwise/events/vo/play_preview_mask_veteran_female_b",
+		display_name = "loc_personality_name_female_veteran_2",
+		character_voice = "veteran_female_b",
+		description = "loc_veteran_female_b__intro_01",
+		sample_sound_event = "wwise/events/vo/play_preview_veteran_female_b",
 		unlocks = {
 			{
 				text = "loc_personality_effect_description",
 				type = "text"
 			}
+		},
+		visibility = {
+			genders = {
+				"female"
+			},
+			archetypes = {
+				"veteran"
+			}
 		}
 	},
-	male_zealot_1 = {
-		description = "loc_zealot_male_a__intro_01",
-		gender = "male",
-		display_name = "loc_personality_name_male_zealot_1",
-		archetype = "zealot",
-		sample_sound_event = "wwise/events/vo/play_preview_zealot_male_a",
+	{
+		preview_sound_event = "wwise/events/vo/play_preview_mask_veteran_female_c",
+		display_name = "loc_personality_name_female_veteran_3",
+		character_voice = "veteran_female_c",
+		description = "loc_veteran_female_c__intro_01",
+		sample_sound_event = "wwise/events/vo/play_preview_veteran_female_c",
+		unlocks = {
+			{
+				text = "loc_personality_effect_description",
+				type = "text"
+			}
+		},
+		visibility = {
+			genders = {
+				"female"
+			},
+			archetypes = {
+				"veteran"
+			}
+		},
+		restrictions = {
+			home_planets = {
+				"option_7"
+			}
+		}
+	},
+	{
 		preview_sound_event = "wwise/events/vo/play_preview_mask_zealot_male_a",
+		display_name = "loc_personality_name_male_zealot_1",
 		character_voice = "zealot_male_a",
-		breed = "human",
+		description = "loc_zealot_male_a__intro_01",
+		sample_sound_event = "wwise/events/vo/play_preview_zealot_male_a",
 		unlocks = {
 			{
 				text = "loc_personality_effect_description",
 				type = "text"
 			}
+		},
+		visibility = {
+			genders = {
+				"male"
+			},
+			archetypes = {
+				"zealot"
+			}
 		}
 	},
-	male_zealot_2 = {
-		description = "loc_zealot_male_b__intro_01",
-		gender = "male",
-		display_name = "loc_personality_name_male_zealot_2",
-		archetype = "zealot",
-		sample_sound_event = "wwise/events/vo/play_preview_zealot_male_b",
+	{
 		preview_sound_event = "wwise/events/vo/play_preview_mask_zealot_male_b",
+		display_name = "loc_personality_name_male_zealot_2",
 		character_voice = "zealot_male_b",
-		breed = "human",
+		description = "loc_zealot_male_b__intro_01",
+		sample_sound_event = "wwise/events/vo/play_preview_zealot_male_b",
 		unlocks = {
 			{
 				text = "loc_personality_effect_description",
 				type = "text"
 			}
+		},
+		visibility = {
+			genders = {
+				"male"
+			},
+			archetypes = {
+				"zealot"
+			}
 		}
 	},
-	male_zealot_3 = {
-		description = "loc_zealot_male_c__intro_01",
-		gender = "male",
-		display_name = "loc_personality_name_male_zealot_3",
-		archetype = "zealot",
-		sample_sound_event = "wwise/events/vo/play_preview_zealot_male_c",
+	{
 		preview_sound_event = "wwise/events/vo/play_preview_mask_zealot_male_c",
+		display_name = "loc_personality_name_male_zealot_3",
 		character_voice = "zealot_male_c",
-		breed = "human",
+		description = "loc_zealot_male_c__intro_01",
+		sample_sound_event = "wwise/events/vo/play_preview_zealot_male_c",
 		unlocks = {
 			{
 				text = "loc_personality_effect_description",
 				type = "text"
 			}
+		},
+		visibility = {
+			genders = {
+				"male"
+			},
+			archetypes = {
+				"zealot"
+			}
 		}
 	},
-	female_zealot_1 = {
-		description = "loc_zealot_female_a__intro_01",
-		gender = "female",
-		display_name = "loc_personality_name_female_zealot_1",
-		archetype = "zealot",
-		sample_sound_event = "wwise/events/vo/play_preview_zealot_female_a",
+	{
 		preview_sound_event = "wwise/events/vo/play_preview_mask_zealot_female_a",
+		display_name = "loc_personality_name_female_zealot_1",
 		character_voice = "zealot_female_a",
-		breed = "human",
+		description = "loc_zealot_female_a__intro_01",
+		sample_sound_event = "wwise/events/vo/play_preview_zealot_female_a",
 		unlocks = {
 			{
 				text = "loc_personality_effect_description",
 				type = "text"
 			}
+		},
+		visibility = {
+			genders = {
+				"female"
+			},
+			archetypes = {
+				"zealot"
+			}
 		}
 	},
-	female_zealot_2 = {
-		description = "loc_zealot_female_b__intro_01",
-		gender = "female",
-		display_name = "loc_personality_name_female_zealot_2",
-		archetype = "zealot",
-		sample_sound_event = "wwise/events/vo/play_preview_zealot_female_b",
+	{
 		preview_sound_event = "wwise/events/vo/play_preview_mask_zealot_female_b",
+		display_name = "loc_personality_name_female_zealot_2",
 		character_voice = "zealot_female_b",
-		breed = "human",
+		description = "loc_zealot_female_b__intro_01",
+		sample_sound_event = "wwise/events/vo/play_preview_zealot_female_b",
 		unlocks = {
 			{
 				text = "loc_personality_effect_description",
 				type = "text"
 			}
+		},
+		visibility = {
+			genders = {
+				"female"
+			},
+			archetypes = {
+				"zealot"
+			}
 		}
 	},
-	female_zealot_3 = {
-		description = "loc_zealot_female_c__intro_01",
-		gender = "female",
-		display_name = "loc_personality_name_female_zealot_3",
-		archetype = "zealot",
-		sample_sound_event = "wwise/events/vo/play_preview_zealot_female_c",
+	{
 		preview_sound_event = "wwise/events/vo/play_preview_mask_zealot_female_c",
+		display_name = "loc_personality_name_female_zealot_3",
 		character_voice = "zealot_female_c",
-		breed = "human",
+		description = "loc_zealot_female_c__intro_01",
+		sample_sound_event = "wwise/events/vo/play_preview_zealot_female_c",
 		unlocks = {
 			{
 				text = "loc_personality_effect_description",
 				type = "text"
 			}
+		},
+		visibility = {
+			genders = {
+				"female"
+			},
+			archetypes = {
+				"zealot"
+			}
 		}
 	},
-	male_psyker_1 = {
-		description = "loc_psyker_male_a__intro_01",
-		gender = "male",
-		display_name = "loc_personality_name_male_psyker_1",
-		archetype = "psyker",
-		sample_sound_event = "wwise/events/vo/play_preview_psyker_male_a",
+	{
 		preview_sound_event = "wwise/events/vo/play_preview_mask_psyker_male_a",
+		display_name = "loc_personality_name_male_psyker_1",
 		character_voice = "psyker_male_a",
-		breed = "human",
+		description = "loc_psyker_male_a__intro_01",
+		sample_sound_event = "wwise/events/vo/play_preview_psyker_male_a",
 		unlocks = {
 			{
 				text = "loc_personality_effect_description",
 				type = "text"
 			}
+		},
+		visibility = {
+			genders = {
+				"male"
+			},
+			archetypes = {
+				"psyker"
+			}
 		}
 	},
-	male_psyker_2 = {
-		description = "loc_psyker_male_b__intro_01",
-		gender = "male",
-		display_name = "loc_personality_name_male_psyker_2",
-		archetype = "psyker",
-		sample_sound_event = "wwise/events/vo/play_preview_psyker_male_b",
+	{
 		preview_sound_event = "wwise/events/vo/play_preview_mask_psyker_male_b",
+		display_name = "loc_personality_name_male_psyker_2",
 		character_voice = "psyker_male_b",
-		breed = "human",
+		description = "loc_psyker_male_b__intro_01",
+		sample_sound_event = "wwise/events/vo/play_preview_psyker_male_b",
 		unlocks = {
 			{
 				text = "loc_personality_effect_description",
 				type = "text"
 			}
+		},
+		visibility = {
+			genders = {
+				"male"
+			},
+			archetypes = {
+				"psyker"
+			}
 		}
 	},
-	male_psyker_3 = {
-		description = "loc_psyker_male_c__intro_01",
-		gender = "male",
-		display_name = "loc_personality_name_male_psyker_3",
-		archetype = "psyker",
-		sample_sound_event = "wwise/events/vo/play_preview_psyker_male_c",
+	{
 		preview_sound_event = "wwise/events/vo/play_preview_mask_psyker_male_c",
+		display_name = "loc_personality_name_male_psyker_3",
 		character_voice = "psyker_male_c",
-		breed = "human",
+		description = "loc_psyker_male_c__intro_01",
+		sample_sound_event = "wwise/events/vo/play_preview_psyker_male_c",
 		unlocks = {
 			{
 				text = "loc_personality_effect_description",
 				type = "text"
 			}
+		},
+		visibility = {
+			genders = {
+				"male"
+			},
+			archetypes = {
+				"psyker"
+			}
 		}
 	},
-	female_psyker_1 = {
-		description = "loc_psyker_female_a__intro_01",
-		gender = "female",
-		display_name = "loc_personality_name_female_psyker_1",
-		archetype = "psyker",
-		sample_sound_event = "wwise/events/vo/play_preview_psyker_female_a",
+	{
 		preview_sound_event = "wwise/events/vo/play_preview_mask_psyker_female_a",
+		display_name = "loc_personality_name_female_psyker_1",
 		character_voice = "psyker_female_a",
-		breed = "human",
+		description = "loc_psyker_female_a__intro_01",
+		sample_sound_event = "wwise/events/vo/play_preview_psyker_female_a",
 		unlocks = {
 			{
 				text = "loc_personality_effect_description",
 				type = "text"
 			}
+		},
+		visibility = {
+			genders = {
+				"female"
+			},
+			archetypes = {
+				"psyker"
+			}
 		}
 	},
-	female_psyker_2 = {
-		description = "loc_psyker_female_b__intro_01",
-		gender = "female",
-		display_name = "loc_personality_name_female_psyker_2",
-		archetype = "psyker",
-		sample_sound_event = "wwise/events/vo/play_preview_psyker_female_b",
+	{
 		preview_sound_event = "wwise/events/vo/play_preview_mask_psyker_female_b",
+		display_name = "loc_personality_name_female_psyker_2",
 		character_voice = "psyker_female_b",
-		breed = "human",
+		description = "loc_psyker_female_b__intro_01",
+		sample_sound_event = "wwise/events/vo/play_preview_psyker_female_b",
 		unlocks = {
 			{
 				text = "loc_personality_effect_description",
 				type = "text"
 			}
+		},
+		visibility = {
+			genders = {
+				"female"
+			},
+			archetypes = {
+				"psyker"
+			}
 		}
 	},
-	female_psyker_3 = {
-		description = "loc_psyker_female_c__intro_01",
-		gender = "female",
-		display_name = "loc_personality_name_female_psyker_3",
-		archetype = "psyker",
-		sample_sound_event = "wwise/events/vo/play_preview_psyker_female_c",
+	{
 		preview_sound_event = "wwise/events/vo/play_preview_mask_psyker_female_c",
+		display_name = "loc_personality_name_female_psyker_3",
 		character_voice = "psyker_female_c",
-		breed = "human",
+		description = "loc_psyker_female_c__intro_01",
+		sample_sound_event = "wwise/events/vo/play_preview_psyker_female_c",
 		unlocks = {
 			{
 				text = "loc_personality_effect_description",
 				type = "text"
 			}
+		},
+		visibility = {
+			genders = {
+				"female"
+			},
+			archetypes = {
+				"psyker"
+			}
 		}
 	},
-	ogryn_1 = {
-		description = "loc_ogryn_a__intro_01",
-		gender = "male",
-		display_name = "loc_personality_name_ogryn_1",
-		archetype = "ogryn",
-		sample_sound_event = "wwise/events/vo/play_preview_ogryn_a",
+	{
 		preview_sound_event = "wwise/events/vo/play_preview_mask_ogryn_a",
+		display_name = "loc_personality_name_ogryn_1",
 		character_voice = "ogryn_a",
-		breed = "ogryn",
+		description = "loc_ogryn_a__intro_01",
+		sample_sound_event = "wwise/events/vo/play_preview_ogryn_a",
 		unlocks = {
 			{
 				text = "loc_personality_effect_description",
 				type = "text"
 			}
+		},
+		visibility = {
+			archetypes = {
+				"ogryn"
+			}
 		}
 	},
-	ogryn_2 = {
-		description = "loc_ogryn_b__intro_01",
-		gender = "male",
-		display_name = "loc_personality_name_ogryn_2",
-		archetype = "ogryn",
-		sample_sound_event = "wwise/events/vo/play_preview_ogryn_b",
+	{
 		preview_sound_event = "wwise/events/vo/play_preview_mask_ogryn_b",
+		display_name = "loc_personality_name_ogryn_2",
 		character_voice = "ogryn_b",
-		breed = "ogryn",
+		description = "loc_ogryn_b__intro_01",
+		sample_sound_event = "wwise/events/vo/play_preview_ogryn_b",
 		unlocks = {
 			{
 				text = "loc_personality_effect_description",
 				type = "text"
 			}
+		},
+		visibility = {
+			archetypes = {
+				"ogryn"
+			}
 		}
 	},
-	ogryn_3 = {
-		description = "loc_ogryn_c__intro_01",
-		gender = "male",
-		display_name = "loc_personality_name_ogryn_3",
-		archetype = "ogryn",
-		sample_sound_event = "wwise/events/vo/play_preview_ogryn_c",
+	{
 		preview_sound_event = "wwise/events/vo/play_preview_mask_ogryn_c",
+		display_name = "loc_personality_name_ogryn_3",
 		character_voice = "ogryn_c",
-		breed = "ogryn",
+		description = "loc_ogryn_c__intro_01",
+		sample_sound_event = "wwise/events/vo/play_preview_ogryn_c",
 		unlocks = {
 			{
 				text = "loc_personality_effect_description",
 				type = "text"
+			}
+		},
+		visibility = {
+			archetypes = {
+				"ogryn"
+			}
+		}
+	},
+	{
+		preview_sound_event = "wwise/events/vo/play_preview_mask_adamant_male_a",
+		display_name = "loc_personality_name_male_adamant_1",
+		character_voice = "adamant_male_a",
+		description = "loc_adamant_male_a__intro_01",
+		sample_sound_event = "wwise/events/vo/play_preview_adamant_male_a",
+		unlocks = {
+			{
+				text = "loc_personality_effect_description",
+				type = "text"
+			}
+		},
+		visibility = {
+			genders = {
+				"male"
+			},
+			archetypes = {
+				"adamant"
+			}
+		}
+	},
+	{
+		preview_sound_event = "wwise/events/vo/play_preview_mask_adamant_male_b",
+		display_name = "loc_personality_name_male_adamant_2",
+		character_voice = "adamant_male_b",
+		description = "loc_adamant_male_b__intro_01",
+		sample_sound_event = "wwise/events/vo/play_preview_adamant_male_b",
+		unlocks = {
+			{
+				text = "loc_personality_effect_description",
+				type = "text"
+			}
+		},
+		visibility = {
+			genders = {
+				"male"
+			},
+			archetypes = {
+				"adamant"
+			}
+		}
+	},
+	{
+		preview_sound_event = "wwise/events/vo/play_preview_mask_adamant_male_c",
+		display_name = "loc_personality_name_male_adamant_3",
+		character_voice = "adamant_male_c",
+		description = "loc_adamant_male_c__intro_01",
+		sample_sound_event = "wwise/events/vo/play_preview_adamant_male_c",
+		unlocks = {
+			{
+				text = "loc_personality_effect_description",
+				type = "text"
+			}
+		},
+		visibility = {
+			genders = {
+				"male"
+			},
+			archetypes = {
+				"adamant"
+			}
+		}
+	},
+	{
+		preview_sound_event = "wwise/events/vo/play_preview_mask_adamant_female_a",
+		display_name = "loc_personality_name_female_adamant_1",
+		character_voice = "adamant_female_a",
+		description = "loc_adamant_female_a__intro_01",
+		sample_sound_event = "wwise/events/vo/play_preview_adamant_female_a",
+		unlocks = {
+			{
+				text = "loc_personality_effect_description",
+				type = "text"
+			}
+		},
+		visibility = {
+			genders = {
+				"female"
+			},
+			archetypes = {
+				"adamant"
+			}
+		}
+	},
+	{
+		preview_sound_event = "wwise/events/vo/play_preview_mask_adamant_female_b",
+		display_name = "loc_personality_name_female_adamant_2",
+		character_voice = "adamant_female_b",
+		description = "loc_adamant_female_b__intro_01",
+		sample_sound_event = "wwise/events/vo/play_preview_adamant_female_b",
+		unlocks = {
+			{
+				text = "loc_personality_effect_description",
+				type = "text"
+			}
+		},
+		visibility = {
+			genders = {
+				"female"
+			},
+			archetypes = {
+				"adamant"
+			}
+		}
+	},
+	{
+		preview_sound_event = "wwise/events/vo/play_preview_mask_adamant_female_c",
+		display_name = "loc_personality_name_female_adamant_3",
+		character_voice = "adamant_female_c",
+		description = "loc_adamant_female_c__intro_01",
+		sample_sound_event = "wwise/events/vo/play_preview_adamant_female_c",
+		unlocks = {
+			{
+				text = "loc_personality_effect_description",
+				type = "text"
+			}
+		},
+		visibility = {
+			genders = {
+				"female"
+			},
+			archetypes = {
+				"adamant"
 			}
 		}
 	}
 }
+local personality_options_by_id = {}
 
-return settings("Personalities", personalities)
+for i = 1, #personality_options do
+	local personality_option = personality_options[i]
+	local id = string.format("option_%d", i)
+	personality_option.id = id
+	personality_options_by_id[id] = personality_option
+end
+
+return settings("Personalities", personality_options_by_id)

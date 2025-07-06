@@ -5,6 +5,7 @@ local UICharacterProfilePackageLoader = require("scripts/managers/ui/ui_characte
 local UIProfileSpawner = require("scripts/managers/ui/ui_profile_spawner")
 local UIWorldSpawner = require("scripts/managers/ui/ui_world_spawner")
 local WorldRender = require("scripts/utilities/world_render")
+local ProfileUtils = require("scripts/utilities/profile_utils")
 local MainMenuBackgroundView = class("MainMenuBackgroundView", "BaseView")
 
 function MainMenuBackgroundView:init(settings, context)
@@ -34,6 +35,7 @@ end
 function MainMenuBackgroundView:_setup_background_world()
 	self:_register_event("event_register_main_menu_camera")
 	self:_register_event("event_register_main_menu_spawn_point")
+	self:_register_event("event_register_main_menu_companion_spawn_point")
 	self:_register_event("event_register_main_menu_new_character_dummy")
 
 	local world_name = MainMenuBackgroundViewSettings.world_name
@@ -75,6 +77,16 @@ function MainMenuBackgroundView:event_register_main_menu_spawn_point(spawn_point
 
 	if self._context then
 		self._context.background_spawn_point_unit = spawn_point_unit
+	end
+end
+
+function MainMenuBackgroundView:event_register_main_menu_companion_spawn_point(spawn_point_unit)
+	self:_unregister_event("event_register_main_menu_companion_spawn_point")
+
+	self._companion_spawn_point_unit = spawn_point_unit
+
+	if self._context then
+		self._context.background_companion_spawn_point_unit = spawn_point_unit
 	end
 end
 
@@ -143,8 +155,18 @@ function MainMenuBackgroundView:_spawn_profile(profile)
 
 	local spawn_position = Unit.world_position(self._spawn_point_unit, 1)
 	local spawn_rotation = Unit.world_rotation(self._spawn_point_unit, 1)
+	local companion_spawn_position = Unit.world_position(self._companion_spawn_point_unit, 1)
+	local companion_spawn_rotation = Unit.world_rotation(self._companion_spawn_point_unit, 1)
+	local companion_data = {
+		position = companion_spawn_position,
+		rotation = companion_spawn_rotation
+	}
 
-	self._profile_spawner:spawn_profile(profile, spawn_position, spawn_rotation)
+	self._profile_spawner:spawn_profile(profile, spawn_position, spawn_rotation, nil, nil, nil, nil, nil, nil, nil, nil, nil, companion_data)
+
+	local has_companion = ProfileUtils.has_companion(profile)
+
+	self._profile_spawner:toggle_companion(has_companion)
 
 	local selected_archetype = profile.archetype
 	local archetype_name = selected_archetype.name

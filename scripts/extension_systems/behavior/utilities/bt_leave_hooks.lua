@@ -2,6 +2,7 @@ local Attack = require("scripts/utilities/attack/attack")
 local Blackboard = require("scripts/extension_systems/blackboard/utilities/blackboard")
 local ChaosBeastOfNurgleSettings = require("scripts/settings/monster/chaos_beast_of_nurgle_settings")
 local DamageProfileTemplates = require("scripts/settings/damage/damage_profile_templates")
+local CompanionFollowUtility = require("scripts/utilities/companion_follow_utility")
 
 local function _set_component_value(unit, breed, blackboard, scratchpad, action_data, t, args)
 	local component_name = args.component_name
@@ -15,132 +16,168 @@ local BtLeaveHooks = {
 	reset_enter_combat_range_flag = function (unit, breed, blackboard, scratchpad, action_data, t, args)
 		local behavior_component = Blackboard.write_component(blackboard, "behavior")
 		behavior_component.enter_combat_range_flag = false
-	end,
-	trigger_anim_event = function (unit, breed, blackboard, scratchpad, action_data, t, args)
-		local anim_event = args.anim_event
+	end
+}
+
+function BtLeaveHooks.trigger_anim_event(unit, breed, blackboard, scratchpad, action_data, t, args)
+	local anim_event = args.anim_event
+	local animation_extension = ScriptUnit.extension(unit, "animation_system")
+
+	animation_extension:anim_event(anim_event)
+end
+
+function BtLeaveHooks.activate_shield_blocking(unit, breed, blackboard, scratchpad, action_data, t)
+	local shield_extension = ScriptUnit.extension(unit, "shield_system")
+
+	shield_extension:set_blocking(true)
+end
+
+BtLeaveHooks.set_component_value = _set_component_value
+
+function BtLeaveHooks.set_component_values(unit, breed, blackboard, scratchpad, action_data, t, args)
+	for ii = 1, #args do
+		_set_component_value(unit, breed, blackboard, scratchpad, action_data, t, args[ii])
+	end
+end
+
+function BtLeaveHooks.set_scratchpad_value(unit, breed, blackboard, scratchpad, action_data, t, args)
+	local field = args.field
+	local value = args.value
+	scratchpad[field] = value
+end
+
+function BtLeaveHooks.captain_charge_exit(unit, breed, blackboard, scratchpad, action_data, t, args)
+	local phase_component = Blackboard.write_component(blackboard, "phase")
+	phase_component.lock = false
+	local visual_loadout_extension = ScriptUnit.extension(unit, "visual_loadout_system")
+	local wielded_slot_name = visual_loadout_extension:wielded_slot_name()
+	local exit_anim_states = args.exit_anim_states
+	local wanted_anim_state = exit_anim_states[wielded_slot_name]
+
+	if wanted_anim_state then
 		local animation_extension = ScriptUnit.extension(unit, "animation_system")
 
-		animation_extension:anim_event(anim_event)
-	end,
-	activate_shield_blocking = function (unit, breed, blackboard, scratchpad, action_data, t)
-		local shield_extension = ScriptUnit.extension(unit, "shield_system")
+		animation_extension:anim_event(wanted_anim_state)
+	end
+end
 
-		shield_extension:set_blocking(true)
-	end,
-	set_component_value = _set_component_value,
-	set_component_values = function (unit, breed, blackboard, scratchpad, action_data, t, args)
-		for ii = 1, #args do
-			_set_component_value(unit, breed, blackboard, scratchpad, action_data, t, args[ii])
-		end
-	end,
-	set_scratchpad_value = function (unit, breed, blackboard, scratchpad, action_data, t, args)
-		local field = args.field
-		local value = args.value
-		scratchpad[field] = value
-	end,
-	captain_charge_exit = function (unit, breed, blackboard, scratchpad, action_data, t, args)
+function BtLeaveHooks.captain_grenade_exit(unit, breed, blackboard, scratchpad, action_data, t, args)
+	if breed.phase_template then
 		local phase_component = Blackboard.write_component(blackboard, "phase")
 		phase_component.lock = false
-		local visual_loadout_extension = ScriptUnit.extension(unit, "visual_loadout_system")
-		local wielded_slot_name = visual_loadout_extension:wielded_slot_name()
-		local exit_anim_states = args.exit_anim_states
-		local wanted_anim_state = exit_anim_states[wielded_slot_name]
+	end
 
-		if wanted_anim_state then
-			local animation_extension = ScriptUnit.extension(unit, "animation_system")
+	local visual_loadout_extension = ScriptUnit.extension(unit, "visual_loadout_system")
+	local wielded_slot_name = visual_loadout_extension:wielded_slot_name()
+	local exit_anim_states = args.exit_anim_states
+	local wanted_anim_state = exit_anim_states[wielded_slot_name]
 
-			animation_extension:anim_event(wanted_anim_state)
-		end
-	end,
-	captain_grenade_exit = function (unit, breed, blackboard, scratchpad, action_data, t, args)
-		if breed.phase_template then
-			local phase_component = Blackboard.write_component(blackboard, "phase")
-			phase_component.lock = false
-		end
+	if wanted_anim_state then
+		local animation_extension = ScriptUnit.extension(unit, "animation_system")
 
-		local visual_loadout_extension = ScriptUnit.extension(unit, "visual_loadout_system")
-		local wielded_slot_name = visual_loadout_extension:wielded_slot_name()
-		local exit_anim_states = args.exit_anim_states
-		local wanted_anim_state = exit_anim_states[wielded_slot_name]
+		animation_extension:anim_event(wanted_anim_state)
+	end
+end
 
-		if wanted_anim_state then
-			local animation_extension = ScriptUnit.extension(unit, "animation_system")
+function BtLeaveHooks.bulwark_climb_leave(unit, breed, blackboard, scratchpad, action_data, t, args)
+	local shield_extension = ScriptUnit.extension(unit, "shield_system")
 
-			animation_extension:anim_event(wanted_anim_state)
-		end
-	end,
-	bulwark_climb_leave = function (unit, breed, blackboard, scratchpad, action_data, t, args)
-		local shield_extension = ScriptUnit.extension(unit, "shield_system")
+	shield_extension:set_blocking(true)
 
-		shield_extension:set_blocking(true)
+	local slot_name = args.slot_name
+	local visual_loadout_extension = ScriptUnit.extension(unit, "visual_loadout_system")
 
-		local slot_name = args.slot_name
-		local visual_loadout_extension = ScriptUnit.extension(unit, "visual_loadout_system")
+	if visual_loadout_extension:can_wield_slot(slot_name) then
+		visual_loadout_extension:wield_slot(slot_name)
+	end
+end
 
-		if visual_loadout_extension:can_wield_slot(slot_name) then
-			visual_loadout_extension:wield_slot(slot_name)
-		end
-	end,
-	wield_slot = function (unit, breed, blackboard, scratchpad, action_data, t, args)
-		local slot_name = args.slot_name
-		local visual_loadout_extension = ScriptUnit.extension(unit, "visual_loadout_system")
+function BtLeaveHooks.wield_slot(unit, breed, blackboard, scratchpad, action_data, t, args)
+	local slot_name = args.slot_name
+	local visual_loadout_extension = ScriptUnit.extension(unit, "visual_loadout_system")
 
-		if visual_loadout_extension:can_wield_slot(slot_name) then
-			visual_loadout_extension:wield_slot(slot_name)
-		end
-	end,
-	poxwalker_bomber_lunge_stagger_check = function (unit, breed, blackboard, scratchpad, action_data, t, args)
-		local death_component = blackboard.death
+	if visual_loadout_extension:can_wield_slot(slot_name) then
+		visual_loadout_extension:wield_slot(slot_name)
+	end
+end
 
-		if death_component.staggered_during_lunge then
-			local stagger_component = blackboard.stagger
-			local attacker_unit = ALIVE[stagger_component.attacker_unit] and stagger_component.attacker_unit
+function BtLeaveHooks.poxwalker_bomber_lunge_stagger_check(unit, breed, blackboard, scratchpad, action_data, t, args)
+	local death_component = blackboard.death
 
-			Attack.execute(unit, DamageProfileTemplates.default, "attacking_unit", attacker_unit, "instakill", true)
-		end
-	end,
-	beast_of_nurgle_set_melee_cooldown = function (unit, breed, blackboard, scratchpad, action_data, t, args)
+	if death_component.staggered_during_lunge then
+		local stagger_component = blackboard.stagger
+		local attacker_unit = ALIVE[stagger_component.attacker_unit] and stagger_component.attacker_unit
+
+		Attack.execute(unit, DamageProfileTemplates.default, "attacking_unit", attacker_unit, "instakill", true)
+	end
+end
+
+function BtLeaveHooks.beast_of_nurgle_set_melee_cooldown(unit, breed, blackboard, scratchpad, action_data, t, args)
+	local behavior_component = Blackboard.write_component(blackboard, "behavior")
+	local cooldowns = ChaosBeastOfNurgleSettings.cooldowns
+	local cooldown = cooldowns.melee
+	behavior_component.melee_cooldown = t + cooldown
+end
+
+function BtLeaveHooks.beast_of_nurgle_set_melee_aoe_cooldown(unit, breed, blackboard, scratchpad, action_data, t, args)
+	local behavior_component = Blackboard.write_component(blackboard, "behavior")
+	local cooldowns = ChaosBeastOfNurgleSettings.cooldowns
+	local cooldown = cooldowns.melee_aoe
+	behavior_component.melee_aoe_cooldown = t + cooldown
+end
+
+function BtLeaveHooks.beast_of_nurgle_set_vomit_cooldown(unit, breed, blackboard, scratchpad, action_data, t, args)
+	local behavior_component = Blackboard.write_component(blackboard, "behavior")
+	local cooldowns = ChaosBeastOfNurgleSettings.cooldowns
+	local cooldown = cooldowns.vomit
+	behavior_component.vomit_cooldown = t + cooldown
+end
+
+function BtLeaveHooks.beast_of_nurgle_set_consume_cooldown(unit, breed, blackboard, scratchpad, action_data, t, args)
+	local behavior_component = Blackboard.write_component(blackboard, "behavior")
+	local cooldowns = ChaosBeastOfNurgleSettings.cooldowns
+	local cooldown = cooldowns.consume
+	behavior_component.consume_cooldown = t + cooldown
+end
+
+function BtLeaveHooks.beast_of_nurgle_reset_alerted(unit, breed, blackboard, scratchpad, action_data, t, args)
+	local behavior_component = Blackboard.write_component(blackboard, "behavior")
+	behavior_component.wants_to_play_alerted = false
+end
+
+function BtLeaveHooks.beast_of_nurgle_force_spit_out(unit, breed, blackboard, scratchpad, action_data, t, args, reason)
+	if reason == "failed" then
 		local behavior_component = Blackboard.write_component(blackboard, "behavior")
-		local cooldowns = ChaosBeastOfNurgleSettings.cooldowns
-		local cooldown = cooldowns.melee
-		behavior_component.melee_cooldown = t + cooldown
-	end,
-	beast_of_nurgle_set_melee_aoe_cooldown = function (unit, breed, blackboard, scratchpad, action_data, t, args)
-		local behavior_component = Blackboard.write_component(blackboard, "behavior")
-		local cooldowns = ChaosBeastOfNurgleSettings.cooldowns
-		local cooldown = cooldowns.melee_aoe
-		behavior_component.melee_aoe_cooldown = t + cooldown
-	end,
-	beast_of_nurgle_set_vomit_cooldown = function (unit, breed, blackboard, scratchpad, action_data, t, args)
-		local behavior_component = Blackboard.write_component(blackboard, "behavior")
-		local cooldowns = ChaosBeastOfNurgleSettings.cooldowns
-		local cooldown = cooldowns.vomit
-		behavior_component.vomit_cooldown = t + cooldown
-	end,
-	beast_of_nurgle_set_consume_cooldown = function (unit, breed, blackboard, scratchpad, action_data, t, args)
-		local behavior_component = Blackboard.write_component(blackboard, "behavior")
+		behavior_component.force_spit_out = true
 		local cooldowns = ChaosBeastOfNurgleSettings.cooldowns
 		local cooldown = cooldowns.consume
 		behavior_component.consume_cooldown = t + cooldown
-	end,
-	beast_of_nurgle_reset_alerted = function (unit, breed, blackboard, scratchpad, action_data, t, args)
-		local behavior_component = Blackboard.write_component(blackboard, "behavior")
-		behavior_component.wants_to_play_alerted = false
-	end,
-	beast_of_nurgle_force_spit_out = function (unit, breed, blackboard, scratchpad, action_data, t, args, reason)
-		if reason == "failed" then
-			local behavior_component = Blackboard.write_component(blackboard, "behavior")
-			behavior_component.force_spit_out = true
-			local cooldowns = ChaosBeastOfNurgleSettings.cooldowns
-			local cooldown = cooldowns.consume
-			behavior_component.consume_cooldown = t + cooldown
-		end
-	end,
-	netgunner_reset_cooldown = function (unit, breed, blackboard, scratchpad, action_data, t, args)
-		local behavior_component = Blackboard.write_component(blackboard, "behavior")
-		behavior_component.net_is_ready = true
-		behavior_component.shoot_net_cooldown = 0
 	end
-}
+end
+
+function BtLeaveHooks.netgunner_reset_cooldown(unit, breed, blackboard, scratchpad, action_data, t, args)
+	local behavior_component = Blackboard.write_component(blackboard, "behavior")
+	behavior_component.net_is_ready = true
+	behavior_component.shoot_net_cooldown = 0
+end
+
+function BtLeaveHooks.companion_leaving_movement(unit, breed, blackboard, scratchpad, action_data, t, args)
+	local navigation_extension = ScriptUnit.extension(unit, "navigation_system")
+
+	navigation_extension:set_enabled(false)
+
+	local aim_component = Blackboard.write_component(blackboard, "aim")
+	aim_component.controlled_aiming = false
+end
+
+function BtLeaveHooks.companion_restore_pounce_state(unit, breed, blackboard, scratchpad, action_data, t, args)
+	local pounce_component = Blackboard.write_component(blackboard, "pounce")
+	pounce_component.has_pounce_started = false
+	pounce_component.has_pounce_target = false
+	pounce_component.started_leap = false
+	pounce_component.pounce_cooldown = 0
+	pounce_component.has_jump_off_direction = true
+	pounce_component.use_fast_jump = false
+end
 
 return BtLeaveHooks

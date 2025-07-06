@@ -528,6 +528,7 @@ function PlayerUnitAbilityExtension:can_be_scroll_wielded(slot_name)
 	for _, ability_slot_name in pairs(ability_configuration) do
 		if ability_slot_name == slot_name then
 			local disable_scroll_wield = talent_extension:has_special_rule(special_rules.zealot_throwing_knives)
+			disable_scroll_wield = disable_scroll_wield or talent_extension:has_special_rule(special_rules.adamant_whistle)
 
 			if disable_scroll_wield then
 				return false

@@ -6,6 +6,7 @@ local PlayerCompositions = require("scripts/utilities/players/player_composition
 function HudElementNameplates:init(parent, draw_layer, start_scale)
 	self._parent = parent
 	self._nameplate_units = {}
+	self._companion_nameplates = {}
 	self._scan_delay = HudElementNameplatesSettings.scan_delay
 	self._scan_delay_duration = 0
 	local mission_name = Managers.state.mission:mission_name()
@@ -33,6 +34,7 @@ function HudElementNameplates:update(dt, t)
 		self._scan_delay_duration = self._scan_delay_duration - dt
 	else
 		self:_nameplate_extension_scan()
+		self:_companion_nameplate_extension_scan()
 
 		self._scan_delay_duration = self._scan_delay
 	end
@@ -121,6 +123,58 @@ function HudElementNameplates:_nameplate_extension_scan()
 	end
 end
 
+function HudElementNameplates:_companion_nameplate_extension_scan()
+	local parent = self._parent
+	local local_player = parent:player()
+	local marker_type = self._is_mission_hub and "nameplate_companion_hub" or "nameplate_companion"
+	local player_manager = Managers.player
+	local players = player_manager:players()
+	local ALIVE = ALIVE
+
+	for _, player in pairs(players) do
+		local player_unit = player.player_unit
+
+		if ALIVE[player_unit] then
+			self:_handle_player_companion_nameplate(player, marker_type)
+		end
+	end
+
+	local companion_nameplates = self._companion_nameplates
+
+	for companion_unit, marker_data in pairs(companion_nameplates) do
+		if not marker_data.synced then
+			self:_remove_companion_nameplate(companion_unit)
+
+			companion_nameplates[companion_unit] = nil
+		end
+	end
+end
+
+function HudElementNameplates:_handle_player_companion_nameplate(player, marker_type)
+	local player_owned_units = player.owned_units
+
+	for _, owned_unit in pairs(player_owned_units) do
+		local unit_data = ScriptUnit.has_extension(owned_unit, "unit_data_system")
+		local breed = unit_data and unit_data:breed()
+		local is_companion = breed and breed.tags and breed.tags.companion
+
+		if is_companion then
+			self:_handle_companion_namplate(player, owned_unit, marker_type)
+		end
+	end
+end
+
+function HudElementNameplates:_handle_companion_namplate(player, companion_unit, marker_type)
+	local companion_nameplates = self._companion_nameplates
+	local existing_companion_maker = companion_nameplates[companion_unit]
+
+	if ALIVE[companion_unit] and not existing_companion_maker then
+		self:_add_companion_nameplate(marker_type, companion_unit, player)
+	elseif not ALIVE[companion_unit] and existing_companion_maker then
+		self:_remove_companion_nameplate(companion_unit)
+	end
+end
+
 function HudElementNameplates:_player_extensions(player)
 	local player_unit = player.player_unit
 
@@ -139,6 +193,33 @@ function HudElementNameplates:_on_nameplate_marker_spawned(unit, id)
 	self._nameplate_units[unit].marker_id = id
 end
 
+function HudElementNameplates:_on_companion_nameplate_marker_spawned(unit, id)
+	self._companion_nameplates[unit].marker_id = id
+end
+
+function HudElementNameplates:_add_companion_nameplate(marker_type, companion_unit, player)
+	local event_manager = Managers.event
+	local companion_nameplates = self._companion_nameplates
+	companion_nameplates[companion_unit] = {
+		synced = true
+	}
+	local marker_callback = callback(self, "_on_companion_nameplate_marker_spawned", companion_unit)
+
+	event_manager:trigger("add_world_marker_unit", marker_type, companion_unit, marker_callback, player)
+end
+
+function HudElementNameplates:_remove_companion_nameplate(companion_unit)
+	local event_manager = Managers.event
+	local companion_nameplates = self._companion_nameplates
+	local companion_marker_id = companion_nameplates[companion_unit] and companion_nameplates[companion_unit].marker_id
+
+	if companion_marker_id then
+		companion_nameplates[companion_unit].synced = false
+
+		event_manager:trigger("remove_world_marker", companion_marker_id)
+	end
+end
+
 function HudElementNameplates:destroy()
 	local event_manager = Managers.event
 	local nameplate_units = self._nameplate_units
@@ -151,7 +232,14 @@ function HudElementNameplates:destroy()
 		end
 	end
 
+	local companion_nameplates = self._companion_nameplates
+
+	for companion_unit, _ in pairs(companion_nameplates) do
+		self:_remove_companion_nameplate(companion_unit)
+	end
+
 	self._nameplate_units = nil
+	self._companion_nameplate = nil
 
 	Managers.event:unregister(self, "event_titles_my_title_in_hub_setting_changed")
 end

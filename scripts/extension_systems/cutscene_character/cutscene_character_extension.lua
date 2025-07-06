@@ -20,6 +20,7 @@ function CutsceneCharacterExtension:init(extension_init_context, unit, extension
 	self._cinematic_name = CinematicSceneSettings.CINEMATIC_NAMES.none
 	self._character_type = "none"
 	self._breed_name = "none"
+	self._companion_inclusion_setting = "any"
 	self._player_unique_id = nil
 	self._prop_items = {}
 	self._equip_slot_on_loadout_assign = ""
@@ -48,10 +49,11 @@ function CutsceneCharacterExtension:destroy()
 	cutscene_character_system:unregister_cutscene_character(self)
 end
 
-function CutsceneCharacterExtension:setup_from_component(cinematic_name, character_type, breed_name, prop_items, slot, inventory_animation_event, equip_slot_on_loadout_assign)
+function CutsceneCharacterExtension:setup_from_component(cinematic_name, character_type, breed_name, prop_items, slot, inventory_animation_event, equip_slot_on_loadout_assign, companion_inclusion_setting)
 	self._cinematic_name = cinematic_name
 	self._character_type = character_type
 	self._breed_name = breed_name
+	self._companion_inclusion_setting = companion_inclusion_setting
 	self._prop_items = prop_items
 	self._slot = slot
 	self._equip_slot_on_loadout_assign = equip_slot_on_loadout_assign
@@ -99,6 +101,10 @@ end
 
 function CutsceneCharacterExtension:breed_name()
 	return self._breed_name
+end
+
+function CutsceneCharacterExtension:companion_inclusion_setting()
+	return self._companion_inclusion_setting
 end
 
 function CutsceneCharacterExtension:breed()
@@ -160,7 +166,7 @@ end
 
 local PROP_ITEMS = {}
 
-function CutsceneCharacterExtension:assign_player_loadout(player_unique_id, items)
+function CutsceneCharacterExtension:assign_player_loadout(player_unique_id, items, companion_cutscene_extension)
 	local cinematic_name = self._cinematic_name
 	local cinematic_template = CinematicSceneTemplates[cinematic_name]
 	local ignored_slots = cinematic_template.ignored_slots
@@ -181,6 +187,18 @@ function CutsceneCharacterExtension:assign_player_loadout(player_unique_id, item
 		self._profile_spawner:wield_slot(equip_slot)
 	end
 
+	self._companion_cutscene_extension = companion_cutscene_extension
+	local companion_unit = companion_cutscene_extension and companion_cutscene_extension:unit()
+
+	if companion_cutscene_extension then
+		companion_cutscene_extension:assign_player_unique_id(player_unique_id)
+	end
+
+	local profile_spawner_companion_data = {
+		attach_to_character = false,
+		optional_unit_3p = companion_unit,
+		ignore = companion_cutscene_extension == nil
+	}
 	local profile = Managers.player:player_from_unique_id(player_unique_id):profile()
 	local unit = self._unit
 	local position = Unit.world_position(unit, 1)
@@ -194,7 +212,7 @@ function CutsceneCharacterExtension:assign_player_loadout(player_unique_id, item
 	local mission_template = self._mission_template
 	local face_state_machine_key = mission_template and mission_template.face_state_machine_key
 
-	self._profile_spawner:spawn_profile(profile, position, rotation, scale, state_machine, animation_event, face_state_machine_key, face_animation_event, force_highest_mip, disable_hair_state_machine, unit, ignore_state_machine)
+	self._profile_spawner:spawn_profile(profile, position, rotation, scale, state_machine, animation_event, face_state_machine_key, face_animation_event, force_highest_mip, disable_hair_state_machine, unit, ignore_state_machine, profile_spawner_companion_data)
 	self:_load_props()
 
 	self._player_unique_id = player_unique_id
@@ -239,6 +257,7 @@ function CutsceneCharacterExtension:unassign_player_loadout()
 	self._profile_spawner:reset()
 
 	self._player_unique_id = nil
+	self._companion_cutscene_extension = nil
 end
 
 function CutsceneCharacterExtension:set_equipped_weapon(weapon)
@@ -286,6 +305,10 @@ end
 function CutsceneCharacterExtension:_start_weapon_specific_walk_animation()
 	local unit = self._unit
 	local event = self._weapon_animation_event
+
+	if self._companion_cutscene_extension then
+		self._companion_cutscene_extension:trigger_walk_animation_event()
+	end
 
 	if self._current_state_machine ~= AnimationType.Weapon then
 		local weapon_template = WeaponTemplates[self._equipped_weapon.weapon_template]

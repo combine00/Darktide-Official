@@ -32,12 +32,11 @@ function ShadingEnvironmentExtension:setup_from_component(fade_in_distance, laye
 	self._shading_environment_resource_name_default = shading_environment_resource_name
 	self._fade_in_distance = fade_in_distance
 	self._layer = layer
-	self._blend_mask = blend_mask
 	self._slot = shading_environment_slot
 
-	if self._blend_mask == "true" then
+	if blend_mask == "OVERRIDES" then
 		self._blend_mask = ShadingEnvironmentBlendMask.OVERRIDES
-	else
+	elseif blend_mask == "ALL" then
 		self._blend_mask = ShadingEnvironmentBlendMask.ALL
 	end
 
@@ -86,13 +85,13 @@ function ShadingEnvironmentExtension:disable()
 end
 
 function ShadingEnvironmentExtension:setup_theme(shading_environment_system, force_reset)
-	if force_reset then
-		self:_clear_previous_shading_environment_resource()
-	end
-
 	local slot_id = self._slot
 
 	if slot_id > -1 then
+		if force_reset then
+			self:_clear_previous_shading_environment_resource()
+		end
+
 		local shading_environment = shading_environment_system:theme_environment_from_slot(slot_id)
 
 		if shading_environment then

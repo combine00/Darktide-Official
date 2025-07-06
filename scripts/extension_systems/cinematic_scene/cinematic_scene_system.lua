@@ -271,6 +271,8 @@ function CinematicSceneSystem:load_cutscene(cinematic_name, preload_id)
 end
 
 function CinematicSceneSystem:play_cutscene(cinematic_name, client_channel_id)
+	self:_cleanup_level_unit_for_cutscene(cinematic_name)
+
 	if client_channel_id ~= nil then
 		local cinematic_name_id = NetworkLookup.cinematic_scene_names[cinematic_name]
 
@@ -347,6 +349,14 @@ function CinematicSceneSystem:_prepare_cutscene_levels(cinematic_name, client_ch
 		Managers.state.cinematic:load_levels(cinematic_name, origin_level_names, on_level_prepared_callback, client_channel_id, hotjoin_only, false)
 
 		return true
+	end
+end
+
+function CinematicSceneSystem:_cleanup_level_unit_for_cutscene(cinematic_name)
+	local should_remove_deployables = cinematic_name == CINEMATIC_NAMES.outro_fail or cinematic_name == CINEMATIC_NAMES.outro_win
+
+	if should_remove_deployables and Managers.state.unit_job then
+		Managers.state.unit_job:delete_units()
 	end
 end
 
@@ -531,7 +541,7 @@ function CinematicSceneSystem:_activate_view(cinematic_name)
 			if not ui_manager:view_active(view) then
 				local view_context = {}
 				local template = CinematicSceneTemplates[cinematic_name]
-				local use_transition_ui = template.use_transition_ui
+				local use_transition_ui = template.use_transition_ui and not ui_manager:view_active("video_view")
 				local no_transition_ui = use_transition_ui == false
 				local view_settings_override = no_transition_ui and {
 					use_transition_ui = false

@@ -552,7 +552,7 @@ end
 local GROUND_NORMAL_ABOVE = 1
 local GROUND_NORMAL_BELOW = 3
 
-function MinionMovement.update_ground_normal_rotation(unit, scratchpad, optional_direction)
+function MinionMovement.update_ground_normal_rotation(unit, scratchpad, optional_direction, optional_rotation_threshold)
 	if scratchpad.is_anim_driven then
 		return
 	end
@@ -585,8 +585,9 @@ function MinionMovement.update_ground_normal_rotation(unit, scratchpad, optional
 		wanted_direction[1] = fwd_direction[1]
 		wanted_direction[2] = fwd_direction[2]
 		local fwd_dot = Vector3.dot(wanted_direction, Vector3.up())
+		local rotation_threshold = optional_rotation_threshold or 0.5
 
-		if math.abs(fwd_dot) < 0.5 then
+		if math.abs(fwd_dot) < rotation_threshold then
 			local wanted_rotation = Quaternion.look(wanted_direction)
 
 			locomotion_extension:set_wanted_rotation(wanted_rotation)
@@ -623,7 +624,7 @@ function MinionMovement.rotate_towards_target_unit(unit, scratchpad)
 	end
 end
 
-function MinionMovement.smooth_speed_based_on_distance(unit, scratchpad, dt, action_data, breed, use_slow_action_data)
+function MinionMovement.smooth_speed_based_on_distance(unit, scratchpad, dt, action_data, breed, use_slow_action_data, threshold, ignore_max_acc, ignore_max_dec)
 	local self_position = POSITION_LOOKUP[unit]
 	local move_to_position = scratchpad.move_to_position:unbox()
 	local adapt_speed = action_data.adapt_speed
@@ -633,9 +634,9 @@ function MinionMovement.smooth_speed_based_on_distance(unit, scratchpad, dt, act
 	if speed_timer <= scratchpad.current_speed_timer then
 		local current_speed = scratchpad.navigation_extension:max_speed()
 		local max_deceleration = use_slow_action_data and adapt_speed.slow_max_deceleration or adapt_speed.max_acceleration
-		local max_acceleration_per_second = adapt_speed.max_acceleration * dt
-		local max_deceleration_per_second = max_deceleration * dt
-		local distance = Vector3.length(move_to_position - self_position)
+		local max_acceleration_per_second = not ignore_max_acc and adapt_speed.max_acceleration * dt or math.huge
+		local max_deceleration_per_second = not ignore_max_dec and max_deceleration * dt or math.huge
+		local distance = math.clamp(Vector3.length(move_to_position - self_position) - threshold, 0, math.huge)
 		local epsilon = use_slow_action_data and adapt_speed.slow_epsilon or adapt_speed.epsilon
 		local v_target = math.sqrt(2 * max_deceleration * distance) * distance / (distance + epsilon)
 		v_target = math.clamp(v_target, breed.run_speed * adapt_speed.min_speed_multiplier, breed.run_speed * adapt_speed.max_speed_multiplier)
@@ -653,6 +654,135 @@ function MinionMovement.smooth_speed_based_on_distance(unit, scratchpad, dt, act
 
 		scratchpad.navigation_extension:set_max_speed(new_velocity)
 	end
+end
+
+function MinionMovement.update_move_around_target(unit, t, scratchpad, action_data, target_unit, distance_sign, angle_sign, force_move_to_target)
+	local navigation_extension = scratchpad.navigation_extension
+
+	if HEALTH_ALIVE[target_unit] then
+		local target_position = POSITION_LOOKUP[target_unit]
+		local unit_position = POSITION_LOOKUP[unit]
+		local direction = unit_position - target_position
+		local direction_length = Vector3.length(direction)
+		direction = Vector3.normalize(direction)
+		local nav_world = navigation_extension:nav_world()
+		local traverse_logic = navigation_extension:traverse_logic()
+		local above = 2
+		local below = 2
+		local lateral = 0.1
+
+		if force_move_to_target then
+			local nav_wanted_position = NavQueries.position_on_mesh(nav_world, target_position, above, below, traverse_logic)
+
+			if nav_wanted_position then
+				navigation_extension:move_to(nav_wanted_position)
+
+				return true
+			end
+		end
+
+		local rotation = Quaternion.axis_angle(Vector3.up(), action_data.rotation_angle * angle_sign)
+		local target_direction = Quaternion.rotate(rotation, direction)
+		local current_distance_to_target = scratchpad.current_distance_to_target
+		local min_distance_to_target = action_data.min_distance_to_target
+		local max_distance_to_target = action_data.max_distance_to_target
+
+		if not current_distance_to_target then
+			scratchpad.current_distance_to_target = math.clamp(direction_length, min_distance_to_target, max_distance_to_target)
+		end
+
+		local offset_distance = action_data.offset_distance
+		local max_attempts = (max_distance_to_target - min_distance_to_target) / offset_distance
+		local initial_distance_to_target = scratchpad.current_distance_to_target
+		local wanted_position = target_position + target_direction * initial_distance_to_target
+		local nav_wanted_position = NavQueries.position_on_mesh(nav_world, wanted_position, above, below, traverse_logic)
+
+		if nav_wanted_position then
+			navigation_extension:move_to(nav_wanted_position)
+
+			return true
+		else
+			local current_attempts = 0
+			local current_multiplier = distance_sign
+
+			while current_attempts < max_attempts do
+				current_multiplier = (math.abs(current_multiplier) + 1) * distance_sign
+				current_distance_to_target = initial_distance_to_target + offset_distance * current_multiplier
+				local range = max_distance_to_target - min_distance_to_target + 1
+				current_distance_to_target = current_distance_to_target % range + min_distance_to_target
+				wanted_position = target_position + target_direction * current_distance_to_target
+				nav_wanted_position = NavQueries.position_on_mesh(nav_world, wanted_position, above, below, traverse_logic)
+
+				if nav_wanted_position then
+					navigation_extension:move_to(nav_wanted_position)
+
+					scratchpad.current_distance_to_target = current_distance_to_target
+
+					return true
+				end
+
+				current_attempts = current_attempts + 1
+			end
+		end
+
+		return false
+	end
+end
+
+function MinionMovement.companion_select_movement_animation(unit, scratchpad, dt, action_data, breed)
+	local animation_extension = scratchpad.animation_extension
+	local current_speed = Vector3.length(scratchpad.locomotion_extension:current_velocity())
+	local animation_speed_thresholds = breed.get_animation_speed_thresholds and breed.get_animation_speed_thresholds() or breed.animation_speed_thresholds
+	local follow_component = scratchpad.follow_component
+	local current_movement_animation = follow_component.current_movement_animation
+
+	if current_movement_animation ~= "none" then
+		local animation_speed_threshold = animation_speed_thresholds[current_movement_animation]
+		local min_speed = animation_speed_threshold.min
+		local max_speed = animation_speed_threshold.max
+		local offset = animation_speed_threshold.offset
+
+		if current_speed >= min_speed - offset and current_speed <= max_speed + offset then
+			current_speed = math.clamp(current_speed, min_speed, max_speed)
+			local movement_animation_speed = MinionMovement._companion_get_movement_animation_speed(action_data, animation_speed_threshold, current_speed, breed)
+
+			animation_extension:set_variable(animation_speed_threshold.speed_variable, movement_animation_speed)
+
+			return
+		end
+	end
+
+	for key, values in pairs(animation_speed_thresholds) do
+		local animation_speed_threshold = animation_speed_thresholds[key]
+		local min_speed = animation_speed_threshold.min
+		local max_speed = animation_speed_threshold.max
+		local offset = animation_speed_threshold.offset
+
+		if current_speed >= min_speed - offset and current_speed <= max_speed + offset then
+			current_speed = math.clamp(current_speed, min_speed, max_speed)
+			local movement_animation_speed = MinionMovement._companion_get_movement_animation_speed(action_data, animation_speed_threshold, current_speed, breed)
+
+			animation_extension:anim_event_with_variable_float(animation_speed_threshold.event_name, animation_speed_threshold.speed_variable, movement_animation_speed)
+
+			follow_component.current_movement_animation = key
+
+			return
+		end
+	end
+end
+
+function MinionMovement._companion_get_movement_animation_speed(action_data, animation_speed_threshold, current_speed, breed)
+	local speed_variable = animation_speed_threshold.speed_variable
+	local animation_variable_bounds = breed.get_animation_variable_bounds and breed.get_animation_variable_bounds() or breed.animation_variable_bounds
+	local animation_variable_bounds_speed_variable = animation_variable_bounds[speed_variable]
+	local min_speed_rate = animation_variable_bounds_speed_variable[1]
+	local max_speed_rate = animation_variable_bounds_speed_variable[2]
+	local threshold_min_value = animation_speed_threshold.min
+	local threshold_max_value = animation_speed_threshold.max
+	local numerator = current_speed - threshold_min_value
+	local denominator = threshold_max_value - threshold_min_value
+
+	return min_speed_rate + numerator / denominator * (max_speed_rate - min_speed_rate)
 end
 
 return MinionMovement

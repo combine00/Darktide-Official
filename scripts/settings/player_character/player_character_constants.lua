@@ -334,7 +334,10 @@ local constants = {
 			mispredict_packages = true,
 			priority = 30,
 			profile_field = true,
-			slot_type = "gear"
+			slot_type = "gear",
+			slot_dependencies = {
+				"slot_gear_material_override_decal"
+			}
 		},
 		slot_gear_head = {
 			wieldable = false,
@@ -343,7 +346,8 @@ local constants = {
 			profile_field = true,
 			slot_type = "gear",
 			slot_dependencies = {
-				"slot_body_skin_color"
+				"slot_body_skin_color",
+				"slot_gear_material_override_decal"
 			}
 		},
 		slot_gear_lowerbody = {
@@ -351,14 +355,62 @@ local constants = {
 			mispredict_packages = true,
 			priority = 30,
 			profile_field = true,
-			slot_type = "gear"
+			slot_type = "gear",
+			slot_dependencies = {
+				"slot_body_skin_color",
+				"slot_gear_material_override_decal"
+			}
 		},
 		slot_gear_upperbody = {
 			wieldable = false,
 			mispredict_packages = true,
 			priority = 30,
 			profile_field = true,
+			slot_type = "gear",
+			slot_dependencies = {
+				"slot_body_skin_color",
+				"slot_gear_material_override_decal"
+			}
+		},
+		slot_gear_material_override_decal = {
+			wieldable = false,
+			mispredict_packages = true,
+			priority = 60,
+			profile_field = true,
 			slot_type = "gear"
+		},
+		slot_companion_body_skin_color = {
+			wieldable = false,
+			mispredict_packages = true,
+			priority = 50,
+			profile_field = true,
+			slot_type = "body"
+		},
+		slot_companion_body_fur_color = {
+			wieldable = false,
+			mispredict_packages = true,
+			priority = 50,
+			profile_field = true,
+			slot_type = "body"
+		},
+		slot_companion_body_coat_pattern = {
+			wieldable = false,
+			mispredict_packages = true,
+			priority = 50,
+			profile_field = true,
+			slot_type = "body"
+		},
+		slot_companion_gear_full = {
+			wieldable = false,
+			mispredict_packages = true,
+			priority = 30,
+			profile_field = true,
+			slot_type = "gear",
+			slot_dependencies = {
+				"slot_companion_body_skin_color",
+				"slot_companion_body_fur_color",
+				"slot_companion_body_coat_pattern"
+			}
 		},
 		slot_attachment_1 = {
 			slot_type = "gadget",
@@ -514,6 +566,12 @@ local constants = {
 	player_interactions_hub = {
 		{
 			interaction_type = "player_hub_inspect",
+			override_context = {}
+		}
+	},
+	companion_interactions_hub = {
+		{
+			interaction_type = "companion_hub_interact",
 			override_context = {}
 		}
 	},

@@ -1,100 +1,89 @@
 return function ()
 	define_rule({
-		name = "adamant_male_a_ogryn_bonding_conversation_01_a",
-		category = "conversations_prio_1",
-		wwise_route = 0,
-		response = "adamant_male_a_ogryn_bonding_conversation_01_a",
+		name = "ability_charge_a",
+		category = "player_prio_1",
+		wwise_route = 29,
+		response = "ability_charge_a",
 		database = "adamant",
 		criterias = {
 			{
 				"query_context",
 				"concept",
 				OP.EQ,
-				"short_story_talk"
+				"combat_ability"
+			},
+			{
+				"query_context",
+				"ability_name",
+				OP.EQ,
+				"ability_charge_a"
 			},
 			{
 				"user_context",
-				"friends_close",
+				"enemies_distant",
 				OP.GT,
 				0
-			},
-			{
-				"user_context",
-				"enemies_close",
-				OP.LT,
-				1
-			},
-			{
-				"global_context",
-				"level_time",
-				OP.GT,
-				90
-			},
-			{
-				"global_context",
-				"is_decaying_tension",
-				OP.EQ,
-				"true"
-			},
-			{
-				"user_context",
-				"voice_template",
-				OP.SET_INCLUDES,
-				args = {
-					"adamant_male_a"
-				}
-			},
-			{
-				"global_context",
-				"player_voice_profiles",
-				OP.SET_INTERSECTS,
-				args = {
-					"ogryn_a"
-				}
-			},
-			{
-				"faction_memory",
-				"adamant_male_a_ogryn_bonding_conversation_01_a",
-				OP.EQ,
-				0
-			},
-			{
-				"faction_memory",
-				"time_since_last_short_conversation",
-				OP.TIMEDIFF,
-				OP.GT,
-				140
-			},
-			{
-				"faction_memory",
-				"time_since_last_conversation",
-				OP.TIMEDIFF,
-				OP.GT,
-				20
 			}
 		},
-		on_done = {
-			{
-				"faction_memory",
-				"adamant_male_a_ogryn_bonding_conversation_01_a",
-				OP.ADD,
-				1
-			},
-			{
-				"faction_memory",
-				"time_since_last_short_conversation",
-				OP.TIMESET,
-				"0"
-			},
-			{
-				"user_memory",
-				"adamant_male_a_ogryn_bonding_conversation_01_a_user",
-				OP.ADD,
-				1
-			}
-		},
+		on_done = {},
 		heard_speak_routing = {
-			target = "players"
+			target = "disabled"
+		}
+	})
+	define_rule({
+		name = "ability_howl_a",
+		category = "player_ability_vo",
+		wwise_route = 30,
+		response = "ability_howl_a",
+		database = "adamant",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"combat_ability"
+			},
+			{
+				"query_context",
+				"ability_name",
+				OP.EQ,
+				"ability_howl_a"
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "disabled"
+		}
+	})
+	define_rule({
+		name = "ability_stance_a",
+		category = "player_prio_1",
+		wwise_route = 24,
+		response = "ability_stance_a",
+		database = "adamant",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"combat_ability"
+			},
+			{
+				"query_context",
+				"ability_name",
+				OP.EQ,
+				"ability_stance_a"
+			},
+			{
+				"user_context",
+				"enemies_distant",
+				OP.GT,
+				0
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "disabled"
 		}
 	})
 	define_rule({
@@ -668,74 +657,298 @@ return function ()
 		}
 	})
 	define_rule({
-		name = "adamant_to_adamant_bonding_conversation_01_a",
-		category = "conversations_prio_1",
+		name = "blitz_grenade_a",
+		category = "player_prio_1",
 		wwise_route = 0,
-		response = "adamant_to_adamant_bonding_conversation_01_a",
+		response = "blitz_grenade_a",
 		database = "adamant",
 		criterias = {
 			{
 				"query_context",
 				"concept",
 				OP.EQ,
-				"short_story_talk"
+				"throwing_item"
+			},
+			{
+				"query_context",
+				"item",
+				OP.SET_INCLUDES,
+				args = {
+					"adamant_grenade"
+				}
+			},
+			{
+				"user_memory",
+				"time_since_throw_item",
+				OP.TIMEDIFF,
+				OP.GT,
+				5
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"time_since_throw_item",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		}
+	})
+	define_rule({
+		name = "blitz_kill_attack_a",
+		category = "player_prio_1",
+		wwise_route = 0,
+		response = "blitz_kill_attack_a",
+		database = "adamant",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"combat_ability"
+			},
+			{
+				"query_context",
+				"ability_name",
+				OP.EQ,
+				"ability_targeting_a"
 			},
 			{
 				"user_context",
-				"friends_close",
-				OP.GT,
+				"enemies_distant",
+				OP.GTEQ,
 				0
+			},
+			{
+				"user_memory",
+				"ability_targeting_a",
+				OP.TIMEDIFF,
+				OP.GT,
+				5
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"ability_targeting_a",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "disabled"
+		}
+	})
+	define_rule({
+		name = "blitz_kill_attack_a_heard_tag",
+		wwise_route = 0,
+		response = "blitz_kill_attack_a_heard_tag",
+		database = "adamant",
+		category = "player_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"smart_tag_vo_enemy_berserker",
+					"smart_tag_vo_enemy_captain",
+					"smart_tag_vo_enemy_chaos_hound",
+					"smart_tag_vo_enemy_chaos_mutant_charger",
+					"smart_tag_vo_enemy_chaos_ogryn_armored_executor",
+					"smart_tag_vo_enemy_chaos_ogryn_bulwark",
+					"smart_tag_vo_enemy_chaos_ogryn_heavy_gunner",
+					"smart_tag_vo_enemy_chaos_poxwalker_bomber",
+					"smart_tag_vo_enemy_chaos_spawn",
+					"smart_tag_vo_enemy_cultist_flamer",
+					"smart_tag_vo_enemy_cultist_grenadier",
+					"smart_tag_vo_enemy_cultist_holy_stubber_gunner",
+					"smart_tag_vo_enemy_cultist_shocktrooper",
+					"smart_tag_vo_enemy_daemonhost_witch",
+					"smart_tag_vo_enemy_daemonhost_witch_not_alerted",
+					"smart_tag_vo_enemy_netgunner",
+					"smart_tag_vo_enemy_plague_ogryn",
+					"smart_tag_vo_enemy_renegade_berserker",
+					"smart_tag_vo_enemy_scab_flamer",
+					"smart_tag_vo_enemy_traitor_executor",
+					"smart_tag_vo_enemy_traitor_grenadier",
+					"smart_tag_vo_enemy_traitor_gunner",
+					"smart_tag_vo_enemy_traitor_scout_shocktrooper",
+					"smart_tag_vo_enemy_traitor_sniper"
+				}
+			},
+			{
+				"user_memory",
+				"ability_targeting_a",
+				OP.TIMEDIFF,
+				OP.GT,
+				5
+			},
+			{
+				"user_memory",
+				"command_triggered",
+				OP.TIMEDIFF,
+				OP.LT,
+				5
+			},
+			{
+				"user_memory",
+				"ability_targeting_a",
+				OP.GT,
+				1
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"ability_targeting_a",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "disabled"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.1
+			}
+		}
+	})
+	define_rule({
+		name = "blitz_mine_a",
+		category = "player_prio_1",
+		wwise_route = 0,
+		response = "blitz_mine_a",
+		database = "adamant",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"throwing_item"
+			},
+			{
+				"query_context",
+				"item",
+				OP.SET_INCLUDES,
+				args = {
+					"shock_mine"
+				}
+			},
+			{
+				"user_memory",
+				"time_since_throw_item",
+				OP.TIMEDIFF,
+				OP.GT,
+				5
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"time_since_throw_item",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		}
+	})
+	define_rule({
+		name = "blitz_nuncio_a",
+		category = "player_ability_vo",
+		wwise_route = 30,
+		response = "blitz_nuncio_a",
+		database = "adamant",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"combat_ability"
+			},
+			{
+				"query_context",
+				"ability_name",
+				OP.EQ,
+				"blitz_nuncio_a"
+			}
+		},
+		on_done = {},
+		heard_speak_routing = {
+			target = "disabled"
+		}
+	})
+	define_rule({
+		name = "found_ammo_adamant_low_on_ammo",
+		category = "player_prio_1",
+		wwise_route = 0,
+		response = "found_ammo_adamant_low_on_ammo",
+		database = "adamant",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"look_at"
+			},
+			{
+				"query_context",
+				"look_at_tag",
+				OP.EQ,
+				"ammo"
+			},
+			{
+				"query_context",
+				"distance",
+				OP.GT,
+				6
+			},
+			{
+				"query_context",
+				"distance",
+				OP.LT,
+				20
 			},
 			{
 				"user_context",
 				"enemies_close",
 				OP.LT,
-				1
+				30
 			},
 			{
-				"global_context",
-				"level_time",
-				OP.GT,
-				90
+				"faction_context",
+				"total_ammo_percentage",
+				OP.LT,
+				0.5
 			},
 			{
-				"global_context",
-				"is_decaying_tension",
-				OP.EQ,
-				"true"
+				"faction_context",
+				"class_name",
+				OP.SET_INCLUDES,
+				args = {
+					"adamant"
+				}
 			},
 			{
 				"user_context",
-				"voice_template",
+				"threat_level",
 				OP.SET_INCLUDES,
 				args = {
-					"adamant_male_a"
+					"low",
+					"medium"
 				}
 			},
 			{
-				"global_context",
-				"player_voice_profiles",
-				OP.SET_INTERSECTS,
-				args = {
-					"adamant_male_b"
-				}
-			},
-			{
-				"faction_memory",
-				"adamant_to_adamant_bonding_conversation_01_a",
-				OP.EQ,
-				0
-			},
-			{
-				"faction_memory",
-				"time_since_last_short_conversation",
-				OP.TIMEDIFF,
-				OP.GT,
-				140
-			},
-			{
-				"faction_memory",
-				"time_since_last_conversation",
+				"user_memory",
+				"last_saw_ammo",
 				OP.TIMEDIFF,
 				OP.GT,
 				20
@@ -743,166 +956,9 @@ return function ()
 		},
 		on_done = {
 			{
-				"faction_memory",
-				"adamant_to_adamant_bonding_conversation_01_a",
-				OP.ADD,
-				1
-			},
-			{
-				"faction_memory",
-				"time_since_last_short_conversation",
-				OP.TIMESET,
-				"0"
-			},
-			{
 				"user_memory",
-				"adamant_to_adamant_bonding_conversation_01_a_user",
-				OP.ADD,
-				1
-			}
-		},
-		heard_speak_routing = {
-			target = "players"
-		}
-	})
-	define_rule({
-		name = "adamant_to_adamant_bonding_conversation_01_b",
-		wwise_route = 0,
-		response = "adamant_to_adamant_bonding_conversation_01_b",
-		database = "adamant",
-		category = "conversations_prio_1",
-		criterias = {
-			{
-				"query_context",
-				"concept",
-				OP.EQ,
-				"heard_speak"
-			},
-			{
-				"query_context",
-				"dialogue_name",
-				OP.SET_INCLUDES,
-				args = {
-					"adamant_to_adamant_bonding_conversation_01_b"
-				}
-			},
-			{
-				"user_context",
-				"voice_template",
-				OP.SET_INCLUDES,
-				args = {
-					"psyker_male_a"
-				}
-			}
-		},
-		on_done = {
-			{
-				"user_memory",
-				"adamant_to_adamant_bonding_conversation_01_b_user",
-				OP.ADD,
-				1
-			}
-		},
-		heard_speak_routing = {
-			target = "players"
-		},
-		on_pre_rule_execution = {
-			delay_vo = {
-				duration = 0.2
-			}
-		}
-	})
-	define_rule({
-		name = "adamant_to_adamant_bonding_conversation_01_c",
-		wwise_route = 0,
-		response = "adamant_to_adamant_bonding_conversation_01_c",
-		database = "adamant",
-		category = "conversations_prio_1",
-		criterias = {
-			{
-				"query_context",
-				"concept",
-				OP.EQ,
-				"heard_speak"
-			},
-			{
-				"query_context",
-				"dialogue_name",
-				OP.SET_INCLUDES,
-				args = {
-					"adamant_to_adamant_bonding_conversation_01_b"
-				}
-			},
-			{
-				"user_context",
-				"voice_template",
-				OP.SET_INCLUDES,
-				args = {
-					"adamant_male_a"
-				}
-			}
-		},
-		on_done = {
-			{
-				"user_memory",
-				"adamant_to_adamant_bonding_conversation_01_c_user",
-				OP.ADD,
-				1
-			}
-		},
-		heard_speak_routing = {
-			target = "players"
-		},
-		on_pre_rule_execution = {
-			delay_vo = {
-				duration = 0.2
-			}
-		}
-	})
-	define_rule({
-		name = "adamant_to_adamant_bonding_conversation_01_d",
-		wwise_route = 0,
-		response = "adamant_to_adamant_bonding_conversation_01_d",
-		database = "adamant",
-		category = "conversations_prio_1",
-		criterias = {
-			{
-				"query_context",
-				"concept",
-				OP.EQ,
-				"heard_speak"
-			},
-			{
-				"query_context",
-				"dialogue_name",
-				OP.SET_INCLUDES,
-				args = {
-					"adamant_to_adamant_bonding_conversation_01_c"
-				}
-			},
-			{
-				"user_context",
-				"voice_template",
-				OP.SET_INCLUDES,
-				args = {
-					"adamant_male_b"
-				}
-			}
-		},
-		on_done = {
-			{
-				"user_memory",
-				"adamant_to_adamant_bonding_conversation_01_d_user",
-				OP.ADD,
-				1
-			}
-		},
-		heard_speak_routing = {
-			target = "players"
-		},
-		on_pre_rule_execution = {
-			delay_vo = {
-				duration = 0.2
+				"last_saw_ammo",
+				OP.TIMESET
 			}
 		}
 	})
@@ -984,6 +1040,286 @@ return function ()
 				"attacked_class",
 				OP.EQ,
 				"adamant"
+			},
+			{
+				"user_context",
+				"threat_level",
+				OP.SET_INCLUDES,
+				args = {
+					"low"
+				}
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.LT,
+				5
+			},
+			{
+				"user_memory",
+				"time_since_friendly_fire",
+				OP.TIMEDIFF,
+				OP.GT,
+				45
+			},
+			{
+				"faction_memory",
+				"time_since_friendly_fire_global",
+				OP.TIMEDIFF,
+				OP.GT,
+				30
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"time_since_friendly_fire",
+				OP.TIMESET
+			},
+			{
+				"faction_memory",
+				"time_since_friendly_fire_global",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		}
+	})
+	define_rule({
+		name = "friendly_fire_from_adamant_to_ogryn",
+		category = "player_prio_1",
+		wwise_route = 0,
+		response = "friendly_fire_from_adamant_to_ogryn",
+		database = "adamant",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"friendly_fire"
+			},
+			{
+				"query_context",
+				"attacking_class",
+				OP.EQ,
+				"adamant"
+			},
+			{
+				"query_context",
+				"attacked_class",
+				OP.EQ,
+				"ogryn"
+			},
+			{
+				"user_context",
+				"threat_level",
+				OP.SET_INCLUDES,
+				args = {
+					"low"
+				}
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.LT,
+				5
+			},
+			{
+				"user_memory",
+				"time_since_friendly_fire",
+				OP.TIMEDIFF,
+				OP.GT,
+				45
+			},
+			{
+				"faction_memory",
+				"time_since_friendly_fire_global",
+				OP.TIMEDIFF,
+				OP.GT,
+				30
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"time_since_friendly_fire",
+				OP.TIMESET
+			},
+			{
+				"faction_memory",
+				"time_since_friendly_fire_global",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		}
+	})
+	define_rule({
+		name = "friendly_fire_from_adamant_to_psyker",
+		category = "player_prio_1",
+		wwise_route = 0,
+		response = "friendly_fire_from_adamant_to_psyker",
+		database = "adamant",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"friendly_fire"
+			},
+			{
+				"query_context",
+				"attacking_class",
+				OP.EQ,
+				"adamant"
+			},
+			{
+				"query_context",
+				"attacked_class",
+				OP.EQ,
+				"psyker"
+			},
+			{
+				"user_context",
+				"threat_level",
+				OP.SET_INCLUDES,
+				args = {
+					"low"
+				}
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.LT,
+				5
+			},
+			{
+				"user_memory",
+				"time_since_friendly_fire",
+				OP.TIMEDIFF,
+				OP.GT,
+				45
+			},
+			{
+				"faction_memory",
+				"time_since_friendly_fire_global",
+				OP.TIMEDIFF,
+				OP.GT,
+				30
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"time_since_friendly_fire",
+				OP.TIMESET
+			},
+			{
+				"faction_memory",
+				"time_since_friendly_fire_global",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		}
+	})
+	define_rule({
+		name = "friendly_fire_from_adamant_to_veteran",
+		category = "player_prio_1",
+		wwise_route = 0,
+		response = "friendly_fire_from_adamant_to_veteran",
+		database = "adamant",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"friendly_fire"
+			},
+			{
+				"query_context",
+				"attacking_class",
+				OP.EQ,
+				"adamant"
+			},
+			{
+				"query_context",
+				"attacked_class",
+				OP.EQ,
+				"veteran"
+			},
+			{
+				"user_context",
+				"threat_level",
+				OP.SET_INCLUDES,
+				args = {
+					"low"
+				}
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.LT,
+				5
+			},
+			{
+				"user_memory",
+				"time_since_friendly_fire",
+				OP.TIMEDIFF,
+				OP.GT,
+				45
+			},
+			{
+				"faction_memory",
+				"time_since_friendly_fire_global",
+				OP.TIMEDIFF,
+				OP.GT,
+				30
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"time_since_friendly_fire",
+				OP.TIMESET
+			},
+			{
+				"faction_memory",
+				"time_since_friendly_fire_global",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		}
+	})
+	define_rule({
+		name = "friendly_fire_from_adamant_to_zealot",
+		category = "player_prio_1",
+		wwise_route = 0,
+		response = "friendly_fire_from_adamant_to_zealot",
+		database = "adamant",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"friendly_fire"
+			},
+			{
+				"query_context",
+				"attacking_class",
+				OP.EQ,
+				"adamant"
+			},
+			{
+				"query_context",
+				"attacked_class",
+				OP.EQ,
+				"zealot"
 			},
 			{
 				"user_context",
@@ -1357,6 +1693,122 @@ return function ()
 		}
 	})
 	define_rule({
+		name = "ogryn_seen_killstreak_adamant",
+		wwise_route = 0,
+		response = "ogryn_seen_killstreak_adamant",
+		database = "adamant",
+		category = "player_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"seen_killstreak_adamant"
+			},
+			{
+				"query_context",
+				"killer_class",
+				OP.EQ,
+				"adamant"
+			},
+			{
+				"query_context",
+				"number_of_kills",
+				OP.GTEQ,
+				15
+			},
+			{
+				"query_context",
+				"class_name",
+				OP.EQ,
+				"ogryn"
+			},
+			{
+				"faction_memory",
+				"last_seen_killstreak",
+				OP.TIMEDIFF,
+				OP.GT,
+				25
+			}
+		},
+		on_done = {
+			{
+				"faction_memory",
+				"last_seen_killstreak",
+				OP.TIMESET
+			},
+			{
+				"user_memory",
+				"last_seen_killstreak_user",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			random_ignore_vo = {
+				chance = 0.5,
+				max_failed_tries = 4,
+				hold_for = 2
+			}
+		}
+	})
+	define_rule({
+		name = "ogryn_start_revive_adamant",
+		category = "player_prio_1",
+		wwise_route = 0,
+		response = "ogryn_start_revive_adamant",
+		database = "adamant",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"interaction_vo"
+			},
+			{
+				"user_context",
+				"interactor_class",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn"
+				}
+			},
+			{
+				"user_context",
+				"interactee_class",
+				OP.SET_INCLUDES,
+				args = {
+					"adamant"
+				}
+			},
+			{
+				"query_context",
+				"trigger_id",
+				OP.EQ,
+				"start_revive"
+			},
+			{
+				"faction_memory",
+				"last_revived_friendly",
+				OP.TIMEDIFF,
+				OP.GT,
+				10
+			}
+		},
+		on_done = {
+			{
+				"faction_memory",
+				"last_revived_friendly",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		}
+	})
+	define_rule({
 		name = "player_death_adamant",
 		wwise_route = 0,
 		response = "player_death_adamant",
@@ -1402,6 +1854,122 @@ return function ()
 			delay_vo = {
 				duration = 1
 			}
+		}
+	})
+	define_rule({
+		name = "psyker_seen_killstreak_adamant",
+		wwise_route = 0,
+		response = "psyker_seen_killstreak_adamant",
+		database = "adamant",
+		category = "player_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"seen_killstreak_adamant"
+			},
+			{
+				"query_context",
+				"killer_class",
+				OP.EQ,
+				"adamant"
+			},
+			{
+				"query_context",
+				"number_of_kills",
+				OP.GTEQ,
+				15
+			},
+			{
+				"query_context",
+				"class_name",
+				OP.EQ,
+				"psyker"
+			},
+			{
+				"faction_memory",
+				"last_seen_killstreak",
+				OP.TIMEDIFF,
+				OP.GT,
+				25
+			}
+		},
+		on_done = {
+			{
+				"faction_memory",
+				"last_seen_killstreak",
+				OP.TIMESET
+			},
+			{
+				"user_memory",
+				"last_seen_killstreak_user",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			random_ignore_vo = {
+				chance = 0.5,
+				max_failed_tries = 4,
+				hold_for = 2
+			}
+		}
+	})
+	define_rule({
+		name = "psyker_start_revive_adamant",
+		category = "player_prio_1",
+		wwise_route = 0,
+		response = "psyker_start_revive_adamant",
+		database = "adamant",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"interaction_vo"
+			},
+			{
+				"user_context",
+				"interactor_class",
+				OP.SET_INCLUDES,
+				args = {
+					"psyker"
+				}
+			},
+			{
+				"user_context",
+				"interactee_class",
+				OP.SET_INCLUDES,
+				args = {
+					"adamant"
+				}
+			},
+			{
+				"query_context",
+				"trigger_id",
+				OP.EQ,
+				"start_revive"
+			},
+			{
+				"faction_memory",
+				"last_revived_friendly",
+				OP.TIMEDIFF,
+				OP.GT,
+				10
+			}
+		},
+		on_done = {
+			{
+				"faction_memory",
+				"last_revived_friendly",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
 		}
 	})
 	define_rule({
@@ -1504,7 +2072,7 @@ return function ()
 				"query_context",
 				"speaker_class",
 				OP.EQ,
-				"veteran"
+				"adamant"
 			},
 			{
 				"user_memory",
@@ -1810,6 +2378,381 @@ return function ()
 		}
 	})
 	define_rule({
+		name = "response_for_adamant_seen_killstreak_adamant",
+		wwise_route = 0,
+		response = "response_for_adamant_seen_killstreak_adamant",
+		database = "adamant",
+		category = "player_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"user_context",
+				"friends_close",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.GTEQ,
+				0
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"adamant_seen_killstreak_adamant"
+				}
+			},
+			{
+				"query_context",
+				"speaker_class",
+				OP.EQ,
+				"adamant"
+			},
+			{
+				"query_context",
+				"class_name",
+				OP.EQ,
+				"adamant"
+			},
+			{
+				"user_memory",
+				"last_killstreak",
+				OP.TIMEDIFF,
+				OP.LT,
+				10
+			},
+			{
+				"user_memory",
+				"last_killstreak",
+				OP.GT,
+				1
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"last_killstreak",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "response_for_adamant_seen_killstreak_ogryn",
+		wwise_route = 0,
+		response = "response_for_adamant_seen_killstreak_ogryn",
+		database = "adamant",
+		category = "player_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"user_context",
+				"friends_close",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.GTEQ,
+				0
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"adamant_seen_killstreak_ogryn"
+				}
+			},
+			{
+				"query_context",
+				"speaker_class",
+				OP.EQ,
+				"adamant"
+			},
+			{
+				"query_context",
+				"class_name",
+				OP.EQ,
+				"ogryn"
+			},
+			{
+				"user_memory",
+				"last_killstreak",
+				OP.TIMEDIFF,
+				OP.LT,
+				10
+			},
+			{
+				"user_memory",
+				"last_killstreak",
+				OP.GT,
+				1
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"last_killstreak",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "response_for_adamant_seen_killstreak_psyker",
+		wwise_route = 0,
+		response = "response_for_adamant_seen_killstreak_psyker",
+		database = "adamant",
+		category = "player_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"user_context",
+				"friends_close",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.GTEQ,
+				0
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"adamant_seen_killstreak_psyker"
+				}
+			},
+			{
+				"query_context",
+				"speaker_class",
+				OP.EQ,
+				"adamant"
+			},
+			{
+				"query_context",
+				"class_name",
+				OP.EQ,
+				"psyker"
+			},
+			{
+				"user_memory",
+				"last_killstreak",
+				OP.TIMEDIFF,
+				OP.LT,
+				10
+			},
+			{
+				"user_memory",
+				"last_killstreak",
+				OP.GT,
+				1
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"last_killstreak",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "response_for_adamant_seen_killstreak_veteran",
+		wwise_route = 0,
+		response = "response_for_adamant_seen_killstreak_veteran",
+		database = "adamant",
+		category = "player_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"user_context",
+				"friends_close",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.GTEQ,
+				0
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"adamant_seen_killstreak_veteran"
+				}
+			},
+			{
+				"query_context",
+				"speaker_class",
+				OP.EQ,
+				"adamant"
+			},
+			{
+				"query_context",
+				"class_name",
+				OP.EQ,
+				"veteran"
+			},
+			{
+				"user_memory",
+				"last_killstreak",
+				OP.TIMEDIFF,
+				OP.LT,
+				10
+			},
+			{
+				"user_memory",
+				"last_killstreak",
+				OP.GT,
+				1
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"last_killstreak",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "response_for_adamant_seen_killstreak_zealot",
+		wwise_route = 0,
+		response = "response_for_adamant_seen_killstreak_zealot",
+		database = "adamant",
+		category = "player_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"user_context",
+				"friends_close",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.GTEQ,
+				0
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"adamant_seen_killstreak_zealot"
+				}
+			},
+			{
+				"query_context",
+				"speaker_class",
+				OP.EQ,
+				"adamant"
+			},
+			{
+				"query_context",
+				"class_name",
+				OP.EQ,
+				"zealot"
+			},
+			{
+				"user_memory",
+				"last_killstreak",
+				OP.TIMEDIFF,
+				OP.LT,
+				10
+			},
+			{
+				"user_memory",
+				"last_killstreak",
+				OP.GT,
+				1
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"last_killstreak",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
 		name = "response_for_adamant_start_revive_adamant",
 		wwise_route = 0,
 		response = "response_for_adamant_start_revive_adamant",
@@ -1872,6 +2815,270 @@ return function ()
 		heard_speak_routing = {
 			target = "players"
 		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "response_for_adamant_start_revive_ogryn",
+		category = "player_prio_1",
+		wwise_route = 0,
+		response = "response_for_adamant_start_revive_ogryn",
+		database = "adamant",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"user_context",
+				"friends_close",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.LTEQ,
+				7
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_start_revive_adamant"
+				}
+			},
+			{
+				"query_context",
+				"speaker_class",
+				OP.EQ,
+				"ogryn"
+			},
+			{
+				"query_context",
+				"class_name",
+				OP.EQ,
+				"adamant"
+			},
+			{
+				"user_memory",
+				"last_revivee",
+				OP.GT,
+				1
+			},
+			{
+				"user_memory",
+				"last_revivee",
+				OP.TIMEDIFF,
+				OP.LT,
+				10
+			}
+		},
+		on_done = {},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "response_for_adamant_start_revive_psyker",
+		category = "player_prio_1",
+		wwise_route = 0,
+		response = "response_for_adamant_start_revive_psyker",
+		database = "adamant",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"user_context",
+				"friends_close",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.LTEQ,
+				7
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"psyker_start_revive_adamant"
+				}
+			},
+			{
+				"query_context",
+				"speaker_class",
+				OP.EQ,
+				"psyker"
+			},
+			{
+				"query_context",
+				"class_name",
+				OP.EQ,
+				"adamant"
+			},
+			{
+				"user_memory",
+				"last_revivee",
+				OP.GT,
+				1
+			},
+			{
+				"user_memory",
+				"last_revivee",
+				OP.TIMEDIFF,
+				OP.LT,
+				10
+			}
+		},
+		on_done = {},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "response_for_adamant_start_revive_veteran",
+		category = "player_prio_1",
+		wwise_route = 0,
+		response = "response_for_adamant_start_revive_veteran",
+		database = "adamant",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"user_context",
+				"friends_close",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.LTEQ,
+				7
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"veteran_start_revive_adamant"
+				}
+			},
+			{
+				"query_context",
+				"speaker_class",
+				OP.EQ,
+				"veteran"
+			},
+			{
+				"query_context",
+				"class_name",
+				OP.EQ,
+				"adamant"
+			},
+			{
+				"user_memory",
+				"last_revivee",
+				OP.GT,
+				1
+			},
+			{
+				"user_memory",
+				"last_revivee",
+				OP.TIMEDIFF,
+				OP.LT,
+				10
+			}
+		},
+		on_done = {},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "response_for_adamant_start_revive_zealot",
+		category = "player_prio_1",
+		wwise_route = 0,
+		response = "response_for_adamant_start_revive_zealot",
+		database = "adamant",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"user_context",
+				"friends_close",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.LTEQ,
+				7
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"zealot_start_revive_adamant"
+				}
+			},
+			{
+				"query_context",
+				"speaker_class",
+				OP.EQ,
+				"zealot"
+			},
+			{
+				"query_context",
+				"class_name",
+				OP.EQ,
+				"adamant"
+			},
+			{
+				"user_memory",
+				"last_revivee",
+				OP.GT,
+				1
+			},
+			{
+				"user_memory",
+				"last_revivee",
+				OP.TIMEDIFF,
+				OP.LT,
+				10
+			}
+		},
+		on_done = {},
 		on_pre_rule_execution = {
 			delay_vo = {
 				duration = 0.2
@@ -2229,6 +3436,320 @@ return function ()
 		}
 	})
 	define_rule({
+		name = "response_for_friendly_fire_from_ogryn_to_adamant",
+		wwise_route = 0,
+		response = "response_for_friendly_fire_from_ogryn_to_adamant",
+		database = "adamant",
+		category = "player_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"user_context",
+				"friends_close",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.LT,
+				5
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"friendly_fire_from_ogryn_to_adamant"
+				}
+			},
+			{
+				"user_context",
+				"class_name",
+				OP.EQ,
+				"ogryn"
+			},
+			{
+				"user_memory",
+				"response_for_friendly_fire",
+				OP.TIMEDIFF,
+				OP.GT,
+				"60"
+			},
+			{
+				"user_memory",
+				"last_shot_friend",
+				OP.GT,
+				1
+			},
+			{
+				"user_memory",
+				"last_shot_friend",
+				OP.TIMEDIFF,
+				OP.LT,
+				10
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"response_for_friendly_fire",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "response_for_friendly_fire_from_psyker_to_adamant",
+		wwise_route = 0,
+		response = "response_for_friendly_fire_from_psyker_to_adamant",
+		database = "adamant",
+		category = "player_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"user_context",
+				"friends_close",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.LT,
+				5
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"friendly_fire_from_psyker_to_adamant"
+				}
+			},
+			{
+				"user_context",
+				"class_name",
+				OP.EQ,
+				"psyker"
+			},
+			{
+				"user_memory",
+				"response_for_friendly_fire",
+				OP.TIMEDIFF,
+				OP.GT,
+				"60"
+			},
+			{
+				"user_memory",
+				"last_shot_friend",
+				OP.GT,
+				1
+			},
+			{
+				"user_memory",
+				"last_shot_friend",
+				OP.TIMEDIFF,
+				OP.LT,
+				10
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"response_for_friendly_fire",
+				OP.TIMESET
+			},
+			{
+				"user_memory",
+				"time_since_friendly_fire_ps_og",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "response_for_friendly_fire_from_veteran_to_adamant",
+		wwise_route = 0,
+		response = "response_for_friendly_fire_from_veteran_to_adamant",
+		database = "adamant",
+		category = "player_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"user_context",
+				"friends_close",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.LT,
+				5
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"friendly_fire_from_veteran_to_adamant"
+				}
+			},
+			{
+				"query_context",
+				"class_name",
+				OP.EQ,
+				"veteran"
+			},
+			{
+				"user_memory",
+				"response_for_friendly_fire",
+				OP.TIMEDIFF,
+				OP.GT,
+				"60"
+			},
+			{
+				"user_memory",
+				"last_shot_friend",
+				OP.GT,
+				1
+			},
+			{
+				"user_memory",
+				"last_shot_friend",
+				OP.TIMEDIFF,
+				OP.LT,
+				10
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"response_for_friendly_fire",
+				OP.TIMESET
+			},
+			{
+				"user_memory",
+				"time_since_friendly_fire_vt_og",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "response_for_friendly_fire_from_zealot_to_adamant",
+		wwise_route = 0,
+		response = "response_for_friendly_fire_from_zealot_to_adamant",
+		database = "adamant",
+		category = "player_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"user_context",
+				"friends_close",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.LT,
+				5
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"friendly_fire_from_zealot_to_adamant"
+				}
+			},
+			{
+				"query_context",
+				"class_name",
+				OP.EQ,
+				"zealot"
+			},
+			{
+				"user_memory",
+				"response_for_friendly_fire",
+				OP.TIMEDIFF,
+				OP.GT,
+				"60"
+			},
+			{
+				"user_memory",
+				"last_shot_friend",
+				OP.GT,
+				1
+			},
+			{
+				"user_memory",
+				"last_shot_friend",
+				OP.TIMEDIFF,
+				OP.LT,
+				10
+			}
+		},
+		on_done = {
+			{
+				"user_memory",
+				"response_for_friendly_fire",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
 		name = "response_for_ogryn_seen_killstreak_adamant",
 		wwise_route = 0,
 		response = "response_for_ogryn_seen_killstreak_adamant",
@@ -2271,7 +3792,7 @@ return function ()
 				"query_context",
 				"class_name",
 				OP.EQ,
-				"zealot"
+				"adamant"
 			},
 			{
 				"user_memory",
@@ -2757,7 +4278,7 @@ return function ()
 				"query_context",
 				"class_name",
 				OP.EQ,
-				"ogryn"
+				"adamant"
 			},
 			{
 				"user_memory",
@@ -2853,6 +4374,238 @@ return function ()
 			delay_vo = {
 				duration = 0.2
 			}
+		}
+	})
+	define_rule({
+		name = "veteran_seen_killstreak_adamant",
+		wwise_route = 0,
+		response = "veteran_seen_killstreak_adamant",
+		database = "adamant",
+		category = "player_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"seen_killstreak_adamant"
+			},
+			{
+				"query_context",
+				"killer_class",
+				OP.EQ,
+				"adamant"
+			},
+			{
+				"query_context",
+				"number_of_kills",
+				OP.GTEQ,
+				15
+			},
+			{
+				"query_context",
+				"class_name",
+				OP.EQ,
+				"veteran"
+			},
+			{
+				"faction_memory",
+				"last_seen_killstreak",
+				OP.TIMEDIFF,
+				OP.GT,
+				25
+			}
+		},
+		on_done = {
+			{
+				"faction_memory",
+				"last_seen_killstreak",
+				OP.TIMESET
+			},
+			{
+				"user_memory",
+				"last_seen_killstreak_user",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			random_ignore_vo = {
+				chance = 0.5,
+				max_failed_tries = 4,
+				hold_for = 2
+			}
+		}
+	})
+	define_rule({
+		name = "veteran_start_revive_adamant",
+		category = "player_prio_1",
+		wwise_route = 0,
+		response = "veteran_start_revive_adamant",
+		database = "adamant",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"interaction_vo"
+			},
+			{
+				"user_context",
+				"interactor_class",
+				OP.SET_INCLUDES,
+				args = {
+					"veteran"
+				}
+			},
+			{
+				"user_context",
+				"interactee_class",
+				OP.SET_INCLUDES,
+				args = {
+					"adamant"
+				}
+			},
+			{
+				"query_context",
+				"trigger_id",
+				OP.EQ,
+				"start_revive"
+			},
+			{
+				"faction_memory",
+				"last_revived_friendly",
+				OP.TIMEDIFF,
+				OP.GT,
+				10
+			}
+		},
+		on_done = {
+			{
+				"faction_memory",
+				"last_revived_friendly",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		}
+	})
+	define_rule({
+		name = "zealot_seen_killstreak_adamant",
+		wwise_route = 0,
+		response = "zealot_seen_killstreak_adamant",
+		database = "adamant",
+		category = "player_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"seen_killstreak_adamant"
+			},
+			{
+				"query_context",
+				"killer_class",
+				OP.EQ,
+				"adamant"
+			},
+			{
+				"query_context",
+				"number_of_kills",
+				OP.GTEQ,
+				15
+			},
+			{
+				"query_context",
+				"class_name",
+				OP.EQ,
+				"zealot"
+			},
+			{
+				"faction_memory",
+				"last_seen_killstreak",
+				OP.TIMEDIFF,
+				OP.GT,
+				25
+			}
+		},
+		on_done = {
+			{
+				"faction_memory",
+				"last_seen_killstreak",
+				OP.TIMESET
+			},
+			{
+				"user_memory",
+				"last_seen_killstreak_user",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			random_ignore_vo = {
+				chance = 0.5,
+				max_failed_tries = 4,
+				hold_for = 2
+			}
+		}
+	})
+	define_rule({
+		name = "zealot_start_revive_adamant",
+		category = "player_prio_1",
+		wwise_route = 0,
+		response = "zealot_start_revive_adamant",
+		database = "adamant",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"interaction_vo"
+			},
+			{
+				"user_context",
+				"interactor_class",
+				OP.SET_INCLUDES,
+				args = {
+					"zealot"
+				}
+			},
+			{
+				"user_context",
+				"interactee_class",
+				OP.SET_INCLUDES,
+				args = {
+					"adamant"
+				}
+			},
+			{
+				"query_context",
+				"trigger_id",
+				OP.EQ,
+				"start_revive"
+			},
+			{
+				"faction_memory",
+				"last_revived_friendly",
+				OP.TIMEDIFF,
+				OP.GT,
+				10
+			}
+		},
+		on_done = {
+			{
+				"faction_memory",
+				"last_revived_friendly",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
 		}
 	})
 end

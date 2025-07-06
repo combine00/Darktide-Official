@@ -54,6 +54,27 @@ weapon_stamina_templates.linesman = {
 		lerp_basic = 3
 	}
 }
+weapon_stamina_templates.linesman_plus = {
+	stamina_modifier = 4.5,
+	sprint_cost_per_second = {
+		lerp_perfect = 0.75,
+		lerp_basic = 1.25
+	},
+	block_cost_default = {
+		inner = {
+			lerp_perfect = 0.5,
+			lerp_basic = 1
+		},
+		outer = {
+			lerp_perfect = 1,
+			lerp_basic = 3
+		}
+	},
+	push_cost = {
+		lerp_perfect = 1,
+		lerp_basic = 3
+	}
+}
 weapon_stamina_templates.linesman_rangedblock = {
 	stamina_modifier = 4,
 	sprint_cost_per_second = {
@@ -260,6 +281,60 @@ weapon_stamina_templates.ogryn_powermaul_slabshield_p1_m1 = {
 	push_cost = {
 		lerp_perfect = 0.5,
 		lerp_basic = 1.5
+	}
+}
+weapon_stamina_templates.powermaul_shield_p1_m1 = {
+	stamina_modifier = 4,
+	sprint_cost_per_second = {
+		lerp_perfect = 1.5,
+		lerp_basic = 2.5
+	},
+	block_cost_default = {
+		inner = {
+			lerp_perfect = 0.2,
+			lerp_basic = 0.6
+		},
+		outer = {
+			lerp_perfect = 1,
+			lerp_basic = 2
+		}
+	},
+	block_cost_ranged = {
+		inner = {
+			lerp_perfect = 0.1,
+			lerp_basic = 0.3
+		}
+	},
+	push_cost = {
+		lerp_perfect = 0.5,
+		lerp_basic = 1.5
+	}
+}
+weapon_stamina_templates.shotpistol_shield_p1_m1 = {
+	stamina_modifier = 4,
+	sprint_cost_per_second = {
+		lerp_perfect = 1.5,
+		lerp_basic = 2.5
+	},
+	block_cost_default = {
+		inner = {
+			lerp_perfect = 0.2,
+			lerp_basic = 0.6
+		},
+		outer = {
+			lerp_perfect = 1,
+			lerp_basic = 2
+		}
+	},
+	block_cost_ranged = {
+		inner = {
+			lerp_perfect = 0.1,
+			lerp_basic = 0.3
+		}
+	},
+	push_cost = {
+		lerp_perfect = 1,
+		lerp_basic = 2
 	}
 }
 weapon_stamina_templates.bot_linesman = {

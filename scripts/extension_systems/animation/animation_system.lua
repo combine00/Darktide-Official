@@ -5,6 +5,7 @@ require("scripts/extension_systems/animation/player_unit_animation_extension")
 require("scripts/extension_systems/animation/prop_animation_extension")
 
 local AnimCallbackTemplates = require("scripts/extension_systems/animation/anim_callback_templates")
+local CompanionHubInteractionsSettings = require("scripts/settings/companion_hub_interactions/companion_hub_interactions_settings")
 local AnimationSystem = class("AnimationSystem", "ExtensionSystemBase")
 local CLIENT_RPCS = {
 	"rpc_prop_anim_event",
@@ -123,7 +124,7 @@ function AnimationSystem:rpc_minion_anim_event_variable_float(channel_id, unit_i
 		local breed = unit_data_extension:breed()
 
 		if breed then
-			local variable_bounds = breed.animation_variable_bounds
+			local variable_bounds = breed.get_animation_variable_bounds and breed.get_animation_variable_bounds() or breed.animation_variable_bounds
 
 			if variable_bounds and variable_bounds[variable_name] then
 				variable_value = math.clamp(variable_value, variable_bounds[variable_name][1], variable_bounds[variable_name][2])
@@ -205,6 +206,22 @@ function AnimationSystem:rpc_sync_anim_state(channel_id, unit_id, is_level_unit,
 
 	Unit.animation_set_state(unit, unpack(animation_state))
 	Unit.animation_set_seeds(unit, unpack(seeds))
+end
+
+function AnimationSystem.play_companion_interaction_anim_event(player_unit, companion_unit, anim_event_player, anim_event_companion, optional_variable_name, optional_variable_value)
+	if optional_variable_name and optional_variable_value then
+		local variable_index = Unit.animation_find_variable(player_unit, optional_variable_name)
+		local variable_index_companion = Unit.animation_find_variable(companion_unit, optional_variable_name)
+
+		Unit.animation_set_variable(player_unit, variable_index, optional_variable_value)
+		Unit.animation_set_variable(companion_unit, variable_index_companion, optional_variable_value)
+	end
+
+	local player_event_index = Unit.animation_event(player_unit, anim_event_player)
+	local companion_event_index = Unit.animation_event(companion_unit, anim_event_companion)
+
+	Unit.animation_event_by_index(player_unit, player_event_index)
+	Unit.animation_event_by_index(companion_unit, companion_event_index)
 end
 
 return AnimationSystem

@@ -53,10 +53,14 @@ local MinionState = {
 			local stagger_component = target_blackboard.stagger
 			local num_triggered_staggers = stagger_component.num_triggered_staggers
 
-			return num_triggered_staggers > 0
+			if num_triggered_staggers > 0 then
+				return true
+			end
 		end
 
-		return nil
+		local buff_extension = ScriptUnit.has_extension(unit, "buff_system")
+
+		return buff_extension and buff_extension:has_keyword(buff_keywords.count_as_staggered)
 	end,
 	is_burning = function (unit)
 		local buff_extension = ScriptUnit.has_extension(unit, "buff_system")

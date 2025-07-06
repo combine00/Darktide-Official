@@ -17,6 +17,7 @@ local MINIMUM_SPEED_TO_SLEEP = ProjectileLocomotionSettings.MINIMUM_SPEED_TO_SLE
 local ProjectileUnitLocomotionExtension = class("ProjectileUnitLocomotionExtension")
 
 function ProjectileUnitLocomotionExtension:init(extension_init_context, unit, extension_init_data, game_object_data)
+	self._soft_cap_out_of_bounds_units = extension_init_context.soft_cap_out_of_bounds_units
 	local owner_unit = extension_init_data.owner_unit
 	self._owner_unit = owner_unit
 
@@ -92,7 +93,7 @@ function ProjectileUnitLocomotionExtension:init(extension_init_context, unit, ex
 	local speed = extension_init_data.speed
 	local momentum_or_angular_velocity = extension_init_data.momentum_or_angular_velocity
 	self._unit_rotation_offset = projectile_template.unit_rotation_offset
-	local want_sleep = starting_state == locomotion_states.none or starting_state == locomotion_states.sleep
+	local want_sleep = starting_state == locomotion_states.none or starting_state == locomotion_states.sleep or starting_state == locomotion_states.deployed
 
 	if want_sleep then
 		self:switch_to_sleep(position, rotation)
@@ -125,7 +126,6 @@ function ProjectileUnitLocomotionExtension:init(extension_init_context, unit, ex
 	self._fixed_time_step = Managers.state.game_session.fixed_time_step
 
 	self:_hide_grenade_pin()
-	Managers.state.out_of_bounds:register_soft_oob_unit(unit, self, "_cb_update_soft_oob")
 end
 
 function ProjectileUnitLocomotionExtension:game_object_initialized(game_session, game_object_id)
@@ -134,13 +134,8 @@ function ProjectileUnitLocomotionExtension:game_object_initialized(game_session,
 	self._is_level_unit = false
 end
 
-function ProjectileUnitLocomotionExtension:destroy()
-	Managers.state.out_of_bounds:unregister_soft_oob_unit(self._projectile_unit, self)
-end
-
 function ProjectileUnitLocomotionExtension:mark_for_deletion()
 	if not self._marked_for_deletion then
-		Managers.state.out_of_bounds:unregister_soft_oob_unit(self._projectile_unit, self)
 		Managers.state.unit_spawner:mark_for_deletion(self._projectile_unit)
 
 		self._marked_for_deletion = true
@@ -200,19 +195,17 @@ function ProjectileUnitLocomotionExtension:_update_out_of_bounds()
 
 	for ii = 1, 3 do
 		if safe_extents[ii] < math.abs(position[ii]) then
-			self:_cb_update_soft_oob(unit)
+			self:switch_to_sleep(Vector3.zero(), Quaternion.identity())
+
+			if self._handle_oob_despawning and not self._marked_for_deletion then
+				Log.info("ProjectileUnitLocomotionExtension", "%s is out-of-bounds, despawning (%s).", unit, tostring(POSITION_LOOKUP[unit]))
+				Managers.state.unit_spawner:mark_for_deletion(unit)
+
+				self._marked_for_deletion = true
+			end
 
 			break
 		end
-	end
-end
-
-function ProjectileUnitLocomotionExtension:_cb_update_soft_oob(unit)
-	self:switch_to_sleep(Vector3.zero(), Quaternion.identity())
-
-	if self._handle_oob_despawning and not self._marked_for_deletion then
-		Log.info("ProjectileUnitLocomotionExtension", "%s is out-of-bounds, despawning (%s).", unit, tostring(POSITION_LOOKUP[unit]))
-		self:mark_for_deletion()
 	end
 end
 
@@ -320,9 +313,18 @@ function ProjectileUnitLocomotionExtension:_update_manual_physics(unit, dt, t)
 	local hit_this_frame = old_collision_count < new_collision_count
 
 	if not integrate_this_frame then
-		local angular_momentum = integration_data.angular_velocity / integration_data.inertia
+		local projectile_template = self._projectile_template
+		local deployable_settings = projectile_template.deployable
+		local deploy_on_stop = deployable_settings ~= nil
 
-		self:switch_to_engine_physics(new_position, new_rotation, new_velocity, angular_momentum)
+		if deploy_on_stop then
+			self:switch_to_deployed(new_position, new_rotation)
+			deployable_settings.deploy_func(self._world, self._physics_world, unit)
+		else
+			local angular_momentum = integration_data.angular_velocity / integration_data.inertia
+
+			self:switch_to_engine_physics(new_position, new_rotation, new_velocity, angular_momentum)
+		end
 	else
 		if hit_this_frame then
 			Unit.flow_event(unit, "lua_manual_physics_collision")
@@ -366,7 +368,16 @@ function ProjectileUnitLocomotionExtension:_update_true_flight(unit, dt, t)
 
 		self:_apply_changes(locomotion_states.manual_physics, new_position, new_rotation, new_velocity, Vector3.zero(), new_target_position, new_target_unit, new_target_hit_zone)
 	else
-		self:switch_to_sleep(new_position, new_rotation)
+		local projectile_template = self._projectile_template
+		local deployable_settings = projectile_template.deployable
+		local deploy_on_stop = deployable_settings ~= nil
+
+		if deploy_on_stop then
+			self:switch_to_deployed(new_position, new_rotation)
+			deployable_settings.deploy_func(self._world, self._physics_world, unit)
+		else
+			self:switch_to_sleep(new_position, new_rotation)
+		end
 	end
 
 	local time_without_target = integration_data.time_without_target
@@ -534,6 +545,11 @@ function ProjectileUnitLocomotionExtension:switch_to_sleep(position, rotation)
 	self:_apply_changes(locomotion_states.sleep, position, rotation, Vector3.zero(), Vector3.zero(), nil, nil, nil)
 end
 
+function ProjectileUnitLocomotionExtension:switch_to_deployed(position, rotation)
+	self:_set_state(locomotion_states.deployed)
+	self:_apply_changes(locomotion_states.deployed, position, rotation, Vector3.zero(), Vector3.zero(), nil, nil, nil)
+end
+
 function ProjectileUnitLocomotionExtension:_set_state(new_state)
 	local old_state = self._current_state
 
@@ -553,6 +569,8 @@ function ProjectileUnitLocomotionExtension:_set_state(new_state)
 		if new_state == locomotion_states.carried then
 			ProjectileLocomotion.deactivate_physics(projectile_unit, self._dynamic_actor_id)
 		elseif new_state == locomotion_states.socket_lock then
+			ProjectileLocomotion.deactivate_physics(projectile_unit, self._dynamic_actor_id)
+		elseif new_state == locomotion_states.deployed then
 			ProjectileLocomotion.deactivate_physics(projectile_unit, self._dynamic_actor_id)
 		elseif old_state == locomotion_states.carried then
 			ProjectileLocomotion.activate_physics(projectile_unit)

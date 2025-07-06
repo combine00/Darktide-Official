@@ -127,7 +127,7 @@ function BaseView:_create_widgets(definitions, widgets, widgets_by_name)
 	local widget_count = #widgets
 
 	for name, definition in pairs(widget_definitions) do
-		local widget = self:_create_widget(name, definition)
+		local widget = self:_create_widget(name, definition, widgets_by_name)
 		widget_count = widget_count + 1
 		widgets[widget_count] = widget
 	end
@@ -135,8 +135,8 @@ function BaseView:_create_widgets(definitions, widgets, widgets_by_name)
 	return widgets, widgets_by_name
 end
 
-function BaseView:_create_widget(name, definition)
-	local widgets_by_name = self._widgets_by_name
+function BaseView:_create_widget(name, definition, widgets_by_name)
+	widgets_by_name = widgets_by_name or self._widgets_by_name
 	local widget = UIWidget.init(name, definition)
 	widgets_by_name[name] = widget
 

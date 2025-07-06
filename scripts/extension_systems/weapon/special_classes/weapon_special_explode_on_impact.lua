@@ -28,6 +28,10 @@ function WeaponSpecialExplodeOnImpact:init(context, init_data)
 	self._num_hit_enemies = 0
 end
 
+function WeaponSpecialExplodeOnImpact:on_wieldable_slot_equipped()
+	return
+end
+
 function WeaponSpecialExplodeOnImpact:fixed_update(dt, t)
 	if self._num_hit_enemies <= 0 then
 		WeaponSpecial.update_active(t, self._tweak_data, self._inventory_slot_component, self._buff_extension, self._input_extension, self._weapon_extension)
@@ -64,6 +68,10 @@ function WeaponSpecialExplodeOnImpact:process_hit(t, weapon, action_settings, nu
 
 		inventory_slot_component.num_special_charges = num_special_charges + 1
 	end
+end
+
+function WeaponSpecialExplodeOnImpact:blocked_attack(attacking_unit, block_cost, block_broken, is_perfect_block)
+	return
 end
 
 function WeaponSpecialExplodeOnImpact:on_special_activation(t, num_hit_enemies)

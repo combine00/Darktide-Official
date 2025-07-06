@@ -23,7 +23,7 @@ function MissionObjectiveZoneSynchronizerExtension:setup_from_component(num_zone
 	self._mission_objective_system:register_objective_synchronizer(objective_name, self._unit)
 end
 
-function MissionObjectiveZoneSynchronizerExtension:on_gameplay_post_init(level)
+function MissionObjectiveZoneSynchronizerExtension:on_gameplay_post_init(unit)
 	self._mission_objective_zone_system = Managers.state.extension:system("mission_objective_zone_system")
 end
 

@@ -140,8 +140,8 @@ local veteran_b_adamant_female_a = {
 			[2.0] = "loc_adamant_female_a__combat_pause_quirk_traitor_b_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 1.792677,
+			[2.0] = 3.308427
 		},
 		randomize_indexes = {}
 	},
@@ -153,8 +153,8 @@ local veteran_b_adamant_female_a = {
 			[2.0] = "loc_adamant_female_a__combat_pause_quirk_trinket_b_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 2.587448,
+			[2.0] = 2.678823
 		},
 		sound_event_weights = {
 			[1.0] = 0.5,

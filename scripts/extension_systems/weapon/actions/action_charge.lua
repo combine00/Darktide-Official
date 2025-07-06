@@ -43,7 +43,7 @@ function ActionCharge:update(dt, t)
 	return
 end
 
-function ActionCharge:fixed_update(dt, t, time_in_action, ignore_update_charge_module)
+function ActionCharge:fixed_update(dt, t, time_in_action, frame, ignore_update_charge_module)
 	if not ignore_update_charge_module then
 		self._charge_module:fixed_update(dt, t)
 	end

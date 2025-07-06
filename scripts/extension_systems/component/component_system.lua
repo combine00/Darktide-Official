@@ -73,11 +73,7 @@ function ComponentSystem:register_extension_update(unit, extension_name, extensi
 end
 
 function ComponentSystem:on_gameplay_post_init(level)
-	local unit_to_extension_map = self._unit_to_extension_map
-
-	for unit, extension in pairs(unit_to_extension_map) do
-		extension:on_gameplay_post_init(unit, level)
-	end
+	self:call_gameplay_post_init_on_extensions(level)
 end
 
 function ComponentSystem:enable_component(unit, guid)

@@ -31,7 +31,7 @@ function SideMissionPickupSynchronizerExtension:setup_from_component(auto_start_
 	self._auto_start_on_level_spawned = auto_start_on_level_spawned
 end
 
-function SideMissionPickupSynchronizerExtension:on_gameplay_post_init(level)
+function SideMissionPickupSynchronizerExtension:on_gameplay_post_init(unit)
 	if self._is_server and self._participate_in_game and self._auto_start_on_level_spawned then
 		local objective_name = Managers.state.mission:side_mission().name
 

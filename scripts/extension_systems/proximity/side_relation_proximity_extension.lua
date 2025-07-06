@@ -1,4 +1,6 @@
+require("scripts/extension_systems/proximity/side_relation_gameplay_logic/proximity_area_buff_drone")
 require("scripts/extension_systems/proximity/side_relation_gameplay_logic/proximity_heal")
+require("scripts/extension_systems/proximity/side_relation_gameplay_logic/proximity_shock_mine")
 
 local JobInterface = require("scripts/managers/unit_job/job_interface")
 local Proximity = require("scripts/utilities/proximity")

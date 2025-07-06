@@ -1,3 +1,4 @@
+local ArchetypeSettings = require("scripts/settings/archetype/archetype_settings")
 local player_abilities_name = "PlayerAbilities"
 local player_abilities = {}
 
@@ -11,9 +12,11 @@ local function _include_ability_definition(file_name)
 	end
 end
 
-_include_ability_definition("scripts/settings/ability/player_abilities/abilities/ogryn_abilities")
-_include_ability_definition("scripts/settings/ability/player_abilities/abilities/psyker_abilities")
-_include_ability_definition("scripts/settings/ability/player_abilities/abilities/veteran_abilities")
-_include_ability_definition("scripts/settings/ability/player_abilities/abilities/zealot_abilities")
+for archetype_name, _ in pairs(ArchetypeSettings.archetype_names) do
+	local path = string.format("scripts/settings/ability/player_abilities/abilities/%s_abilities", archetype_name)
+	local exists = Application.can_get_resource("lua", path)
+
+	_include_ability_definition(path)
+end
 
 return settings(player_abilities_name, player_abilities)

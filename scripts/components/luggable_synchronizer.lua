@@ -9,6 +9,7 @@ function LuggableSynchronizer:init(unit, is_server)
 	if luggable_synchronizer_extension then
 		local objective_name = self:get_data(unit, "objective_name")
 		local objective_stages = self:get_data(unit, "objective_stages")
+		local shuffle_stages = self:get_data(unit, "shuffle_stages")
 		local auto_start = self:get_data(unit, "automatic_start")
 		local manual_luggable_spawn = self:get_data(unit, "manual_luggable_spawn")
 		local max_socket_target = self:get_data(unit, "max_socket_target")
@@ -20,7 +21,7 @@ function LuggableSynchronizer:init(unit, is_server)
 		local is_side_mission_synchronizer = self:get_data(unit, "is_side_mission_synchronizer")
 		local automatic_start_on_level_spawned = self:get_data(unit, "automatic_start_on_level_spawned")
 
-		luggable_synchronizer_extension:setup_from_component(objective_name, objective_stages, auto_start, manual_luggable_spawn, max_socket_target, keep_unused_sockets, luggable_should_respawn, luggable_respawn_timer, luggable_reset_timer, luggable_consume_timer, is_side_mission_synchronizer, automatic_start_on_level_spawned)
+		luggable_synchronizer_extension:setup_from_component(objective_name, objective_stages, shuffle_stages, auto_start, manual_luggable_spawn, max_socket_target, keep_unused_sockets, luggable_should_respawn, luggable_respawn_timer, luggable_reset_timer, luggable_consume_timer, is_side_mission_synchronizer, automatic_start_on_level_spawned)
 
 		self._luggable_synchronizer_extension = luggable_synchronizer_extension
 	end
@@ -81,6 +82,11 @@ LuggableSynchronizer.component_data = {
 		ui_type = "text_box",
 		value = "default",
 		ui_name = "Objective Name"
+	},
+	shuffle_stages = {
+		ui_type = "check_box",
+		value = false,
+		ui_name = "Shuffle Stages"
 	},
 	objective_stages = {
 		value = 1,

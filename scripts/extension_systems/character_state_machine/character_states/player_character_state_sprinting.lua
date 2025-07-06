@@ -43,6 +43,8 @@ function PlayerCharacterStateSprinting:init(...)
 	local archetype = self._archetype
 	self._archetype_sprint_template = archetype.sprint
 	self._archetype_stamina_template = archetype.stamina
+	self._entered_t = 0
+	self._slowdown_duration = 0
 end
 
 function PlayerCharacterStateSprinting:on_enter(unit, dt, t, previous_state, params)
@@ -77,6 +79,8 @@ function PlayerCharacterStateSprinting:on_enter(unit, dt, t, previous_state, par
 	end
 
 	self._previous_velocity_move_speed = nil
+	self._entered_t = t
+	self._slowdown_duration = sprint_character_state_component.use_sprint_start_slowdown and 0.11 or 0
 end
 
 function PlayerCharacterStateSprinting:on_exit(unit, t, next_state)
@@ -158,6 +162,14 @@ function PlayerCharacterStateSprinting:fixed_update(unit, dt, t, next_state_para
 	local wants_slide = movement_state.is_crouching
 
 	return self:_check_transition(unit, t, next_state_params, input_extension, decreasing_speed, action_move_speed_modifier, sprint_momentum, wants_slide, wants_to_stop, has_weapon_action_input, weapon_action_input, move_direction, move_speed_without_weapon_actions)
+end
+
+function PlayerCharacterStateSprinting:entered_t()
+	return self._entered_t
+end
+
+function PlayerCharacterStateSprinting:slowdown_duration()
+	return self._slowdown_duration
 end
 
 function PlayerCharacterStateSprinting:_check_transition(unit, t, next_state_params, input_source, decreasing_speed, action_move_speed_modifier, sprint_momentum, wants_slide, wants_to_stop, has_weapon_action_input, weapon_action_input, move_direction, move_speed_without_weapon_actions)
@@ -292,9 +304,9 @@ function PlayerCharacterStateSprinting:_wanted_movement(dt, sprint_character_sta
 	local speed_scale = stopped and 0 or math.sqrt(math.min(1, new_x * new_x + new_y * new_y))
 
 	if sprint_character_state_component.use_sprint_start_slowdown then
-		local time_in_sprint = t - self._character_state_component.entered_t
-		local slowdown_time = 0.11
-		local speed_mod = math.clamp(time_in_sprint, 0, slowdown_time) / slowdown_time
+		local time_in_sprint = t - self._entered_t
+		local slowdown_duration = self._slowdown_duration
+		local speed_mod = math.clamp(time_in_sprint, 0, slowdown_duration) / slowdown_duration
 		speed_scale = speed_scale * speed_mod
 	end
 

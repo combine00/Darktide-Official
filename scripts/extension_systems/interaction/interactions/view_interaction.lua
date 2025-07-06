@@ -1,32 +1,16 @@
 require("scripts/extension_systems/interaction/interactions/ui_interaction")
 
-HubLocationIntroductionSettings = require("scripts/settings/cinematic_video/hub_location_introduction_settings")
+local HubLocationIntroductionSettings = require("scripts/settings/cinematic_video/hub_location_introduction_settings")
 local PlayerProgressionUnlocks = require("scripts/settings/player/player_progression_unlocks")
 local ViewInteraction = class("ViewInteraction", "UIInteraction")
 local ui_view_level_requirement = {
+	havoc_background_view = PlayerProgressionUnlocks.havoc_missions
+}
+local ui_view_progression_requirement = {
 	credits_vendor_background_view = PlayerProgressionUnlocks.credits_vendor,
 	crafting_view = PlayerProgressionUnlocks.crafting,
 	contracts_background_view = PlayerProgressionUnlocks.contracts,
-	cosmetics_vendor_background_view = PlayerProgressionUnlocks.cosmetics_vendor,
-	havoc_background_view = PlayerProgressionUnlocks.havoc_missions
-}
-local view_story_chapter_requirement = {
-	credits_vendor_background_view = {
-		chapter = "pot_story_traitor_first",
-		story = "path_of_trust"
-	},
-	crafting_view = {
-		chapter = "pot_crafting",
-		story = "path_of_trust"
-	},
-	contracts_background_view = {
-		chapter = "pot_contracts",
-		story = "path_of_trust"
-	},
-	havoc_background_view = {
-		chapter = "pot_story_final",
-		story = "path_of_trust"
-	}
+	cosmetics_vendor_background_view = PlayerProgressionUnlocks.cosmetics_vendor
 }
 
 function ViewInteraction:_ui_interaction(interactee_unit)
@@ -58,19 +42,30 @@ function ViewInteraction:_is_blocked(interactor_unit, interactee_unit)
 		return true, "loc_requires_level", requirement_context
 	end
 
-	local story_data = view_story_chapter_requirement[ui_interaction]
+	local progression_requirement = ui_view_progression_requirement[ui_interaction]
 
-	if story_data then
-		local story_name = story_data.story
-		local chapter_name = story_data.chapter
-		local story_requirement_met = Managers.narrative:is_chapter_complete(story_name, chapter_name, player)
+	if progression_requirement then
+		local block_reason, block_context = Managers.data_service.mission_board:get_block_reason("hub_facility", progression_requirement)
 
-		if not story_requirement_met then
-			return true, "loc_requires_pot_access"
+		if block_reason then
+			return true, block_reason, block_context
 		end
 	end
 
 	return false
+end
+
+function ViewInteraction:_video_template(hli_settings)
+	local player = Managers.player:local_player(1)
+	local profile = player:profile()
+	local archetype_name = profile.archetype.name
+	local video_template_by_archetype = hli_settings.video_template_by_archetype
+
+	if video_template_by_archetype and video_template_by_archetype[archetype_name] then
+		return video_template_by_archetype[archetype_name]
+	end
+
+	return hli_settings.video_template
 end
 
 function ViewInteraction:_start(interactor_unit, interactee_unit)
@@ -83,9 +78,10 @@ function ViewInteraction:_start(interactor_unit, interactee_unit)
 	}
 
 	if hli_settings and not hli_seen then
+		local video_template = self:_video_template(hli_settings)
 		context = {
 			allow_skip_input = true,
-			template = hli_settings.video_template
+			template = video_template
 		}
 		ui_interaction = "video_view"
 

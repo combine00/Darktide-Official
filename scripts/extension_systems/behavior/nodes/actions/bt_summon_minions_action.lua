@@ -81,9 +81,22 @@ function BtSummonMinionsAction:run(unit, breed, blackboard, scratchpad, action_d
 		end
 
 		if not scratchpad.pre_stinger then
-			scratchpad.pre_stinger = action_data.pre_stinger
+			local perception_extension = scratchpad.perception_extension
+			local unit_aggro_state = perception_extension:aggro_state()
 
-			_play_wwise(unit, scratchpad.pre_stinger)
+			if unit_aggro_state then
+				slot14 = "aggroed"
+
+				if "aggroed" then
+					slot14 = "alerted"
+				end
+
+				if unit_aggro_state == slot14 then
+					scratchpad.pre_stinger = action_data.pre_stinger
+
+					_play_wwise(unit, scratchpad.pre_stinger)
+				end
+			end
 		end
 	end
 
@@ -216,9 +229,22 @@ function BtSummonMinionsAction:_summon_minions(unit, breed, blackboard, scratchp
 	table.clear_array(TEMP_FLOOD_FILL_POSITONS, num_positions)
 	table.clear(BREEDS_TO_SPAWN)
 
-	local stinger = action_data.stinger
+	local perception_extension = scratchpad.perception_extension
+	local unit_aggro_state = perception_extension:aggro_state()
 
-	_play_wwise(unit, stinger)
+	if unit_aggro_state then
+		slot30 = "aggroed"
+
+		if "aggroed" then
+			slot30 = "alerted"
+		end
+
+		if unit_aggro_state == slot30 then
+			local stinger = action_data.stinger
+
+			_play_wwise(unit, stinger)
+		end
+	end
 end
 
 function BtSummonMinionsAction:_try_find_occluded_position(nav_world, side, target_side, occluded_spawn_range, try_find_on_main_path, optional_main_path_offset, optional_disallowed_positions)

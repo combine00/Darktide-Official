@@ -11,10 +11,14 @@ local companion_dog = {
 	follow = {
 		last_owner_cooldown_time = "number",
 		last_referenced_vector = "Vector3Box",
-		current_position_cooldown = "number",
 		current_owner_cooldown = "number",
+		current_adaptive_angle_check_right = "number",
 		current_movement_type = "string",
-		current_movement_animation = "string"
+		current_movement_animation = "string",
+		adaptive_angle_enlarge_t = "number",
+		current_position_cooldown = "number",
+		speed_reference = "number",
+		current_adaptive_angle_check_left = "number"
 	},
 	perception = {
 		previous_target_unit = "Unit",
@@ -64,14 +68,15 @@ local companion_dog = {
 		type = "string"
 	},
 	pounce = {
-		leap_node = "string",
-		has_pounce_target = "boolean",
-		started_leap = "boolean",
 		has_pounce_started = "boolean",
+		started_leap = "boolean",
+		leap_node = "string",
+		use_fast_jump = "boolean",
 		pounce_cooldown = "number",
+		has_jump_off_direction = "boolean",
+		has_pounce_target = "boolean",
 		target_hit_zone_name = "string",
-		pounce_target = "Unit",
-		has_jump_off_direction = "boolean"
+		pounce_target = "Unit"
 	},
 	whistle = {
 		current_target = "Unit"
@@ -81,10 +86,20 @@ local companion_dog = {
 		unit_reference = "Unit",
 		has_leave_teleport_position = "boolean",
 		node = "string"
+	},
+	teleport = {
+		teleport_position = "Vector3Box",
+		has_teleport_position = "boolean"
 	}
 }
+local companion_dog_hub = table.clone(companion_dog)
+companion_dog_hub.hub_interaction_with_player = {
+	has_owner_started_interaction = "boolean"
+}
+companion_dog_hub.movable_platform = nil
 local templates = {
-	companion_dog = companion_dog
+	companion_dog = companion_dog,
+	companion_dog_hub = companion_dog_hub
 }
 
 return templates

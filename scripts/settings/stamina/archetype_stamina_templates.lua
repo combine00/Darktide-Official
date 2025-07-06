@@ -33,6 +33,13 @@ local archetype_stamina_templates = {
 		no_stamina_sprint_speed_multiplier = 0.5,
 		regeneration_per_second = 1,
 		no_stamina_sprint_speed_deceleration_time = 1
+	},
+	adamant = {
+		base_stamina = 3,
+		regeneration_delay = 0.5,
+		no_stamina_sprint_speed_multiplier = 0.5,
+		regeneration_per_second = 1,
+		no_stamina_sprint_speed_deceleration_time = 1
 	}
 }
 

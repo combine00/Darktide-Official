@@ -22,8 +22,8 @@ function ActionOverloadChargePositionFinder:start(action_settings, t, time_scale
 	self._overload_module:start(t)
 end
 
-function ActionOverloadChargePositionFinder:fixed_update(dt, t, time_in_action)
-	ActionOverloadChargePositionFinder.super.fixed_update(self, dt, t, time_in_action)
+function ActionOverloadChargePositionFinder:fixed_update(dt, t, time_in_action, frame)
+	ActionOverloadChargePositionFinder.super.fixed_update(self, dt, t, time_in_action, frame)
 	self._position_finder_module:fixed_update(dt, t)
 	self._overload_module:fixed_update(dt, t)
 end

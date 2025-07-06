@@ -102,6 +102,12 @@ function MinionUnitDataExtension:faction_name()
 	return self._breed.faction_name
 end
 
+function MinionUnitDataExtension:is_companion()
+	local is_companion = Breed.is_companion(self._breed)
+
+	return is_companion
+end
+
 function MinionUnitDataExtension:breed_name()
 	local breed = self._breed
 	local breed_name = breed.name

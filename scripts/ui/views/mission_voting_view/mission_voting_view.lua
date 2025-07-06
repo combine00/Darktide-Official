@@ -407,6 +407,10 @@ function MissionVotingView:_try_get_voting_initiator_presence()
 	local _, presence_promise = Managers.presence:get_presence(self._voting_started_by_account_id)
 	self._presence_promise = presence_promise
 
+	if not self._presence_promise then
+		return
+	end
+
 	presence_promise:next(function (presence)
 		self._presence_promise = nil
 
@@ -578,11 +582,14 @@ function MissionVotingView:_populate_quickplay_data()
 	local mission_rewards_text = widgets_by_name.rewards_text
 	mission_rewards_text.content.visible = false
 	local danger_level_widget = widgets_by_name.mission_danger_info
+	danger_level_widget.style.danger_icon.visible = false
+	danger_level_widget.style.danger_icon_drop_shadow.visible = false
 	local danger_level, danger_level_text = calculate_quickplay_danger_level(self._backend_mission_id)
 
 	self:_set_difficulty_icons(danger_level_widget.style, danger_level)
 
 	danger_level_widget.content.danger_text = Utf8.upper(Localize(danger_level_text))
+	danger_level_widget.content.difficulty_icon = DangerSettings[danger_level].icon
 	danger_level_widget.style.rankup_icon.amount = 0
 	danger_level_widget.style.rankup_icon_background.amount = 0
 
@@ -650,14 +657,18 @@ function MissionVotingView:_set_mission_data(mission_data)
 		danger_level_widget.style.rankup_icon.amount = levels_to_be_gained
 		danger_level_widget.style.rankup_icon_background.amount = get_max_havoc_promotion_rate()
 		danger_level_widget.content.danger_text = Utf8.upper(Localize("loc_havoc_name"))
-		danger_level_widget.style.difficulty_icon.amount = 0
-		danger_level_widget.style.diffulty_icon_background.amount = 0
+		danger_level_widget.style.difficulty_background.visible = false
+		danger_level_widget.style.difficulty_icon.visible = false
+		danger_level_widget.style.difficulty_icon_frame.visible = false
 	else
+		danger_level_widget.style.danger_icon.visible = false
+		danger_level_widget.style.danger_icon_drop_shadow.visible = false
 		local danger_level, danger_level_text = calculate_danger_level(mission_data)
 
 		self:_set_difficulty_icons(danger_level_widget.style, danger_level)
 
 		danger_level_widget.content.danger_text = Utf8.upper(Localize(danger_level_text))
+		danger_level_widget.content.difficulty_icon = DangerSettings[danger_level].icon
 	end
 
 	local accept_confirmation_widget = self._widgets_by_name.accept_confirmation
@@ -886,8 +897,10 @@ end
 
 function MissionVotingView:_set_difficulty_icons(style, difficulty_value)
 	local difficulty_icon_style = style.difficulty_icon
-	difficulty_icon_style.amount = difficulty_value
-	difficulty_icon_style.color = DangerSettings[difficulty_value] and DangerSettings[difficulty_value].color or DangerSettings[1].color
+	local color = DangerSettings[difficulty_value] and DangerSettings[difficulty_value].color or DangerSettings[1].color
+	difficulty_icon_style.color = color
+	local difficulty_icon_frame = style.difficulty_icon_frame
+	difficulty_icon_frame.color = color
 end
 
 function MissionVotingView:_set_circumstance(mission_data)

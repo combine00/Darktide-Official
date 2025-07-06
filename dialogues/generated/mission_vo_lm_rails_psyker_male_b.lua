@@ -10,10 +10,6 @@ local mission_vo_lm_rails_psyker_male_b = {
 			[1.0] = 6.591708,
 			[2.0] = 6.360292
 		},
-		sound_event_weights = {
-			[1.0] = 0.5,
-			[2.0] = 0.5
-		},
 		randomize_indexes = {}
 	},
 	mission_rails_district_gate = {

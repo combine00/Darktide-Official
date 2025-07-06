@@ -132,7 +132,14 @@ local template_groups = {
 	{
 		"power_mauls",
 		"powermaul_p1_m1",
-		"powermaul_p1_m2"
+		"powermaul_p1_m2",
+		"powermaul_p2_m1",
+		"powermaul_p2_m2"
+	},
+	{
+		"power_maul_shields",
+		"powermaul_shield_p1_m1",
+		"powermaul_shield_p1_m2"
 	},
 	{
 		"power_swords_2h",
@@ -234,7 +241,14 @@ local template_groups = {
 		"shotgun_p1_m1",
 		"shotgun_p1_m2",
 		"shotgun_p1_m3",
-		"shotgun_p2_m1"
+		"shotgun_p2_m1",
+		"shotgun_p4_m1",
+		"shotgun_p4_m2",
+		"shotgun_p4_m3"
+	},
+	{
+		"shotpistol_shield",
+		"shotpistol_shield_p1_m1"
 	},
 	{
 		"stub_pistols",
@@ -257,7 +271,8 @@ local template_groups = {
 		"combat_abilities",
 		"psyker_force_field",
 		"psyker_force_field_dome",
-		"zealot_relic"
+		"zealot_relic",
+		"area_buff_drone"
 	},
 	{
 		"devices",
@@ -270,6 +285,9 @@ local template_groups = {
 	},
 	{
 		"grenades",
+		"adamant_whistle_grenade",
+		"adamant_grenade",
+		"shock_mine",
 		"ogryn_grenade_box",
 		"ogryn_grenade_box_cluster",
 		"ogryn_grenade_frag",
@@ -304,6 +322,7 @@ local template_groups = {
 	},
 	{
 		"unarmed",
+		"unarmed_hub_adamant",
 		"unarmed_hub_ogryn",
 		"unarmed_hub_psyker",
 		"unarmed_hub_veteran",

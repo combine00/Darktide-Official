@@ -13,14 +13,17 @@ function MinionBehaviorExtension:init(extension_init_context, unit, extension_in
 	local world = extension_init_context.world
 	local physics_world = extension_init_context.physics_world
 	local selected_attack_names_or_nil = extension_init_data.selected_attack_names
+	local owner_unit_or_nil = extension_init_data.owner_unit
 
-	self:_init_blackboard_components(blackboard, breed, unit, world, physics_world, game_session, selected_attack_names_or_nil)
+	self:_init_blackboard_components(blackboard, breed, unit, world, physics_world, game_session, selected_attack_names_or_nil, owner_unit_or_nil)
 
 	local behavior_tree_name = extension_init_data.behavior_tree_name
 
 	self:_init_brain(unit, breed, blackboard, behavior_tree_name)
 
 	self._units_dodged = {}
+	self._pounced_by_units = {}
+	self._units_blocked_damage = {}
 end
 
 function MinionBehaviorExtension:_init_brain(unit, breed, blackboard, behavior_tree_name)
@@ -34,7 +37,7 @@ function MinionBehaviorExtension:override_brain(behavior_tree_name, t)
 	self:_init_brain(self._unit, self._breed, self._blackboard, behavior_tree_name)
 end
 
-function MinionBehaviorExtension:_init_blackboard_components(blackboard, breed, unit, world, physics_world, game_session, optional_selected_attack_names)
+function MinionBehaviorExtension:_init_blackboard_components(blackboard, breed, unit, world, physics_world, game_session, optional_selected_attack_names, optional_owner_unit)
 	local spawn_component = Blackboard.write_component(blackboard, "spawn")
 	spawn_component.unit = unit
 	spawn_component.world = world
@@ -47,6 +50,11 @@ function MinionBehaviorExtension:_init_blackboard_components(blackboard, breed, 
 	spawn_component.anim_translation_scale_factor = 1
 	local behavior_component = Blackboard.write_component(blackboard, "behavior")
 	behavior_component.move_state = ""
+
+	if optional_owner_unit then
+		behavior_component.owner_unit = optional_owner_unit
+	end
+
 	local component_config = Blackboard.component_config(blackboard)
 	local available_attacks_fields = component_config.available_attacks
 
@@ -76,6 +84,9 @@ function MinionBehaviorExtension:game_object_initialized(game_session, game_obje
 end
 
 function MinionBehaviorExtension:destroy()
+	table.clear(self._pounced_by_units)
+	table.clear(self._units_blocked_damage)
+
 	local time_manager = Managers.time
 	local t = time_manager:time("gameplay")
 
@@ -167,6 +178,26 @@ function MinionBehaviorExtension:dodged_before(unit)
 	end
 
 	self._units_dodged[unit] = true
+
+	return false
+end
+
+function MinionBehaviorExtension:blocked_before(unit)
+	if self._units_blocked_damage[unit] then
+		return true
+	end
+
+	self._units_blocked_damage[unit] = true
+
+	return false
+end
+
+function MinionBehaviorExtension:pounced_by_companion_before(companion_unit)
+	if self._pounced_by_units[companion_unit] then
+		return true
+	end
+
+	self._pounced_by_units[companion_unit] = true
 
 	return false
 end

@@ -4,8 +4,11 @@ local SPECIAL_CHARGING_LOOPING_SFX_ALIAS = "weapon_special_loop"
 local SPECIAL_CHARGING_LOOPING_VFX_ALIAS = "weapon_special_loop"
 local SPECIAL_ACTIVATE_SFX_ALIAS = "sfx_special_activate"
 local SPECIAL_ACTIVATE_VFX_ALIAS = "vfx_weapon_special_start"
+local CONDITIONAL_LOOPING_SOUND_ALIAS = "conditional_equipped_item_passive_loop"
+local CONDITIONAL_LOOPING_PARTICLE_ALIAS = "conditional_equipped_item_passive"
 local SOURCE_TO_NAME = "_special_active"
 local SOURCE_FROM_NAME = "_shield_special_active"
+local SOURCE_PASSIVE_LOOP_NAME = "_shield_melee_idling"
 local PARTICLE_VARIABLE_NAME = "length"
 local _sfx_external_properties = {}
 local _vfx_external_properties = {}
@@ -27,10 +30,19 @@ function RiotShieldEffects:init(context, slot, weapon_template, fx_sources, item
 	self._action_sweep_component = unit_data_extension:read_component("action_sweep")
 	self._weapon_action_component = unit_data_extension:read_component("weapon_action")
 	self._first_person_component = unit_data_extension:read_component("first_person")
-	self._fx_source_from_name = fx_sources[SOURCE_FROM_NAME]
+	self._inventory_slot_component = unit_data_extension:read_component(slot.name)
+	self._weapon_special_tweak_data = weapon_template.weapon_special_tweak_data
 	self._fx_source_to_name = fx_sources[SOURCE_TO_NAME]
+	self._fx_source_from_name = fx_sources[SOURCE_FROM_NAME]
+	self._fx_source_passive_loop_name = fx_sources[SOURCE_PASSIVE_LOOP_NAME]
 	self._waiting_for_activation_fx = false
 	self._has_triggered_activation_fx = false
+	self._looping_windup_effect_id = nil
+	self._looping_windup_playing_id = nil
+	self._looping_windup_stop_event_name = nil
+	self._looping_passive_effect_id = nil
+	self._looping_passive_playing_id = nil
+	self._looping_passive_stop_event_name = nil
 end
 
 function RiotShieldEffects:fixed_update(unit, dt, t, frame)
@@ -45,10 +57,18 @@ function RiotShieldEffects:update(unit, dt, t)
 
 	self:_update_windup(dt, t, action_settings, time_in_action)
 	self:_update_activation(dt, t, action_settings, time_in_action)
+	self:_update_passive(dt, t)
 end
 
 function RiotShieldEffects:update_first_person_mode(first_person_mode)
-	return
+	if self._first_person_mode ~= first_person_mode then
+		self:_stop_windup_sfx_loop(true)
+		self:_stop_windup_vfx_loop(true)
+		self:_stop_passive_sfx_loop(true)
+		self:_stop_passive_vfx_loop(true)
+
+		self._first_person_mode = first_person_mode
+	end
 end
 
 function RiotShieldEffects:wield()
@@ -58,11 +78,15 @@ end
 function RiotShieldEffects:unwield()
 	self:_stop_windup_sfx_loop()
 	self:_stop_windup_vfx_loop()
+	self:_stop_passive_vfx_loop()
+	self:_stop_passive_sfx_loop()
 end
 
 function RiotShieldEffects:destroy()
 	self:_stop_windup_sfx_loop(true)
 	self:_stop_windup_vfx_loop(true)
+	self:_stop_passive_vfx_loop(true)
+	self:_stop_passive_sfx_loop(true)
 end
 
 function RiotShieldEffects:_update_windup(dt, t, action_settings, time_in_action)
@@ -133,6 +157,49 @@ function RiotShieldEffects:_update_activation(dt, t, action_settings, time_in_ac
 
 		self:_trigger_activation_sfx()
 		self:_trigger_activation_vfx()
+	end
+end
+
+function RiotShieldEffects:_update_passive(dt, t)
+	local tweak_data = self._weapon_special_tweak_data
+
+	if not tweak_data then
+		return
+	end
+
+	local above_threshold = false
+	local thresholds = tweak_data.thresholds
+	local num_special_charges = self._inventory_slot_component.num_special_charges
+
+	for ii = #thresholds, 2, -1 do
+		local threshold = thresholds[ii].threshold
+
+		if threshold <= num_special_charges then
+			above_threshold = true
+
+			break
+		end
+	end
+
+	local looping_passive_effect_id = self._looping_passive_effect_id
+	local looping_passive_playing_id = self._looping_passive_playing_id
+	local should_stop_vfx = not above_threshold and looping_passive_effect_id
+	local should_start_vfx = above_threshold and not looping_passive_effect_id
+
+	if should_start_vfx then
+		self:_start_passive_vfx_loop()
+	elseif should_stop_vfx then
+		self:_stop_passive_vfx_loop(false)
+	end
+
+	local should_play_husk_effect = self._fx_extension:should_play_husk_effect()
+	local should_stop_sfx = (not above_threshold or should_play_husk_effect) and looping_passive_playing_id
+	local should_start_sfx = above_threshold and not looping_passive_playing_id and not should_play_husk_effect
+
+	if should_start_sfx then
+		self:_start_passive_sfx_loop()
+	elseif should_stop_sfx then
+		self:_stop_passive_sfx_loop(false)
 	end
 end
 
@@ -252,6 +319,68 @@ function RiotShieldEffects:_trigger_activation_vfx()
 		local spawn_pos = Unit.world_position(from_unit, from_node)
 		local new_effect_id = World.create_particles(world, effect_name, spawn_pos, spawn_rot)
 	end
+end
+
+function RiotShieldEffects:_start_passive_sfx_loop()
+	local visual_loadout_extension = self._visual_loadout_extension
+	local should_play_husk_effect = self._fx_extension:should_play_husk_effect()
+	local resolved, event_name, resolved_stop, stop_event_name = visual_loadout_extension:resolve_looping_gear_sound(CONDITIONAL_LOOPING_SOUND_ALIAS, should_play_husk_effect, _sfx_external_properties)
+
+	if resolved and not self._looping_passive_playing_id then
+		local sfx_source_id = self._fx_extension:sound_source(self._fx_source_passive_loop_name)
+		local playing_id = WwiseWorld.trigger_resource_event(self._wwise_world, event_name, sfx_source_id)
+		self._looping_passive_playing_id = playing_id
+
+		if resolved_stop then
+			self._looping_passive_stop_event_name = stop_event_name
+		end
+	end
+end
+
+function RiotShieldEffects:_stop_passive_sfx_loop(force_stop)
+	local looping_passive_playing_id = self._looping_passive_playing_id
+
+	if looping_passive_playing_id then
+		local looping_passive_stop_event_name = self._looping_passive_stop_event_name
+		local sfx_source_id = self._fx_extension:sound_source(self._fx_source_passive_loop_name)
+
+		if not force_stop and looping_passive_stop_event_name and sfx_source_id then
+			WwiseWorld.trigger_resource_event(self._wwise_world, looping_passive_stop_event_name, sfx_source_id)
+		elseif self._looping_passive_playing_id then
+			WwiseWorld.stop_event(self._wwise_world, looping_passive_playing_id)
+		end
+	end
+
+	self._looping_passive_playing_id = nil
+	self._looping_passive_stop_event_name = nil
+end
+
+function RiotShieldEffects:_start_passive_vfx_loop()
+	local resolved, effect_name = self._visual_loadout_extension:resolve_gear_particle(CONDITIONAL_LOOPING_PARTICLE_ALIAS, _vfx_external_properties)
+
+	if resolved then
+		local world = self._world
+		local new_effect_id = World.create_particles(world, effect_name, Vector3.zero())
+		local vfx_link_unit, vfx_link_node = self._fx_extension:vfx_spawner_unit_and_node(self._fx_source_passive_loop_name)
+
+		World.link_particles(world, new_effect_id, vfx_link_unit, vfx_link_node, Matrix4x4.identity(), "stop")
+
+		self._looping_passive_effect_id = new_effect_id
+	end
+end
+
+function RiotShieldEffects:_stop_passive_vfx_loop(force_stop)
+	local current_effect_id = self._looping_passive_effect_id
+
+	if current_effect_id then
+		if force_stop then
+			World.destroy_particles(self._world, current_effect_id)
+		else
+			World.stop_spawning_particles(self._world, current_effect_id)
+		end
+	end
+
+	self._looping_passive_effect_id = nil
 end
 
 implements(RiotShieldEffects, WieldableSlotScriptInterface)

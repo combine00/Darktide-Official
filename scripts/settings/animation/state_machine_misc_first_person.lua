@@ -92,6 +92,12 @@ local state_machine_settings = {
 	},
 	["content/characters/player/human/first_person/animations/syringe"] = {
 		blend_time = DEFAULT_BLEND_TIME
+	},
+	["content/characters/player/human/first_person/animations/shock_mine"] = {
+		blend_time = DEFAULT_BLEND_TIME
+	},
+	["content/characters/player/human/first_person/animations/adamant_drone"] = {
+		blend_time = DEFAULT_BLEND_TIME
 	}
 }
 

@@ -1,13 +1,8 @@
 local Definitions = require("scripts/ui/view_elements/view_element_discard_items/view_element_discard_items_definitions")
-local ViewElementDiscardItemsSettings = require("scripts/ui/view_elements/view_element_discard_items/view_element_discard_items_settings")
-local UIRenderer = require("scripts/managers/ui/ui_renderer")
-local UISoundEvents = require("scripts/settings/ui/ui_sound_events")
-local UIWidget = require("scripts/managers/ui/ui_widget")
-local ScriptWorld = require("scripts/foundation/utilities/script_world")
+local Items = require("scripts/utilities/items")
 local RaritySettings = require("scripts/settings/item/rarity_settings")
-local ButtonPassTemplates = require("scripts/ui/pass_templates/button_pass_templates")
 local StepperPassTemplates = require("scripts/ui/pass_templates/stepper_pass_templates")
-local ItemUtils = require("scripts/utilities/items")
+local UISoundEvents = require("scripts/settings/ui/ui_sound_events")
 local ViewElementDiscardItems = class("ViewElementDiscardItems", "ViewElementBase")
 
 function ViewElementDiscardItems:init(parent, draw_layer, start_scale, optional_menu_settings)
@@ -23,7 +18,7 @@ function ViewElementDiscardItems:init(parent, draw_layer, start_scale, optional_
 	local highest_item_level = 0
 
 	for _, item in pairs(self._items) do
-		local item_expertise = ItemUtils.expertise_level(item, true)
+		local item_expertise = Items.expertise_level(item, true)
 		local expertise_value = tonumber(item_expertise)
 		local item_level = expertise_value or 0
 
@@ -32,7 +27,7 @@ function ViewElementDiscardItems:init(parent, draw_layer, start_scale, optional_
 		end
 	end
 
-	self._highest_item_level = highest_item_level + 1 * ItemUtils.get_expertise_multiplier()
+	self._highest_item_level = highest_item_level + 1 * Items.get_expertise_multiplier()
 	self._highest_item_level_cap = self._highest_item_level
 	self._current_rating_value = self._highest_item_level_cap
 	self._pivot_offset = {
@@ -63,7 +58,7 @@ function ViewElementDiscardItems:_initialize_all(items, display_name, selection_
 	local highest_item_level = 0
 
 	for _, item in pairs(self._items) do
-		local item_expertise = ItemUtils.expertise_level(item, true)
+		local item_expertise = Items.expertise_level(item, true)
 		local expertise_value = tonumber(item_expertise)
 		local item_level = expertise_value or 0
 
@@ -72,7 +67,7 @@ function ViewElementDiscardItems:_initialize_all(items, display_name, selection_
 		end
 	end
 
-	self._highest_item_level = highest_item_level + 1 * ItemUtils.get_expertise_multiplier()
+	self._highest_item_level = highest_item_level + 1 * Items.get_expertise_multiplier()
 	self._highest_item_level_cap = self._highest_item_level
 	self._current_rating_value = self._highest_item_level_cap
 	self._pivot_offset = {
@@ -123,7 +118,7 @@ function ViewElementDiscardItems:_update_selected_items_by_rarity()
 		for index, item in ipairs(items) do
 			local gear_id = item.gear_id
 
-			if self:_can_discard_item(item) and not ItemUtils.is_item_id_favorited(gear_id) then
+			if self:_can_discard_item(item) and not Items.is_item_id_favorited(gear_id) then
 				selected_items_by_rarity[rarity][#selected_items_by_rarity[rarity] + 1] = item
 			end
 		end
@@ -277,7 +272,7 @@ end
 
 function ViewElementDiscardItems:_can_discard_item(item)
 	local allowed_item_level = math.min(self._highest_item_level, self._current_rating_value or 0)
-	local item_expertise = ItemUtils.expertise_level(item, true)
+	local item_expertise = Items.expertise_level(item, true)
 	local expertise_value = tonumber(item_expertise)
 
 	return expertise_value and expertise_value < allowed_item_level
@@ -304,11 +299,11 @@ function ViewElementDiscardItems:_on_unselect_pressed()
 end
 
 function ViewElementDiscardItems:_on_rating_stepper_left_pressed()
-	self:_increment_rating_value(-1 * ItemUtils.get_expertise_multiplier())
+	self:_increment_rating_value(-1 * Items.get_expertise_multiplier())
 end
 
 function ViewElementDiscardItems:_on_rating_stepper_right_pressed()
-	self:_increment_rating_value(1 * ItemUtils.get_expertise_multiplier())
+	self:_increment_rating_value(1 * Items.get_expertise_multiplier())
 end
 
 function ViewElementDiscardItems:_increment_rating_value(add)

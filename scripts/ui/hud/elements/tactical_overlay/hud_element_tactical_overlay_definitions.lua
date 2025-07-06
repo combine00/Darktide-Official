@@ -386,7 +386,8 @@ end
 local left_panel_widgets_definitions = {
 	danger_info = UIWidget.create_definition({
 		{
-			value = "content/ui/materials/icons/generic/danger",
+			value = "content/ui/materials/buttons/rhombus",
+			style_id = "difficulty_background",
 			pass_type = "texture",
 			style = {
 				vertical_alignment = "top",
@@ -398,30 +399,62 @@ local left_panel_widgets_definitions = {
 					153
 				},
 				offset = {
-					5,
-					5,
-					2
+					-6.399999999999999,
+					-2,
+					5
 				},
 				size = {
-					50,
-					50
+					72.8,
+					72.8
 				}
 			}
 		},
 		{
-			value = "content/ui/materials/backgrounds/default_square",
-			style_id = "diffulty_icon_background",
-			pass_type = "multi_texture"
-		},
-		{
-			value = "content/ui/materials/frames/frame_tile_2px",
-			style_id = "diffulty_icon_background_frame",
-			pass_type = "multi_texture"
-		},
-		{
-			value = "content/ui/materials/backgrounds/default_square",
+			value_id = "difficulty_icon",
 			style_id = "difficulty_icon",
-			pass_type = "multi_texture"
+			pass_type = "texture",
+			value = "content/ui/materials/icons/difficulty/difficulty_skull_uprising",
+			style = {
+				vertical_alignment = "top",
+				horizontal_alignment = "left",
+				color = Color.white(255, true),
+				offset = {
+					-0.8000000000000043,
+					2,
+					7
+				},
+				size = {
+					61.599999999999994,
+					61.599999999999994
+				}
+			}
+		},
+		{
+			style_id = "difficulty_name",
+			value_id = "difficulty_name",
+			pass_type = "text",
+			style = {
+				vertical_alignment = "center",
+				horizontal_alignment = "left",
+				text_vertical_alignment = "top",
+				font_size = 34,
+				text_horizontal_alignment = "left",
+				offset = {
+					65,
+					-40,
+					10
+				},
+				size = {
+					mission_info_size[1] + 100,
+					50
+				},
+				text_color = {
+					255,
+					169,
+					191,
+					153
+				}
+			}
 		}
 	}, "mission_info_panel", nil, nil, element_styles.difficulty),
 	mission_info = UIWidget.create_definition({
@@ -626,7 +659,6 @@ local left_panel_widgets_definitions = {
 	}, "circumstance_info_panel"),
 	plasteel_info = UIWidget.create_definition(generate_currency_passes("content/ui/materials/icons/currencies/plasteel_small"), "crafting_pickup_panel", nil, currency_info_size),
 	diamantine_info = UIWidget.create_definition(generate_currency_passes("content/ui/materials/icons/currencies/diamantine_small"), "crafting_pickup_panel", nil, currency_info_size),
-	survival_currency = UIWidget.create_definition(generate_currency_passes(), "crafting_pickup_panel", nil, currency_info_size),
 	havoc_rank_info = UIWidget.create_definition({
 		{
 			value = "content/ui/materials/icons/generic/havoc",

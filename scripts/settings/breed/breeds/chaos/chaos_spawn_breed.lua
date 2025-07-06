@@ -22,24 +22,25 @@ local stagger_types = StaggerSettings.stagger_types
 local weakspot_types = WeakspotSettings.types
 local breed_name = "chaos_spawn"
 local breed_data = {
+	detection_radius = 20,
 	walk_speed = 6,
-	navigation_propagation_box_extent = 200,
+	use_navigation_path_splines = true,
 	use_bone_lod = false,
 	look_at_distance = 20,
-	fx_proximity_culling_weight = 10,
-	spawn_aggro_state = "aggroed",
-	unit_template_name = "minion",
-	power_level_type = "chaos_spawn_melee",
 	ignore_stagger_accumulation = true,
+	fx_proximity_culling_weight = 10,
+	activate_slot_system_on_spawn = true,
+	unit_template_name = "minion",
+	sub_faction_name = "chaos",
+	power_level_type = "chaos_spawn_melee",
 	slot_template = "chaos_spawn",
 	broadphase_radius = 2,
+	navigation_propagation_box_extent = 200,
 	count_num_grabs_done = true,
 	stagger_resistance = 1,
-	sub_faction_name = "chaos",
 	half_extent_forward = 0.6,
 	half_extent_right = 0.7,
 	hit_reacts_min_damage = 100,
-	use_navigation_path_splines = true,
 	game_object_type = "minion_monster",
 	challenge_rating = 30,
 	bone_lod_radius = 3,
@@ -53,7 +54,7 @@ local breed_data = {
 	line_of_sight_collision_filter = "filter_minion_line_of_sight_check",
 	stagger_reduction = 50,
 	player_locomotion_constrain_radius = 1.5,
-	activate_slot_system_on_spawn = true,
+	can_patrol = true,
 	smart_tag_target_type = "breed",
 	explosion_power_multiplier = 2,
 	base_unit = "content/characters/enemy/chaos_spawn/third_person/base",
@@ -104,6 +105,9 @@ local breed_data = {
 		}
 	},
 	inventory = MinionVisualLoadoutTemplates.chaos_spawn,
+	animation_variables = {
+		"anim_move_speed"
+	},
 	sounds = require("scripts/settings/breed/breeds/chaos/chaos_spawn_sounds"),
 	vfx = require("scripts/settings/breed/breeds/chaos/chaos_spawn_vfx"),
 	look_at_tag = breed_name,
@@ -118,7 +122,6 @@ local breed_data = {
 			0
 		}
 	},
-	detection_radius = math.huge,
 	target_changed_attack_intensities = {
 		disabling = 5
 	},
@@ -435,7 +438,31 @@ local breed_data = {
 		}
 	},
 	outline_config = {},
-	blackboard_component_config = BreedBlackboardComponentTemplates.chaos_spawn
+	blackboard_component_config = BreedBlackboardComponentTemplates.chaos_spawn,
+	companion_pounce_setting = {
+		companion_pounce_action = "stagger_and_leap_away",
+		on_target_hit = {
+			linking_time = 1.55,
+			anim_event_on_stick = "attack_leap_nonhuman_stick",
+			anim_event = "attack_leap_nonhuman_start",
+			animation_driven_duration = 0.5333333333333333,
+			dog_target_nodes = {
+				"dog_target_position_right_01",
+				"dog_target_position_right_02",
+				"dog_target_position_back_01",
+				"dog_target_position_back_02",
+				"dog_target_position_front_01",
+				"dog_target_position_front_02"
+			}
+		},
+		land_anim_events = {
+			{
+				duration = 0.8333333333333334,
+				name = "attack_leap_nonhuman_land_02"
+			}
+		},
+		damage_profile = DamageProfileTemplates.adamant_companion_monster_pounce
+	}
 }
 
 return breed_data

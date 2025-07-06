@@ -1,3 +1,4 @@
+local ArchetypeSettings = require("scripts/settings/archetype/archetype_settings")
 local archetypes = {}
 
 local function _create_archetype_entry(archetype_name)
@@ -10,9 +11,8 @@ local function _create_archetype_entry(archetype_name)
 	archetypes[archetype_name] = entry
 end
 
-_create_archetype_entry("ogryn")
-_create_archetype_entry("psyker")
-_create_archetype_entry("veteran")
-_create_archetype_entry("zealot")
+for archetype_name, _ in pairs(ArchetypeSettings.archetype_names) do
+	_create_archetype_entry(archetype_name)
+end
 
 return settings("Archetypes", archetypes)

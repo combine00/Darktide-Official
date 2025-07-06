@@ -77,7 +77,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -234,7 +234,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -387,7 +387,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -517,16 +517,10 @@ return function ()
 				"player_voice_profiles",
 				OP.SET_INTERSECTS,
 				args = {
-					"zealot_male_a",
-					"zealot_female_a",
 					"veteran_female_b",
 					"veteran_male_b",
-					"veteran_male_c",
 					"veteran_female_c",
-					"adamant_female_b",
-					"adamant_male_b",
-					"adamant_male_c",
-					"adamant_female_c"
+					"veteran_male_c"
 				}
 			},
 			{
@@ -540,7 +534,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -599,12 +593,12 @@ return function ()
 				"voice_template",
 				OP.SET_INCLUDES,
 				args = {
-					"adamant_female_b",
-					"adamant_male_b",
-					"adamant_male_c",
-					"adamant_female_c",
 					"adamant_male_a",
-					"adamant_female_a"
+					"adamant_female_a",
+					"veteran_female_b",
+					"veteran_male_b",
+					"veteran_female_c",
+					"veteran_male_c"
 				}
 			}
 		},
@@ -692,7 +686,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -759,6 +753,7 @@ return function ()
 					"psyker_female_a",
 					"zealot_male_a",
 					"zealot_female_a",
+					"ogryn_a",
 					"ogryn_c",
 					"psyker_male_b",
 					"psyker_female_b",
@@ -830,9 +825,7 @@ return function ()
 					"zealot_male_c",
 					"zealot_female_c",
 					"veteran_female_a",
-					"veteran_male_a",
-					"adamant_female_a",
-					"adamant_male_a"
+					"veteran_male_a"
 				}
 			},
 			{
@@ -846,7 +839,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -995,7 +988,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -1127,9 +1120,7 @@ return function ()
 					"adamant_male_c",
 					"adamant_female_c",
 					"psyker_male_a",
-					"psyker_female_a",
-					"adamant_male_a",
-					"adamant_female_a"
+					"psyker_female_a"
 				}
 			},
 			{
@@ -1143,7 +1134,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -1270,13 +1261,12 @@ return function ()
 				"player_voice_profiles",
 				OP.SET_INTERSECTS,
 				args = {
-					"ogryn_a",
-					"adamant_male_c",
-					"adamant_female_c",
 					"psyker_male_a",
 					"psyker_female_a",
-					"adamant_male_a",
-					"adamant_female_a"
+					"zealot_male_b",
+					"zealot_female_b",
+					"zealot_male_c",
+					"zealot_female_c"
 				}
 			},
 			{
@@ -1290,7 +1280,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -1436,7 +1426,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -1563,10 +1553,6 @@ return function ()
 				args = {
 					"adamant_male_b",
 					"adamant_female_b",
-					"adamant_male_a",
-					"adamant_female_a",
-					"adamant_male_b",
-					"adamant_female_b",
 					"adamant_male_c",
 					"adamant_female_c",
 					"veteran_male_a",
@@ -1588,7 +1574,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -1722,20 +1708,11 @@ return function ()
 				"player_voice_profiles",
 				OP.SET_INTERSECTS,
 				args = {
-					"adamant_male_b",
-					"adamant_female_b",
-					"adamant_male_a",
-					"adamant_female_a",
-					"adamant_male_b",
-					"adamant_female_b",
-					"adamant_male_c",
-					"adamant_female_c",
 					"veteran_male_a",
 					"veteran_female_a",
-					"psyker_male_b",
-					"psyker_female_b",
-					"psyker_male_c",
-					"psyker_female_c"
+					"ogryn_a",
+					"ogryn_b",
+					"ogryn_c"
 				}
 			},
 			{
@@ -1749,7 +1726,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -1808,20 +1785,13 @@ return function ()
 				"voice_template",
 				OP.SET_INCLUDES,
 				args = {
-					"adamant_male_b",
-					"adamant_female_b",
 					"adamant_male_a",
 					"adamant_female_a",
-					"adamant_male_b",
-					"adamant_female_b",
-					"adamant_male_c",
-					"adamant_female_c",
 					"veteran_male_a",
 					"veteran_female_a",
-					"psyker_male_b",
-					"psyker_female_b",
-					"psyker_male_c",
-					"psyker_female_c"
+					"ogryn_a",
+					"ogryn_b",
+					"ogryn_c"
 				}
 			}
 		},
@@ -1883,13 +1853,10 @@ return function ()
 				"player_voice_profiles",
 				OP.SET_INTERSECTS,
 				args = {
-					"adamant_male_a",
-					"adamant_female_a",
-					"ogryn_a",
-					"ogryn_b",
-					"ogryn_c",
-					"veteran_male_a",
-					"veteran_female_a"
+					"zealot_male_a",
+					"zealot_female_a",
+					"zealot_male_b",
+					"zealot_female_b"
 				}
 			},
 			{
@@ -1903,7 +1870,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -2046,7 +2013,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -2172,8 +2139,6 @@ return function ()
 				"player_voice_profiles",
 				OP.SET_INTERSECTS,
 				args = {
-					"adamant_male_a",
-					"adamant_female_a",
 					"adamant_male_c",
 					"adamant_female_c",
 					"psyker_male_a",
@@ -2195,7 +2160,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -2254,12 +2219,16 @@ return function ()
 				"voice_template",
 				OP.SET_INCLUDES,
 				args = {
-					"ogryn_b",
-					"ogryn_c",
-					"zealot_male_c",
-					"zealot_female_c",
-					"zealot_male_b",
-					"zealot_female_b"
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_c",
+					"adamant_female_c",
+					"psyker_male_a",
+					"psyker_female_a",
+					"psyker_male_b",
+					"psyker_female_b",
+					"psyker_male_c",
+					"psyker_female_c"
 				}
 			}
 		},
@@ -2321,16 +2290,14 @@ return function ()
 				"player_voice_profiles",
 				OP.SET_INTERSECTS,
 				args = {
-					"adamant_male_a",
-					"adamant_female_a",
-					"adamant_male_c",
-					"adamant_female_c",
-					"psyker_male_a",
-					"psyker_female_a",
-					"psyker_male_b",
-					"psyker_female_b",
-					"psyker_male_c",
-					"psyker_female_c"
+					"ogryn_b",
+					"ogryn_c",
+					"veteran_male_b",
+					"veteran_female_b",
+					"veteran_male_c",
+					"veteran_female_c",
+					"adamant_male_b",
+					"adamant_female_b"
 				}
 			},
 			{
@@ -2344,7 +2311,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -2495,7 +2462,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -2625,16 +2592,16 @@ return function ()
 				"player_voice_profiles",
 				OP.SET_INTERSECTS,
 				args = {
-					"veteran_male_b",
-					"veteran_female_b",
-					"veteran_male_c",
-					"veteran_female_c",
+					"veteran_male_a",
+					"veteran_female_a",
 					"adamant_male_b",
 					"adamant_female_b",
 					"adamant_male_c",
 					"adamant_female_c",
-					"zealot_male_a",
-					"zealot_female_a"
+					"psyker_male_b",
+					"psyker_female_b",
+					"psyker_male_c",
+					"psyker_female_c"
 				}
 			},
 			{
@@ -2648,7 +2615,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -2780,8 +2747,6 @@ return function ()
 				"player_voice_profiles",
 				OP.SET_INTERSECTS,
 				args = {
-					"adamant_male_a",
-					"adamant_female_a",
 					"psyker_male_a",
 					"psyker_female_a",
 					"ogryn_a",
@@ -2800,7 +2765,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -2927,8 +2892,6 @@ return function ()
 				"player_voice_profiles",
 				OP.SET_INTERSECTS,
 				args = {
-					"adamant_male_c",
-					"adamant_female_c",
 					"veteran_male_a",
 					"veteran_female_a",
 					"psyker_male_b",
@@ -2950,7 +2913,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -3009,8 +2972,6 @@ return function ()
 				"voice_template",
 				OP.SET_INCLUDES,
 				args = {
-					"adamant_male_c",
-					"adamant_female_c",
 					"veteran_male_a",
 					"veteran_female_a",
 					"psyker_male_b",
@@ -3019,6 +2980,588 @@ return function ()
 					"psyker_female_c",
 					"zealot_male_a",
 					"zealot_female_a"
+				}
+			}
+		},
+		on_done = {},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "combat_pause_limited_bolt_on_a_adamant_a_01_a",
+		wwise_route = 0,
+		response = "combat_pause_limited_bolt_on_a_adamant_a_01_a",
+		database = "adamant_a",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"short_story_talk"
+			},
+			{
+				"user_context",
+				"friends_close",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.LT,
+				1
+			},
+			{
+				"global_context",
+				"level_time",
+				OP.GT,
+				90
+			},
+			{
+				"global_context",
+				"is_decaying_tension",
+				OP.EQ,
+				"true"
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"adamant_female_a",
+					"adamant_male_a"
+				}
+			},
+			{
+				"global_context",
+				"player_voice_profiles",
+				OP.SET_INTERSECTS,
+				args = {
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c",
+					"veteran_male_a",
+					"veteran_female_a",
+					"psyker_male_b",
+					"psyker_female_b",
+					"psyker_male_c",
+					"psyker_female_c"
+				}
+			},
+			{
+				"faction_memory",
+				"combat_pause_limited_bolt_on_a_adamant_a_01_a",
+				OP.EQ,
+				0
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				120
+			},
+			{
+				"faction_memory",
+				"time_since_last_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				20
+			}
+		},
+		on_done = {
+			{
+				"faction_memory",
+				"combat_pause_limited_bolt_on_a_adamant_a_01_a",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMESET,
+				"0"
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 1
+			}
+		}
+	})
+	define_rule({
+		name = "combat_pause_limited_bolt_on_a_adamant_a_01_b",
+		category = "conversations_prio_1",
+		wwise_route = 0,
+		response = "combat_pause_limited_bolt_on_a_adamant_a_01_b",
+		database = "adamant_a",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"combat_pause_limited_bolt_on_a_adamant_a_01_a"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c",
+					"veteran_male_a",
+					"veteran_female_a",
+					"psyker_male_b",
+					"psyker_female_b",
+					"psyker_male_c",
+					"psyker_female_c"
+				}
+			}
+		},
+		on_done = {},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "combat_pause_limited_bolt_on_a_adamant_a_02_a",
+		wwise_route = 0,
+		response = "combat_pause_limited_bolt_on_a_adamant_a_02_a",
+		database = "adamant_a",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"short_story_talk"
+			},
+			{
+				"user_context",
+				"friends_close",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.LT,
+				1
+			},
+			{
+				"global_context",
+				"level_time",
+				OP.GT,
+				90
+			},
+			{
+				"global_context",
+				"is_decaying_tension",
+				OP.EQ,
+				"true"
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"adamant_female_a",
+					"adamant_male_a"
+				}
+			},
+			{
+				"global_context",
+				"player_voice_profiles",
+				OP.SET_INTERSECTS,
+				args = {
+					"veteran_male_a",
+					"veteran_female_a",
+					"veteran_male_b",
+					"veteran_female_b",
+					"veteran_male_c",
+					"veteran_female_c"
+				}
+			},
+			{
+				"faction_memory",
+				"combat_pause_limited_bolt_on_a_adamant_a_02_a",
+				OP.EQ,
+				0
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				120
+			},
+			{
+				"faction_memory",
+				"time_since_last_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				20
+			}
+		},
+		on_done = {
+			{
+				"faction_memory",
+				"combat_pause_limited_bolt_on_a_adamant_a_02_a",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMESET,
+				"0"
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 1
+			}
+		}
+	})
+	define_rule({
+		name = "combat_pause_limited_bolt_on_a_adamant_a_02_b",
+		category = "conversations_prio_1",
+		wwise_route = 0,
+		response = "combat_pause_limited_bolt_on_a_adamant_a_02_b",
+		database = "adamant_a",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"combat_pause_limited_bolt_on_a_adamant_a_02_a"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"veteran_male_a",
+					"veteran_female_a",
+					"veteran_male_b",
+					"veteran_female_b",
+					"veteran_male_c",
+					"veteran_female_c"
+				}
+			}
+		},
+		on_done = {},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "combat_pause_limited_bolt_on_a_adamant_a_03_a",
+		wwise_route = 0,
+		response = "combat_pause_limited_bolt_on_a_adamant_a_03_a",
+		database = "adamant_a",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"short_story_talk"
+			},
+			{
+				"user_context",
+				"friends_close",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.LT,
+				1
+			},
+			{
+				"global_context",
+				"level_time",
+				OP.GT,
+				90
+			},
+			{
+				"global_context",
+				"is_decaying_tension",
+				OP.EQ,
+				"true"
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"adamant_female_a",
+					"adamant_male_a"
+				}
+			},
+			{
+				"global_context",
+				"player_voice_profiles",
+				OP.SET_INTERSECTS,
+				args = {
+					"zealot_male_a",
+					"zealot_female_a",
+					"zealot_male_b",
+					"zealot_female_b",
+					"zealot_male_c",
+					"zealot_female_c"
+				}
+			},
+			{
+				"faction_memory",
+				"combat_pause_limited_bolt_on_a_adamant_a_03_a",
+				OP.EQ,
+				0
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				120
+			},
+			{
+				"faction_memory",
+				"time_since_last_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				20
+			}
+		},
+		on_done = {
+			{
+				"faction_memory",
+				"combat_pause_limited_bolt_on_a_adamant_a_03_a",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMESET,
+				"0"
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 1
+			}
+		}
+	})
+	define_rule({
+		name = "combat_pause_limited_bolt_on_a_adamant_a_03_b",
+		category = "conversations_prio_1",
+		wwise_route = 0,
+		response = "combat_pause_limited_bolt_on_a_adamant_a_03_b",
+		database = "adamant_a",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"combat_pause_limited_bolt_on_a_adamant_a_03_a"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"zealot_male_a",
+					"zealot_female_a",
+					"zealot_male_b",
+					"zealot_female_b",
+					"zealot_male_c",
+					"zealot_female_c"
+				}
+			}
+		},
+		on_done = {},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.2
+			}
+		}
+	})
+	define_rule({
+		name = "combat_pause_limited_bolt_on_a_adamant_a_04_a",
+		wwise_route = 0,
+		response = "combat_pause_limited_bolt_on_a_adamant_a_04_a",
+		database = "adamant_a",
+		category = "conversations_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"short_story_talk"
+			},
+			{
+				"user_context",
+				"friends_close",
+				OP.GT,
+				0
+			},
+			{
+				"user_context",
+				"enemies_close",
+				OP.LT,
+				1
+			},
+			{
+				"global_context",
+				"level_time",
+				OP.GT,
+				90
+			},
+			{
+				"global_context",
+				"is_decaying_tension",
+				OP.EQ,
+				"true"
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"adamant_female_a",
+					"adamant_male_a"
+				}
+			},
+			{
+				"global_context",
+				"player_voice_profiles",
+				OP.SET_INTERSECTS,
+				args = {
+					"ogryn_b",
+					"ogryn_a",
+					"ogryn_c"
+				}
+			},
+			{
+				"faction_memory",
+				"combat_pause_limited_bolt_on_a_adamant_a_04_a",
+				OP.EQ,
+				0
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				120
+			},
+			{
+				"faction_memory",
+				"time_since_last_conversation",
+				OP.TIMEDIFF,
+				OP.GT,
+				20
+			}
+		},
+		on_done = {
+			{
+				"faction_memory",
+				"combat_pause_limited_bolt_on_a_adamant_a_04_a",
+				OP.ADD,
+				1
+			},
+			{
+				"faction_memory",
+				"time_since_last_short_conversation",
+				OP.TIMESET,
+				"0"
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 1
+			}
+		}
+	})
+	define_rule({
+		name = "combat_pause_limited_bolt_on_a_adamant_a_04_b",
+		category = "conversations_prio_1",
+		wwise_route = 0,
+		response = "combat_pause_limited_bolt_on_a_adamant_a_04_b",
+		database = "adamant_a",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"heard_speak"
+			},
+			{
+				"query_context",
+				"dialogue_name",
+				OP.SET_INCLUDES,
+				args = {
+					"combat_pause_limited_bolt_on_a_adamant_a_04_a"
+				}
+			},
+			{
+				"user_context",
+				"voice_template",
+				OP.SET_INCLUDES,
+				args = {
+					"ogryn_b",
+					"ogryn_a",
+					"ogryn_c"
 				}
 			}
 		},
@@ -3101,8 +3644,6 @@ return function ()
 					"zealot_male_b",
 					"zealot_female_c",
 					"zealot_male_c",
-					"adamant_female_a",
-					"adamant_male_a",
 					"adamant_female_b",
 					"adamant_male_b",
 					"adamant_female_c",
@@ -3120,7 +3661,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -3257,8 +3798,6 @@ return function ()
 					"zealot_male_b",
 					"zealot_female_c",
 					"zealot_male_c",
-					"adamant_female_a",
-					"adamant_male_a",
 					"adamant_female_b",
 					"adamant_male_b",
 					"adamant_female_c",
@@ -3276,7 +3815,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -3413,8 +3952,6 @@ return function ()
 					"zealot_male_b",
 					"zealot_female_c",
 					"zealot_male_c",
-					"adamant_female_a",
-					"adamant_male_a",
 					"adamant_female_b",
 					"adamant_male_b",
 					"adamant_female_c",
@@ -3432,7 +3969,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -3569,8 +4106,6 @@ return function ()
 					"zealot_male_b",
 					"zealot_female_c",
 					"zealot_male_c",
-					"adamant_female_a",
-					"adamant_male_a",
 					"adamant_female_b",
 					"adamant_male_b",
 					"adamant_female_c",
@@ -3588,7 +4123,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -3725,8 +4260,6 @@ return function ()
 					"zealot_male_b",
 					"zealot_female_c",
 					"zealot_male_c",
-					"adamant_female_a",
-					"adamant_male_a",
 					"adamant_female_b",
 					"adamant_male_b",
 					"adamant_female_c",
@@ -3744,7 +4277,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -3881,8 +4414,6 @@ return function ()
 					"zealot_male_b",
 					"zealot_female_c",
 					"zealot_male_c",
-					"adamant_female_a",
-					"adamant_male_a",
 					"adamant_female_b",
 					"adamant_male_b",
 					"adamant_female_c",
@@ -3900,7 +4431,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -4037,12 +4568,10 @@ return function ()
 					"zealot_male_b",
 					"zealot_female_c",
 					"zealot_male_c",
-					"adamant_male_a",
-					"adamant_female_a",
-					"adamant_male_b",
 					"adamant_female_b",
-					"adamant_male_c",
-					"adamant_female_c"
+					"adamant_male_b",
+					"adamant_female_c",
+					"adamant_male_c"
 				}
 			},
 			{
@@ -4056,7 +4585,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -4193,12 +4722,10 @@ return function ()
 					"zealot_male_b",
 					"zealot_female_c",
 					"zealot_male_c",
-					"adamant_male_a",
-					"adamant_female_a",
-					"adamant_male_b",
 					"adamant_female_b",
-					"adamant_male_c",
-					"adamant_female_c"
+					"adamant_male_b",
+					"adamant_female_c",
+					"adamant_male_c"
 				}
 			},
 			{
@@ -4212,7 +4739,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -4349,12 +4876,10 @@ return function ()
 					"zealot_male_b",
 					"zealot_female_c",
 					"zealot_male_c",
-					"adamant_male_a",
-					"adamant_female_a",
-					"adamant_male_b",
 					"adamant_female_b",
-					"adamant_male_c",
-					"adamant_female_c"
+					"adamant_male_b",
+					"adamant_female_c",
+					"adamant_male_c"
 				}
 			},
 			{
@@ -4368,7 +4893,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -4505,12 +5030,10 @@ return function ()
 					"zealot_male_b",
 					"zealot_female_c",
 					"zealot_male_c",
-					"adamant_male_a",
-					"adamant_female_a",
-					"adamant_male_b",
 					"adamant_female_b",
-					"adamant_male_c",
-					"adamant_female_c"
+					"adamant_male_b",
+					"adamant_female_c",
+					"adamant_male_c"
 				}
 			},
 			{
@@ -4524,7 +5047,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",

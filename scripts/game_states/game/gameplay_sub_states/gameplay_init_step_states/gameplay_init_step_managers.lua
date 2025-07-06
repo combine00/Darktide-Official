@@ -6,6 +6,7 @@ local ChunkLodManager = require("scripts/managers/chunk_lod/chunk_lod_manager")
 local CinematicManager = require("scripts/managers/cinematic/cinematic_manager")
 local CircumstanceManager = require("scripts/managers/circumstance/circumstance_manager")
 local CollectiblesManager = require("scripts/managers/collectibles/collectibles_manager")
+local CompanionInteractionsManager = require("scripts/managers/companion/companion_interactions_manager")
 local HavocManager = require("scripts/managers/havoc/havoc_manager")
 local DecalManager = require("scripts/managers/decal/decal_manager")
 local DifficultyManager = require("scripts/managers/difficulty/difficulty_manager")
@@ -106,6 +107,7 @@ function GameplayInitStepManagers:_init_state_managers(world, physics_world, nav
 	Managers.state.mutator = MutatorManager:new(is_server, nav_world, network_event_delegate, circumstance_name, level_seed)
 	Managers.state.world_interaction = WorldInteractionManager:new(world)
 	Managers.state.emote = EmoteManager:new(is_server, network_event_delegate)
+	Managers.state.companion_interaction = CompanionInteractionsManager:new(is_server, network_event_delegate)
 	Managers.state.collectibles = CollectiblesManager:new(is_server, network_event_delegate)
 end
 

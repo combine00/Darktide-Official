@@ -332,7 +332,7 @@ function PacingManager:spawn_type_enabled(spawn_type)
 		return false, "paused"
 	end
 
-	if not self._allowed_spawn_types or not self._allowed_spawn_types[spawn_type] then
+	if not self._allowed_spawn_types or not self._allowed_spawn_types[spawn_type] and not self._use_heat then
 		return false, "not_allowed"
 	end
 

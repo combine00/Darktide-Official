@@ -18,7 +18,8 @@ local dialogue_breed_settings = {
 		"tertium_noble",
 		"cargo_pilot",
 		"travelling_salesman",
-		"commissar"
+		"commissar",
+		"adamant_officer"
 	}
 }
 dialogue_breed_settings.voice_classes_npc = dialogue_breed_settings.voice_classes_2d
@@ -203,7 +204,13 @@ dialogue_breed_settings.human = {
 		"zealot_female_c",
 		"zealot_male_a",
 		"zealot_male_b",
-		"zealot_male_c"
+		"zealot_male_c",
+		"adamant_male_a",
+		"adamant_male_b",
+		"adamant_male_c",
+		"adamant_female_a",
+		"adamant_female_b",
+		"adamant_female_c"
 	}
 }
 dialogue_breed_settings.mission_giver = {
@@ -245,7 +252,8 @@ dialogue_breed_settings.mission_giver = {
 		"travelling_salesman_b",
 		"travelling_salesman_c",
 		"cargo_pilot_a",
-		"commissar_a"
+		"commissar_a",
+		"adamant_officer_a"
 	}
 }
 dialogue_breed_settings.sergeant = {
@@ -350,15 +358,21 @@ dialogue_breed_settings.purser = {
 		zealot_male_b = "likes_character",
 		zealot_male_c = "likes_character",
 		veteran_male_c = "likes_character",
+		adamant_female_c = "likes_character",
+		adamant_female_a = "likes_character",
+		adamant_male_b = "likes_character",
 		psyker_female_b = "likes_character",
+		adamant_male_c = "likes_character",
 		psyker_female_a = "likes_character",
+		adamant_female_b = "likes_character",
 		psyker_male_a = "likes_character",
 		zealot_female_a = "likes_character",
 		veteran_female_a = "likes_character",
 		zealot_female_b = "likes_character",
 		psyker_male_c = "likes_character",
 		veteran_male_a = "likes_character",
-		veteran_female_b = "likes_character"
+		veteran_female_b = "likes_character",
+		adamant_male_a = "likes_character"
 	}
 }
 dialogue_breed_settings.interrogator = {
@@ -415,15 +429,21 @@ dialogue_breed_settings.boon_vendor = {
 		zealot_male_b = "likes_character",
 		veteran_male_c = "dislikes_character",
 		veteran_female_c = "dislikes_character",
+		adamant_female_c = "likes_character",
+		adamant_female_a = "likes_character",
+		adamant_male_b = "likes_character",
 		psyker_female_b = "dislikes_character",
+		adamant_male_c = "likes_character",
 		psyker_female_a = "dislikes_character",
+		adamant_female_b = "likes_character",
 		psyker_male_a = "dislikes_character",
 		zealot_female_a = "likes_character",
 		veteran_female_a = "likes_character",
 		ogryn_c = "likes_character",
 		psyker_male_c = "dislikes_character",
 		veteran_male_a = "likes_character",
-		veteran_female_b = "dislikes_character"
+		veteran_female_b = "dislikes_character",
+		adamant_male_a = "likes_character"
 	}
 }
 dialogue_breed_settings.tertium_noble = {
@@ -753,6 +773,7 @@ dialogue_breed_settings.renegade_twin_captain = {
 	vo_triggers_enemy_kill_query = true,
 	dialogue_memory_faction_name = "enemy",
 	vo_class_name = "captain_twin_male",
+	prop_name = "voice_over_2d",
 	spawn_vo_event = "taunt",
 	wwise_voice_switch_group = "switch_voice_enemy_captain",
 	wwise_voices = {
@@ -849,6 +870,23 @@ dialogue_breed_settings.renegade_flamer = {
 	wwise_voice_switch_group = "switch_voice_enemy_traitor_flamer",
 	wwise_voices = {
 		"enemy_traitor_guard_flamer_a"
+	}
+}
+dialogue_breed_settings.renegade_flamer_mutator = {
+	trigger_seen_vo = true,
+	vo_class_name = "renegade_flamer",
+	trigger_heard_vo = false,
+	is_network_synced = false,
+	has_dialogue_extension = true,
+	vo_triggers_enemy_kill_query = true,
+	dialogue_memory_faction_name = "enemy",
+	spawn_vo_event = "spawned",
+	wwise_voice_switch_group = "switch_voice_enemy_traitor_flamer_mutator",
+	wwise_voices = {
+		"enemy_traitor_guard_flamer_a",
+		"enemy_traitor_guard_flamer_mutator_b",
+		"enemy_traitor_guard_flamer_mutator_c",
+		"enemy_traitor_guard_flamer_mutator_d"
 	}
 }
 dialogue_breed_settings.unknown_breed_name = {
@@ -1011,15 +1049,21 @@ dialogue_breed_settings.contract_vendor = {
 		zealot_male_b = "dislikes_character",
 		zealot_male_c = "dislikes_character",
 		veteran_male_c = "dislikes_character",
+		adamant_female_c = "likes_character",
+		adamant_female_a = "likes_character",
+		adamant_male_b = "likes_character",
 		psyker_female_b = "dislikes_character",
+		adamant_male_c = "likes_character",
 		psyker_female_a = "likes_character",
+		adamant_female_b = "likes_character",
 		psyker_male_a = "likes_character",
 		zealot_female_a = "likes_character",
 		veteran_female_a = "likes_character",
 		zealot_female_b = "dislikes_character",
 		psyker_male_c = "likes_character",
 		veteran_male_a = "likes_character",
-		veteran_female_b = "dislikes_character"
+		veteran_female_b = "dislikes_character",
+		adamant_male_a = "likes_character"
 	}
 }
 dialogue_breed_settings.credit_store_servitor = {
@@ -1065,15 +1109,21 @@ dialogue_breed_settings.training_ground_psyker = {
 		zealot_male_b = "dislikes_character",
 		zealot_female_b = "dislikes_character",
 		veteran_female_c = "likes_character",
+		adamant_female_c = "dislikes_character",
+		adamant_female_a = "dislikes_character",
+		adamant_male_b = "dislikes_character",
 		psyker_female_b = "likes_character",
+		adamant_male_c = "dislikes_character",
 		psyker_female_a = "likes_character",
+		adamant_female_b = "dislikes_character",
 		psyker_male_a = "likes_character",
 		zealot_female_a = "dislikes_character",
 		veteran_female_a = "dislikes_character",
 		ogryn_c = "dislikes_character",
 		psyker_male_c = "likes_character",
 		veteran_male_a = "dislikes_character",
-		veteran_female_b = "dislikes_character"
+		veteran_female_b = "dislikes_character",
+		adamant_male_a = "dislikes_character"
 	}
 }
 dialogue_breed_settings.medicae_servitor = {
@@ -1199,12 +1249,15 @@ dialogue_breed_settings.past = {
 	prop_name = "voice_over_2d",
 	wwise_voice_switch_group = "voice_profile",
 	wwise_voices = {
+		"fx",
+		"past_alpha_a",
 		"past_armourer_a",
 		"past_auspex_operator_a",
 		"past_brother_a",
 		"past_cartel_tough_a",
 		"past_cartel_tough_c",
 		"past_enemy_nemesis_wolfer_a",
+		"past_enginseer_a",
 		"past_explicator_a",
 		"past_explicator_b",
 		"past_interrogator_a",
@@ -1215,14 +1268,17 @@ dialogue_breed_settings.past = {
 		"past_legion_trooper_b",
 		"past_legion_trooper_c",
 		"past_magos_biologis_a",
+		"past_matriarch_a",
+		"past_mourningstar_officer_a",
 		"past_ragged_king_a",
 		"past_sergeant_a",
+		"past_shipmistress_a",
+		"past_tech_priest_a",
 		"past_tertium_enforcer_a",
 		"past_tertium_enforcer_b",
 		"past_world_eater_a",
 		"past_young_explicator_a",
-		"past_young_sergeant_a",
-		"fx"
+		"past_young_sergeant_a"
 	}
 }
 dialogue_breed_settings.cargo_pilot = {
@@ -1266,6 +1322,58 @@ dialogue_breed_settings.commissar = {
 	wwise_voices = {
 		"commissar_a"
 	}
+}
+dialogue_breed_settings.adamant_officer = {
+	trigger_seen_vo = false,
+	vo_class_name = "adamant_officer",
+	trigger_heard_vo = false,
+	is_network_synced = true,
+	has_dialogue_extension = true,
+	vo_triggers_enemy_kill_query = false,
+	dialogue_memory_faction_name = "npc",
+	prop_name = "voice_over_2d",
+	wwise_voice_switch_group = "voice_profile",
+	wwise_voices = {
+		"adamant_officer_a"
+	},
+	opinion_settings = {
+		ogryn_c = "dislikes_character",
+		veteran_male_b = "dislikes_character",
+		zealot_female_c = "dislikes_character",
+		psyker_male_b = "dislikes_character",
+		ogryn_a = "dislikes_character",
+		psyker_female_c = "dislikes_character",
+		ogryn_b = "dislikes_character",
+		zealot_male_a = "dislikes_character",
+		veteran_female_c = "dislikes_character",
+		zealot_male_b = "dislikes_character",
+		zealot_male_c = "dislikes_character",
+		veteran_male_c = "dislikes_character",
+		adamant_female_c = "likes_character",
+		adamant_female_a = "likes_character",
+		adamant_male_b = "likes_character",
+		psyker_female_b = "dislikes_character",
+		adamant_male_c = "likes_character",
+		psyker_female_a = "dislikes_character",
+		adamant_female_b = "likes_character",
+		psyker_male_a = "dislikes_character",
+		zealot_female_a = "dislikes_character",
+		veteran_female_a = "dislikes_character",
+		zealot_female_b = "dislikes_character",
+		psyker_male_c = "dislikes_character",
+		veteran_male_a = "dislikes_character",
+		veteran_female_b = "dislikes_character",
+		adamant_male_a = "likes_character"
+	}
+}
+dialogue_breed_settings.companion_dog = {
+	trigger_seen_vo = true,
+	vo_class_name = "companion_dog",
+	trigger_heard_vo = true,
+	is_network_synced = false,
+	has_dialogue_extension = false,
+	vo_triggers_enemy_kill_query = true,
+	dialogue_memory_faction_name = "npc"
 }
 
 return settings("DialogueBreedSettings", dialogue_breed_settings)

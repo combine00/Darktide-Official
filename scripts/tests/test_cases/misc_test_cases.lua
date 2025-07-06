@@ -503,7 +503,8 @@ function MiscTestCases.play_all_vfx(case_settings)
 			"content/fx/particles/weapons/swords/powersword_1h_activate_mesh_loop",
 			"content/fx/particles/weapons/swords/powersword_1h_activate_mesh",
 			"content/fx/particles/weapons/swords/powersword_2h/powersword_2h_activate_mesh_loop",
-			"content/fx/particles/weapons/swords/powersword_2h/powersword_2h_activate_mesh"
+			"content/fx/particles/weapons/swords/powersword_2h/powersword_2h_activate_mesh",
+			"content/fx/particles/weapons/shields/arbites_shield_chargeup_lightnings_01"
 		}
 
 		if TestifySnippets.is_debug_stripped() or BUILD == "release" then

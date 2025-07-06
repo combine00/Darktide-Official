@@ -11,14 +11,14 @@ function ShadingEnvironmentVolume:enable(unit)
 		self._extension = environment_extension
 		local fade_in_distance = self:get_data(unit, "fade_in_distance")
 		local blend_layer = self:get_data(unit, "blend_layer")
-		local override = self:get_data(unit, "override")
+		local blend_mask = self:get_data(unit, "blend_mask")
 		local shading_environment = self:get_data(unit, "shading_environment")
 		local shading_environment_slot_string = self:get_data(unit, "shading_environment_slot")
 		local shading_environment_slot = tonumber(shading_environment_slot_string)
 		local start_enabled = self:get_data(unit, "start_enabled")
 
 		if shading_environment and shading_environment ~= "" then
-			environment_extension:setup_from_component(fade_in_distance, blend_layer, override, shading_environment, shading_environment_slot, start_enabled)
+			environment_extension:setup_from_component(fade_in_distance, blend_layer, blend_mask, shading_environment, shading_environment_slot, start_enabled)
 		else
 			Log.warning("ShadingEnvironmentVolume", "[Unit: %s, %s] A ShadingEnvironmentVolume is missing a ShadingEnvironment", unit, Unit.id_string(unit))
 		end
@@ -117,7 +117,20 @@ ShadingEnvironmentVolume.component_data = {
 	override = {
 		ui_type = "check_box",
 		value = false,
-		ui_name = "Override:"
+		ui_name = "Override: (Deprecated)"
+	},
+	blend_mask = {
+		value = "ALL",
+		ui_type = "combo_box",
+		ui_name = "Blend Mask:",
+		options_keys = {
+			"ALL",
+			"OVERRIDES"
+		},
+		options_values = {
+			"ALL",
+			"OVERRIDES"
+		}
 	},
 	shading_environment = {
 		ui_type = "resource",

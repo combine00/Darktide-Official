@@ -160,9 +160,9 @@ local function generate_base_template()
 		action_wield = {
 			kind = "wield",
 			uninterruptible = true,
-			weapon_handling_template = "time_scale_1_5",
+			weapon_handling_template = "time_scale_1",
 			anim_event_3p = "to_grenade_stumm",
-			anim_event = "to_grenade",
+			anim_event = "equip",
 			total_time = 0.3,
 			conditional_state_to_action_input = {
 				auto_chain = {
@@ -175,7 +175,7 @@ local function generate_base_template()
 				},
 				aim_drone = {
 					action_name = "action_aim_drone",
-					chain_time = 0.1
+					chain_time = 0.2
 				}
 			}
 		},
@@ -194,8 +194,7 @@ local function generate_base_template()
 					action_name = "action_unwield"
 				},
 				release_drone = {
-					action_name = "action_release_drone",
-					chain_time = 0.8
+					action_name = "action_release_drone"
 				},
 				cancel = {
 					action_name = "action_cancel"
@@ -209,11 +208,13 @@ local function generate_base_template()
 		action_instant_aim_drone = {
 			position_finder_module_class_name = "drone_position_finder",
 			uninterruptible = true,
-			anim_end_event = "to_unaim_arc",
+			anim_event = "quick_throw",
 			kind = "position_finder",
+			anim_event_3p = "throw_underhand",
+			anim_end_event = "to_unaim_arc",
 			abort_sprint = true,
 			allowed_during_sprint = true,
-			anim_event = "to_aim_arc",
+			instant_cast = true,
 			prevent_sprint = true,
 			total_time = 0,
 			conditional_state_to_action_input = {
@@ -226,7 +227,7 @@ local function generate_base_template()
 					action_name = "action_unwield"
 				},
 				instant_release_drone = {
-					action_name = "action_release_drone"
+					action_name = "action_instant_release_drone"
 				},
 				cancel = {
 					action_name = "action_cancel"
@@ -239,19 +240,61 @@ local function generate_base_template()
 		},
 		action_release_drone = {
 			position_finder_module_class_name = "drone_position_finder",
-			spawn_at_time = 0.22,
+			spawn_at_time = 0.4,
 			kind = "spawn_projectile",
-			weapon_handling_template = "grenade_throw",
 			uninterruptible = true,
+			weapon_handling_template = "grenade_throw",
+			anim_end_event = "equip",
 			track_towards_position = true,
-			allowed_during_sprint = false,
+			allowed_during_sprint = true,
 			ability_type = "combat_ability",
 			recoil_template = "default_shotgun_killshot",
-			anim_end_event = "equip",
-			fire_time = 0.25,
+			fire_time = 0.4,
+			vo_tag = "blitz_nuncio_a",
+			abort_sprint = true,
 			use_ability_charge = true,
 			anim_event = "throw_underhand",
-			total_time = 0.67,
+			prevent_sprint = true,
+			total_time = 1.3,
+			conditional_state_to_action_input = {
+				auto_chain = {
+					input_name = "unwield_to_previous"
+				}
+			},
+			allowed_chain_actions = {
+				unwield_to_previous = {
+					action_name = "action_unwield_to_previous"
+				},
+				wield = {
+					action_name = "action_unwield"
+				}
+			},
+			spawn_offset = Vector3Box(0.5, -0.2, -0.2),
+			anim_end_event_condition_func = function (unit, data, end_reason)
+				local ability_extension = ScriptUnit.has_extension(unit, "ability_system")
+				local ability_type = "combat_ability"
+
+				return ability_extension and ability_extension:can_use_ability(ability_type)
+			end
+		},
+		action_instant_release_drone = {
+			position_finder_module_class_name = "drone_position_finder",
+			spawn_at_time = 0.22,
+			kind = "spawn_projectile",
+			uninterruptible = true,
+			weapon_handling_template = "grenade_throw",
+			anim_end_event = "equip",
+			track_towards_position = true,
+			allowed_during_sprint = true,
+			ability_type = "combat_ability",
+			recoil_template = "default_shotgun_killshot",
+			fire_time = 0.25,
+			vo_tag = "blitz_nuncio_a",
+			abort_sprint = true,
+			use_ability_charge = true,
+			anim_event = "throw_underhand",
+			prevent_sprint = true,
+			total_time = 1,
 			conditional_state_to_action_input = {
 				auto_chain = {
 					input_name = "unwield_to_previous"
@@ -311,9 +354,15 @@ local function generate_base_template()
 	base_template.keywords = {
 		"adamant"
 	}
+	base_template.conditional_state_to_action_input = {
+		{
+			conditional_state = "no_running_action",
+			input_name = "cancel"
+		}
+	}
 	base_template.smart_targeting_template = SmartTargetingTemplates.default_melee
 	base_template.anim_state_machine_3p = "content/characters/player/human/third_person/animations/grenade"
-	base_template.anim_state_machine_1p = "content/characters/player/human/first_person/animations/grenade_equipable_stumm"
+	base_template.anim_state_machine_1p = "content/characters/player/human/first_person/animations/adamant_drone"
 	base_template.spread_template = "lasgun"
 	base_template.ammo_template = "no_ammo"
 	base_template.hud_configuration = {

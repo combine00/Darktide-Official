@@ -158,7 +158,7 @@ return function ()
 				"query_context",
 				"trigger_id",
 				OP.EQ,
-				"combat_ability_psyker_1"
+				"combat_ability_adamant_1"
 			},
 			{
 				"user_context",
@@ -2544,7 +2544,7 @@ return function ()
 				"query_context",
 				"trigger_id",
 				OP.EQ,
-				"disabled_trigger"
+				"adamant_companion_targeting"
 			},
 			{
 				"user_context",

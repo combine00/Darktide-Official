@@ -53,6 +53,14 @@ character_name.offset = {
 	195,
 	1
 }
+local archetype_not_available = table.clone(UIFontSettings.body)
+archetype_not_available.text_horizontal_alignment = "center"
+archetype_not_available.offset = {
+	0,
+	420,
+	1
+}
+archetype_not_available.text_color = Color.terminal_text_warning_light(255, true)
 local character_title_style = table.clone(UIFontSettings.body)
 character_title_style.text_horizontal_alignment = "center"
 character_title_style.offset = {
@@ -587,6 +595,13 @@ local widget_definitions = {
 			pass_type = "text",
 			value = "Reject",
 			style = character_title_style
+		},
+		{
+			value_id = "archetype_not_available",
+			style_id = "archetype_not_available",
+			pass_type = "text",
+			value = "",
+			style = archetype_not_available
 		}
 	}, "character_info"),
 	character_list_background = UIWidget.create_definition({

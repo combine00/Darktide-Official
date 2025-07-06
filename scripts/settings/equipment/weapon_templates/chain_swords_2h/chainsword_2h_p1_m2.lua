@@ -33,6 +33,7 @@ local weapon_template = {
 	action_inputs = table.clone(MeleeActionInputSetupMid.action_inputs),
 	action_input_hierarchy = table.clone(MeleeActionInputSetupMid.action_input_hierarchy)
 }
+weapon_template.action_inputs.wield.buffer_time = 0.4
 local _force_abort_breed_tags_special_active = {
 	"elite",
 	"special",
@@ -1419,9 +1420,9 @@ weapon_template.actions = {
 		},
 		damage_profile = DamageProfileTemplates.smiter_light_chainsword_2h,
 		damage_type = damage_types.sawing_2h,
-		damage_profile_on_abort = DamageProfileTemplates.light_chainsword_2h_push_follow,
+		damage_profile_on_abort = DamageProfileTemplates.light_chainsword_2h_smiter_push_follow,
 		damage_type_on_abort = damage_types.sawing_2h,
-		damage_profile_special_active = DamageProfileTemplates.light_chainsword_active_2h_push_follow,
+		damage_profile_special_active = DamageProfileTemplates.light_chainsword_active_2h_smiter_push_follow,
 		damage_type_special_active = damage_types.sawing_stuck,
 		force_abort_breed_tags = _force_abort_breed_tags_quick,
 		force_abort_breed_tags_special_active = _force_abort_breed_tags_special_active,

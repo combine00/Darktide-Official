@@ -233,6 +233,7 @@ minion_difficulty_settings.health = {
 	cultist_captain = _roamer_health_steps(14000),
 	cultist_flamer = _special_health_steps(700),
 	renegade_flamer = _special_health_steps(700),
+	renegade_flamer_mutator = _special_health_steps(700),
 	cultist_grenadier = _special_health_steps(500),
 	renegade_grenadier = _special_health_steps(375),
 	renegade_sniper = _special_health_steps(250),
@@ -257,7 +258,8 @@ minion_difficulty_settings.health = {
 	cultist_melee = _roamer_health_steps(275),
 	cultist_assault = _roamer_health_steps(200),
 	cultist_shocktrooper = _elite_health_steps(500),
-	cultist_gunner = _elite_health_steps(700)
+	cultist_gunner = _elite_health_steps(700),
+	companion_dog = _roamer_health_steps(700)
 }
 minion_difficulty_settings.hit_mass = {
 	chaos_hound_mutator = 2,

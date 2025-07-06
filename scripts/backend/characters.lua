@@ -205,6 +205,20 @@ function Characters:get_narrative(character_id)
 	end)
 end
 
+function Characters:get_missions(character_id)
+	return self:get_data(character_id, "narrative|missions"):next(function (response)
+		local data = _process_narrative(response.body.data)
+
+		return data and data.missions or {}
+	end)
+end
+
+function Characters:set_mission(character_id, event_name, is_completed)
+	return self:set_data(character_id, "narrative|missions", {
+		[event_name] = is_completed ~= false and "true" or "false"
+	})
+end
+
 function Characters:set_narrative_story_chapter(character_id, story_name, chapter_id)
 	return self:set_data(character_id, "narrative|stories", {
 		[story_name] = chapter_id
@@ -248,16 +262,18 @@ function Characters:get_data(character_id, section, part, optional_account_id)
 	end)
 end
 
-function Characters:check_name(name)
-	return Managers.backend:title_request("/data/characters/names/check", {
-		method = "POST",
-		body = {
-			names = {
-				name
-			}
-		}
+function Characters:check_name(name, name_type)
+	local sanitized_name = Http.url_encode(name)
+	local url = BackendUtilities.url_builder("/data/characters/name/" .. sanitized_name .. "/check")
+
+	if name_type then
+		url:query("nameType", name_type)
+	end
+
+	return Managers.backend:title_request(url:to_string(), {
+		method = "GET"
 	}):next(function (data)
-		return data.body.results[1]
+		return data.body
 	end)
 end
 

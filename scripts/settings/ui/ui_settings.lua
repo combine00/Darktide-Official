@@ -77,7 +77,7 @@ local ui_settings = {
 		1000,
 		2000
 	},
-	ITEM_TYPES = table.enum("BODY_TATTOO", "BOON", "CHARACTER_INSIGNIA", "CHARACTER_TITLE", "DEVICE", "EMOTE", "END_OF_ROUND", "EYE_COLOR", "FACE_HAIR", "FACE_SCAR", "FACE_TATTOO", "FACE", "GADGET", "GEAR_EXTRA_COSMETIC", "GEAR_HEAD", "GEAR_LOWERBODY", "GEAR_UPPERBODY", "HAIR_COLOR", "HAIR", "LUGGABLE", "PERK", "POCKETABLE", "PORTRAIT_FRAME", "SET", "SKIN_COLOR", "TRAIT", "WEAPON_MELEE", "WEAPON_RANGED", "WEAPON_SKIN", "WEAPON_TRINKET"),
+	ITEM_TYPES = table.enum("BODY_TATTOO", "BOON", "CHARACTER_INSIGNIA", "CHARACTER_TITLE", "DEVICE", "EMOTE", "END_OF_ROUND", "EYE_COLOR", "FACE_HAIR", "FACE_SCAR", "FACE_TATTOO", "FACE", "GADGET", "GEAR_EXTRA_COSMETIC", "GEAR_HEAD", "GEAR_LOWERBODY", "GEAR_UPPERBODY", "HAIR_COLOR", "HAIR", "LUGGABLE", "PERK", "POCKETABLE", "PORTRAIT_FRAME", "SET", "SKIN_COLOR", "TRAIT", "WEAPON_MELEE", "WEAPON_RANGED", "WEAPON_SKIN", "WEAPON_TRINKET", "COMPANION_GEAR_FULL"),
 	item_type_group_lookup = {
 		GEAR_LOWERBODY = "outfits",
 		BOON = "boons",
@@ -89,6 +89,7 @@ local ui_settings = {
 		WEAPON_TRINKET = "weapon_trinket",
 		WEAPON_MELEE = "weapons",
 		DEVICE = "devices",
+		COMPANION_GEAR_FULL = "outfits",
 		CHARACTER_TITLE = "titles",
 		SET = "outfits",
 		GEAR_HEAD = "outfits",
@@ -138,41 +139,43 @@ local ui_settings = {
 		WEAPON_SKIN = 0,
 		FACE_TATTOO = 0,
 		CHARACTER_INSIGNIA = 0,
-		LUGGABLE = 0
+		LUGGABLE = 0,
+		COMPANION_GEAR_FULL = 0
 	},
 	item_type_localization_lookup = {
-		END_OF_ROUND = "loc_item_type_end_of_round",
+		GADGET = "loc_item_type_gadget",
 		BOON = "loc_item_type_boon",
 		EMOTE = "loc_item_type_emote",
-		FACE = "loc_item_type_face",
-		GEAR_LOWERBODY = "loc_item_type_gear_lowerbody",
-		WEAPON_RANGED = "loc_item_type_weapon_ranged",
+		CHARACTER_TITLE = "loc_item_type_title",
+		PORTRAIT_FRAME = "loc_item_type_portrait_frame",
+		GEAR_EXTRA_COSMETIC = "loc_item_type_gear_extra_cosmetic",
 		HAIR = "loc_item_type_hair",
 		BODY_TATTOO = "loc_item_type_body_tattoo",
-		GEAR_EXTRA_COSMETIC = "loc_item_type_gear_extra_cosmetic",
-		PORTRAIT_FRAME = "loc_item_type_portrait_frame",
+		WEAPON_MELEE = "loc_item_type_weapon_melee",
+		SKIN = "loc_item_type_skin",
 		TRAIT = "loc_item_type_trait",
-		BUNDLE = "loc_item_type_bundle",
+		PERK = "loc_item_type_perk",
 		DEVICE = "loc_item_type_device",
 		POCKETABLE = "loc_item_type_pocketable",
-		FACE_HAIR = "loc_item_type_face_hair",
-		CHARACTER_TITLE = "loc_item_type_title",
-		HAIR_COLOR = "loc_item_type_hair_color",
-		SKIN = "loc_item_type_skin",
-		EYE_COLOR = "loc_item_type_eye_color",
 		SKIN_COLOR = "loc_item_type_skin_color",
-		PERK = "loc_item_type_perk",
-		SET = "loc_item_type_set",
+		END_OF_ROUND = "loc_item_type_end_of_round",
+		COMPANION_GEAR_FULL = "loc_inventory_title_slot_companion_gear_full",
+		EYE_COLOR = "loc_item_type_eye_color",
 		FACE_SCAR = "loc_item_type_face_scar",
-		WEAPON_MELEE = "loc_item_type_weapon_melee",
-		GEAR_HEAD = "loc_item_type_gear_head",
-		GADGET = "loc_item_type_gadget",
-		GEAR_UPPERBODY = "loc_item_type_gear_upperbody",
+		FACE = "loc_item_type_face",
+		WEAPON_TRINKET = "loc_item_type_trinket",
 		WEAPON_SKIN = "loc_item_type_weapon_skin",
 		FACE_TATTOO = "loc_item_type_face_tattoo",
-		CHARACTER_INSIGNIA = "loc_item_type_character_insignia",
 		LUGGABLE = "loc_item_type_luggable",
-		WEAPON_TRINKET = "loc_item_type_trinket"
+		GEAR_LOWERBODY = "loc_item_type_gear_lowerbody",
+		WEAPON_RANGED = "loc_item_type_weapon_ranged",
+		BUNDLE = "loc_item_type_bundle",
+		FACE_HAIR = "loc_item_type_face_hair",
+		GEAR_UPPERBODY = "loc_item_type_gear_upperbody",
+		HAIR_COLOR = "loc_item_type_hair_color",
+		SET = "loc_item_type_set",
+		GEAR_HEAD = "loc_item_type_gear_head",
+		CHARACTER_INSIGNIA = "loc_item_type_character_insignia"
 	},
 	item_type_texture_lookup = {
 		GEAR_LOWERBODY = "content/ui/textures/icons/item_types/lower_bodies",
@@ -190,6 +193,7 @@ local ui_settings = {
 		FACE_HAIR = "content/ui/textures/icons/item_types/facial_hair_styles",
 		GEAR_UPPERBODY = "content/ui/textures/icons/item_types/upper_bodies",
 		HAIR_COLOR = "content/ui/textures/icons/item_types/hair_styles",
+		COMPANION_GEAR_FULL = "content/ui/textures/icons/item_types/companion_gear_full",
 		EYE_COLOR = "content/ui/textures/icons/item_types/eye_colors",
 		SET = "content/ui/textures/icons/item_types/outfits",
 		FACE_SCAR = "content/ui/textures/icons/item_types/scars",
@@ -217,6 +221,7 @@ local ui_settings = {
 		HAIR_COLOR = "content/ui/materials/icons/item_types/hair_styles",
 		WEAPON_TRINKET = "content/ui/materials/icons/item_types/weapon_trinkets",
 		EYE_COLOR = "content/ui/materials/icons/item_types/eye_color",
+		COMPANION_GEAR_FULL = "content/ui/materials/icons/item_types/companion_gear_full",
 		SET = "content/ui/materials/icons/item_types/outfits",
 		FACE_SCAR = "content/ui/materials/icons/item_types/scars",
 		FACE = "content/ui/materials/icons/item_types/face_types",
@@ -232,6 +237,7 @@ local ui_settings = {
 		graia = "loc_item_pattern_graia"
 	},
 	item_store_categories = {
+		"companion_gear_full",
 		"boons",
 		"devices",
 		"emotes",
@@ -243,25 +249,28 @@ local ui_settings = {
 	texture_by_store_category = {
 		emotes = "content/ui/materials/icons/item_types/emotes",
 		weapons = "content/ui/materials/icons/item_types/weapons",
-		devices = "content/ui/materials/icons/item_types/devices",
 		nameplates = "content/ui/materials/icons/item_types/nameplates",
+		boons = "content/ui/materials/icons/item_types/boons",
+		devices = "content/ui/materials/icons/item_types/devices",
 		outfits = "content/ui/materials/icons/item_types/outfits",
 		poses = "content/ui/materials/icons/item_types/poses",
-		boons = "content/ui/materials/icons/item_types/boons"
+		companion_gear_full = "content/ui/materials/icons/item_types/companion_gear_full"
 	},
 	display_name_by_store_category = {
 		emotes = "loc_store_category_display_name_emotes",
 		weapons = "loc_store_category_display_name_weapons",
-		devices = "loc_store_category_display_name_devices",
 		nameplates = "loc_store_category_display_name_nameplates",
+		boons = "loc_store_category_display_name_boons",
+		devices = "loc_store_category_display_name_devices",
 		outfits = "loc_store_category_display_name_outfits",
 		poses = "loc_store_category_display_name_poses",
-		boons = "loc_store_category_display_name_boons"
+		companion_gear_full = "loc_store_category_display_name_archetype_specific"
 	},
 	store_category_sort_order = {
 		emotes = 6,
 		weapons = 1,
 		devices = 2,
+		companion_gear_full = 8,
 		nameplates = 4,
 		outfits = 3,
 		poses = 5,
@@ -488,17 +497,25 @@ ui_settings.digital_clock_numbers = {
 }
 ui_settings.archetype_font_icon = {
 	psyker = "",
+	adamant = "",
+	ogryn = "",
 	veteran = "",
-	zealot = "",
-	ogryn = ""
+	zealot = ""
 }
 ui_settings.archetype_font_icon_simple = {
 	psyker = "",
+	adamant = "",
+	ogryn = "",
 	veteran = "",
-	zealot = "",
-	ogryn = ""
+	zealot = ""
 }
 ui_settings.inventory_frames_by_archetype = {
+	adamant = {
+		right_upper = "content/ui/materials/frames/screen/adamant_01_upper_right",
+		left_lower = "content/ui/materials/frames/screen/adamant_01_lower_left",
+		right_lower = "content/ui/materials/frames/screen/adamant_01_lower_right",
+		left_upper = "content/ui/materials/frames/screen/adamant_01_upper_left"
+	},
 	ogryn = {
 		right_upper = "content/ui/materials/frames/screen/class_ogryn_01_upper_right",
 		left_lower = "content/ui/materials/frames/screen/class_ogryn_01_lower_left",
@@ -695,6 +712,34 @@ ui_settings.weapon_patterns = {
 			{
 				item = "content/items/weapons/player/ranged/shotgun_p2_m1",
 				name = "shotgun_p2_m1"
+			}
+		}
+	},
+	shotgun_p4 = {
+		overview_icon_texture_complete = "content/ui/textures/icons/weapons/masteries/shotgun_p4_m1_complete",
+		display_name = "loc_weapon_family_shotgun_p4_m1",
+		overview_icon_texture = "content/ui/textures/icons/weapons/masteries/shotgun_p4_m1",
+		overview_icon_texture_mask = "content/ui/textures/icons/weapons/masteries/shotgun_p4_m1_mask",
+		marks = {
+			{
+				item = "content/items/weapons/player/ranged/shotgun_p4_m1",
+				name = "shotgun_p4_m1"
+			},
+			{
+				item = "content/items/weapons/player/ranged/shotgun_p4_m2",
+				name = "shotgun_p4_m2"
+			}
+		}
+	},
+	shotpistol_shield_p1 = {
+		overview_icon_texture_complete = "content/ui/textures/icons/weapons/masteries/shield_shotpistol_p1_m1_complete",
+		display_name = "loc_weapon_family_shotpistol_shield_p1_m1",
+		overview_icon_texture = "content/ui/textures/icons/weapons/masteries/shield_shotpistol_p1_m1",
+		overview_icon_texture_mask = "content/ui/textures/icons/weapons/masteries/shield_shotpistol_p1_m1_mask",
+		marks = {
+			{
+				item = "content/items/weapons/player/ranged/shotpistol_shield_p1_m1",
+				name = "shotpistol_shield_p1_m1"
 			}
 		}
 	},
@@ -1103,6 +1148,34 @@ ui_settings.weapon_patterns = {
 			{
 				item = "content/items/weapons/player/melee/powermaul_p1_m2",
 				name = "powermaul_p1_m2"
+			}
+		}
+	},
+	powermaul_p2 = {
+		overview_icon_texture_complete = "content/ui/textures/icons/weapons/masteries/powermaul_p2_m1_complete",
+		display_name = "loc_weapon_family_powermaul_p2_m1",
+		overview_icon_texture = "content/ui/textures/icons/weapons/masteries/powermaul_p2_m1",
+		overview_icon_texture_mask = "content/ui/textures/icons/weapons/masteries/powermaul_p2_m1_mask",
+		marks = {
+			{
+				item = "content/items/weapons/player/melee/powermaul_p2_m1",
+				name = "powermaul_p2_m1"
+			}
+		}
+	},
+	powermaul_shield_p1 = {
+		overview_icon_texture_complete = "content/ui/textures/icons/weapons/masteries/shield_powermaul_p1_m1_complete",
+		display_name = "loc_weapon_family_powermaul_shield_p1_m1",
+		overview_icon_texture = "content/ui/textures/icons/weapons/masteries/shield_powermaul_p1_m1",
+		overview_icon_texture_mask = "content/ui/textures/icons/weapons/masteries/shield_powermaul_p1_m1_mask",
+		marks = {
+			{
+				item = "content/items/weapons/player/melee/powermaul_shield_p1_m1",
+				name = "powermaul_shield_p1_m1"
+			},
+			{
+				item = "content/items/weapons/player/melee/powermaul_shield_p1_m2",
+				name = "powermaul_shield_p1_m2"
 			}
 		}
 	},

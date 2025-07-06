@@ -170,7 +170,7 @@ function FxSystem:update(context, dt, t, ...)
 	FxSystem.super.update(self, context, dt, t, ...)
 end
 
-function FxSystem:_has_running_template_of_name(unit, template_name)
+function FxSystem:has_running_template_of_name(unit, template_name)
 	local running_template_effects = self._running_template_effects
 
 	for i = 1, #running_template_effects do
@@ -447,12 +447,7 @@ function FxSystem:trigger_wwise_event(event_name, optional_position, optional_un
 
 	if optional_position or optional_unit or optional_ambisonics then
 		local event_id = NetworkLookup.sound_events[event_name]
-		local optional_parameter_id = nil
-
-		if optional_parameter_name then
-			optional_parameter_id = NetworkLookup.sound_parameters[optional_parameter_name]
-		end
-
+		local optional_parameter_id = optional_parameter_name and NetworkLookup.sound_parameters[optional_parameter_name]
 		local optional_unit_id = Managers.state.unit_spawner:game_object_id(optional_unit)
 
 		Managers.state.game_session:send_rpc_clients("rpc_trigger_wwise_event", event_id, optional_position, optional_unit_id, optional_node, optional_parameter_id, optional_parameter_value, not not optional_ambisonics)

@@ -7,6 +7,9 @@ local MAX_BATCH_SIZE = TelemetrySettings.batch.max_size
 local BATCH_SIZE = TelemetrySettings.batch.size
 local ENABLED = TelemetrySettings.enabled
 local TelemetryManager = class("TelemetryManager")
+local RPCS_HOST = {
+	"rpc_failed_sending_telemetry"
+}
 
 function TelemetryManager:init()
 	self._events = {}
@@ -20,6 +23,35 @@ function TelemetryManager:init()
 		event_manager:register(self, "event_player_authenticated", "_event_player_authenticated")
 		event_manager:register(self, "event_telemetry_change", "_event_telemetry_change")
 	end
+
+	self._network_event_delegate = Managers.connection:network_event_delegate()
+
+	self._network_event_delegate:register_connection_events(self, unpack(RPCS_HOST))
+end
+
+local log_cache = {}
+
+function TelemetryManager:rpc_failed_sending_telemetry(channel_id, message)
+	local peer_id = Managers.state.game_session:channel_to_peer(channel_id)
+	local account_id = nil
+
+	if peer_id then
+		local players = Managers.player:players_at_peer(peer_id)
+
+		if players then
+			local player = players[1]
+
+			if player then
+				account_id = player:account_id()
+			end
+		end
+	end
+
+	log_cache.peer_id = peer_id or "unknown_peer"
+	log_cache.account_id = account_id or "unknown_player"
+	log_cache.message = message or "no_message"
+
+	Log.warning("TelemetryManager", "Player failed sending telemetry: %s", cjson.encode(log_cache))
 end
 
 function TelemetryManager:update(dt, t)
@@ -123,6 +155,20 @@ function TelemetryManager:post_batch(shutdown)
 	end):catch(function (error)
 		if error.code ~= BackendError.NotInitialized then
 			Log.exception("TelemetryManager", "Error posting batch: %s", error)
+
+			local is_host = Managers.connection and Managers.connection:is_host()
+			local connected_to_host = not is_host and Managers.state.game_session and Managers.state.game_session:connected_to_host()
+
+			if connected_to_host then
+				local error_text = error and tostring(error) or "no_error"
+				local step_size = 500
+
+				for i = 1, string.len(error_text), step_size do
+					local message = string.sub(error_text, i, i + step_size - 1)
+
+					Managers.state.game_session:send_rpc_server("rpc_failed_sending_telemetry", message)
+				end
+			end
 		else
 			Log.info("TelemetryManager", "Error posting batch as we're not logged in")
 		end
@@ -140,6 +186,8 @@ function TelemetryManager:batch_in_flight()
 end
 
 function TelemetryManager:destroy()
+	self._network_event_delegate:unregister_events(unpack(RPCS_HOST))
+
 	local event_manager = Managers.event
 
 	if event_manager then

@@ -5,19 +5,19 @@ local ArchetypeTalents = require("scripts/settings/ability/archetype_talents/arc
 local ArchetypeToughnessTemplates = require("scripts/settings/toughness/archetype_toughness_templates")
 local ArchetypeWarpChargeTemplates = require("scripts/settings/warp_charge/archetype_warp_charge_templates")
 local UiSoundEvents = require("scripts/settings/ui/ui_sound_events")
+local Promise = require("scripts/foundation/utilities/promise")
 local archetype_data = {
 	archetype_description = "loc_class_veteran_description",
-	name = "veteran",
+	archetype_background_large = "content/ui/materials/icons/classes/large/veteran",
 	archetype_icon_selection_large_unselected = "content/ui/materials/icons/classes/veteran_terminal_shadow",
 	talent_layout_file_path = "scripts/ui/views/talent_builder_view/layouts/veteran_tree",
 	archetype_selection_icon = "content/ui/textures/frames/class_selection/windows/class_selection_top_veteran_unselected",
-	archetype_selection_background = "content/ui/materials/backgrounds/info_panels/veteran",
-	archetype_title = "loc_class_veteran_title",
 	archetype_selection_level = "content/levels/ui/class_selection/class_selection_veteran/class_selection_veteran",
+	archetype_title = "loc_class_veteran_title",
+	archetype_selection_background = "content/ui/materials/backgrounds/info_panels/veteran",
 	base_critical_strike_chance = 0.05,
-	archetype_background_large = "content/ui/materials/icons/classes/large/veteran",
-	archetype_badge = "content/ui/materials/icons/class_badges/veteran_01_01",
 	archetype_selection_highlight_icon = "content/ui/textures/frames/class_selection/windows/class_selection_top_veteran",
+	archetype_badge = "content/ui/materials/icons/class_badges/veteran_01_01",
 	archetype_video = "content/videos/class_selection/veteran_2",
 	ui_selection_order = 1,
 	talents_package_path = "packages/ui/views/talent_builder_view/veteran",
@@ -49,7 +49,16 @@ local archetype_data = {
 			item = "content/items/weapons/player/ranged/plasmagun_p1_m1",
 			display_name = "loc_class_selection_unique_weapon_veteran_ranged_1"
 		}
-	}
+	},
+	is_available = function (archetype_ref)
+		return Promise.resolved({
+			available = true,
+			archetype = archetype_ref
+		})
+	end,
+	acquire_callback = function (archetype_ref, on_flow_finished_callback)
+		return
+	end
 }
 
 return archetype_data

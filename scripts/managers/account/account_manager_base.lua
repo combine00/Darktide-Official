@@ -1,4 +1,5 @@
 local AccountManagerBase = class("AccountManagerBase")
+local Promise = require("scripts/foundation/utilities/promise")
 
 function AccountManagerBase:init()
 	return
@@ -126,6 +127,18 @@ end
 
 function AccountManagerBase:region_has_restriction(restriction)
 	return false
+end
+
+function AccountManagerBase:open_to_store(app_id)
+	return Promise.resolved({
+		success = false
+	})
+end
+
+function AccountManagerBase:is_owner_of(app_id)
+	return Promise.resolved({
+		success = false
+	})
 end
 
 return AccountManagerBase

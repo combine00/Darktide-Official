@@ -157,8 +157,8 @@ function BtChaosHoundRoamAction:_start_move_anim(unit, scratchpad, action_data, 
 end
 
 local DEFAULT_RADIUS = {
-	-30,
-	30
+	-15,
+	15
 }
 local NAV_MESH_ABOVE = 5
 local NAV_MESH_BELOW = 5

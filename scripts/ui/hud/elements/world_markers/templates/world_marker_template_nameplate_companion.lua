@@ -28,15 +28,15 @@ template.check_line_of_sight = false
 template.max_distance = 100
 template.screen_clamp = true
 template.screen_margins = {
-	down = 0.23148148148148148,
-	up = 0.23148148148148148,
-	left = 0.234375,
-	right = 0.234375
+	down = 0.09259259259259259,
+	up = 0.09259259259259259,
+	left = 0.052083333333333336,
+	right = 0.052083333333333336
 }
 template.scale_settings = {
 	scale_to = 1,
 	scale_from = 0.8,
-	distance_max = 20,
+	distance_max = 100,
 	distance_min = 10
 }
 
@@ -126,6 +126,14 @@ function template.create_widget_defintion(template, scenegraph_id)
 	}, scenegraph_id)
 end
 
+local function _should_show_nameplate(player, option_type)
+	local player_deleted = player and player.__deleted
+	local is_local_player = not player_deleted and player:peer_id() == Network.peer_id()
+	local show_nameplate = option_type == "all" or option_type == "mine_only" and is_local_player
+
+	return not player_deleted and show_nameplate
+end
+
 local function _get_color_string(data)
 	local player_slot = data:slot()
 	local player_slot_color = UISettings.player_slot_colors[player_slot] or Color.ui_hud_green_light(255, true)
@@ -135,8 +143,15 @@ local function _get_color_string(data)
 end
 
 local function _generate_header_text(data, show_header)
+	if not show_header then
+		return ""
+	end
+
 	local color_string = _get_color_string(data)
-	local companion_text = color_string .. companion_glyph .. "{#reset()} " .. data:name() .. "'s Mastiff"
+	local is_player_blocked = data.is_player_blocked and data:is_player_blocked() or false
+	local companion_name = data:companion_name() or "<Missing Name>"
+	local companion_name_text = not is_player_blocked and companion_name or Localize("loc_blocking_player")
+	local companion_text = color_string .. companion_glyph .. "{#reset()} " .. companion_name_text
 	local header_text = show_header and companion_text or ""
 
 	return header_text
@@ -145,7 +160,21 @@ end
 local function _cb_companion_interface_settings_changed(self, option_type)
 	local marker = self
 	local data = marker.data
-	local header_text = _generate_header_text(data, option_type ~= "none")
+	local show_nameplate = _should_show_nameplate(data, option_type)
+	local header_text = _generate_header_text(data, show_nameplate)
+	local widget = marker.widget
+	local content = widget.content
+	content.header_text = header_text
+end
+
+local function _cb_update_companion_name(self)
+	local marker = self
+	local data = marker.data
+	local save_data = Managers.save:account_data()
+	local interface_settings = save_data.interface_settings
+	local companion_nameplate_in_mission_type = interface_settings.companion_nameplate_in_mission_type
+	local show_nameplate = _should_show_nameplate(data, companion_nameplate_in_mission_type)
+	local header_text = _generate_header_text(data, show_nameplate)
 	local widget = marker.widget
 	local content = widget.content
 	content.header_text = header_text
@@ -153,6 +182,7 @@ end
 
 function template.on_exit(widget, marker)
 	Managers.event:unregister(marker, "event_companion_nameplate_in_mission_setting_changed")
+	Managers.event:unregister(marker, "event_update_player_name")
 end
 
 function template.on_enter(widget, marker)
@@ -161,11 +191,14 @@ function template.on_enter(widget, marker)
 	local save_data = Managers.save:account_data()
 	local interface_settings = save_data.interface_settings
 	local companion_nameplate_in_mission_type = interface_settings.companion_nameplate_in_mission_type
-	local header_text = _generate_header_text(data, companion_nameplate_in_mission_type ~= "none")
+	local show_nameplate = _should_show_nameplate(data, companion_nameplate_in_mission_type)
+	local header_text = _generate_header_text(data, show_nameplate)
 	local color_string = _get_color_string(data)
 	marker.cb_companion_interface_settings_changed = _cb_companion_interface_settings_changed
+	marker.cb_update_companion_name = _cb_update_companion_name
 
 	Managers.event:register(marker, "event_companion_nameplate_in_mission_setting_changed", "cb_companion_interface_settings_changed")
+	Managers.event:register(marker, "event_update_player_name", "cb_update_companion_name")
 
 	content.header_text = header_text
 	content.icon_text = color_string .. companion_glyph .. "{#reset()}"

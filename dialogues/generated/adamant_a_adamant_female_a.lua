@@ -8,9 +8,6 @@ local adamant_a_adamant_female_a = {
 		sound_events_duration = {
 			[1.0] = 5.526656
 		},
-		sound_event_weights = {
-			[1.0] = 1
-		},
 		randomize_indexes = {}
 	},
 	combat_pause_limited_adamant_a_01_b = {
@@ -21,9 +18,6 @@ local adamant_a_adamant_female_a = {
 		},
 		sound_events_duration = {
 			[1.0] = 2.741781
-		},
-		sound_event_weights = {
-			[1.0] = 1
 		},
 		randomize_indexes = {}
 	},
@@ -36,22 +30,16 @@ local adamant_a_adamant_female_a = {
 		sound_events_duration = {
 			[1.0] = 4.087073
 		},
-		sound_event_weights = {
-			[1.0] = 1
-		},
 		randomize_indexes = {}
 	},
 	combat_pause_limited_adamant_a_03_a = {
 		randomize_indexes_n = 0,
 		sound_events_n = 1,
 		sound_events = {
-			[1.0] = "loc_adamant_female_a__combat_pause_limited_adamant_a_01_a_01"
+			[1.0] = "loc_adamant_female_a__combat_pause_limited_adamant_a_03_a_01"
 		},
 		sound_events_duration = {
-			[1.0] = 5.526656
-		},
-		sound_event_weights = {
-			[1.0] = 1
+			[1.0] = 5.782969
 		},
 		randomize_indexes = {}
 	},
@@ -92,13 +80,10 @@ local adamant_a_adamant_female_a = {
 		randomize_indexes_n = 0,
 		sound_events_n = 1,
 		sound_events = {
-			[1.0] = "loc_adamant_female_a__combat_pause_limited_adamant_a_01_a_01"
+			[1.0] = "loc_adamant_female_a__combat_pause_limited_adamant_a_06_a_01"
 		},
 		sound_events_duration = {
-			[1.0] = 5.526656
-		},
-		sound_event_weights = {
-			[1.0] = 1
+			[1.0] = 6.109646
 		},
 		randomize_indexes = {}
 	},
@@ -344,6 +329,50 @@ local adamant_a_adamant_female_a = {
 		},
 		randomize_indexes = {}
 	},
+	combat_pause_limited_bolt_on_a_adamant_a_01_a = {
+		randomize_indexes_n = 0,
+		sound_events_n = 1,
+		sound_events = {
+			[1.0] = "loc_adamant_female_a__combat_pause_limited_bolt_on_a_adamant_a_01_a_01"
+		},
+		sound_events_duration = {
+			[1.0] = 6.781417
+		},
+		randomize_indexes = {}
+	},
+	combat_pause_limited_bolt_on_a_adamant_a_02_a = {
+		randomize_indexes_n = 0,
+		sound_events_n = 1,
+		sound_events = {
+			[1.0] = "loc_adamant_female_a__combat_pause_limited_bolt_on_a_adamant_a_02_a_01"
+		},
+		sound_events_duration = {
+			[1.0] = 3.13125
+		},
+		randomize_indexes = {}
+	},
+	combat_pause_limited_bolt_on_a_adamant_a_03_a = {
+		randomize_indexes_n = 0,
+		sound_events_n = 1,
+		sound_events = {
+			[1.0] = "loc_adamant_female_a__combat_pause_limited_bolt_on_a_adamant_a_03_a_01"
+		},
+		sound_events_duration = {
+			[1.0] = 5.865625
+		},
+		randomize_indexes = {}
+	},
+	combat_pause_limited_bolt_on_a_adamant_a_04_a = {
+		randomize_indexes_n = 0,
+		sound_events_n = 1,
+		sound_events = {
+			[1.0] = "loc_adamant_female_a__combat_pause_limited_bolt_on_a_adamant_a_04_a_01"
+		},
+		sound_events_duration = {
+			[1.0] = 4.607906
+		},
+		randomize_indexes = {}
+	},
 	combat_pause_quirk_adamant_a_trait_01_a = {
 		randomize_indexes_n = 0,
 		sound_events_n = 3,
@@ -353,9 +382,9 @@ local adamant_a_adamant_female_a = {
 			"loc_adamant_female_a__combat_pause_quirk_adamant_a_trait_01_a_03"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678
+			3.80001,
+			3.01249,
+			3.794531
 		},
 		randomize_indexes = {}
 	},
@@ -367,8 +396,8 @@ local adamant_a_adamant_female_a = {
 			[2.0] = "loc_adamant_female_a__combat_pause_quirk_adamant_a_trait_01_b_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 2.576198,
+			[2.0] = 4.818156
 		},
 		randomize_indexes = {}
 	},
@@ -381,9 +410,9 @@ local adamant_a_adamant_female_a = {
 			"loc_adamant_female_a__combat_pause_quirk_adamant_a_trait_02_a_03"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678
+			3.725677,
+			3.669448,
+			4.954208
 		},
 		randomize_indexes = {}
 	},
@@ -395,8 +424,8 @@ local adamant_a_adamant_female_a = {
 			[2.0] = "loc_adamant_female_a__combat_pause_quirk_adamant_a_trait_02_b_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 4.576635,
+			[2.0] = 3.099938
 		},
 		randomize_indexes = {}
 	},
@@ -409,9 +438,9 @@ local adamant_a_adamant_female_a = {
 			"loc_adamant_female_a__combat_pause_quirk_adamant_a_trait_03_a_03"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678
+			5.958719,
+			3.416052,
+			3.205688
 		},
 		randomize_indexes = {}
 	},
@@ -423,8 +452,8 @@ local adamant_a_adamant_female_a = {
 			[2.0] = "loc_adamant_female_a__combat_pause_quirk_adamant_a_trait_03_b_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 5.6895,
+			[2.0] = 4.665906
 		},
 		randomize_indexes = {}
 	},
@@ -437,9 +466,9 @@ local adamant_a_adamant_female_a = {
 			"loc_adamant_female_a__combat_pause_quirk_adamant_a_trait_04_a_03"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678
+			3.546167,
+			3.409281,
+			3.703469
 		},
 		randomize_indexes = {}
 	},
@@ -451,8 +480,8 @@ local adamant_a_adamant_female_a = {
 			[2.0] = "loc_adamant_female_a__combat_pause_quirk_adamant_a_trait_04_b_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 2.370833,
+			[2.0] = 2.741427
 		},
 		randomize_indexes = {}
 	},
@@ -465,9 +494,9 @@ local adamant_a_adamant_female_a = {
 			"loc_adamant_female_a__combat_pause_quirk_adamant_a_trait_05_a_03"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678
+			4.254469,
+			4.602313,
+			5.89525
 		},
 		randomize_indexes = {}
 	},
@@ -479,8 +508,8 @@ local adamant_a_adamant_female_a = {
 			[2.0] = "loc_adamant_female_a__combat_pause_quirk_adamant_a_trait_05_b_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 3.918938,
+			[2.0] = 5.067063
 		},
 		randomize_indexes = {}
 	},
@@ -493,9 +522,9 @@ local adamant_a_adamant_female_a = {
 			"loc_adamant_female_a__combat_pause_quirk_adamant_a_trait_06_a_03"
 		},
 		sound_events_duration = {
-			3.45678,
-			3.45678,
-			3.45678
+			5.474979,
+			4.445521,
+			6.177115
 		},
 		randomize_indexes = {}
 	},
@@ -507,8 +536,8 @@ local adamant_a_adamant_female_a = {
 			[2.0] = "loc_adamant_female_a__combat_pause_quirk_adamant_a_trait_06_b_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 4.330865,
+			[2.0] = 3.228594
 		},
 		randomize_indexes = {}
 	},

@@ -20,24 +20,29 @@ function MasterItems.default_inventory(archetype_name, game_mode_settings_or_nil
 		end
 	end
 
-	return {
+	local default_inventory = {
 		slot_unarmed = MasterItems.get_cached()["content/items/weapons/player/melee/unarmed"]
 	}
+
+	return default_inventory
 end
 
 local FALLBACK_ITEMS_BY_SLOT = {
 	slot_body_hair = "content/items/characters/player/human/attachments_default/slot_body_hair",
+	slot_body_tattoo = "content/items/characters/player/human/attachments_default/slot_body_torso",
 	slot_animation_emote_5 = "content/items/animations/emotes/emote_human_greeting_001_wave_01",
-	slot_animation_emote_1 = "content/items/animations/emotes/emote_human_greeting_001_wave_01",
 	slot_gear_extra_cosmetic = "content/items/characters/player/human/attachments_default/slot_attachment",
 	slot_body_skin_color = "content/items/characters/player/skin_colors/skin_color_pale_01",
 	slot_animation_emote_3 = "content/items/animations/emotes/emote_human_greeting_001_wave_01",
 	slot_pocketable = "content/items/pocketable/empty_pocketable",
 	slot_character_title = "content/items/titles/title_default",
-	slot_body_tattoo = "content/items/characters/player/human/attachments_default/slot_body_torso",
+	slot_companion_body_skin_color = "content/items/characters/companion/companion_dog/body_skin_colors/empty_companion_body_skin_color",
+	slot_companion_body_fur_color = "content/items/characters/companion/companion_dog/body_fur_colors/empty_companion_body_fur_color",
 	slot_trinket_1 = "content/items/weapons/player/trinkets/empty_trinket",
+	slot_companion_gear_full = "content/items/characters/companion/companion_dog/gear_full/empty_companion_gear_full",
 	slot_body_face_implant = "content/items/characters/player/human/attachments_default/slot_body_face",
 	slot_gear_upperbody = "content/items/characters/player/human/attachments_default/slot_gear_torso",
+	slot_body_face_scar = "content/items/characters/player/human/attachments_default/slot_body_face",
 	slot_body_face_hair = "content/items/characters/player/human/attachments_default/slot_body_face",
 	slot_body_legs = "content/items/characters/player/human/attachments_default/slot_body_legs",
 	slot_secondary = "content/items/weapons/player/melee/unarmed",
@@ -47,6 +52,7 @@ local FALLBACK_ITEMS_BY_SLOT = {
 	slot_gear_lowerbody = "content/items/characters/player/human/attachments_default/slot_gear_legs",
 	slot_portrait_frame = "content/items/2d/portrait_frames/portrait_frame_default",
 	slot_body_face_tattoo = "content/items/characters/player/human/attachments_default/slot_body_face",
+	slot_companion_body_coat_pattern = "content/items/characters/companion/companion_dog/body_coat_patterns/empty_companion_body_coat_pattern",
 	slot_pocketable_small = "content/items/pocketable/empty_pocketable",
 	slot_insignia = "content/items/2d/insignias/insignia_default",
 	slot_body_torso = "content/items/characters/player/human/attachments_default/slot_body_torso",
@@ -55,10 +61,11 @@ local FALLBACK_ITEMS_BY_SLOT = {
 	slot_device = "content/items/devices/empty_device",
 	slot_animation_end_of_round = "content/items/animations/emotes/emote_human_greeting_001_wave_01",
 	slot_animation_emote_4 = "content/items/animations/emotes/emote_human_greeting_001_wave_01",
-	slot_body_face_scar = "content/items/characters/player/human/attachments_default/slot_body_face",
+	slot_animation_emote_1 = "content/items/animations/emotes/emote_human_greeting_001_wave_01",
 	slot_gear_head = "content/items/characters/player/human/attachments_default/slot_gear_head",
 	slot_body_arms = "content/items/characters/player/human/attachments_default/slot_body_arms",
 	slot_skin_set = "content/items/characters/player/sets/empty_set",
+	slot_gear_material_override_decal = "content/items/characters/player/human/material_archetype_specific/empty_material_override_decal",
 	slot_animation_emote_2 = "content/items/animations/emotes/emote_human_greeting_001_wave_01",
 	slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_brown_01"
 }
@@ -71,20 +78,25 @@ if BUILD == "release" then
 	FALLBACK_ITEMS_BY_SLOT.slot_body_tattoo = "content/items/characters/player/human/body_tattoo/empty_body_tattoo"
 	FALLBACK_ITEMS_BY_SLOT.slot_body_eye_color = "content/items/characters/player/eye_colors/eye_color_blue_01"
 	FALLBACK_ITEMS_BY_SLOT.slot_body_hair_color = "content/items/characters/player/hair_colors/hair_color_brown_01"
+	FALLBACK_ITEMS_BY_SLOT.slot_gear_material_override_decal = "content/items/characters/player/human/material_archetype_specific/empty_material_override_decal"
 	FALLBACK_ITEMS_BY_SLOT.slot_gear_extra_cosmetic = "items/characters/player/human/backpacks/empty_backpack"
 	FALLBACK_ITEMS_BY_SLOT.slot_gear_head = "content/items/characters/player/human/gear_head/empty_headgear"
 	FALLBACK_ITEMS_BY_SLOT.slot_gear_lowerbody = "content/items/characters/player/human/gear_lowerbody/empty_lowerbody"
 	FALLBACK_ITEMS_BY_SLOT.slot_gear_upperbody = "content/items/characters/player/human/gear_upperbody/empty_upperbody"
+	FALLBACK_ITEMS_BY_SLOT.slot_companion_body_skin_color = "content/items/characters/companion/companion_dog/body_skin_colors/empty_companion_body_skin_color"
+	FALLBACK_ITEMS_BY_SLOT.slot_companion_body_fur_color = "content/items/characters/companion/companion_dog/body_fur_colors/empty_companion_body_fur_color"
+	FALLBACK_ITEMS_BY_SLOT.slot_companion_body_coat_pattern = "content/items/characters/companion/companion_dog/body_coat_patterns/empty_companion_body_coat_pattern"
+	FALLBACK_ITEMS_BY_SLOT.slot_companion_gear_full = "content/items/characters/companion/companion_dog/gear_full/empty_companion_gear_full"
 end
 
-function MasterItems.find_fallback_item_id(slot)
-	local fallback_name = slot and FALLBACK_ITEMS_BY_SLOT[slot]
+function MasterItems.find_fallback_item_id(slot_name)
+	local fallback_name = slot_name and FALLBACK_ITEMS_BY_SLOT[slot_name]
 
 	return fallback_name
 end
 
-function MasterItems.find_fallback_item(slot)
-	local fallback_id = MasterItems.find_fallback_item_id(slot)
+function MasterItems.find_fallback_item(slot_name)
+	local fallback_id = MasterItems.find_fallback_item_id(slot_name)
 	local fallback_item = MasterItems.get_item(fallback_id)
 
 	return fallback_item
@@ -95,11 +107,11 @@ local function _fallback_item(gear)
 
 	Log.error("MasterItemCache", string.format("No master data for item with id %s", instance_id))
 
-	local slot = gear.slots and gear.slots[1]
-	local fallback_name = slot and FALLBACK_ITEMS_BY_SLOT[slot]
+	local slot_name = gear.slots and gear.slots[1]
+	local fallback_name = slot_name and FALLBACK_ITEMS_BY_SLOT[slot_name]
 
 	if not fallback_name then
-		Log.error("MasterItemCache", string.format("No fallback item found for %s in slot %s", instance_id, slot))
+		Log.error("MasterItemCache", string.format("No fallback item found for %s in slot %s", instance_id, slot_name))
 
 		return nil
 	end
@@ -369,6 +381,91 @@ end
 
 function MasterItems.get_store_item_instance(description)
 	return _store_item_plus_overrides(description)
+end
+
+function MasterItems.get_ui_item_instance(item)
+	local gear_override = item.gear and item.gear.masterDataInstance and item.gear.masterDataInstance.overrides
+	local overrides = item.overrides or gear_override
+
+	if overrides then
+		overrides = table.clone_instance(overrides)
+	else
+		overrides = {}
+	end
+
+	if item.slot_weapon_skin then
+		overrides.slot_weapon_skin = type(item.slot_weapon_skin) == "table" and item.slot_weapon_skin.name or item.slot_weapon_skin
+	end
+
+	local item_instance = {
+		__is_ui_item_preview = true,
+		__data = item,
+		__gear = {
+			masterDataInstance = {
+				id = item.name,
+				overrides = overrides
+			}
+		},
+		__gear_id = item.gear_id or math.uuid()
+	}
+
+	setmetatable(item_instance, {
+		__index = function (t, field_name)
+			local master_ver = rawget(item_instance, "__master_ver")
+
+			if master_ver ~= MasterItems.get_cached_version() then
+				local success = _update_master_data(item_instance)
+
+				if not success then
+					Log.error("MasterItems", "[_store_item_plus_overrides][1] could not update master data with %s; %s", item.name, item.gear_id)
+
+					return nil
+				end
+			end
+
+			if field_name == "gear_id" then
+				return rawget(item_instance, "__gear_id")
+			end
+
+			if field_name == "gear" then
+				return rawget(item_instance, "__gear")
+			end
+
+			local master_item = rawget(item_instance, "__master_item")
+
+			if not master_item then
+				Log.warning("MasterItemCache", string.format("UI - No master data for item with id %s", item.name))
+
+				return nil
+			end
+
+			local field_value = master_item[field_name]
+
+			if field_name == "rarity" and field_value == -1 then
+				return nil
+			end
+
+			return field_value
+		end,
+		__newindex = function (t, field_name, value)
+			ferror("Not allowed to modify inventory items - %s[%s]", rawget(item_instance, "__gear_id"), field_name)
+		end,
+		__tostring = function (t)
+			local master_item = rawget(item_instance, "__master_item")
+
+			return string.format("master_item: [%s] gear_id: [%s]", tostring(master_item and master_item.name), tostring(rawget(item_instance, "__gear_id")))
+		end
+	})
+
+	local success = _update_master_data(item_instance)
+
+	if not success then
+		Log.error("MasterItems", "UI - [_store_item_plus_overrides][2] could not update master data with %s; %s", item.name, item.gear_id)
+
+		return nil
+	end
+
+	return item_instance
 end
 
 function MasterItems.add_listener(callback_fn)

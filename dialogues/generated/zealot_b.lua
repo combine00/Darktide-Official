@@ -55,7 +55,9 @@ return function ()
 					"veteran_female_b",
 					"veteran_male_b",
 					"veteran_female_c",
-					"veteran_male_c"
+					"veteran_male_c",
+					"adamant_male_a",
+					"adamant_female_a"
 				}
 			},
 			{
@@ -69,7 +71,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -133,7 +135,9 @@ return function ()
 					"veteran_female_b",
 					"veteran_male_b",
 					"veteran_female_c",
-					"veteran_male_c"
+					"veteran_male_c",
+					"adamant_male_a",
+					"adamant_female_a"
 				}
 			}
 		},
@@ -200,7 +204,11 @@ return function ()
 					"psyker_female_c",
 					"psyker_male_c",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -214,7 +222,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -280,7 +288,11 @@ return function ()
 					"psyker_female_c",
 					"psyker_male_c",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			}
 		},
@@ -361,7 +373,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -491,7 +503,9 @@ return function ()
 					"psyker_male_a",
 					"veteran_female_b",
 					"veteran_male_b",
-					"veteran_female_c"
+					"veteran_female_c",
+					"adamant_male_a",
+					"adamant_female_a"
 				}
 			},
 			{
@@ -505,7 +519,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -568,7 +582,9 @@ return function ()
 					"psyker_male_a",
 					"veteran_female_b",
 					"veteran_male_b",
-					"veteran_female_c"
+					"veteran_female_c",
+					"adamant_male_a",
+					"adamant_female_a"
 				}
 			}
 		},
@@ -635,7 +651,11 @@ return function ()
 					"psyker_female_c",
 					"psyker_male_c",
 					"zealot_female_a",
-					"zealot_male_a"
+					"zealot_male_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -649,7 +669,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -713,7 +733,11 @@ return function ()
 					"psyker_female_c",
 					"psyker_male_c",
 					"zealot_female_a",
-					"zealot_male_a"
+					"zealot_male_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			}
 		},
@@ -795,7 +819,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -940,7 +964,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -1073,7 +1097,9 @@ return function ()
 				args = {
 					"ogryn_a",
 					"psyker_female_a",
-					"psyker_male_a"
+					"psyker_male_a",
+					"adamant_male_a",
+					"adamant_female_a"
 				}
 			},
 			{
@@ -1087,7 +1113,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -1148,7 +1174,9 @@ return function ()
 				args = {
 					"ogryn_a",
 					"psyker_female_a",
-					"psyker_male_a"
+					"psyker_male_a",
+					"adamant_male_a",
+					"adamant_female_a"
 				}
 			}
 		},
@@ -1213,7 +1241,9 @@ return function ()
 					"psyker_female_a",
 					"psyker_male_a",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a"
 				}
 			},
 			{
@@ -1227,7 +1257,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -1291,7 +1321,9 @@ return function ()
 					"psyker_female_a",
 					"psyker_male_a",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a"
 				}
 			}
 		},
@@ -1372,7 +1404,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -1500,7 +1532,11 @@ return function ()
 					"psyker_female_c",
 					"psyker_male_c",
 					"veteran_female_a",
-					"veteran_male_a"
+					"veteran_male_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -1514,7 +1550,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -1578,7 +1614,11 @@ return function ()
 					"psyker_female_c",
 					"psyker_male_c",
 					"veteran_female_a",
-					"veteran_male_a"
+					"veteran_male_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			}
 		},
@@ -1655,7 +1695,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -1794,7 +1834,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -1937,7 +1977,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -2068,7 +2108,13 @@ return function ()
 					"psyker_female_b",
 					"psyker_male_b",
 					"psyker_female_c",
-					"psyker_male_c"
+					"psyker_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -2082,7 +2128,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -2146,7 +2192,13 @@ return function ()
 					"psyker_female_b",
 					"psyker_male_b",
 					"psyker_female_c",
-					"psyker_male_c"
+					"psyker_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			}
 		},
@@ -2227,7 +2279,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -2372,7 +2424,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -2503,7 +2555,11 @@ return function ()
 					"psyker_female_c",
 					"psyker_male_c",
 					"veteran_female_a",
-					"veteran_male_a"
+					"veteran_male_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -2517,7 +2573,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -2581,7 +2637,11 @@ return function ()
 					"psyker_female_c",
 					"psyker_male_c",
 					"veteran_female_a",
-					"veteran_male_a"
+					"veteran_male_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			}
 		},
@@ -2646,7 +2706,9 @@ return function ()
 					"psyker_female_a",
 					"psyker_male_a",
 					"zealot_female_a",
-					"zealot_male_a"
+					"zealot_male_a",
+					"adamant_male_a",
+					"adamant_female_a"
 				}
 			},
 			{
@@ -2660,7 +2722,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -2722,7 +2784,9 @@ return function ()
 					"psyker_female_a",
 					"psyker_male_a",
 					"zealot_female_a",
-					"zealot_male_a"
+					"zealot_male_a",
+					"adamant_male_a",
+					"adamant_female_a"
 				}
 			}
 		},
@@ -2788,7 +2852,11 @@ return function ()
 					"psyker_female_b",
 					"psyker_male_b",
 					"psyker_female_c",
-					"psyker_male_c"
+					"psyker_male_c",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -2802,7 +2870,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -2865,7 +2933,11 @@ return function ()
 					"psyker_female_b",
 					"psyker_male_b",
 					"psyker_female_c",
-					"psyker_male_c"
+					"psyker_male_c",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			}
 		},
@@ -2947,7 +3019,13 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -2967,7 +3045,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -3103,7 +3181,13 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -3117,7 +3201,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -3250,7 +3334,13 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -3264,7 +3354,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -3400,7 +3490,13 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -3414,7 +3510,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -3550,7 +3646,13 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -3564,7 +3666,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -3700,7 +3802,13 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -3714,7 +3822,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -3847,7 +3955,13 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -3861,7 +3975,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -3997,7 +4111,13 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -4011,7 +4131,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -4233,7 +4353,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -4486,7 +4606,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",
@@ -4739,7 +4859,7 @@ return function ()
 				"time_since_last_short_conversation",
 				OP.TIMEDIFF,
 				OP.GT,
-				140
+				120
 			},
 			{
 				"faction_memory",

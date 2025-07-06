@@ -263,7 +263,7 @@ function MinionGibbing:gib(hit_zone_name_or_nil, attack_direction, damage_profil
 
 	local gibbing_threshold = hit_zone_gib_template and hit_zone_gib_template.gibbing_threshold or GibbingThresholds.light
 
-	if gibbing_power < gibbing_threshold then
+	if gibbing_threshold > 10 then
 		try_fallback = true
 	end
 

@@ -167,6 +167,19 @@ function SmartTagExtension:_contextual_tag_template_name(tagger_unit, alternate)
 				return "enemy_over_here_veteran"
 			end
 
+			local companion_order = alternate
+
+			if companion_order then
+				local companion_spawner_extension = ScriptUnit.has_extension(tagger_unit, "companion_spawner_system")
+				local has_companion = companion_spawner_extension and companion_spawner_extension:should_have_companion()
+
+				if has_companion then
+					return "enemy_companion_target"
+				end
+
+				return nil
+			end
+
 			return "enemy_over_here"
 		end
 	elseif target_type == "health_station" then
@@ -201,8 +214,10 @@ function SmartTagExtension:register_tag(tag_id)
 	self._tag_id = tag_id
 end
 
-function SmartTagExtension:unregister_tag()
-	self._tag_id = nil
+function SmartTagExtension:unregister_tag(tag_id)
+	if not tag_id or self._tag_id == tag_id then
+		self._tag_id = nil
+	end
 end
 
 function SmartTagExtension:display_name(tagger_unit)

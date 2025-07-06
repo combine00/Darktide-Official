@@ -1,6 +1,8 @@
 local MechanismBase = require("scripts/managers/mechanism/mechanisms/mechanism_base")
 local Missions = require("scripts/settings/mission/mission_templates")
+local PlayerProgressionUnlocks = require("scripts/settings/player/player_progression_unlocks")
 local PlayerVOStoryStage = require("scripts/utilities/player_vo_story_stage")
+local Popups = require("scripts/utilities/ui/popups")
 local Promise = require("scripts/foundation/utilities/promise")
 local StateGameplay = require("scripts/game_states/game/state_gameplay")
 local StateLoading = require("scripts/game_states/game/state_loading")
@@ -60,14 +62,20 @@ local function _fetch_client_data()
 
 	local player = Managers.player:local_player(1)
 	local character_id = player:character_id()
-	local contracts_promise = nil
+	local account_id = player:account_id()
+	local contracts_promise, player_journey_promise, campaign_skip_promise = nil
 
 	if math.is_uuid(character_id) then
+		local mission_board_service = Managers.data_service.mission_board
+		player_journey_promise = mission_board_service:fetch_player_journey_data(account_id, character_id)
+		campaign_skip_promise = mission_board_service:fetch_character_campaign_skip_data(account_id, character_id)
 		local contract_service = Managers.data_service.contracts
-		local contract_exists_promise = contract_service:has_contract(character_id)
-		contracts_promise = Promise.all(contract_exists_promise, narrative_promise):next(function (results)
-			local contract_exist = results[1]
-			local should_create_contract = Managers.narrative:is_event_complete("level_unlock_contract_store_visited")
+		contracts_promise = Promise.all(player_journey_promise, narrative_promise):next(function ()
+			return contract_service:has_contract(character_id)
+		end):next(function (contract_exist)
+			local block_reason, _ = Managers.data_service.mission_board:get_block_reason("hub_facility", PlayerProgressionUnlocks.contracts)
+			local has_visited_contracts = Managers.narrative:is_event_complete("level_unlock_contract_store_visited")
+			local should_create_contract = has_visited_contracts and not block_reason
 
 			if not contract_exist and should_create_contract then
 				Managers.event:trigger("event_add_notification_message", "default", Localize("loc_notification_new_contract"))
@@ -92,27 +100,16 @@ local function _fetch_client_data()
 		end)
 	end
 
-	local havoc_latest_promise, havoc_cadence_status_promise = nil
-
-	if Managers.data_service.havoc and Managers.narrative then
-		havoc_latest_promise = Managers.data_service.havoc:latest():next(function (results)
-			Managers.narrative:set_ever_received_havoc_order(results)
-		end)
-		havoc_cadence_status_promise = Managers.data_service.havoc:summary():next(function (results)
-			local cadence_status = results.cadence_status
-
-			Managers.narrative:set_havoc_cadence_status(cadence_status)
-		end)
-	end
-
 	local promises = {
 		[#promises + 1] = narrative_promise,
-		[#promises + 1] = contracts_promise,
 		[#promises + 1] = Managers.data_service.havoc:refresh_havoc_status(),
 		[#promises + 1] = Managers.data_service.havoc:refresh_havoc_rank(),
-		[#promises + 1] = havoc_latest_promise,
+		[#promises + 1] = Managers.data_service.havoc:refresh_ever_received_havoc_order(),
 		[#promises + 1] = Managers.data_service.havoc:refresh_havoc_unlock_status(),
-		[#promises + 1] = havoc_cadence_status_promise
+		[#promises + 1] = Managers.data_service.havoc:refresh_havoc_cadence_status(),
+		[#promises + 1] = contracts_promise,
+		[#promises + 1] = player_journey_promise,
+		[#promises + 1] = campaign_skip_promise
 	}
 
 	Managers.data_service.store:invalidate_wallets_cache()
@@ -215,6 +212,55 @@ function MechanismHub:wanted_transition()
 			}
 		}
 	elseif state == "in_hub" then
+		if not DEDICATED_SERVER then
+			local mission_board_service = Managers.data_service.mission_board
+
+			if not self._campaign_skip_popup_id and not mission_board_service:get_has_character_been_asked_to_skip_campaign() and mission_board_service:get_is_character_eligible_to_skip_campaign() and Managers.narrative:is_event_complete("onboarding_step_chapel_cutscene_played") and not Managers.ui:handling_popups() and not Managers.ui:has_active_view() then
+				local local_player_id = 1
+				local player_manager = Managers.player
+				local player = player_manager and player_manager:local_player(local_player_id)
+				local character_id = player and player:character_id()
+				local account_id = player and player:account_id()
+
+				Popups.skip_player_journey.hub(function (id)
+					self._campaign_skip_popup_id = id
+				end, function ()
+					local level = Managers.state.mission and Managers.state.mission:mission_level()
+
+					if not level then
+						return
+					end
+
+					if level then
+						Level.trigger_event(level, "event_onboarding_step_mission_board_introduction")
+					end
+
+					if mission_board_service then
+						Managers.telemetry_events:player_journey_popup_play_journey("hub", true)
+						mission_board_service:skip_and_unlock_campaign(account_id, character_id):next(function (data)
+							return mission_board_service:set_character_has_been_shown_skip_campaign_popup(account_id, character_id)
+						end)
+					end
+				end, function ()
+					local level = Managers.state.mission and Managers.state.mission:mission_level()
+
+					if not level then
+						return
+					end
+
+					if level then
+						Level.trigger_event(level, "event_onboarding_step_mission_board_introduction")
+					end
+
+					if mission_board_service then
+						Managers.telemetry_events:player_journey_popup_play_journey("hub", false)
+
+						return mission_board_service:set_character_has_been_shown_skip_campaign_popup(account_id, character_id)
+					end
+				end)
+			end
+		end
+
 		local party_immaterium = Managers.party_immaterium
 		local session_in_progress = party_immaterium and party_immaterium:game_session_in_progress()
 
@@ -337,6 +383,12 @@ function MechanismHub:destroy()
 
 		self._retry_popup_id = nil
 	end
+
+	if self._campaign_skip_popup_id then
+		Managers.event:trigger("event_remove_ui_popup", self._campaign_skip_popup_id)
+
+		self._campaign_skip_popup_id = nil
+	end
 end
 
 function MechanismHub:rpc_sync_mechanism_data_hub(channel_id, circumstance_name_id)
@@ -348,6 +400,16 @@ function MechanismHub:rpc_sync_mechanism_data_hub(channel_id, circumstance_name_
 
 	self._is_syncing = false
 	self._is_synced = true
+end
+
+function MechanismHub:_get_current_character_level()
+	local local_player_id = 1
+	local player_manager = Managers.player
+	local player = player_manager and player_manager:local_player(local_player_id)
+	local player_profile = player and player:profile()
+	local character_level = player_profile and player_profile.character_level
+
+	return character_level
 end
 
 implements(MechanismHub, MechanismBase.INTERFACE)

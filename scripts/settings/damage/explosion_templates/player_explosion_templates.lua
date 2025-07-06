@@ -114,6 +114,23 @@ local explosion_templates = {
 			"heroes",
 			"villains"
 		}
+	},
+	adamant_forceful_explosion = {
+		static_power_level = 500,
+		radius = 2.5,
+		min_radius = 1.9,
+		close_radius = 2.5,
+		collision_filter = "filter_player_character_lunge",
+		override_friendly_fire = false,
+		min_close_radius = 2,
+		close_damage_profile = DamageProfileTemplates.ogryn_charge_finish,
+		close_damage_type = damage_types.ogryn_physical,
+		damage_profile = DamageProfileTemplates.ogryn_charge_finish,
+		damage_type = damage_types.ogryn_physical,
+		broadphase_explosion_filter = {
+			"heroes",
+			"villains"
+		}
 	}
 }
 

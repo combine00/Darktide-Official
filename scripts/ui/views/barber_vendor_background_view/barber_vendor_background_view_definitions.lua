@@ -25,8 +25,10 @@ local intro_texts = {
 	description_text = "loc_barber_vendor_view_intro_description",
 	title_text = "loc_barber_vendor_view_intro_title"
 }
-local button_options_definitions = {
-	{
+
+local function button_options_definitions()
+	local buttons = {}
+	buttons[1] = {
 		display_name = "loc_barber_vendor_view_option_modify",
 		callback = function (self)
 			local tab_bar_params = {
@@ -52,8 +54,8 @@ local button_options_definitions = {
 				fetch_store_items_on_enter = true
 			})
 		end
-	},
-	{
+	}
+	buttons[2] = {
 		display_name = "loc_barber_vendor_view_option_mindwipe",
 		callback = function (self)
 			if self:can_afford_mindwipe() then
@@ -122,7 +124,43 @@ local button_options_definitions = {
 			end
 		end
 	}
-}
+	local player = Managers.player:local_player(1)
+	local real_profile = player:profile()
+	local archetype = real_profile.archetype.name
+
+	if archetype == "adamant" then
+		table.insert(buttons, 2, {
+			display_name = "loc_barber_vendor_view_option_modify_companion_dog",
+			callback = function (self)
+				local tab_bar_params = {
+					hide_tabs = true,
+					layer = 10,
+					tabs_params = {
+						{
+							view = "character_appearance_view",
+							display_name = "loc_credits_vendor_view_title",
+							blur_background = false,
+							context_function = function ()
+								return {
+									pass_draw = false,
+									is_barber_companion_appearance = true,
+									pass_input = true
+								}
+							end
+						}
+					}
+				}
+
+				self:_setup_tab_bar(tab_bar_params, {
+					fetch_store_items_on_enter = true
+				})
+			end
+		})
+	end
+
+	return buttons
+end
+
 local background_world_params = {
 	shading_environment = "content/shading_environments/ui/barber",
 	world_layer = 1,

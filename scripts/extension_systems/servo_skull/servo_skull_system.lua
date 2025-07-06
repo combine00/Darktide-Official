@@ -20,13 +20,7 @@ function ServoSkullSystem:init(context, system_init_data, ...)
 end
 
 function ServoSkullSystem:on_gameplay_post_init(level)
-	local unit_to_extension_map = self._unit_to_extension_map
-
-	for unit, extension in pairs(unit_to_extension_map) do
-		if extension.on_gameplay_post_init then
-			extension:on_gameplay_post_init(level)
-		end
-	end
+	self:call_gameplay_post_init_on_extensions(level)
 end
 
 function ServoSkullSystem:hot_join_sync(sender, channel)

@@ -1,7 +1,15 @@
+local AttackSettings = require("scripts/settings/damage/attack_settings")
 local BuffSettings = require("scripts/settings/buff/buff_settings")
 local Component = require("scripts/utilities/component")
+local Explosion = require("scripts/utilities/attack/explosion")
+local ExplosionTemplates = require("scripts/settings/damage/explosion_templates")
 local JobInterface = require("scripts/managers/unit_job/job_interface")
+local PowerLevelSettings = require("scripts/settings/damage/power_level_settings")
+local TalentSettings = require("scripts/settings/talent/talent_settings")
+local DEFAULT_POWER_LEVEL = PowerLevelSettings.default_power_level
+local attack_types = AttackSettings.attack_types
 local buff_keywords = BuffSettings.keywords
+local talent_settings = TalentSettings.adamant
 local ProximityShockMine = class("ProximityShockMine")
 local COMPONENT_STATES = table.enum("none", "arming", "deployed")
 
@@ -32,6 +40,10 @@ function ProximityShockMine:init(logic_context, init_data, owner_unit_or_nil)
 	self._fx_system = fx_system
 	self._broadphase = broadphase_system.broadphase
 	self._component_state = COMPONENT_STATES.none
+end
+
+function ProximityShockMine:destroy()
+	self:_handle_end_of_lifetime_triggers()
 end
 
 function ProximityShockMine:unit_entered_proximity(t, unit)
@@ -82,7 +94,7 @@ function ProximityShockMine:update(dt, t)
 	self:_apply_buffs(t)
 end
 
-local HARD_CODED_RADIUS = 3
+local HARD_CODED_RADIUS = talent_settings.blitz_ability.shock_mine.range
 local _broadphase_results = {}
 
 function ProximityShockMine:_apply_buffs(t)
@@ -100,6 +112,7 @@ function ProximityShockMine:_apply_buffs(t)
 	local num_added_buffs = 0
 	local result_index = 0
 	local buff_to_add = self._buff_to_add
+	local started = false
 	local stop = false
 
 	while not stop do
@@ -108,6 +121,7 @@ function ProximityShockMine:_apply_buffs(t)
 
 		if HEALTH_ALIVE[target_unit] then
 			local buff_extension = ScriptUnit.has_extension(target_unit, "buff_system")
+			started = true
 
 			if buff_extension then
 				local target_is_electrocuted = buff_extension:has_keyword(buff_keywords.electrocuted)
@@ -123,7 +137,28 @@ function ProximityShockMine:_apply_buffs(t)
 		stop = self._num_targets_per_trigger < num_added_buffs or num_results < result_index
 	end
 
+	if started and not self._started_dealing_damage then
+		self._started_dealing_damage = true
+		self._start_time = t
+		self._life_time = talent_settings.blitz_ability.shock_mine.duration
+	end
+
 	self._buff_trigger_t = t + self._trigger_interval
+end
+
+function ProximityShockMine:_handle_end_of_lifetime_triggers()
+	if not self:is_job_completed() then
+		return
+	end
+
+	local owner_unit = self._owner_unit_or_nil
+	local shock_mine_position = POSITION_LOOKUP[self._unit]
+	local owner_unit_buff_extension = owner_unit and ScriptUnit.has_extension(owner_unit, "buff_system")
+	local has_bigger_explosion_buff = owner_unit_buff_extension and owner_unit_buff_extension:has_keyword(buff_keywords.adamant_mine_explode_on_finish)
+	local explosion_template = has_bigger_explosion_buff and ExplosionTemplates.frag_grenade or ExplosionTemplates.shock_mine_self_destruct
+	local explosion_position = shock_mine_position + Vector3.multiply(Vector3.up(), 0.05)
+
+	Explosion.create_explosion(self._world, self._physics_world, explosion_position, Vector3.up(), owner_unit, explosion_template, DEFAULT_POWER_LEVEL, 1, attack_types.explosion)
 end
 
 function ProximityShockMine:start_job()

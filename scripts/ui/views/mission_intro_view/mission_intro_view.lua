@@ -140,6 +140,7 @@ function MissionIntroView:_initialize_background_world()
 	local game_state_context = Managers.player:game_state_context()
 	local mission_name = game_state_context and game_state_context.mission_name
 	local mission_giver_vo = game_state_context and game_state_context.mission_giver_vo
+	local circumstance_name = game_state_context and game_state_context.circumstance_name
 	local target_intro_level = self._intro_level
 	local level_name = target_intro_level.level_name
 
@@ -148,7 +149,7 @@ function MissionIntroView:_initialize_background_world()
 	self._world_initialized = true
 
 	if mission_name then
-		self:_play_mission_brief_vo(mission_name, mission_giver_vo)
+		self:_play_mission_brief_vo(mission_name, mission_giver_vo, circumstance_name)
 		self:_set_hologram_briefing_material(mission_name)
 	else
 		self.mission_briefing_done = true
@@ -452,7 +453,7 @@ function MissionIntroView:_reset_spawn_slot(slot)
 	slot.player = nil
 end
 
-function MissionIntroView:_play_mission_brief_vo(mission_name, mission_giver_vo)
+function MissionIntroView:_play_mission_brief_vo(mission_name, mission_giver_vo, circumstance_name)
 	local mission = Missions[mission_name]
 	local mission_intro_time = mission.mission_intro_minimum_time or 0
 	self.done_at = Managers.time:time("main") + mission_intro_time
@@ -482,7 +483,8 @@ function MissionIntroView:_play_mission_brief_vo(mission_name, mission_giver_vo)
 		seed = Managers.connection:session_seed()
 	end
 
-	local vo_unit = Vo.play_local_vo_events(dialogue_system, events, voice_profile, wwise_route_key, callback, seed)
+	local specific_lines = MissionIntroViewSettings.journey_briefing_lines[circumstance_name]
+	local vo_unit = Vo.play_local_vo_events(dialogue_system, events, voice_profile, wwise_route_key, callback, seed, nil, specific_lines)
 	self._vo_unit = vo_unit
 	self._last_vo_event = events[#events]
 end

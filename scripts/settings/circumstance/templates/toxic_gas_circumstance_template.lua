@@ -9,9 +9,10 @@ local circumstance_templates = {
 		},
 		ui = {
 			description = "loc_circumstance_toxic_gas_description",
-			display_name = "loc_circumstance_toxic_gas_title",
 			happening_display_name = "loc_happening_ventilation_purge",
+			display_name = "loc_circumstance_toxic_gas_title",
 			background = "content/ui/materials/backgrounds/mutators/mutator_toxic_gas",
+			mission_board_icon = "content/ui/materials/mission_board/circumstances/nurgle_manifestation_01",
 			icon = "content/ui/materials/icons/circumstances/nurgle_manifestation_01"
 		},
 		mission_overrides = MissionOverrides.more_corruption_syringes
@@ -26,9 +27,10 @@ local circumstance_templates = {
 		},
 		ui = {
 			description = "loc_circumstance_toxic_gas_less_resistance_description",
-			icon = "content/ui/materials/icons/circumstances/nurgle_manifestation_01",
+			happening_display_name = "loc_happening_ventilation_purge",
 			display_name = "loc_circumstance_toxic_gas_less_resistance_title",
-			happening_display_name = "loc_happening_ventilation_purge"
+			mission_board_icon = "content/ui/materials/mission_board/circumstances/nurgle_manifestation_01",
+			icon = "content/ui/materials/icons/circumstances/nurgle_manifestation_01"
 		},
 		mission_overrides = MissionOverrides.more_corruption_syringes
 	},
@@ -42,9 +44,10 @@ local circumstance_templates = {
 		},
 		ui = {
 			description = "loc_circumstance_toxic_gas_more_resistance_description",
-			icon = "content/ui/materials/icons/circumstances/nurgle_manifestation_01",
+			happening_display_name = "loc_happening_ventilation_purge",
 			display_name = "loc_circumstance_toxic_gas_more_resistance_title",
-			happening_display_name = "loc_happening_ventilation_purge"
+			mission_board_icon = "content/ui/materials/mission_board/circumstances/nurgle_manifestation_01",
+			icon = "content/ui/materials/icons/circumstances/nurgle_manifestation_01"
 		},
 		mission_overrides = MissionOverrides.more_corruption_syringes
 	},
@@ -58,9 +61,10 @@ local circumstance_templates = {
 		},
 		ui = {
 			description = "loc_circumstance_toxic_gas_cultist_grenadier_description",
-			display_name = "loc_circumstance_toxic_gas_cultist_grenadier_title",
 			happening_display_name = "loc_happening_ventilation_purge",
+			display_name = "loc_circumstance_toxic_gas_cultist_grenadier_title",
 			background = "content/ui/materials/backgrounds/mutators/mutator_toxic_gas",
+			mission_board_icon = "content/ui/materials/mission_board/circumstances/nurgle_manifestation_01",
 			icon = "content/ui/materials/icons/circumstances/nurgle_manifestation_01"
 		},
 		mission_overrides = MissionOverrides.more_corruption_syringes

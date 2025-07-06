@@ -4833,24 +4833,27 @@ local gameplay_vo_psyker_female_b = {
 	},
 	seen_enemy_executor = {
 		randomize_indexes_n = 0,
-		sound_events_n = 4,
+		sound_events_n = 5,
 		sound_events = {
+			"loc_psyker_female_b__seen_enemy_executor_01",
 			"loc_psyker_female_b__smart_tag_vo_enemy_traitor_executor_01",
 			"loc_psyker_female_b__smart_tag_vo_enemy_traitor_executor_02",
 			"loc_psyker_female_b__smart_tag_vo_enemy_traitor_executor_03",
 			"loc_psyker_female_b__smart_tag_vo_enemy_traitor_executor_04"
 		},
 		sound_events_duration = {
+			0.930333,
 			0.677604,
 			0.625958,
 			0.717667,
 			0.862229
 		},
 		sound_event_weights = {
-			0.25,
-			0.25,
-			0.25,
-			0.25
+			0.2,
+			0.2,
+			0.2,
+			0.2,
+			0.2
 		},
 		randomize_indexes = {}
 	},
@@ -4941,6 +4944,29 @@ local gameplay_vo_psyker_female_b = {
 		},
 		randomize_indexes = {}
 	},
+	seen_enemy_heavy_gunner = {
+		randomize_indexes_n = 0,
+		sound_events_n = 4,
+		sound_events = {
+			"loc_psyker_female_b__seen_enemy_heavy_gunner_01",
+			"loc_psyker_female_b__seen_enemy_heavy_gunner_02",
+			"loc_psyker_female_b__seen_enemy_heavy_gunner_03",
+			"loc_psyker_female_b__seen_enemy_heavy_gunner_04"
+		},
+		sound_events_duration = {
+			3.084021,
+			1.297917,
+			1.249771,
+			2.227083
+		},
+		sound_event_weights = {
+			0.25,
+			0.25,
+			0.25,
+			0.25
+		},
+		randomize_indexes = {}
+	},
 	seen_enemy_mutant_charger = {
 		randomize_indexes_n = 0,
 		sound_events_n = 10,
@@ -4970,32 +4996,32 @@ local gameplay_vo_psyker_female_b = {
 		},
 		randomize_indexes = {}
 	},
-	seen_enemy_netgunner = {
+	seen_enemy_poxwalker_bomber = {
 		randomize_indexes_n = 0,
 		sound_events_n = 10,
 		sound_events = {
-			"loc_psyker_female_b__seen_netgunner_01",
-			"loc_psyker_female_b__seen_netgunner_02",
-			"loc_psyker_female_b__seen_netgunner_03",
-			"loc_psyker_female_b__seen_netgunner_04",
-			"loc_psyker_female_b__seen_netgunner_05",
-			"loc_psyker_female_b__seen_netgunner_06",
-			"loc_psyker_female_b__seen_netgunner_07",
-			"loc_psyker_female_b__seen_netgunner_08",
-			"loc_psyker_female_b__seen_netgunner_09",
-			"loc_psyker_female_b__seen_netgunner_10"
+			"loc_psyker_female_b__seen_enemy_poxwalker_bomber_01",
+			"loc_psyker_female_b__seen_enemy_poxwalker_bomber_02",
+			"loc_psyker_female_b__seen_enemy_poxwalker_bomber_03",
+			"loc_psyker_female_b__seen_enemy_poxwalker_bomber_04",
+			"loc_psyker_female_b__seen_enemy_poxwalker_bomber_05",
+			"loc_psyker_female_b__seen_enemy_poxwalker_bomber_06",
+			"loc_psyker_female_b__seen_enemy_poxwalker_bomber_07",
+			"loc_psyker_female_b__seen_enemy_poxwalker_bomber_08",
+			"loc_psyker_female_b__seen_enemy_poxwalker_bomber_09",
+			"loc_psyker_female_b__seen_enemy_poxwalker_bomber_10"
 		},
 		sound_events_duration = {
-			0.669583,
-			1.031771,
-			1.951854,
-			1.347979,
-			1.813125,
-			1.938563,
-			1.277229,
-			2.288208,
-			3.097354,
-			1.573667
+			1.041,
+			2.654625,
+			2.187313,
+			2.306354,
+			1.8905,
+			2.258333,
+			2.286438,
+			1.724875,
+			2.441042,
+			2.481646
 		},
 		sound_event_weights = {
 			0.1,
@@ -5008,67 +5034,6 @@ local gameplay_vo_psyker_female_b = {
 			0.1,
 			0.1,
 			0.1
-		},
-		randomize_indexes = {}
-	},
-	seen_enemy_ogryn_heavy_gunner = {
-		randomize_indexes_n = 0,
-		sound_events_n = 4,
-		sound_events = {
-			"loc_psyker_female_b__seen_enemy_heavy_gunner_01",
-			"loc_psyker_female_b__seen_enemy_heavy_gunner_02",
-			"loc_psyker_female_b__seen_enemy_heavy_gunner_03",
-			"loc_psyker_female_b__seen_enemy_heavy_gunner_04"
-		},
-		sound_events_duration = {
-			3.084021,
-			1.297917,
-			1.249771,
-			2.227083
-		},
-		sound_event_weights = {
-			0.25,
-			0.25,
-			0.25,
-			0.25
-		},
-		randomize_indexes = {}
-	},
-	seen_enemy_poxwalker_bomber = {
-		randomize_indexes_n = 0,
-		sound_events_n = 9,
-		sound_events = {
-			"loc_psyker_female_b__seen_enemy_poxwalker_bomber_01",
-			"loc_psyker_female_b__seen_enemy_poxwalker_bomber_02",
-			"loc_psyker_female_b__seen_enemy_poxwalker_bomber_03",
-			"loc_psyker_female_b__seen_enemy_poxwalker_bomber_04",
-			"loc_psyker_female_b__seen_enemy_poxwalker_bomber_05",
-			"loc_psyker_female_b__seen_enemy_poxwalker_bomber_06",
-			"loc_psyker_female_b__seen_enemy_poxwalker_bomber_07",
-			"loc_psyker_female_b__seen_enemy_poxwalker_bomber_09",
-			"loc_psyker_female_b__seen_enemy_poxwalker_bomber_10"
-		},
-		sound_events_duration = {
-			1.041,
-			2.654625,
-			2.187313,
-			2.306354,
-			1.8905,
-			2.258333,
-			2.286438,
-			2.441042,
-			2.481646
-		},
-		sound_event_weights = {
-			0.1111111,
-			0.1111111,
-			0.1111111,
-			0.1111111,
-			0.1111111,
-			0.1111111,
-			0.1111111,
-			0.1111111,
-			0.1111111
 		},
 		randomize_indexes = {}
 	},
@@ -5115,12 +5080,9 @@ local gameplay_vo_psyker_female_b = {
 	},
 	seen_enemy_renegade_shocktrooper = {
 		randomize_indexes_n = 0,
-		sound_events_n = 9,
+		sound_events_n = 6,
 		sound_events = {
-			"loc_psyker_female_b__seen_enemy_shocktrooper_01",
 			"loc_psyker_female_b__seen_enemy_shocktrooper_02",
-			"loc_psyker_female_b__seen_enemy_shocktrooper_03",
-			"loc_psyker_female_b__seen_enemy_shocktrooper_04",
 			"loc_psyker_female_b__seen_enemy_shocktrooper_05",
 			"loc_psyker_female_b__smart_tag_vo_enemy_traitor_scout_shocktrooper_01",
 			"loc_psyker_female_b__smart_tag_vo_enemy_traitor_scout_shocktrooper_02",
@@ -5128,10 +5090,7 @@ local gameplay_vo_psyker_female_b = {
 			"loc_psyker_female_b__smart_tag_vo_enemy_traitor_scout_shocktrooper_04"
 		},
 		sound_events_duration = {
-			1.642354,
 			1.468208,
-			2.662063,
-			2.852958,
 			2.68225,
 			1.241229,
 			1.368625,
@@ -5139,15 +5098,12 @@ local gameplay_vo_psyker_female_b = {
 			1.79075
 		},
 		sound_event_weights = {
-			0.1111111,
-			0.1111111,
-			0.1111111,
-			0.1111111,
-			0.1111111,
-			0.1111111,
-			0.1111111,
-			0.1111111,
-			0.1111111
+			0.1666667,
+			0.1666667,
+			0.1666667,
+			0.1666667,
+			0.1666667,
+			0.1666667
 		},
 		randomize_indexes = {}
 	},
@@ -5230,6 +5186,35 @@ local gameplay_vo_psyker_female_b = {
 			0.25,
 			0.25,
 			0.25
+		},
+		randomize_indexes = {}
+	},
+	seen_netgunner = {
+		randomize_indexes_n = 0,
+		sound_events_n = 10,
+		sound_events = {
+			"loc_psyker_female_b__seen_netgunner_01",
+			"loc_psyker_female_b__seen_netgunner_02",
+			"loc_psyker_female_b__seen_netgunner_03",
+			"loc_psyker_female_b__seen_netgunner_04",
+			"loc_psyker_female_b__seen_netgunner_05",
+			"loc_psyker_female_b__seen_netgunner_06",
+			"loc_psyker_female_b__seen_netgunner_07",
+			"loc_psyker_female_b__seen_netgunner_08",
+			"loc_psyker_female_b__seen_netgunner_09",
+			"loc_psyker_female_b__seen_netgunner_10"
+		},
+		sound_events_duration = {
+			0.669583,
+			1.031771,
+			1.951854,
+			1.347979,
+			1.813125,
+			1.938563,
+			1.277229,
+			2.288208,
+			3.097354,
+			1.573667
 		},
 		randomize_indexes = {}
 	},

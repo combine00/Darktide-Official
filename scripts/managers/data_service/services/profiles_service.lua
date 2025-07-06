@@ -172,16 +172,27 @@ function ProfilesService:equip_master_items_in_slots(character_id, item_master_i
 end
 
 function ProfilesService:fetch_suggested_names_by_archetype(archetype_name, gender, planet)
-	return Managers.backend.interfaces.social:suggested_names_by_archetype(archetype_name, gender, planet):next(function (names)
+	return Managers.backend.interfaces.social:suggested_names_by_archetype(archetype_name, gender, planet):next(function (result)
+		local names = {
+			character = result.names,
+			companion = result.companionNames
+		}
+
 		return Promise.resolved(names)
 	end):catch(function (error)
 		return Promise.resolved({
-			"Alex",
 			"Rikard",
 			"Thomas",
 			"Jane",
 			"Niki",
-			"Marie"
+			"Marie",
+			"Rikard",
+			"Thomas",
+			"Jane",
+			"Niki",
+			"Marie",
+			companion = "Alex",
+			character = "Alex"
 		})
 	end)
 end
@@ -206,12 +217,19 @@ function ProfilesService:check_name(name)
 	end)
 end
 
+function ProfilesService:check_companion_name(name)
+	return self._backend_interface.characters:check_name(name, "comp"):next(function (data)
+		return Promise.resolved(data)
+	end):catch(function (error)
+		Managers.error:report_error(BackendError:new(error))
+
+		return Promise.rejected({})
+	end)
+end
+
 function ProfilesService:fetch_character_operation(shopkeep, operation_name)
 	return self._backend_interface.characters:fetch_character_operation():next(function (data)
 		local operations = Promise.resolved(data)
-
-		table.dump(operations)
-
 		local operation = operations[shopkeep][operation_name]
 
 		return operation

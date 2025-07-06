@@ -4,13 +4,14 @@ local SmartTag = class("SmartTag")
 local REMOVE_TAG_REASONS = table.enum("canceled_by_owner", "expired", "group_limit_exceeded", "tagged_unit_removed", "tagged_unit_died", "invalid_interaction_state", "health_station_depleted", "smart_tag_system_destroyed", "external_removal")
 SmartTag.REMOVE_TAG_REASONS = REMOVE_TAG_REASONS
 
-function SmartTag:init(tag_id, template, tagger_unit, target_unit, target_location, replies)
+function SmartTag:init(tag_id, template, tagger_unit, target_unit, target_location, replies, is_server)
 	self._id = tag_id
 	self._template = template
 	self._tagger_unit = tagger_unit
 	self._target_unit = target_unit
 	self._target_unit_outline = template.target_unit_outline
 	self._replies = replies or {}
+	self._is_server = is_server
 	self._tagger_player = Managers.state.player_unit_spawn:owner(tagger_unit)
 
 	if target_unit then

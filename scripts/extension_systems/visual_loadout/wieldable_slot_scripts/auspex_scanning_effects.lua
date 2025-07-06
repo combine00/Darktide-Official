@@ -53,13 +53,6 @@ function AuspexScanningEffects:init(context, slot, weapon_template, fx_sources, 
 	self._first_person_component = unit_data_extension:read_component("first_person")
 	self._weapon_action_component = unit_data_extension:read_component("weapon_action")
 
-	if not is_husk then
-		local search_looping_sound_component_name = PlayerUnitData.looping_sound_component_name(SEARCH_LOOP_ALIAS)
-		self._seach_loop_sound_component = unit_data_extension:read_component(search_looping_sound_component_name)
-		local confirm_looping_sound_component_name = PlayerUnitData.looping_sound_component_name(CONFIRM_LOOP_ALIAS)
-		self._confirm_loop_sound_component = unit_data_extension:read_component(confirm_looping_sound_component_name)
-	end
-
 	if is_local_unit then
 		self._scanner_display_extension = ScriptUnit.has_extension(item_unit_1p, "scanner_display_system")
 	end
@@ -92,7 +85,6 @@ function AuspexScanningEffects:init(context, slot, weapon_template, fx_sources, 
 end
 
 function AuspexScanningEffects:destroy()
-	self:_stop_searching_sfx_loop()
 	self:_set_outline_unit(self._outline_unit, false)
 
 	self._outline_unit = nil
@@ -115,8 +107,10 @@ end
 
 function AuspexScanningEffects:unwield()
 	self:_set_scanner_lights(false)
-	self:_stop_searching_sfx_loop()
-	self:_stop_confirm_sfx_loop()
+
+	self._searching_sfx_loop = false
+	self._confirm_sfx_loop = false
+
 	self:_set_outline_unit(self._outline_unit, false)
 
 	self._outline_unit = nil
@@ -125,7 +119,17 @@ function AuspexScanningEffects:unwield()
 end
 
 function AuspexScanningEffects:fixed_update(unit, dt, t, frame)
-	return
+	if self._is_husk then
+		return
+	end
+
+	if self._searching_sfx_loop then
+		self:_run_searching_sfx_loop(frame)
+	end
+
+	if self._confirm_sfx_loop then
+		self:_run_confirm_sfx_loop(frame)
+	end
 end
 
 function AuspexScanningEffects:update_unit_position(unit, dt, t)
@@ -149,15 +153,15 @@ function AuspexScanningEffects:update_unit_position(unit, dt, t)
 
 	if not is_husk then
 		if is_active and not is_confirming_scanning then
-			self:_start_searching_sfx_loop()
+			self._searching_sfx_loop = true
 		else
-			self:_stop_searching_sfx_loop()
+			self._searching_sfx_loop = false
 		end
 
 		if is_confirming_scanning then
-			self:_start_confirm_sfx_loop()
+			self._confirm_sfx_loop = true
 		else
-			self:_stop_confirm_sfx_loop()
+			self._confirm_sfx_loop = false
 		end
 	end
 
@@ -372,44 +376,12 @@ function AuspexScanningEffects:update_first_person_mode(first_person_mode)
 	self._is_in_first_person = first_person_mode
 end
 
-function AuspexScanningEffects:_start_searching_sfx_loop()
-	if self._is_husk then
-		return
-	end
-
-	if not self._seach_loop_sound_component.is_playing then
-		self._fx_extension:trigger_looping_wwise_event(SEARCH_LOOP_ALIAS, self._fx_source_name)
-	end
+function AuspexScanningEffects:_run_searching_sfx_loop(frame)
+	self._fx_extension:run_looping_sound(SEARCH_LOOP_ALIAS, self._fx_source_name, nil, frame)
 end
 
-function AuspexScanningEffects:_stop_searching_sfx_loop()
-	if self._is_husk then
-		return
-	end
-
-	if self._seach_loop_sound_component.is_playing then
-		self._fx_extension:stop_looping_wwise_event(SEARCH_LOOP_ALIAS)
-	end
-end
-
-function AuspexScanningEffects:_start_confirm_sfx_loop()
-	if self._is_husk then
-		return
-	end
-
-	if not self._confirm_loop_sound_component.is_playing then
-		self._fx_extension:trigger_looping_wwise_event(CONFIRM_LOOP_ALIAS, self._fx_source_name)
-	end
-end
-
-function AuspexScanningEffects:_stop_confirm_sfx_loop()
-	if self._is_husk then
-		return
-	end
-
-	if self._confirm_loop_sound_component.is_playing then
-		self._fx_extension:stop_looping_wwise_event(CONFIRM_LOOP_ALIAS)
-	end
+function AuspexScanningEffects:_run_confirm_sfx_loop(frame)
+	self._fx_extension:run_looping_sound(CONFIRM_LOOP_ALIAS, self._fx_source_name, nil, frame)
 end
 
 function AuspexScanningEffects:_set_outline_unit(unit, active)

@@ -248,10 +248,11 @@ local minion_target_selection_weights = {
 		max_distance = 50,
 		distance_to_target = 5,
 		archetypes = {
-			veteran = 1,
 			psyker = 1,
-			zealot = 1,
-			ogryn = 1
+			adamant = 1,
+			ogryn = 1,
+			veteran = 1,
+			zealot = 1
 		}
 	},
 	renegade_rifleman = {
@@ -306,6 +307,14 @@ local minion_target_selection_weights = {
 		max_distance = 20,
 		stickiness_bonus = 5000,
 		taunt_weight_multiplier = 20
+	},
+	companion_dog = {
+		occupied_slots = -1,
+		disabled = -5,
+		inverse_coherency_weight = 5,
+		max_distance = 50,
+		threat_multiplier = 1.5,
+		distance_to_target = 3
 	}
 }
 

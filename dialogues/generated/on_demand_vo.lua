@@ -120,10 +120,10 @@ return function ()
 		}
 	})
 	define_rule({
-		name = "com_wheel_vo_lets_go_this_way",
+		name = "com_wheel_vo_location_ping",
 		category = "player_on_demand_vo",
 		wwise_route = 0,
-		response = "com_wheel_vo_lets_go_this_way",
+		response = "com_wheel_vo_location_ping",
 		database = "on_demand_vo",
 		criterias = {
 			{
@@ -560,10 +560,10 @@ return function ()
 		}
 	})
 	define_rule({
-		name = "response_for_seen_enemy_netgunner_flee",
+		name = "response_for_seen_netgunner_flee",
 		category = "player_prio_1",
 		wwise_route = 0,
-		response = "response_for_seen_enemy_netgunner_flee",
+		response = "response_for_seen_netgunner_flee",
 		database = "on_demand_vo",
 		criterias = {
 			{
@@ -774,10 +774,10 @@ return function ()
 	})
 	define_rule({
 		name = "smart_tag_vo_enemy_berserker",
-		category = "player_on_demand_vo",
 		wwise_route = 0,
 		response = "smart_tag_vo_enemy_berserker",
 		database = "on_demand_vo",
+		category = "player_on_demand_vo",
 		criterias = {
 			{
 				"query_context",
@@ -811,6 +811,9 @@ return function ()
 				OP.TIMESET
 			}
 		},
+		heard_speak_routing = {
+			target = "self"
+		},
 		on_pre_rule_execution = {
 			delay_vo = {
 				duration = 0.15
@@ -819,10 +822,10 @@ return function ()
 	})
 	define_rule({
 		name = "smart_tag_vo_enemy_captain",
-		category = "player_on_demand_vo",
 		wwise_route = 0,
 		response = "smart_tag_vo_enemy_captain",
 		database = "on_demand_vo",
+		category = "player_on_demand_vo",
 		criterias = {
 			{
 				"query_context",
@@ -856,6 +859,9 @@ return function ()
 				OP.TIMESET
 			}
 		},
+		heard_speak_routing = {
+			target = "self"
+		},
 		on_pre_rule_execution = {
 			delay_vo = {
 				duration = 0.15
@@ -864,10 +870,10 @@ return function ()
 	})
 	define_rule({
 		name = "smart_tag_vo_enemy_chaos_hound",
-		category = "player_on_demand_vo",
 		wwise_route = 0,
 		response = "smart_tag_vo_enemy_chaos_hound",
 		database = "on_demand_vo",
+		category = "player_on_demand_vo",
 		criterias = {
 			{
 				"query_context",
@@ -901,6 +907,9 @@ return function ()
 				OP.TIMESET
 			}
 		},
+		heard_speak_routing = {
+			target = "self"
+		},
 		on_pre_rule_execution = {
 			delay_vo = {
 				duration = 0.15
@@ -909,10 +918,10 @@ return function ()
 	})
 	define_rule({
 		name = "smart_tag_vo_enemy_chaos_mutant_charger",
-		category = "player_on_demand_vo",
 		wwise_route = 0,
 		response = "smart_tag_vo_enemy_chaos_mutant_charger",
 		database = "on_demand_vo",
+		category = "player_on_demand_vo",
 		criterias = {
 			{
 				"query_context",
@@ -946,6 +955,9 @@ return function ()
 				OP.TIMESET
 			}
 		},
+		heard_speak_routing = {
+			target = "self"
+		},
 		on_pre_rule_execution = {
 			delay_vo = {
 				duration = 0.15
@@ -954,10 +966,10 @@ return function ()
 	})
 	define_rule({
 		name = "smart_tag_vo_enemy_chaos_ogryn_armored_executor",
-		category = "player_on_demand_vo",
 		wwise_route = 0,
 		response = "smart_tag_vo_enemy_chaos_ogryn_armored_executor",
 		database = "on_demand_vo",
+		category = "player_on_demand_vo",
 		criterias = {
 			{
 				"query_context",
@@ -991,6 +1003,9 @@ return function ()
 				OP.TIMESET
 			}
 		},
+		heard_speak_routing = {
+			target = "self"
+		},
 		on_pre_rule_execution = {
 			delay_vo = {
 				duration = 0.15
@@ -999,10 +1014,10 @@ return function ()
 	})
 	define_rule({
 		name = "smart_tag_vo_enemy_chaos_ogryn_bulwark",
-		category = "player_on_demand_vo",
 		wwise_route = 0,
 		response = "smart_tag_vo_enemy_chaos_ogryn_bulwark",
 		database = "on_demand_vo",
+		category = "player_on_demand_vo",
 		criterias = {
 			{
 				"query_context",
@@ -1043,6 +1058,9 @@ return function ()
 				OP.TIMESET
 			}
 		},
+		heard_speak_routing = {
+			target = "self"
+		},
 		on_pre_rule_execution = {
 			delay_vo = {
 				duration = 0.15
@@ -1051,10 +1069,10 @@ return function ()
 	})
 	define_rule({
 		name = "smart_tag_vo_enemy_chaos_ogryn_heavy_gunner",
-		category = "player_on_demand_vo",
 		wwise_route = 0,
 		response = "smart_tag_vo_enemy_chaos_ogryn_heavy_gunner",
 		database = "on_demand_vo",
+		category = "player_on_demand_vo",
 		criterias = {
 			{
 				"query_context",
@@ -1088,6 +1106,9 @@ return function ()
 				OP.TIMESET
 			}
 		},
+		heard_speak_routing = {
+			target = "self"
+		},
 		on_pre_rule_execution = {
 			delay_vo = {
 				duration = 0.15
@@ -1096,10 +1117,10 @@ return function ()
 	})
 	define_rule({
 		name = "smart_tag_vo_enemy_chaos_poxwalker_bomber",
-		category = "player_on_demand_vo",
 		wwise_route = 0,
 		response = "smart_tag_vo_enemy_chaos_poxwalker_bomber",
 		database = "on_demand_vo",
+		category = "player_on_demand_vo",
 		criterias = {
 			{
 				"query_context",
@@ -1133,6 +1154,9 @@ return function ()
 				OP.TIMESET
 			}
 		},
+		heard_speak_routing = {
+			target = "self"
+		},
 		on_pre_rule_execution = {
 			delay_vo = {
 				duration = 0.15
@@ -1141,10 +1165,10 @@ return function ()
 	})
 	define_rule({
 		name = "smart_tag_vo_enemy_chaos_spawn",
-		category = "player_on_demand_vo",
 		wwise_route = 0,
 		response = "smart_tag_vo_enemy_chaos_spawn",
 		database = "on_demand_vo",
+		category = "player_on_demand_vo",
 		criterias = {
 			{
 				"query_context",
@@ -1178,6 +1202,9 @@ return function ()
 				OP.TIMESET
 			}
 		},
+		heard_speak_routing = {
+			target = "self"
+		},
 		on_pre_rule_execution = {
 			delay_vo = {
 				duration = 0.15
@@ -1186,10 +1213,10 @@ return function ()
 	})
 	define_rule({
 		name = "smart_tag_vo_enemy_cultist_flamer",
-		category = "player_on_demand_vo",
 		wwise_route = 0,
 		response = "smart_tag_vo_enemy_cultist_flamer",
 		database = "on_demand_vo",
+		category = "player_on_demand_vo",
 		criterias = {
 			{
 				"query_context",
@@ -1223,6 +1250,9 @@ return function ()
 				OP.TIMESET
 			}
 		},
+		heard_speak_routing = {
+			target = "self"
+		},
 		on_pre_rule_execution = {
 			delay_vo = {
 				duration = 0.15
@@ -1231,10 +1261,10 @@ return function ()
 	})
 	define_rule({
 		name = "smart_tag_vo_enemy_cultist_grenadier",
-		category = "player_on_demand_vo",
 		wwise_route = 0,
 		response = "smart_tag_vo_enemy_cultist_grenadier",
 		database = "on_demand_vo",
+		category = "player_on_demand_vo",
 		criterias = {
 			{
 				"query_context",
@@ -1268,6 +1298,9 @@ return function ()
 				OP.TIMESET
 			}
 		},
+		heard_speak_routing = {
+			target = "self"
+		},
 		on_pre_rule_execution = {
 			delay_vo = {
 				duration = 0.15
@@ -1276,10 +1309,10 @@ return function ()
 	})
 	define_rule({
 		name = "smart_tag_vo_enemy_cultist_holy_stubber_gunner",
-		category = "player_on_demand_vo",
 		wwise_route = 0,
 		response = "smart_tag_vo_enemy_cultist_holy_stubber_gunner",
 		database = "on_demand_vo",
+		category = "player_on_demand_vo",
 		criterias = {
 			{
 				"query_context",
@@ -1313,6 +1346,9 @@ return function ()
 				OP.TIMESET
 			}
 		},
+		heard_speak_routing = {
+			target = "self"
+		},
 		on_pre_rule_execution = {
 			delay_vo = {
 				duration = 0.15
@@ -1321,10 +1357,10 @@ return function ()
 	})
 	define_rule({
 		name = "smart_tag_vo_enemy_cultist_shocktrooper",
-		category = "player_on_demand_vo",
 		wwise_route = 0,
 		response = "smart_tag_vo_enemy_cultist_shocktrooper",
 		database = "on_demand_vo",
+		category = "player_on_demand_vo",
 		criterias = {
 			{
 				"query_context",
@@ -1365,6 +1401,9 @@ return function ()
 				OP.TIMESET
 			}
 		},
+		heard_speak_routing = {
+			target = "self"
+		},
 		on_pre_rule_execution = {
 			delay_vo = {
 				duration = 0.15
@@ -1373,10 +1412,10 @@ return function ()
 	})
 	define_rule({
 		name = "smart_tag_vo_enemy_daemonhost_witch",
-		category = "player_on_demand_vo",
 		wwise_route = 0,
 		response = "smart_tag_vo_enemy_daemonhost_witch",
 		database = "on_demand_vo",
+		category = "player_on_demand_vo",
 		criterias = {
 			{
 				"query_context",
@@ -1410,6 +1449,9 @@ return function ()
 				OP.TIMESET
 			}
 		},
+		heard_speak_routing = {
+			target = "self"
+		},
 		on_pre_rule_execution = {
 			delay_vo = {
 				duration = 0.15
@@ -1418,10 +1460,10 @@ return function ()
 	})
 	define_rule({
 		name = "smart_tag_vo_enemy_daemonhost_witch_not_alerted",
-		category = "player_on_demand_vo",
 		wwise_route = 0,
 		response = "smart_tag_vo_enemy_daemonhost_witch_not_alerted",
 		database = "on_demand_vo",
+		category = "player_on_demand_vo",
 		criterias = {
 			{
 				"query_context",
@@ -1455,6 +1497,9 @@ return function ()
 				OP.TIMESET
 			}
 		},
+		heard_speak_routing = {
+			target = "self"
+		},
 		on_pre_rule_execution = {
 			delay_vo = {
 				duration = 0.15
@@ -1463,10 +1508,10 @@ return function ()
 	})
 	define_rule({
 		name = "smart_tag_vo_enemy_netgunner",
-		category = "player_on_demand_vo",
 		wwise_route = 0,
 		response = "smart_tag_vo_enemy_netgunner",
 		database = "on_demand_vo",
+		category = "player_on_demand_vo",
 		criterias = {
 			{
 				"query_context",
@@ -1500,6 +1545,9 @@ return function ()
 				OP.TIMESET
 			}
 		},
+		heard_speak_routing = {
+			target = "self"
+		},
 		on_pre_rule_execution = {
 			delay_vo = {
 				duration = 0.15
@@ -1508,10 +1556,10 @@ return function ()
 	})
 	define_rule({
 		name = "smart_tag_vo_enemy_plague_ogryn",
-		category = "player_on_demand_vo",
 		wwise_route = 0,
 		response = "smart_tag_vo_enemy_plague_ogryn",
 		database = "on_demand_vo",
+		category = "player_on_demand_vo",
 		criterias = {
 			{
 				"query_context",
@@ -1545,6 +1593,9 @@ return function ()
 				OP.TIMESET
 			}
 		},
+		heard_speak_routing = {
+			target = "self"
+		},
 		on_pre_rule_execution = {
 			delay_vo = {
 				duration = 0.15
@@ -1553,10 +1604,10 @@ return function ()
 	})
 	define_rule({
 		name = "smart_tag_vo_enemy_renegade_berserker",
-		category = "player_on_demand_vo",
 		wwise_route = 0,
 		response = "smart_tag_vo_enemy_renegade_berserker",
 		database = "on_demand_vo",
+		category = "player_on_demand_vo",
 		criterias = {
 			{
 				"query_context",
@@ -1590,6 +1641,9 @@ return function ()
 				OP.TIMESET
 			}
 		},
+		heard_speak_routing = {
+			target = "self"
+		},
 		on_pre_rule_execution = {
 			delay_vo = {
 				duration = 0.15
@@ -1598,10 +1652,10 @@ return function ()
 	})
 	define_rule({
 		name = "smart_tag_vo_enemy_scab_flamer",
-		category = "player_on_demand_vo",
 		wwise_route = 0,
 		response = "smart_tag_vo_enemy_scab_flamer",
 		database = "on_demand_vo",
+		category = "player_on_demand_vo",
 		criterias = {
 			{
 				"query_context",
@@ -1635,6 +1689,9 @@ return function ()
 				OP.TIMESET
 			}
 		},
+		heard_speak_routing = {
+			target = "self"
+		},
 		on_pre_rule_execution = {
 			delay_vo = {
 				duration = 0.15
@@ -1643,10 +1700,10 @@ return function ()
 	})
 	define_rule({
 		name = "smart_tag_vo_enemy_traitor_executor",
-		category = "player_on_demand_vo",
 		wwise_route = 0,
 		response = "smart_tag_vo_enemy_traitor_executor",
 		database = "on_demand_vo",
+		category = "player_on_demand_vo",
 		criterias = {
 			{
 				"query_context",
@@ -1680,6 +1737,9 @@ return function ()
 				OP.TIMESET
 			}
 		},
+		heard_speak_routing = {
+			target = "self"
+		},
 		on_pre_rule_execution = {
 			delay_vo = {
 				duration = 0.15
@@ -1688,10 +1748,10 @@ return function ()
 	})
 	define_rule({
 		name = "smart_tag_vo_enemy_traitor_grenadier",
-		category = "player_on_demand_vo",
 		wwise_route = 0,
 		response = "smart_tag_vo_enemy_traitor_grenadier",
 		database = "on_demand_vo",
+		category = "player_on_demand_vo",
 		criterias = {
 			{
 				"query_context",
@@ -1725,6 +1785,9 @@ return function ()
 				OP.TIMESET
 			}
 		},
+		heard_speak_routing = {
+			target = "self"
+		},
 		on_pre_rule_execution = {
 			delay_vo = {
 				duration = 0.15
@@ -1733,10 +1796,10 @@ return function ()
 	})
 	define_rule({
 		name = "smart_tag_vo_enemy_traitor_gunner",
-		category = "player_on_demand_vo",
 		wwise_route = 0,
 		response = "smart_tag_vo_enemy_traitor_gunner",
 		database = "on_demand_vo",
+		category = "player_on_demand_vo",
 		criterias = {
 			{
 				"query_context",
@@ -1770,6 +1833,9 @@ return function ()
 				OP.TIMESET
 			}
 		},
+		heard_speak_routing = {
+			target = "self"
+		},
 		on_pre_rule_execution = {
 			delay_vo = {
 				duration = 0.15
@@ -1778,10 +1844,10 @@ return function ()
 	})
 	define_rule({
 		name = "smart_tag_vo_enemy_traitor_scout_shocktrooper",
-		category = "player_on_demand_vo",
 		wwise_route = 0,
 		response = "smart_tag_vo_enemy_traitor_scout_shocktrooper",
 		database = "on_demand_vo",
+		category = "player_on_demand_vo",
 		criterias = {
 			{
 				"query_context",
@@ -1822,6 +1888,9 @@ return function ()
 				OP.TIMESET
 			}
 		},
+		heard_speak_routing = {
+			target = "self"
+		},
 		on_pre_rule_execution = {
 			delay_vo = {
 				duration = 0.15
@@ -1830,10 +1899,10 @@ return function ()
 	})
 	define_rule({
 		name = "smart_tag_vo_enemy_traitor_sniper",
-		category = "player_on_demand_vo",
 		wwise_route = 0,
 		response = "smart_tag_vo_enemy_traitor_sniper",
 		database = "on_demand_vo",
+		category = "player_on_demand_vo",
 		criterias = {
 			{
 				"query_context",
@@ -1866,6 +1935,9 @@ return function ()
 				"enemy_renegade_sniper",
 				OP.TIMESET
 			}
+		},
+		heard_speak_routing = {
+			target = "self"
 		},
 		on_pre_rule_execution = {
 			delay_vo = {

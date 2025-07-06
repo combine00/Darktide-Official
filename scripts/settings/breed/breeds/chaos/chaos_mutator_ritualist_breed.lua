@@ -46,6 +46,7 @@ local breed_data = {
 	name = breed_name,
 	breed_type = breed_types.minion,
 	tags = {
+		minion = true,
 		ritualist = true
 	},
 	point_cost = math.huge,
@@ -349,7 +350,18 @@ local breed_data = {
 		}
 	},
 	outline_config = {},
-	blackboard_component_config = BreedBlackboardComponentTemplates.unarmed
+	blackboard_component_config = BreedBlackboardComponentTemplates.unarmed,
+	tokens = {},
+	companion_pounce_setting = {
+		pounce_anim_event = "leap_attack",
+		companion_pounce_action = "human",
+		damage_profile = DamageProfileTemplates.adamant_companion_human_pounce,
+		initial_damage_profile = DamageProfileTemplates.adamant_companion_initial_pounce,
+		required_token = {
+			free_target_on_assigned_token = true,
+			name = "pounced"
+		}
+	}
 }
 
 return breed_data

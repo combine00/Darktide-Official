@@ -1,4 +1,4 @@
-local MasteryUtils = require("scripts/utilities/mastery")
+local Mastery = require("scripts/utilities/mastery")
 local DummySessionReport = {}
 
 function DummySessionReport.fetch_session_report(account_id)
@@ -301,7 +301,7 @@ local xp_tables = {
 		64500,
 		89000
 	},
-	weapon = MasteryUtils.get_dummy_weapon_xp_per_level()
+	weapon = Mastery.get_dummy_weapon_xp_per_level()
 }
 
 function DummySessionReport.fetch_xp_table(entity_type)

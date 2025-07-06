@@ -10,9 +10,10 @@ local circumstance_templates = {
 		},
 		ui = {
 			description = "loc_circumstance_assault_description",
-			display_name = "loc_circumstance_assault_title",
 			happening_display_name = "loc_happening_assault",
+			display_name = "loc_circumstance_assault_title",
 			favourable_to_players = true,
+			mission_board_icon = "content/ui/materials/mission_board/circumstances/assault_01",
 			icon = "content/ui/materials/icons/circumstances/assault_01"
 		}
 	}

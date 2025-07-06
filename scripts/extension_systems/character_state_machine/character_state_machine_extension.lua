@@ -180,13 +180,13 @@ function CharacterStateMachineExtension:fixed_update(unit, dt, t, fixed_frame)
 end
 
 function CharacterStateMachineExtension:_on_screen_particles(t)
-	local current_state = self._state_machine:current_state()
+	local current_state_name = self._state_machine:current_state_name()
 
-	if self._dash_particle_effect and current_state ~= "lunging" then
+	if self._dash_particle_effect and current_state_name ~= "lunging" then
 		World.destroy_particles(self._world, self._dash_particle_effect)
 
 		self._dash_particle_effect = nil
-	elseif current_state == "lunging" and not self._dash_particle_effect then
+	elseif current_state_name == "lunging" and not self._dash_particle_effect then
 		local lunge_template = LungeTemplates[self._lunge_character_state_component.lunge_template]
 		local on_screen_effect = lunge_template.on_screen_effect
 		local on_screen_effect_delay = on_screen_effect and lunge_template.on_screen_effect_delay or 0
@@ -232,6 +232,10 @@ end
 
 function CharacterStateMachineExtension:set_state(unit, dt, t, next_state, params)
 	self._state_machine:set_state(unit, dt, t, next_state, params)
+end
+
+function CharacterStateMachineExtension:current_state_name()
+	return self._state_machine:current_state_name() or "none"
 end
 
 function CharacterStateMachineExtension:current_state()

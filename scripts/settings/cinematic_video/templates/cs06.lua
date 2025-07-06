@@ -14,19 +14,19 @@ local cinematic_video_template = {
 			{
 				subtitle_duration = 8.6,
 				currently_playing_subtitle = "loc_servitor_male_a__cs06_servitor_speech_01_01",
-				speaker_name = "servitor_male_a",
+				speaker_name = "servitor_grendyl_a",
 				subtitle_start = 32.3
 			},
 			{
 				subtitle_duration = 4.2,
 				currently_playing_subtitle = "loc_servitor_male_a__cs06_servitor_speech_02_01",
-				speaker_name = "servitor_male_a",
+				speaker_name = "servitor_grendyl_a",
 				subtitle_start = 41.8
 			},
 			{
 				subtitle_duration = 0.9,
 				currently_playing_subtitle = "loc_servitor_male_a__cs06_servitor_speech_03_01",
-				speaker_name = "servitor_male_a",
+				speaker_name = "servitor_grendyl_a",
 				subtitle_start = 46.6
 			},
 			{
@@ -38,25 +38,25 @@ local cinematic_video_template = {
 			{
 				subtitle_duration = 4.56,
 				currently_playing_subtitle = "loc_servitor_male_a__cs06_servitor_speech_05_01",
-				speaker_name = "servitor_male_a",
+				speaker_name = "servitor_grendyl_a",
 				subtitle_start = 51.24
 			},
 			{
 				subtitle_duration = 6.75,
 				currently_playing_subtitle = "loc_servitor_male_a__cs06_servitor_speech_06_01",
-				speaker_name = "servitor_male_a",
+				speaker_name = "servitor_grendyl_a",
 				subtitle_start = 56.55
 			},
 			{
 				subtitle_duration = 4.6,
 				currently_playing_subtitle = "loc_servitor_male_a__cs06_servitor_speech_07_01",
-				speaker_name = "servitor_male_a",
+				speaker_name = "servitor_grendyl_a",
 				subtitle_start = 63.7
 			},
 			{
 				subtitle_duration = 0.8,
 				currently_playing_subtitle = "loc_servitor_male_a__cs06_servitor_speech_08_01",
-				speaker_name = "servitor_male_a",
+				speaker_name = "servitor_grendyl_a",
 				subtitle_start = 70
 			},
 			{
@@ -68,19 +68,19 @@ local cinematic_video_template = {
 			{
 				subtitle_duration = 6.9,
 				currently_playing_subtitle = "loc_servitor_male_a__cs06_servitor_speech_10_01",
-				speaker_name = "servitor_male_a",
+				speaker_name = "servitor_grendyl_a",
 				subtitle_start = 74.3
 			},
 			{
 				subtitle_duration = 5.2,
 				currently_playing_subtitle = "loc_servitor_female_a__cs06_servitor_speech_12_01",
-				speaker_name = "servitor_female_a",
+				speaker_name = "servitor_grendyl_a",
 				subtitle_start = 81.8
 			},
 			{
 				subtitle_duration = 1.1,
 				currently_playing_subtitle = "loc_servitor_female_a__cs06_servitor_speech_13_01",
-				speaker_name = "servitor_female_a",
+				speaker_name = "servitor_grendyl_a",
 				subtitle_start = 87.4
 			},
 			{
@@ -92,13 +92,13 @@ local cinematic_video_template = {
 			{
 				subtitle_duration = 5.6,
 				currently_playing_subtitle = "loc_servitor_female_a__cs06_servitor_speech_15_01",
-				speaker_name = "servitor_female_a",
+				speaker_name = "servitor_grendyl_a",
 				subtitle_start = 91.3
 			},
 			{
 				subtitle_duration = 0.95,
 				currently_playing_subtitle = "loc_servitor_female_a__cs06_servitor_speech_16_01",
-				speaker_name = "servitor_female_a",
+				speaker_name = "servitor_grendyl_a",
 				subtitle_start = 97.65
 			},
 			{
@@ -110,19 +110,19 @@ local cinematic_video_template = {
 			{
 				subtitle_duration = 8.65,
 				currently_playing_subtitle = "loc_servitor_female_a__cs06_servitor_speech_18_01",
-				speaker_name = "servitor_female_a",
+				speaker_name = "servitor_grendyl_a",
 				subtitle_start = 102.4
 			},
 			{
 				subtitle_duration = 3.5,
 				currently_playing_subtitle = "loc_servitor_male_a__cs06_servitor_speech_20_01",
-				speaker_name = "servitor_male_a",
+				speaker_name = "servitor_grendyl_a",
 				subtitle_start = 111.5
 			},
 			{
 				subtitle_duration = 0.85,
 				currently_playing_subtitle = "loc_servitor_male_a__cs06_servitor_speech_21_01",
-				speaker_name = "servitor_male_a",
+				speaker_name = "servitor_grendyl_a",
 				subtitle_start = 116.5
 			},
 			{
@@ -134,7 +134,7 @@ local cinematic_video_template = {
 			{
 				subtitle_duration = 1.4,
 				currently_playing_subtitle = "loc_servitor_male_a__cs06_servitor_speech_23_01",
-				speaker_name = "servitor_male_a",
+				speaker_name = "servitor_grendyl_a",
 				subtitle_start = 127.2
 			},
 			{

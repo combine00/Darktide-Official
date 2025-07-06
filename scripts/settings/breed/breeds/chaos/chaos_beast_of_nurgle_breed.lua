@@ -26,7 +26,8 @@ local stagger_types = StaggerSettings.stagger_types
 local weakspot_types = WeakspotSettings.types
 local breed_name = "chaos_beast_of_nurgle"
 local breed_data = {
-	ignore_stagger_accumulation = true,
+	detection_radius = 20,
+	can_patrol = true,
 	walk_speed = 2,
 	use_bone_lod = false,
 	look_at_distance = 20,
@@ -38,11 +39,12 @@ local breed_data = {
 	only_accumulate_stagger_on_weakspot = true,
 	stagger_resistance = 1,
 	stagger_pool_decay_delay = 1,
+	navigation_propagation_box_extent = 500,
 	base_height = 3.6,
 	explosion_radius = 2,
-	player_locomotion_constrain_radius = 1,
 	half_extent_right = 0.8,
 	stagger_pool_decay_time = 2,
+	player_locomotion_constrain_radius = 1,
 	half_extent_forward = 0.8,
 	hit_reacts_min_damage = 50,
 	use_navigation_path_splines = true,
@@ -55,11 +57,11 @@ local breed_data = {
 	is_boss = true,
 	faction_name = "chaos",
 	uses_script_components = true,
-	spawn_aggro_state = "aggroed",
+	spawn_aggro_state = "passive",
 	line_of_sight_collision_filter = "filter_minion_line_of_sight_check",
 	stagger_reduction = 100,
 	count_num_liquid_hits = true,
-	navigation_propagation_box_extent = 500,
+	ignore_stagger_accumulation = true,
 	smart_tag_target_type = "breed",
 	base_unit = "content/characters/enemy/chaos_beast_of_nurgle/third_person/base",
 	name = breed_name,
@@ -159,7 +161,8 @@ local breed_data = {
 	},
 	behavior_tree_name = breed_name,
 	animation_variables = {
-		"tongue_length"
+		"tongue_length",
+		"anim_move_speed"
 	},
 	spawn_buffs = {
 		"beast_of_nurgle_liquid_immunity"
@@ -174,7 +177,6 @@ local breed_data = {
 			0
 		}
 	},
-	detection_radius = math.huge,
 	target_changed_attack_intensities = {
 		disabling = 5
 	},
@@ -464,7 +466,8 @@ local breed_data = {
 		}
 	},
 	hit_zone_weakspot_types = {
-		[hit_zone_names.weakspot] = weakspot_types.weakspot
+		[hit_zone_names.weakspot] = weakspot_types.weakspot,
+		[hit_zone_names.tongue] = weakspot_types.weakspot
 	},
 	weakspot_config = {
 		impact_fx = {
@@ -472,7 +475,31 @@ local breed_data = {
 		}
 	},
 	outline_config = {},
-	blackboard_component_config = BreedBlackboardComponentTemplates.chaos_beast_of_nurgle
+	blackboard_component_config = BreedBlackboardComponentTemplates.chaos_beast_of_nurgle,
+	companion_pounce_setting = {
+		companion_pounce_action = "stagger_and_leap_away",
+		on_target_hit = {
+			linking_time = 1.55,
+			anim_event_on_stick = "attack_leap_nonhuman_stick",
+			anim_event = "attack_leap_nonhuman_start",
+			animation_driven_duration = 0.5333333333333333,
+			dog_target_nodes = {
+				"dog_target_position_left_01",
+				"dog_target_position_right_01",
+				"dog_target_position_back_01",
+				"dog_target_position_back_02",
+				"dog_target_position_front_01",
+				"dog_target_position_front_02"
+			}
+		},
+		land_anim_events = {
+			{
+				duration = 0.8333333333333334,
+				name = "attack_leap_nonhuman_land_02"
+			}
+		},
+		damage_profile = DamageProfileTemplates.adamant_companion_monster_pounce
+	}
 }
 
 return breed_data

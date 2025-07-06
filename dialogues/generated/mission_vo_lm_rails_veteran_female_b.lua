@@ -8,9 +8,6 @@ local mission_vo_lm_rails_veteran_female_b = {
 		sound_events_duration = {
 			[1.0] = 4.257583
 		},
-		sound_event_weights = {
-			[1.0] = 1
-		},
 		randomize_indexes = {}
 	},
 	mission_rails_district_gate = {

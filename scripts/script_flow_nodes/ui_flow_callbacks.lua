@@ -35,6 +35,14 @@ function UIFlowCallbacks.player_footstep(params)
 	return
 end
 
+function UIFlowCallbacks.companion_footstep(params)
+	return
+end
+
+function UIFlowCallbacks.companion_inventory_fx(params)
+	return
+end
+
 function UIFlowCallbacks.player_material_fx(params)
 	return
 end

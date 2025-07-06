@@ -273,7 +273,7 @@ weapon_template.actions = {
 				0
 			}
 		},
-		damage_profile = DamageProfileTemplates.powermaul_light_tank,
+		damage_profile = DamageProfileTemplates.powermaul_light_linesman,
 		damage_type = damage_types.blunt_shock,
 		time_scale_stat_buffs = {
 			buff_stat_buffs.attack_speed,
@@ -680,6 +680,7 @@ weapon_template.actions = {
 		anim_end_event = "attack_finished",
 		uninterruptible = true,
 		anim_event = "attack_left_down",
+		power_level = 530,
 		total_time = 1.5,
 		action_movement_curve = {
 			{
@@ -744,7 +745,7 @@ weapon_template.actions = {
 		spline_settings = {
 			matrices_data_location = "content/characters/player/human/first_person/animations/power_maul/attack_left_down",
 			anchor_point_offset = {
-				0.1,
+				0.15,
 				0,
 				0
 			}
@@ -823,7 +824,7 @@ weapon_template.actions = {
 		end
 	},
 	action_light_4 = {
-		damage_window_start = 0.2,
+		damage_window_start = 0.28,
 		hit_armor_anim = "attack_hit_shield",
 		weapon_handling_template = "time_scale_1",
 		anim_end_event = "attack_finished",
@@ -831,9 +832,10 @@ weapon_template.actions = {
 		attack_direction_override = "up",
 		range_mod = 1.2,
 		first_person_hit_stop_anim = "hit_stop",
-		damage_window_end = 0.38,
+		damage_window_end = 0.35,
 		anim_event_3p = "attack_swing_up_right",
 		anim_event = "attack_right_up",
+		power_level = 550,
 		total_time = 1.8,
 		action_movement_curve = {
 			{
@@ -894,7 +896,7 @@ weapon_template.actions = {
 		spline_settings = {
 			matrices_data_location = "content/characters/player/human/first_person/animations/power_maul/attack_up_right",
 			anchor_point_offset = {
-				0,
+				0.15,
 				0,
 				0
 			}
@@ -1246,9 +1248,9 @@ weapon_template.keywords = {
 	"power_maul",
 	"p1"
 }
-weapon_template.dodge_template = "assault"
+weapon_template.dodge_template = "default"
 weapon_template.sprint_template = "default"
-weapon_template.stamina_template = "default"
+weapon_template.stamina_template = "linesman_plus"
 weapon_template.toughness_template = "assault"
 weapon_template.movement_curve_modifier_template = "combataxe_p1_m1"
 weapon_template.footstep_intervals = FootstepIntervalsTemplates.default
@@ -1580,7 +1582,7 @@ weapon_template.displayed_attacks = {
 		display_name = "loc_gestalt_smiter",
 		type = "smiter",
 		attack_chain = {
-			"tank",
+			"linesman",
 			"smiter",
 			"smiter",
 			"smiter"
@@ -1603,12 +1605,12 @@ weapon_template.displayed_attacks = {
 weapon_template.weapon_card_data = {
 	main = {
 		{
-			icon = "smiter",
+			icon = "linesman",
 			value_func = "primary_attack",
 			header = "light"
 		},
 		{
-			icon = "tank",
+			icon = "smiter",
 			value_func = "secondary_attack",
 			header = "heavy"
 		}

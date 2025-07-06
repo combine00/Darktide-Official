@@ -10,10 +10,6 @@ local mission_vo_lm_rails_zealot_female_b = {
 			[1.0] = 5.00451,
 			[2.0] = 4.486813
 		},
-		sound_event_weights = {
-			[1.0] = 0.5,
-			[2.0] = 0.5
-		},
 		randomize_indexes = {}
 	},
 	mission_rails_district_gate = {

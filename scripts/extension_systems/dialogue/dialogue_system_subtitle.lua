@@ -77,7 +77,7 @@ function DialogueSystemSubtitle:add_playing_localized_dialogue(speaker_name, dia
 	if speaker_setting then
 		local is_localized = speaker_setting.subtitles_enabled
 
-		if is_localized then
+		if is_localized and dialogue.dialogue_timer ~= 3.45678 then
 			table.insert(self._playing_localized_dialogues_array, 1, dialogue)
 		end
 	end

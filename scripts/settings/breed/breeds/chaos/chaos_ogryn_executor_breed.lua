@@ -411,7 +411,27 @@ local breed_data = {
 		}
 	},
 	outline_config = {},
-	blackboard_component_config = BreedBlackboardComponentTemplates.melee_patroller
+	blackboard_component_config = BreedBlackboardComponentTemplates.melee_patroller,
+	companion_pounce_setting = {
+		companion_pounce_action = "stagger_and_leap_away",
+		on_target_hit = {
+			anim_event = "attack_leap_nonhuman_start",
+			animation_driven_duration = 0.5333333333333333
+		},
+		land_anim_events = {
+			{
+				duration = 0.8333333333333334,
+				name = "attack_leap_nonhuman_land_02"
+			}
+		},
+		damage_profile = DamageProfileTemplates.adamant_companion_ogryn_pounce,
+		force_stagger_settings = {
+			stagger_type = "light",
+			duration = 2.5,
+			length_scale = 1,
+			immune_time = 2.5
+		}
+	}
 }
 
 return breed_data

@@ -7,6 +7,7 @@ function DroneTargetPositionFinderActionModule:init(is_server, physics_world, pl
 	self._player_unit = player_unit
 	self._position_finder_component = position_finder_component
 	self._action_settings = action_settings
+	self._instant_cast = action_settings.instant_cast
 	local unit_data_extension = ScriptUnit.extension(player_unit, "unit_data_system")
 	self._first_person_component = unit_data_extension:read_component("first_person")
 	self._locomotion_component = unit_data_extension:read_component("locomotion")
@@ -18,21 +19,27 @@ end
 
 function DroneTargetPositionFinderActionModule:fixed_update(dt, t)
 	local physics_world = self._physics_world
-	local collision_filter = "filter_player_character_ballistic_raycast"
-	local hit, hit_position, _, normal, _ = BallisticRaycast.cast(physics_world, collision_filter, self._first_person_component, nil, nil, nil, nil, nil)
+	local collision_filter = "filter_place_force_field"
+	local max_steps = 5
+	local max_time = 2
+	local instant_cast = self._instant_cast
+	local speed = instant_cast and 2.5 or 12.5
+	local angle = math.pi / 16
+	local gravity = -19.64
+	local hit, hit_position, _, normal, actor = BallisticRaycast.cast(physics_world, collision_filter, self._first_person_component, max_steps, max_time, speed, angle, gravity)
 
-	if hit then
-		local up = Vector3.up()
+	if hit and Vector3.dot(normal, Vector3.up()) < 0.75 then
+		local player_position = self._locomotion_component.position
+		local half_step_back = 1 * Vector3.normalize(hit_position - player_position)
+		local step_back_position = hit_position - half_step_back
+		local _, new_position, _, _, _ = PhysicsWorld.raycast(physics_world, step_back_position, Vector3(0, 0, -1), 5, "closest", "types", "both", "collision_filter", collision_filter)
 
-		if Vector3.dot(normal, up) < 0.75 then
-			local player_position = self._locomotion_component.position
-			local half_step_back = 1.5 * Vector3.normalize(hit_position - player_position)
-			local new_position = hit_position - half_step_back
-			local _, new_hit_position, _, _, _ = PhysicsWorld.raycast(physics_world, new_position, Vector3(0, 0, -1), 5, "closest", "types", "both", "collision_filter", collision_filter)
-
-			if new_hit_position then
-				hit_position = new_hit_position
-			end
+		if new_position then
+			hit_position = new_position
+		else
+			hit = false
+			hit_position = Vector3.zero()
+			actor = nil
 		end
 	end
 

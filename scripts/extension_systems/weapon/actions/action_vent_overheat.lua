@@ -30,17 +30,7 @@ function ActionVentOverheat:start(action_settings, t, time_scale, action_start_p
 	if vent_fx then
 		local fx_source_name = self._vent_fx_source_name
 		local unit_data_extension = self._unit_data_extension
-		local sfx_alias = vent_fx.looping_sound_alias
-
-		if sfx_alias then
-			self._looping_sfx_alias = sfx_alias
-
-			self._fx_extension:trigger_looping_wwise_event(sfx_alias, fx_source_name)
-
-			local component_name = PlayerUnitData.looping_sound_component_name(sfx_alias)
-			self._looping_sound_component = unit_data_extension:read_component(component_name)
-		end
-
+		self._looping_sfx_alias = vent_fx.looping_sound_alias
 		local vfx_alias = vent_fx.looping_vfx_alias
 
 		if vfx_alias then
@@ -53,7 +43,7 @@ function ActionVentOverheat:start(action_settings, t, time_scale, action_start_p
 	end
 end
 
-function ActionVentOverheat:fixed_update(dt, t, time_in_action)
+function ActionVentOverheat:fixed_update(dt, t, time_in_action, frame)
 	local inventory_slot_component = self._inventory_slot_component
 	local overheat_config = self._weapon_template.overheat_configuration
 	local player = self._player
@@ -71,6 +61,10 @@ function ActionVentOverheat:fixed_update(dt, t, time_in_action)
 		local anim_event_3p = vent_finished_anim_event_3p or anim_event
 
 		self:trigger_anim_event(anim_event, anim_event_3p)
+	end
+
+	if self._looping_sfx_alias then
+		self._fx_extension:run_looping_sound(self._looping_sfx_alias, self._vent_fx_source_name, nil, frame)
 	end
 end
 
@@ -118,12 +112,6 @@ function ActionVentOverheat:finish(reason, data, t, time_in_action)
 	Overheat.stop_venting(self._inventory_slot_component)
 
 	local fx_extension = self._fx_extension
-	local looping_sfx_alias = self._looping_sfx_alias
-
-	if looping_sfx_alias and self._looping_sound_component.is_playing then
-		fx_extension:stop_looping_wwise_event(looping_sfx_alias)
-	end
-
 	local looping_vfx_alias = self._looping_vfx_alias
 
 	if looping_vfx_alias and self._looping_vfx_component.spawner_name ~= "n/a" then

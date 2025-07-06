@@ -1,4 +1,3 @@
-local LevelEventSettings = require("scripts/settings/level_event/level_event_settings")
 local MissionObjectiveZoneScannableExtension = class("MissionObjectiveZoneScannableExtension")
 
 function MissionObjectiveZoneScannableExtension:init(extension_init_context, unit, extension_init_data)
@@ -13,11 +12,11 @@ function MissionObjectiveZoneScannableExtension:init(extension_init_context, uni
 	self._has_highlight = false
 end
 
-function MissionObjectiveZoneScannableExtension:on_gameplay_post_init(level)
+function MissionObjectiveZoneScannableExtension:on_gameplay_post_init(unit)
 	if self._is_server then
 		local mission_objective_zone_system = Managers.state.extension:system("mission_objective_zone_system")
 
-		mission_objective_zone_system:register_scannable_unit(self._unit)
+		mission_objective_zone_system:register_scannable_unit(unit)
 	end
 end
 

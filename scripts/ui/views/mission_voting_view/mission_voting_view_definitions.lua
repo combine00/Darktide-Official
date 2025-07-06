@@ -729,14 +729,62 @@ local mission_info_widget_definitions = {
 			}
 		},
 		{
-			value = "content/ui/materials/backgrounds/default_square",
-			style_id = "diffulty_icon_background",
-			pass_type = "multi_texture"
+			value = "content/ui/materials/icons/difficulty/difficulty_indicator_full",
+			style_id = "difficulty_background",
+			pass_type = "texture",
+			style = {
+				vertical_alignment = "center",
+				horizontal_alignment = "center",
+				color = Color.black(255, true),
+				offset = {
+					-20.4,
+					10,
+					5
+				},
+				size = {
+					72.8,
+					72.8
+				}
+			}
 		},
 		{
-			value = "content/ui/materials/backgrounds/default_square",
+			value = "content/ui/materials/icons/difficulty/difficulty_indicator_empty",
+			style_id = "difficulty_icon_frame",
+			pass_type = "texture",
+			style = {
+				vertical_alignment = "center",
+				horizontal_alignment = "center",
+				color = Color.white(255, true),
+				offset = {
+					-20.4,
+					10,
+					6
+				},
+				size = {
+					72.8,
+					72.8
+				}
+			}
+		},
+		{
+			value_id = "difficulty_icon",
 			style_id = "difficulty_icon",
-			pass_type = "multi_texture"
+			pass_type = "texture",
+			value = "content/ui/materials/icons/difficulty/difficulty_skull_uprising",
+			style = {
+				vertical_alignment = "center",
+				horizontal_alignment = "center",
+				color = Color.white(255, true),
+				offset = {
+					-20.4,
+					10,
+					7
+				},
+				size = {
+					57.2,
+					57.2
+				}
+			}
 		},
 		{
 			value = "content/ui/materials/icons/generic/havoc_chevron",

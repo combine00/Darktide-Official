@@ -46,7 +46,7 @@ function UIWeaponSpawner:_node(node_name)
 	end
 end
 
-function UIWeaponSpawner:start_presentation(item, position, rotation, scale, on_spawn_cb, force_highest_mip)
+function UIWeaponSpawner:start_presentation(item, position, rotation, scale, level_link_unit, on_spawn_cb, force_highest_mip)
 	if self._loading_weapon_data then
 		self._loading_weapon_data.loader:destroy()
 
@@ -56,7 +56,7 @@ function UIWeaponSpawner:start_presentation(item, position, rotation, scale, on_
 	self._weapon_loader_index = (self._weapon_loader_index or 0) + 1
 	local reference_name = self._reference_name .. "_weapon_item_loader_" .. tostring(self._weapon_loader_index)
 	local single_item_loader = UiCharacterProfilePackageLoader:new(reference_name, self._item_definitions)
-	local slot_id = "slot_primary"
+	local slot_id = item.slots and item.slots[1] or "slot_primary"
 	local on_loaded_callback = callback(self, "cb_on_item_package_loaded", slot_id, item, on_spawn_cb)
 	self._loading_weapon_data = {
 		link_unit_name = "content/weapons/default_display",
@@ -66,6 +66,7 @@ function UIWeaponSpawner:start_presentation(item, position, rotation, scale, on_
 		rotation = rotation and QuaternionBox(rotation),
 		scale = scale and Vector3.to_array(scale),
 		item = item,
+		level_link_unit = level_link_unit,
 		force_highest_mip = force_highest_mip
 	}
 
@@ -132,9 +133,10 @@ function UIWeaponSpawner:update(dt, t, input_service)
 			local scale = loading_weapon_data.scale and Vector3.from_array(loading_weapon_data.scale)
 			local item = loading_weapon_data.item
 			local link_unit_name = loading_weapon_data.link_unit_name
+			local level_link_unit = loading_weapon_data.level_link_unit
 			local force_highest_mip = loading_weapon_data.force_highest_mip
 
-			self:_spawn_weapon(item, link_unit_name, loader, position, rotation, scale, force_highest_mip)
+			self:_spawn_weapon(item, link_unit_name, level_link_unit, loader, position, rotation, scale, force_highest_mip)
 
 			self._loading_weapon_data = nil
 		end
@@ -202,7 +204,7 @@ function UIWeaponSpawner:set_position(position)
 	end
 end
 
-function UIWeaponSpawner:_spawn_weapon(item, link_unit_name, loader, position, rotation, scale, force_highest_mip)
+function UIWeaponSpawner:_spawn_weapon(item, link_unit_name, level_link_unit, loader, position, rotation, scale, force_highest_mip)
 	position = position or Vector3.zero()
 	rotation = rotation or Quaternion.identity()
 	scale = scale or Vector3.zero()
@@ -222,7 +224,7 @@ function UIWeaponSpawner:_spawn_weapon(item, link_unit_name, loader, position, r
 		spawn_with_extensions = extension_manager ~= nil
 	}
 	local mission_template, equipment = nil
-	local item_unit_3p, attachment_units_3p = VisualLoadoutCustomization.spawn_item(item, attach_settings, link_unit, false, false, false, mission_template, equipment)
+	local item_unit_3p, attachment_units_3p = VisualLoadoutCustomization.spawn_item(item, attach_settings, link_unit, true, false, true, mission_template, equipment)
 	local spawn_data = {
 		visible = false,
 		streaming_complete = false,
@@ -248,6 +250,21 @@ function UIWeaponSpawner:_spawn_weapon(item, link_unit_name, loader, position, r
 	local link_unit_pos = Unit.local_position(link_unit, 1)
 
 	Unit.set_local_position(link_unit, 1, link_unit_pos + rotated_pos)
+
+	if level_link_unit then
+		local left_attach_source_node_index = Unit.has_node(level_link_unit, "j_leftweaponattach") and Unit.node(level_link_unit, "j_leftweaponattach")
+		local right_attach_source_node_index = Unit.has_node(level_link_unit, "j_rightweaponattach") and Unit.node(level_link_unit, "j_rightweaponattach")
+		local left_attach_target_node_index = Unit.has_node(link_unit, "j_leftweaponattach") and Unit.node(link_unit, "j_leftweaponattach")
+		local right_attach_target_node_index = Unit.has_node(link_unit, "j_rightweaponattach") and Unit.node(link_unit, "j_rightweaponattach")
+
+		if left_attach_source_node_index and right_attach_source_node_index and left_attach_target_node_index and right_attach_target_node_index then
+			local left_attach_offset = Unit.local_pose(level_link_unit, left_attach_source_node_index)
+			local right_attach_offset = Unit.local_pose(level_link_unit, right_attach_source_node_index)
+
+			Unit.set_local_pose(link_unit, left_attach_target_node_index, left_attach_offset)
+			Unit.set_local_pose(link_unit, right_attach_target_node_index, right_attach_offset)
+		end
+	end
 end
 
 function UIWeaponSpawner:cb_on_unit_3p_streaming_complete(item_unit_3p, timeout)

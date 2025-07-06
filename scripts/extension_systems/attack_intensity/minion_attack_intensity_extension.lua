@@ -127,6 +127,10 @@ function MinionAttackIntensityExtension:set_attacked_melee()
 	return
 end
 
+function MinionAttackIntensityExtension:set_damage_dealt()
+	return
+end
+
 function MinionAttackIntensityExtension:set_allow_all_attacks_duration(duration)
 	local t = Managers.time:time("gameplay")
 	self._allow_all_attacks_duration = t + duration

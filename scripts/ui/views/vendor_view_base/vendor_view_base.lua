@@ -1,13 +1,12 @@
 require("scripts/ui/views/item_grid_view_base/item_grid_view_base")
 
 local Definitions = require("scripts/ui/views/vendor_view_base/vendor_view_base_definitions")
+local Items = require("scripts/utilities/items")
 local ItemSlotSettings = require("scripts/settings/item/item_slot_settings")
-local ItemUtils = require("scripts/utilities/items")
 local MasterItems = require("scripts/backend/master_items")
 local Promise = require("scripts/foundation/utilities/promise")
-local TextUtilities = require("scripts/utilities/ui/text")
-local UISettings = require("scripts/settings/ui/ui_settings")
-local UISoundEvents = require("scripts/settings/ui/ui_sound_events")
+local Text = require("scripts/utilities/ui/text")
+local UiSettings = require("scripts/settings/ui/ui_settings")
 local WalletSettings = require("scripts/settings/wallet_settings")
 local definition_merge_recursive = nil
 
@@ -93,31 +92,21 @@ function VendorViewBase:_register_button_callbacks()
 end
 
 function VendorViewBase:_cb_on_purchase_pressed()
-	local acquire_type = self._widgets_by_name.purchase_button.content.acquire_type
+	local offer = self._previewed_offer
 
-	if acquire_type then
-		local callback_func = ItemUtils.class_acquire_callback(acquire_type)
+	if not offer then
+		return
+	end
 
-		if callback_func then
-			callback_func()
-		end
-	else
-		local offer = self._previewed_offer
+	local price_data = offer.price.amount
+	local price = price_data.discounted_price or price_data.amount
+	local can_afford = self:can_afford(price, price_data.type)
 
-		if not offer then
-			return
-		end
+	if can_afford then
+		local is_active = offer.state == "active"
 
-		local price_data = offer.price.amount
-		local price = price_data.discounted_price or price_data.amount
-		local can_afford = self:can_afford(price, price_data.type)
-
-		if can_afford then
-			local is_active = offer.state == "active"
-
-			if is_active then
-				self:_purchase_item(offer)
-			end
+		if is_active then
+			self:_purchase_item(offer)
 		end
 	end
 end
@@ -296,7 +285,7 @@ function VendorViewBase:_fetch_store_items(ignore_focus_on_offer)
 
 			if use_tab_menu then
 				local function tab_sort_function(a, b)
-					local store_category_sort_order = UISettings.store_category_sort_order
+					local store_category_sort_order = UiSettings.store_category_sort_order
 
 					if a.store_category and b.store_category then
 						return store_category_sort_order[a.store_category] < store_category_sort_order[b.store_category]
@@ -417,8 +406,8 @@ function VendorViewBase:_generate_menu_tabs(layout, offers)
 					end
 
 					local tab_content = {
-						display_name = UISettings.display_name_by_store_category[store_category],
-						icon = UISettings.texture_by_store_category[store_category],
+						display_name = UiSettings.display_name_by_store_category[store_category],
+						icon = UiSettings.texture_by_store_category[store_category],
 						slot_types = use_item_categories and store_category_slot_stypes,
 						store_category = store_category
 					}
@@ -557,13 +546,13 @@ function VendorViewBase:_convert_offers_to_layout_entries(item_offers)
 			end
 
 			if #items == #bundled then
-				table.sort(items, ItemUtils.compare_set_item_parts_presentation_order)
+				table.sort(items, Items.compare_set_item_parts_presentation_order)
 
 				local first_item = items[1]
 				local fake_set_item = {
 					name = "set_item",
 					gear_id = offer_id,
-					item_type = UISettings.ITEM_TYPES.SET,
+					item_type = UiSettings.ITEM_TYPES.SET,
 					items = items,
 					display_name = offer.sku.name or "n/a",
 					genders = first_item.genders,
@@ -644,7 +633,7 @@ function VendorViewBase:_generate_mannequin_loadout(profile)
 	local archetype = presentation_profile.archetype
 	local breed_name = archetype.breed
 	local new_loadout = {}
-	local required_breed_item_names_per_slot = UISettings.item_preview_required_slot_items_per_slot_by_breed_and_gender[breed_name]
+	local required_breed_item_names_per_slot = UiSettings.item_preview_required_slot_items_per_slot_by_breed_and_gender[breed_name]
 	local required_gender_item_names_per_slot = required_breed_item_names_per_slot and required_breed_item_names_per_slot[gender_name]
 	local required_items = required_gender_item_names_per_slot and required_gender_item_names_per_slot.default
 
@@ -722,16 +711,11 @@ function VendorViewBase:_update_button_disable_state()
 			elseif category == "item_instance" then
 				local gear_id = offer.description.gearId
 				button_disabled = self:is_item_owned(gear_id)
-				local item = MasterItems.get_store_item_instance(offer.description)
 			end
 		end
 
 		if button_widget then
 			button_widget.content.hotspot.disabled = button_disabled
-
-			if not button_disabled then
-				-- Nothing
-			end
 		end
 	end
 end
@@ -741,7 +725,7 @@ function VendorViewBase:_set_display_price(price_data)
 	local type = price_data and price_data.type
 	local can_afford = price and self:can_afford(price, type)
 	local price_text = nil
-	price_text = price and TextUtilities.format_currency(price) or ""
+	price_text = price and Text.format_currency(price) or ""
 	local widgets_by_name = self._widgets_by_name
 	local price_text_widget = widgets_by_name.price_text
 	local price_text_widget_style = price_text_widget.style
@@ -804,7 +788,7 @@ function VendorViewBase:_update_layout_list_on_item_purchase(items_layout, item)
 			if entry_item.gear_id == gear_id then
 				entry_offer.state = "owned"
 				entry.test = true
-			elseif entry_item_type == UISettings.ITEM_TYPES.SET then
+			elseif entry_item_type == UiSettings.ITEM_TYPES.SET then
 				local offer_id = entry_offer.offerId
 
 				if offer_id == gear_id then
@@ -834,7 +818,7 @@ end
 
 function VendorViewBase:_on_purchase_complete(items)
 	if #items > 1 then
-		table.sort(items, ItemUtils.compare_set_item_parts_presentation_order)
+		table.sort(items, Items.compare_set_item_parts_presentation_order)
 	end
 
 	local offer_items_layout = self._offer_items_layout
@@ -847,7 +831,7 @@ function VendorViewBase:_on_purchase_complete(items)
 			local gear_id = item.gear_id
 
 			if not self:is_item_owned(gear_id) then
-				ItemUtils.mark_item_id_as_new(item)
+				Items.mark_item_id_as_new(item)
 			end
 
 			self._account_items[gear_id] = item
@@ -938,116 +922,116 @@ function VendorViewBase:_setup_sort_options()
 				display_name = Localize("loc_inventory_item_grid_sort_title_format_high_low", true, {
 					sort_name = Localize("loc_inventory_item_grid_sort_title_item_power")
 				}),
-				sort_function = ItemUtils.sort_comparator({
+				sort_function = Items.sort_comparator({
 					">",
-					ItemUtils.compare_item_level,
+					Items.compare_item_level,
 					"<",
-					ItemUtils.compare_item_name,
+					Items.compare_item_name,
 					"<",
-					ItemUtils.compare_item_rarity
+					Items.compare_item_rarity
 				})
 			},
 			{
 				display_name = Localize("loc_inventory_item_grid_sort_title_format_low_high", true, {
 					sort_name = Localize("loc_inventory_item_grid_sort_title_item_power")
 				}),
-				sort_function = ItemUtils.sort_comparator({
+				sort_function = Items.sort_comparator({
 					"<",
-					ItemUtils.compare_item_level,
+					Items.compare_item_level,
 					"<",
-					ItemUtils.compare_item_name,
+					Items.compare_item_name,
 					"<",
-					ItemUtils.compare_item_rarity
+					Items.compare_item_rarity
 				})
 			},
 			{
 				display_name = Localize("loc_inventory_item_grid_sort_title_format_high_low", true, {
 					sort_name = Localize("loc_inventory_item_grid_sort_title_rarity")
 				}),
-				sort_function = ItemUtils.sort_comparator({
+				sort_function = Items.sort_comparator({
 					">",
-					ItemUtils.compare_item_rarity,
+					Items.compare_item_rarity,
 					">",
-					ItemUtils.compare_item_level,
+					Items.compare_item_level,
 					"<",
-					ItemUtils.compare_item_name
+					Items.compare_item_name
 				})
 			},
 			{
 				display_name = Localize("loc_inventory_item_grid_sort_title_format_low_high", true, {
 					sort_name = Localize("loc_inventory_item_grid_sort_title_rarity")
 				}),
-				sort_function = ItemUtils.sort_comparator({
+				sort_function = Items.sort_comparator({
 					"<",
-					ItemUtils.compare_item_rarity,
+					Items.compare_item_rarity,
 					">",
-					ItemUtils.compare_item_level,
+					Items.compare_item_level,
 					"<",
-					ItemUtils.compare_item_name
+					Items.compare_item_name
 				})
 			},
 			{
 				display_name = Localize("loc_inventory_item_grid_sort_title_format_low_high", true, {
 					sort_name = Localize("loc_inventory_item_grid_sort_title_item_price")
 				}),
-				sort_function = ItemUtils.sort_element_key_comparator({
+				sort_function = Items.sort_element_key_comparator({
 					"false",
 					"offer",
-					ItemUtils.compare_offer_owned,
+					Items.compare_offer_owned,
 					"<",
 					"offer",
-					ItemUtils.compare_offer_price,
+					Items.compare_offer_price,
 					"<",
 					"item",
-					ItemUtils.compare_item_rarity,
+					Items.compare_item_rarity,
 					"<",
 					"item",
-					ItemUtils.compare_item_name
+					Items.compare_item_name
 				})
 			},
 			{
 				display_name = Localize("loc_inventory_item_grid_sort_title_format_high_low", true, {
 					sort_name = Localize("loc_inventory_item_grid_sort_title_item_price")
 				}),
-				sort_function = ItemUtils.sort_element_key_comparator({
+				sort_function = Items.sort_element_key_comparator({
 					"false",
 					"offer",
-					ItemUtils.compare_offer_owned,
+					Items.compare_offer_owned,
 					">",
 					"offer",
-					ItemUtils.compare_offer_price,
+					Items.compare_offer_price,
 					"<",
 					"item",
-					ItemUtils.compare_item_rarity,
+					Items.compare_item_rarity,
 					"<",
 					"item",
-					ItemUtils.compare_item_name
+					Items.compare_item_name
 				})
 			},
 			{
 				display_name = Localize("loc_inventory_item_grid_sort_title_format_increasing_letters", true, {
 					sort_name = Localize("loc_inventory_item_grid_sort_title_name")
 				}),
-				sort_function = ItemUtils.sort_comparator({
+				sort_function = Items.sort_comparator({
 					"<",
-					ItemUtils.compare_item_name,
+					Items.compare_item_name,
 					"<",
-					ItemUtils.compare_item_level,
+					Items.compare_item_level,
 					"<",
-					ItemUtils.compare_item_rarity
+					Items.compare_item_rarity
 				})
 			},
 			{
 				display_name = Localize("loc_inventory_item_grid_sort_title_format_decreasing_letters", true, {
 					sort_name = Localize("loc_inventory_item_grid_sort_title_name")
 				}),
-				sort_function = ItemUtils.sort_comparator({
+				sort_function = Items.sort_comparator({
 					">",
-					ItemUtils.compare_item_name,
+					Items.compare_item_name,
 					"<",
-					ItemUtils.compare_item_level,
+					Items.compare_item_level,
 					"<",
-					ItemUtils.compare_item_rarity
+					Items.compare_item_rarity
 				})
 			}
 		}

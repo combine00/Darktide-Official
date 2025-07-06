@@ -134,6 +134,24 @@ local objectives_lookup = {
 		play_sound = true,
 		objective_id = "combat_ability_zealot_3_2"
 	},
+	combat_ability_adamant_1 = {
+		max_value = 1,
+		name = "loc_medkit_input_description_deploy",
+		play_sound = true,
+		objective_id = "combat_ability_adamant_1"
+	},
+	combat_ability_adamant_2 = {
+		max_value = 3,
+		name = "loc_psyker_ability_objective",
+		play_sound = true,
+		objective_id = "combat_ability_adamant_2"
+	},
+	adamant_companion_targeting = {
+		max_value = 3,
+		name = "loc_psyker_thowing_knife_input_description_charge",
+		play_sound = true,
+		objective_id = "adamant_companion_targeting"
+	},
 	attack_chain = {
 		max_value = 3,
 		name = "loc_melee_chain_objective",

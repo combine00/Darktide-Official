@@ -539,7 +539,7 @@ templates.weapon_trait_bespoke_shotgun_p4_reload_speed_on_slide = {
 templates.weapon_trait_bespoke_shotgun_p4_hipfire_while_sprinting = {
 	format_values = {
 		weapon_spread = {
-			prefix = "-",
+			prefix = "",
 			format_type = "percentage",
 			find_value = {
 				buff_template_name = "weapon_trait_bespoke_shotgun_p4_hipfire_while_sprinting",
@@ -817,6 +817,46 @@ templates.weapon_trait_bespoke_shotgun_p4_followup_shots_ranged_weakspot_damage 
 			{
 				conditional_stat_buffs = {
 					[stat_buffs.ranged_weakspot_damage] = 0.5
+				}
+			}
+		}
+	}
+}
+templates.weapon_trait_bespoke_shotgun_p4_followup_shots_ranged_damage = {
+	format_values = {
+		damage = {
+			prefix = "+",
+			format_type = "percentage",
+			find_value = {
+				buff_template_name = "weapon_trait_bespoke_shotgun_p4_followup_shots_ranged_damage",
+				find_value_type = "trait_override",
+				path = {
+					"conditional_stat_buffs",
+					stat_buffs.ranged_damage
+				}
+			}
+		}
+	},
+	buffs = {
+		weapon_trait_bespoke_shotgun_p4_followup_shots_ranged_damage = {
+			{
+				conditional_stat_buffs = {
+					[stat_buffs.ranged_damage] = 0.14
+				}
+			},
+			{
+				conditional_stat_buffs = {
+					[stat_buffs.ranged_damage] = 0.16
+				}
+			},
+			{
+				conditional_stat_buffs = {
+					[stat_buffs.ranged_damage] = 0.18
+				}
+			},
+			{
+				conditional_stat_buffs = {
+					[stat_buffs.ranged_damage] = 0.2
 				}
 			}
 		}

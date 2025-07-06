@@ -21,33 +21,33 @@ local stagger_types = StaggerSettings.stagger_types
 local weakspot_types = WeakspotSettings.types
 local breed_name = "renegade_grenadier"
 local breed_data = {
-	display_name = "loc_breed_display_name_renegade_grenadier",
-	run_speed = 4.8,
+	navigation_propagation_box_extent = 200,
+	walk_speed = 2.3,
 	use_bone_lod = true,
-	volley_fire_target = true,
-	fx_proximity_culling_weight = 6,
-	unit_template_name = "minion",
-	spawn_aggro_state = "aggroed",
-	can_be_used_for_all_factions = true,
-	faction_name = "chaos",
 	sub_faction_name = "renegade",
+	fx_proximity_culling_weight = 6,
+	spawn_aggro_state = "aggroed",
+	unit_template_name = "minion",
+	volley_fire_target = true,
 	broadphase_radius = 1,
 	stagger_resistance = 1,
-	walk_speed = 2.3,
-	navigation_propagation_box_extent = 200,
-	base_height = 2,
-	line_of_sight_collision_filter = "filter_minion_line_of_sight_check",
-	player_locomotion_constrain_radius = 0.5,
-	stagger_reduction = 0,
-	state_machine = "content/characters/enemy/chaos_traitor_guard/third_person/animations/chaos_traitor_guard_grenadier",
-	stagger_reduction_ranged = 20,
-	use_wounds = true,
-	smart_tag_target_type = "breed",
 	count_num_attacks = true,
 	game_object_type = "minion_ranged",
-	base_unit = "content/characters/enemy/chaos_traitor_guard/third_person/base",
 	challenge_rating = 2,
 	bone_lod_radius = 1.3,
+	use_wounds = true,
+	display_name = "loc_breed_display_name_renegade_grenadier",
+	run_speed = 4.8,
+	can_be_used_for_all_factions = true,
+	faction_name = "chaos",
+	base_height = 2,
+	state_machine = "content/characters/enemy/chaos_traitor_guard/third_person/animations/chaos_traitor_guard_grenadier",
+	line_of_sight_collision_filter = "filter_minion_line_of_sight_check",
+	stagger_reduction = 0,
+	player_locomotion_constrain_radius = 0.5,
+	stagger_reduction_ranged = 20,
+	smart_tag_target_type = "breed",
+	base_unit = "content/characters/enemy/chaos_traitor_guard/third_person/base",
 	has_direct_ragdoll_flow_event = true,
 	name = breed_name,
 	breed_type = breed_types.minion,
@@ -401,7 +401,18 @@ local breed_data = {
 		}
 	},
 	outline_config = {},
-	blackboard_component_config = BreedBlackboardComponentTemplates.grenadier
+	blackboard_component_config = BreedBlackboardComponentTemplates.grenadier,
+	tokens = {},
+	companion_pounce_setting = {
+		pounce_anim_event = "leap_attack",
+		companion_pounce_action = "human",
+		damage_profile = DamageProfileTemplates.adamant_companion_human_pounce,
+		initial_damage_profile = DamageProfileTemplates.adamant_companion_initial_pounce,
+		required_token = {
+			free_target_on_assigned_token = true,
+			name = "pounced"
+		}
+	}
 }
 
 return breed_data

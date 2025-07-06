@@ -192,7 +192,7 @@ weapon_template.actions = {
 		end
 	},
 	action_left_light = {
-		damage_window_start = 0.26666666666666666,
+		damage_window_start = 0.3,
 		hit_armor_anim = "attack_hit_shield",
 		kind = "sweep",
 		weapon_handling_template = "time_scale_1",
@@ -268,9 +268,9 @@ weapon_template.actions = {
 		spline_settings = {
 			matrices_data_location = "content/characters/player/human/first_person/animations/power_maul/attack_left_diagonal_down",
 			anchor_point_offset = {
+				0.2,
 				0,
-				0,
-				-0.3
+				-0.35
 			}
 		},
 		damage_profile = DamageProfileTemplates.powermaul_light_linesman,
@@ -427,7 +427,7 @@ weapon_template.actions = {
 		end
 	},
 	action_right_light = {
-		damage_window_start = 0.3,
+		damage_window_start = 0.3333333333333333,
 		hit_armor_anim = "attack_hit_shield",
 		kind = "sweep",
 		weapon_handling_template = "time_scale_1",
@@ -661,7 +661,7 @@ weapon_template.actions = {
 		end
 	},
 	action_left_light_2 = {
-		damage_window_start = 0.2,
+		damage_window_start = 0.275,
 		hit_armor_anim = "attack_hit_shield_v01",
 		weapon_handling_template = "time_scale_1",
 		kind = "sweep",
@@ -670,7 +670,7 @@ weapon_template.actions = {
 		range_mod = 1.2,
 		num_frames_before_process = 0,
 		anim_event_3p = "attack_swing_up_left",
-		damage_window_end = 0.3,
+		damage_window_end = 0.325,
 		attack_direction_override = "up",
 		anim_end_event = "attack_finished",
 		uninterruptible = true,
@@ -742,7 +742,7 @@ weapon_template.actions = {
 			anchor_point_offset = {
 				0,
 				0,
-				-0.1
+				0
 			}
 		},
 		damage_profile = DamageProfileTemplates.powermaul_light_smiter,
@@ -1318,9 +1318,9 @@ weapon_template.keywords = {
 	"power_maul",
 	"p1"
 }
-weapon_template.dodge_template = "assault"
+weapon_template.dodge_template = "default"
 weapon_template.sprint_template = "default"
-weapon_template.stamina_template = "default"
+weapon_template.stamina_template = "linesman_plus"
 weapon_template.toughness_template = "assault"
 weapon_template.movement_curve_modifier_template = "combataxe_p1_m1"
 weapon_template.footstep_intervals = FootstepIntervalsTemplates.default

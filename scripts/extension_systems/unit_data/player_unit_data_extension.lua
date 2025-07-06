@@ -683,6 +683,12 @@ function PlayerUnitDataExtension:breed_name()
 	return breed_name
 end
 
+function PlayerUnitDataExtension:is_companion()
+	local is_companion = Breed.is_companion(self._breed)
+
+	return is_companion
+end
+
 function PlayerUnitDataExtension:archetype()
 	return self._archetype
 end

@@ -7,6 +7,7 @@ local PSNRestrictions = require("scripts/managers/account/psn_restrictions")
 local RegionRestrictionsPSN = require("scripts/settings/region/region_restrictions_psn")
 local ScriptWebApiPsn = require("scripts/managers/account/script_web_api_psn")
 local SoundSettings = require("scripts/settings/options/sound_settings")
+local ExternalPaymentPlatformPlaystation = require("scripts/backend/platform/external_payment_platform_playstation")
 local SIGNIN_STATES = {
 	fetching_sandbox_id = "loc_signin_fetch_sandbox_id",
 	loading_save = "loc_signin_load_save",
@@ -41,6 +42,7 @@ function AccountManagerPSN:init()
 	}
 	self._psn_block_users_states_manager = PsnBlockUsersStatesManager:new()
 
+	PlaystationDLC.initialize()
 	Managers.save:load(callback(self, "_apply_audio_settings"))
 end
 
@@ -881,6 +883,22 @@ function AccountManagerPSN:_apply_audio_settings()
 			end
 		end
 	end
+end
+
+function AccountManagerPSN:is_owner_of(entitlement_key)
+	PlaystationDLC.fetch_owned_dlcs()
+
+	return Promise.until_true(function ()
+		return PlaystationDLC.has_fetched_dlcs()
+	end):next(function ()
+		return {
+			is_owner = PlaystationDLC.has_dlc(entitlement_key)
+		}
+	end)
+end
+
+function AccountManagerPSN:open_to_store(entitlement_key)
+	return ExternalPaymentPlatformPlaystation:show_commerce_dialogue(entitlement_key)
 end
 
 return AccountManagerPSN

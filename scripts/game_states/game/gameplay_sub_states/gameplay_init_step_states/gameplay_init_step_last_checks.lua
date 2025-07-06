@@ -9,6 +9,14 @@ function GameplayInitStepStateLastChecks:on_enter(parent, params)
 end
 
 function GameplayInitStepStateLastChecks:update(main_dt, main_t)
+	local view = "video_view"
+	local ui_manager = Managers.ui
+	local video_view_active_not_closing = ui_manager and ui_manager:view_active(view) and not ui_manager:is_view_closing(view)
+
+	if video_view_active_not_closing then
+		return nil, nil
+	end
+
 	self._shared_state.initialized_steps.GameplayInitStepStateLastChecks = true
 	local next_step_params = {
 		shared_state = self._shared_state

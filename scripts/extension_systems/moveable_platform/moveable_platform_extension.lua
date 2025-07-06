@@ -485,6 +485,10 @@ function MoveablePlatformExtension:_update_passengers()
 end
 
 function MoveablePlatformExtension:teleport_bots_to_node(node_name)
+	if not self._is_server then
+		return
+	end
+
 	local unit = self._unit
 	local current_node_name = node_name
 	local has_node = Unit.has_node(unit, current_node_name)
@@ -507,6 +511,27 @@ function MoveablePlatformExtension:teleport_bots_to_node(node_name)
 
 			follow_component.level_forced_teleport_position:store(node_position)
 			self:_unparent_passenger(bot_unit)
+		end
+	end
+
+	local human_players = Managers.player:human_players()
+
+	for _, human_player in pairs(human_players) do
+		local human_unit = human_player.player_unit
+
+		if human_unit then
+			local companion_spawner_extension = ScriptUnit.extension(human_unit, "companion_spawner_system")
+			local companion_unit = companion_spawner_extension:companion_unit()
+
+			if companion_unit then
+				local companion_blackboard = BLACKBOARDS[companion_unit]
+				local movable_platform_component = Blackboard.write_component(companion_blackboard, "movable_platform")
+				movable_platform_component.has_leave_teleport_position = true
+
+				movable_platform_component.leave_teleport_position:store(node_position)
+
+				movable_platform_component.unit_reference = unit
+			end
 		end
 	end
 end
@@ -612,6 +637,19 @@ function MoveablePlatformExtension:_teleport_player_onboard(unit)
 	self._teleport_node_index = node_index % self._teleport_node_count + 1
 end
 
+function MoveablePlatformExtension:_teleport_companion_onboard(companion_unit, movable_platform_component)
+	local moveable_platform_unit = self._unit
+	local node_index = self._teleport_node_index
+	local node = self._teleport_nodes[node_index]
+	local node_position = Unit.world_position(moveable_platform_unit, node)
+	movable_platform_component.node = node
+	local companion_locomotion_extension = ScriptUnit.has_extension(companion_unit, "locomotion_system")
+
+	companion_locomotion_extension:teleport_to(node_position)
+
+	self._teleport_node_index = node_index % self._teleport_node_count + 1
+end
+
 function MoveablePlatformExtension:_unlock_units_on_platform()
 	self:set_wall_collision(false)
 
@@ -634,6 +672,7 @@ function MoveablePlatformExtension:add_passenger(unit, place_on_platform)
 
 		if place_on_platform then
 			self:_teleport_player_onboard(unit)
+			self:_set_companion_platform_reference(unit, self._unit)
 		end
 	end
 end
@@ -651,6 +690,8 @@ function MoveablePlatformExtension:_set_platform_as_parent(passenger_unit)
 		if locomotion_extension then
 			locomotion_extension:set_parent_unit(self._unit)
 		end
+
+		self:_set_companion_platform_reference(passenger_unit, self._unit)
 	end
 end
 
@@ -678,6 +719,8 @@ function MoveablePlatformExtension:_unparent_all_passengers()
 					if locomotion_extension then
 						locomotion_extension:set_parent_unit()
 					end
+
+					self:_set_companion_platform_reference(passenger_unit)
 				end
 			end
 		end
@@ -920,6 +963,24 @@ function MoveablePlatformExtension:_set_nav_layer_allowed(layer_name, is_allowed
 	local nav_mesh_manager = Managers.state.nav_mesh
 
 	nav_mesh_manager:set_allowed_nav_tag_layer(layer_name, is_allowed)
+end
+
+function MoveablePlatformExtension:_set_companion_platform_reference(passenger_unit, platform_reference)
+	if self._is_server then
+		local companion_spawner_extension = ScriptUnit.extension(passenger_unit, "companion_spawner_system")
+		local companion_unit = companion_spawner_extension:companion_unit()
+
+		if companion_unit then
+			local companion_blackboard = BLACKBOARDS[companion_unit]
+			local movable_platform_component = Blackboard.write_component(companion_blackboard, "movable_platform")
+
+			if platform_reference then
+				self:_teleport_companion_onboard(companion_unit, movable_platform_component)
+			end
+
+			movable_platform_component.unit_reference = platform_reference
+		end
+	end
 end
 
 return MoveablePlatformExtension

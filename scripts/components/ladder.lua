@@ -8,7 +8,7 @@ function Ladder:init(unit, is_server)
 	return run_update
 end
 
-function Ladder:on_gameplay_post_init(unit, level)
+function Ladder:on_gameplay_post_init(unit)
 	if self.is_server then
 		Managers.state.bot_nav_transition:register_ladder(unit)
 

@@ -1309,7 +1309,7 @@ function table.concat_arrays(...)
 	local t = {}
 
 	for i = 1, select("#", ...) do
-		append(t, select(i, ...))
+		append(t, select(i, ...), nil)
 	end
 
 	return t

@@ -38,6 +38,7 @@ local breed_data = {
 	psyker_mark_target = true,
 	use_wounds = true,
 	line_of_sight_collision_filter = "filter_minion_line_of_sight_check",
+	smart_tag_target_type = "breed",
 	game_object_type = "minion_ritualist",
 	base_unit = "content/characters/enemy/chaos_traitor_guard/third_person/base",
 	bone_lod_radius = 1.1,
@@ -45,6 +46,7 @@ local breed_data = {
 	name = breed_name,
 	breed_type = breed_types.minion,
 	tags = {
+		minion = true,
 		ritualist = true
 	},
 	point_cost = math.huge,
@@ -348,7 +350,18 @@ local breed_data = {
 		}
 	},
 	outline_config = {},
-	blackboard_component_config = BreedBlackboardComponentTemplates.unarmed
+	blackboard_component_config = BreedBlackboardComponentTemplates.unarmed,
+	tokens = {},
+	companion_pounce_setting = {
+		pounce_anim_event = "leap_attack",
+		companion_pounce_action = "human",
+		damage_profile = DamageProfileTemplates.adamant_companion_human_pounce,
+		initial_damage_profile = DamageProfileTemplates.adamant_companion_initial_pounce,
+		required_token = {
+			free_target_on_assigned_token = true,
+			name = "pounced"
+		}
+	}
 }
 
 return breed_data

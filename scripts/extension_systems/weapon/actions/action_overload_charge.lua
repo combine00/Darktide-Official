@@ -15,8 +15,8 @@ function ActionOverloadCharge:start(action_settings, t, time_scale, action_start
 	self._overload_module:start(t)
 end
 
-function ActionOverloadCharge:fixed_update(dt, t, time_in_action)
-	ActionOverloadCharge.super.fixed_update(self, dt, t, time_in_action)
+function ActionOverloadCharge:fixed_update(dt, t, time_in_action, frame)
+	ActionOverloadCharge.super.fixed_update(self, dt, t, time_in_action, frame)
 	self._overload_module:fixed_update(dt, t)
 end
 

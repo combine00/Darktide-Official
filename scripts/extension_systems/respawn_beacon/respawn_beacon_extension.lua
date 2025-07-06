@@ -187,7 +187,7 @@ function RespawnBeaconExtension:_try_spawn_guards(spawn_position, beacon_unit, v
 	local nav_spawn_points = main_path_manager:nav_spawn_points()
 	local nav_world = self._nav_world
 	local spawn_point_group_index = SpawnPointQueries.group_from_position(nav_world, nav_spawn_points, spawn_position)
-	local start_index = Managers.state.main_path:node_index_by_nav_group_index(spawn_point_group_index or 1)
+	local start_index = Managers.state.main_path:node_index_by_nav_group_index(spawn_point_group_index)
 	local end_index = start_index + 1
 	local _, travel_distance, _, _, _ = MainPathQueries.closest_position_between_nodes(spawn_position, start_index, end_index)
 	local travel_distance_threshold = settings.travel_distance_threshold

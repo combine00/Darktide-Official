@@ -85,7 +85,7 @@ end
 
 function LoadingStateData:destroy()
 	Managers.event:unregister(self, "event_start_waiting")
-	Managers.event:unregister(self, "event_set_loading_state")
+	Managers.event:unregister(self, "event_set_waiting_state")
 	Managers.event:unregister(self, "event_stop_waiting")
 end
 

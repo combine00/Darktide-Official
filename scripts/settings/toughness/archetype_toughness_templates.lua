@@ -79,6 +79,25 @@ local archetype_toughness_templates = {
 			[replenish_types.ogryn_braced_regen] = gunlugger_talent_settings.defensive_3.braced_toughness_regen,
 			[replenish_types.bonebreaker_heavy_hit] = 0.05
 		}
+	},
+	adamant = {
+		regeneration_delay = 3,
+		max = 100,
+		template_type = template_types.player,
+		regeneration_speed = {
+			still = 5,
+			moving = 5
+		},
+		state_damage_modifiers = {
+			sliding = 0.5,
+			dodging = 0.5,
+			sprinting = 1
+		},
+		on_depleted_function = ToughnessDepleted.spill_over,
+		recovery_percentages = {
+			[replenish_types.melee_kill] = 0.05,
+			[replenish_types.gunslinger_crit_regen] = 0.15
+		}
 	}
 }
 

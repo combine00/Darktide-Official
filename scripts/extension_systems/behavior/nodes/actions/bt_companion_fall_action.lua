@@ -33,7 +33,7 @@ function BtCompanionFallAction:run(unit, breed, blackboard, scratchpad, action_d
 		local unit_position = POSITION_LOOKUP[unit]
 		local above = 1
 		local below = 30
-		local lateral = 1
+		local lateral = 0.3
 		local nav_world = scratchpad.nav_world
 		local traverse_logic = scratchpad.traverse_logic
 		local landing_position = NavQueries.position_on_mesh_with_outside_position(nav_world, traverse_logic, unit_position, above, below, lateral)
@@ -45,6 +45,7 @@ function BtCompanionFallAction:run(unit, breed, blackboard, scratchpad, action_d
 		end
 
 		scratchpad.locomotion_extension:set_movement_type("constrained_by_mover")
+		scratchpad.locomotion_extension:set_gravity(nil)
 		scratchpad.locomotion_extension:set_affected_by_gravity(true)
 
 		scratchpad.set_fall = false
@@ -56,9 +57,9 @@ function BtCompanionFallAction:run(unit, breed, blackboard, scratchpad, action_d
 
 		if Mover.collides_down(mover) then
 			local unit_position = POSITION_LOOKUP[unit]
-			local above = 0.1
-			local below = 0.1
-			local lateral = 0.1
+			local above = 0.2
+			local below = 0.2
+			local lateral = 0.3
 			local nav_world = scratchpad.nav_world
 			local traverse_logic = scratchpad.traverse_logic
 			local landing_position = NavQueries.position_on_mesh_with_outside_position(nav_world, traverse_logic, unit_position, above, below, lateral)

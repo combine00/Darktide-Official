@@ -43,6 +43,14 @@ local chaos_beast_of_nurgle = {
 	statistics = {
 		num_attacks_done = "number",
 		num_in_liquid = "number"
+	},
+	patrol = {
+		patrol_leader_unit = "Unit",
+		patrol_index = "number",
+		should_patrol = "boolean",
+		patrol_id = "number",
+		walk_position = "Vector3Box",
+		auto_patrol = "boolean"
 	}
 }
 

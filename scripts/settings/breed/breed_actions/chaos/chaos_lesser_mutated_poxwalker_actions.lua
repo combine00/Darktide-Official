@@ -269,7 +269,28 @@ local action_data = {
 			jump_over_gap_4m_2 = "jumping"
 		}
 	},
-	disable = {},
+	disable = {
+		disable_anims = {
+			pounced = {
+				fwd = {
+					"dog_leap_pinned"
+				},
+				bwd = {
+					"dog_leap_pinned"
+				},
+				left = {
+					"dog_leap_pinned"
+				},
+				right = {
+					"dog_leap_pinned"
+				}
+			}
+		},
+		stand_anim = {
+			duration = 4,
+			name = "dog_leap_pinned_stand"
+		}
+	},
 	follow = {
 		idle_anim_events = "idle",
 		run_anim_event = "move_fwd",

@@ -1011,7 +1011,13 @@ return function ()
 					"zealot_female_c",
 					"zealot_male_a",
 					"zealot_male_b",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_female_a",
+					"adamant_female_b",
+					"adamant_female_c",
+					"adamant_male_a",
+					"adamant_male_b",
+					"adamant_male_c"
 				}
 			},
 			{
@@ -1039,7 +1045,13 @@ return function ()
 					"zealot_female_c",
 					"zealot_male_a",
 					"zealot_male_b",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_female_a",
+					"adamant_female_b",
+					"adamant_female_c",
+					"adamant_male_a",
+					"adamant_male_b",
+					"adamant_male_c"
 				}
 			},
 			{
@@ -17351,6 +17363,59 @@ return function ()
 		}
 	})
 	define_rule({
+		name = "seen_enemy_heavy_gunner",
+		wwise_route = 0,
+		response = "seen_enemy_heavy_gunner",
+		database = "gameplay_vo",
+		category = "enemy_alerts_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"seen_enemy"
+			},
+			{
+				"query_context",
+				"enemy_tag",
+				OP.EQ,
+				"chaos_ogryn_gunner"
+			},
+			{
+				"user_context",
+				"threat_level",
+				OP.SET_INCLUDES,
+				args = {
+					"low",
+					"medium",
+					"high"
+				}
+			},
+			{
+				"faction_memory",
+				"enemy_chaos_ogryn_gunner",
+				OP.TIMEDIFF,
+				OP.GT,
+				20
+			}
+		},
+		on_done = {
+			{
+				"faction_memory",
+				"enemy_chaos_ogryn_gunner",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.5
+			}
+		}
+	})
+	define_rule({
 		name = "seen_enemy_mutant_charger",
 		wwise_route = 0,
 		response = "seen_enemy_mutant_charger",
@@ -17391,112 +17456,6 @@ return function ()
 			{
 				"faction_memory",
 				"enemy_cultist_mutant",
-				OP.TIMESET
-			}
-		},
-		heard_speak_routing = {
-			target = "players"
-		},
-		on_pre_rule_execution = {
-			delay_vo = {
-				duration = 0.5
-			}
-		}
-	})
-	define_rule({
-		name = "seen_enemy_netgunner",
-		wwise_route = 0,
-		response = "seen_enemy_netgunner",
-		database = "gameplay_vo",
-		category = "enemy_alerts_prio_1",
-		criterias = {
-			{
-				"query_context",
-				"concept",
-				OP.EQ,
-				"seen_enemy"
-			},
-			{
-				"query_context",
-				"enemy_tag",
-				OP.EQ,
-				"renegade_netgunner"
-			},
-			{
-				"user_context",
-				"threat_level",
-				OP.SET_INCLUDES,
-				args = {
-					"low",
-					"medium",
-					"high"
-				}
-			},
-			{
-				"faction_memory",
-				"enemy_renegade_netgunner",
-				OP.TIMEDIFF,
-				OP.GT,
-				20
-			}
-		},
-		on_done = {
-			{
-				"faction_memory",
-				"enemy_renegade_netgunner",
-				OP.TIMESET
-			}
-		},
-		heard_speak_routing = {
-			target = "players"
-		},
-		on_pre_rule_execution = {
-			delay_vo = {
-				duration = 0.5
-			}
-		}
-	})
-	define_rule({
-		name = "seen_enemy_ogryn_heavy_gunner",
-		wwise_route = 0,
-		response = "seen_enemy_ogryn_heavy_gunner",
-		database = "gameplay_vo",
-		category = "enemy_alerts_prio_1",
-		criterias = {
-			{
-				"query_context",
-				"concept",
-				OP.EQ,
-				"seen_enemy"
-			},
-			{
-				"query_context",
-				"enemy_tag",
-				OP.EQ,
-				"chaos_ogryn_gunner"
-			},
-			{
-				"user_context",
-				"threat_level",
-				OP.SET_INCLUDES,
-				args = {
-					"low",
-					"medium",
-					"high"
-				}
-			},
-			{
-				"faction_memory",
-				"enemy_chaos_ogryn_gunner",
-				OP.TIMEDIFF,
-				OP.GT,
-				20
-			}
-		},
-		on_done = {
-			{
-				"faction_memory",
-				"enemy_chaos_ogryn_gunner",
 				OP.TIMESET
 			}
 		},
@@ -17961,6 +17920,59 @@ return function ()
 				chance = 0.15,
 				max_failed_tries = 0,
 				hold_for = 0
+			}
+		}
+	})
+	define_rule({
+		name = "seen_netgunner",
+		wwise_route = 0,
+		response = "seen_netgunner",
+		database = "gameplay_vo",
+		category = "enemy_alerts_prio_1",
+		criterias = {
+			{
+				"query_context",
+				"concept",
+				OP.EQ,
+				"seen_enemy"
+			},
+			{
+				"query_context",
+				"enemy_tag",
+				OP.EQ,
+				"renegade_netgunner"
+			},
+			{
+				"user_context",
+				"threat_level",
+				OP.SET_INCLUDES,
+				args = {
+					"low",
+					"medium",
+					"high"
+				}
+			},
+			{
+				"faction_memory",
+				"enemy_renegade_netgunner",
+				OP.TIMEDIFF,
+				OP.GT,
+				20
+			}
+		},
+		on_done = {
+			{
+				"faction_memory",
+				"enemy_renegade_netgunner",
+				OP.TIMESET
+			}
+		},
+		heard_speak_routing = {
+			target = "players"
+		},
+		on_pre_rule_execution = {
+			delay_vo = {
+				duration = 0.5
 			}
 		}
 	})

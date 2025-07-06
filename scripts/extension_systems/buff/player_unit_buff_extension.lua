@@ -306,6 +306,14 @@ function PlayerUnitBuffExtension:remove_externally_controlled_buff(local_index, 
 	end
 end
 
+function PlayerUnitBuffExtension:mark_buff_finished(local_index)
+	local buff_instance = self._buffs_by_index[local_index]
+
+	if buff_instance then
+		buff_instance:force_finish()
+	end
+end
+
 function PlayerUnitBuffExtension:remove_internally_controlled_buff_stack(template_name)
 	local buff_instance = self._stacking_buffs[template_name]
 

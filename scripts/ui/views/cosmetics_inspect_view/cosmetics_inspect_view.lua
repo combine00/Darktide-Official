@@ -17,6 +17,14 @@ local UIWorldSpawner = require("scripts/managers/ui/ui_world_spawner")
 local ViewElementInputLegend = require("scripts/ui/view_elements/view_element_input_legend/view_element_input_legend")
 local VoiceFxPresetSettings = require("scripts/settings/dialogue/voice_fx_preset_settings")
 local CosmeticsInspectView = class("CosmeticsInspectView", "BaseView")
+local ANIMATION_SLOTS_MAP = {
+	slot_animation_emote_3 = true,
+	slot_animation_end_of_round = true,
+	slot_animation_emote_4 = true,
+	slot_animation_emote_5 = true,
+	slot_animation_emote_1 = true,
+	slot_animation_emote_2 = true
+}
 
 function CosmeticsInspectView:init(settings, context)
 	self._context = context
@@ -56,12 +64,16 @@ function CosmeticsInspectView:init(settings, context)
 			self._disable_rotation_input = context.disable_rotation_input
 			self._animation_event_name_suffix = context.animation_event_name_suffix
 			self._animation_event_variable_data = context.animation_event_variable_data
+			self._companion_animation_event_name_suffix = context.companion_animation_event_name_suffix
+			self._companion_animation_event_variable_data = context.companion_animation_event_variable_data
 			self._disable_zoom = context.disable_zoom
 			local profile = context.profile
 			local gender_name = profile.gender
 			local archetype = profile.archetype
+			local archetype_name = archetype and archetype.name
+			local breed_name = profile.archetype.breed
 			local real_item = item.items and item.items[1] or item
-			self._mannequin_profile = Items.create_mannequin_profile_by_item(real_item, gender_name, archetype)
+			self._mannequin_profile = Items.create_mannequin_profile_by_item(real_item, gender_name, archetype_name, breed_name)
 			local slots = self._preview_item and self._preview_item.slots
 			local slot_name = context.slot_name or slots and slots[1]
 			self._selected_slot = slot_name and ItemSlotSettings[slot_name]
@@ -601,16 +613,21 @@ function CosmeticsInspectView:_spawn_profile(profile, initial_rotation, disable_
 	self._profile_spawner:spawn_profile(profile, spawn_position, spawn_rotation)
 
 	self._spawned_profile = profile
-end
+	local selected_slot = self._selected_slot
+	local selected_slot_name = selected_slot and selected_slot.name
 
-local ANIMATION_SLOTS_MAP = {
-	slot_animation_emote_3 = true,
-	slot_animation_end_of_round = true,
-	slot_animation_emote_4 = true,
-	slot_animation_emote_5 = true,
-	slot_animation_emote_1 = true,
-	slot_animation_emote_2 = true
-}
+	if selected_slot_name == "slot_companion_gear_full" then
+		self._profile_spawner:toggle_character(false)
+	elseif ANIMATION_SLOTS_MAP[selected_slot_name] then
+		local companion_state_machine = self._context
+		local item = self._preview_item
+		local toggle_companion = item and item.companion_state_machine ~= nil and item.companion_state_machine ~= ""
+
+		self._profile_spawner:toggle_companion(toggle_companion)
+	else
+		self._profile_spawner:toggle_companion(false)
+	end
+end
 
 function CosmeticsInspectView:_setup_item_description(description_text, restriction_text, property_text)
 	local widgets_by_name = self._widgets_by_name
@@ -761,18 +778,33 @@ function CosmeticsInspectView:_start_preview_item()
 			local item_animation_event = item.animation_event
 			local item_face_animation_event = item.face_animation_event
 			local animation_event_name_suffix = self._animation_event_name_suffix
+			local companion_animation_event_name_suffix = self._companion_animation_event_name_suffix
+			local companion_state_machine = item.companion_state_machine
+			local companion_item_animation_event = item.companion_animation_event
 			self._disable_zoom = true
-			context.state_machine = context.state_machine or item.state_machine
+			context.state_machine = context.state_machine or state_machine
 			context.animation_event = context.animation_event or item_animation_event
 			context.face_animation_event = self._previewed_with_gear and (context.face_animation_event or item_face_animation_event) or nil
+			context.companion_state_machine = context.companion_state_machine or companion_state_machine
+			context.companion_animation_event = context.companion_animation_event or item_animation_event
 			local animation_event = item_animation_event
 
 			if animation_event_name_suffix then
 				animation_event = animation_event .. animation_event_name_suffix
 			end
 
+			local companion_animation_event = companion_item_animation_event
+
+			if companion_animation_event_name_suffix then
+				companion_animation_event = companion_animation_event .. companion_animation_event_name_suffix
+			end
+
 			if self._profile_spawner then
 				self._profile_spawner:assign_state_machine(context.state_machine, context.item_animation_event, context.item_face_animation_event)
+
+				if companion_state_machine and companion_state_machine ~= "" then
+					self._profile_spawner:assign_companion_state_machine(context.companion_state_machine, context.companion_animation_event)
+				end
 			end
 
 			local animation_event_variable_data = self._animation_event_variable_data
@@ -783,6 +815,17 @@ function CosmeticsInspectView:_start_preview_item()
 
 				if self._profile_spawner then
 					self._profile_spawner:assign_animation_variable(index, value)
+				end
+			end
+
+			local companion_animation_event_variable_data = self._companion_animation_event_variable_data
+
+			if companion_animation_event_variable_data and self._profile_spawner then
+				local index = companion_animation_event_variable_data.index
+				local value = companion_animation_event_variable_data.value
+
+				if self._profile_spawner then
+					self._profile_spawner:assign_companion_animation_variable(index, value)
 				end
 			end
 
@@ -798,6 +841,8 @@ function CosmeticsInspectView:_start_preview_item()
 					self._profile_spawner:wield_slot(prop_item_slot)
 				end
 			end
+		elseif selected_slot_name == "slot_companion_gear_full" then
+			self._disable_zoom = true
 		end
 
 		self:_set_preview_widgets_visibility(true)
@@ -1117,6 +1162,14 @@ function CosmeticsInspectView:update(dt, t, input_service)
 			local face_animation_event = context.face_animation_event
 
 			self._profile_spawner:assign_state_machine(state_machine, animation_event, face_animation_event)
+		end
+
+		local companion_state_machine = context.companion_state_machine
+
+		if companion_state_machine and companion_state_machine ~= "" then
+			local companion_animation_event = context.companion_animation_event
+
+			self._profile_spawner:assign_companion_state_machine(companion_state_machine, companion_animation_event)
 		end
 
 		local animation_event_variable_data = self._animation_event_variable_data

@@ -216,6 +216,12 @@ function ActionSweep:start(action_settings, t, time_scale, action_start_params)
 
 	self:_reset_sweep_component()
 
+	if action_settings.activate_special_during_sweep then
+		self._weapon_extension:set_wielded_weapon_weapon_special_active(t, true)
+
+		self._weapon_action_component.special_active_at_start = true
+	end
+
 	local fx_extension = self._fx_extension
 	local special_active = self._inventory_slot_component.special_active
 	local sweep_fx_source_name = self._sweep_fx_source_name
@@ -319,6 +325,11 @@ function ActionSweep:finish(reason, data, t, time_in_action)
 	end
 
 	local action_settings = self._action_settings
+
+	if action_settings.activate_special_during_sweep then
+		self._weapon_extension:set_wielded_weapon_weapon_special_active(t, false)
+	end
+
 	local special_active_at_start = self._weapon_action_component.special_active_at_start
 	local hit_stickyness_settings = special_active_at_start and action_settings.hit_stickyness_settings_special_active or action_settings.hit_stickyness_settings
 	local is_sticky = self:_is_currently_sticky()

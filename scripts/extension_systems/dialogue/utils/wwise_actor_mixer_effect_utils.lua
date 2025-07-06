@@ -1,10 +1,10 @@
 local WwiseActorMixerEffectSettings = require("scripts/settings/dialogue/wwise_actor_mixer_effect_settings")
-local WwiseActorMixerEffectUtilities = {
+local WwiseActorMixerEffect = {
 	apply_preset = function (preset_name)
 		local preset = WwiseActorMixerEffectSettings.presets[preset_name]
 
 		if not preset then
-			Log.error("[WwiseActorMixerEffectUtilities] Preset %q not found", preset_name)
+			Log.error("WwiseActorMixerEffect", "Preset %q not found", preset_name)
 
 			return false
 		end
@@ -16,7 +16,7 @@ local WwiseActorMixerEffectUtilities = {
 			local effect_id = WwiseActorMixerEffectSettings.effects[effect_name]
 
 			if not effect_id then
-				Log.error("[WwiseActorMixerEffectUtilities] Error: Effect %q not found", effect_name)
+				Log.error("WwiseActorMixerEffect", "Error: Effect %q not found", effect_name)
 
 				return false
 			end
@@ -34,7 +34,7 @@ local WwiseActorMixerEffectUtilities = {
 			local effect_id = WwiseActorMixerEffectSettings.effects[effect_name]
 
 			if not effect_id then
-				Log.error("[WwiseActorMixerEffectUtilities] Error: Effect %q not found", effect_name)
+				Log.error("WwiseActorMixerEffect", "Error: Effect %q not found", effect_name)
 
 				return false
 			end
@@ -73,4 +73,4 @@ local WwiseActorMixerEffectUtilities = {
 	end
 }
 
-return WwiseActorMixerEffectUtilities
+return WwiseActorMixerEffect

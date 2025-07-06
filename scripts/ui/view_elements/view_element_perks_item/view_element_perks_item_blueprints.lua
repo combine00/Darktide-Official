@@ -1,9 +1,7 @@
 local Items = require("scripts/utilities/items")
-local UIFontSettings = require("scripts/managers/ui/ui_font_settings")
-local ButtonPassTemplates = require("scripts/ui/pass_templates/button_pass_templates")
-local ColorUtilities = require("scripts/utilities/ui/colors")
+local Colors = require("scripts/utilities/ui/colors")
 local InputDevice = require("scripts/managers/input/input_device")
-local TextUtilities = require("scripts/utilities/ui/text")
+local UIFontSettings = require("scripts/managers/ui/ui_font_settings")
 local UISoundEvents = require("scripts/settings/ui/ui_sound_events")
 local amount_style = table.clone(UIFontSettings.body_small)
 amount_style.text_color = Color.terminal_icon(nil, true)
@@ -92,7 +90,7 @@ local function item_selection_button_change_function(content, style)
 	end
 
 	if color then
-		ColorUtilities.color_copy(color, style.color)
+		Colors.color_copy(color, style.color)
 	end
 end
 
@@ -282,7 +280,7 @@ ViewElementPerksItemBlueprints.perk = {
 				local text_color = style.text_color
 				local progress = math.max(math.max(hotspot.anim_focus_progress, hotspot.anim_select_progress), math.max(hotspot.anim_hover_progress, hotspot.anim_input_progress))
 
-				ColorUtilities.color_lerp(default_color, hover_color, progress, text_color)
+				Colors.color_lerp(default_color, hover_color, progress, text_color)
 			end
 		},
 		{

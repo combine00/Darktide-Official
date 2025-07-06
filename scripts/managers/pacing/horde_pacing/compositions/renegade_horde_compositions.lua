@@ -54,6 +54,17 @@ local horde_compositions = {
 					}
 				}
 			}
+		},
+		{
+			breeds = {
+				{
+					name = "chaos_poxwalker",
+					amount = {
+						22,
+						24
+					}
+				}
+			}
 		}
 	},
 	infected_small = {
@@ -108,6 +119,17 @@ local horde_compositions = {
 					amount = {
 						20,
 						22
+					}
+				}
+			}
+		},
+		{
+			breeds = {
+				{
+					name = "chaos_newly_infected",
+					amount = {
+						22,
+						24
 					}
 				}
 			}
@@ -189,6 +211,24 @@ local horde_compositions = {
 					}
 				}
 			}
+		},
+		{
+			breeds = {
+				{
+					name = "chaos_poxwalker",
+					amount = {
+						22,
+						24
+					}
+				},
+				{
+					name = "renegade_berzerker",
+					amount = {
+						2,
+						4
+					}
+				}
+			}
 		}
 	},
 	renegade_medium = {
@@ -243,6 +283,17 @@ local horde_compositions = {
 					amount = {
 						32,
 						35
+					}
+				}
+			}
+		},
+		{
+			breeds = {
+				{
+					name = "chaos_poxwalker",
+					amount = {
+						34,
+						37
 					}
 				}
 			}
@@ -303,6 +354,17 @@ local horde_compositions = {
 					}
 				}
 			}
+		},
+		{
+			breeds = {
+				{
+					name = "chaos_newly_infected",
+					amount = {
+						34,
+						37
+					}
+				}
+			}
 		}
 	},
 	renegade_large = {
@@ -357,6 +419,17 @@ local horde_compositions = {
 					amount = {
 						50,
 						55
+					}
+				}
+			}
+		},
+		{
+			breeds = {
+				{
+					name = "chaos_poxwalker",
+					amount = {
+						55,
+						60
 					}
 				}
 			}
@@ -417,6 +490,17 @@ local horde_compositions = {
 					}
 				}
 			}
+		},
+		{
+			breeds = {
+				{
+					name = "chaos_newly_infected",
+					amount = {
+						55,
+						60
+					}
+				}
+			}
 		}
 	},
 	renegade_flood = {
@@ -471,6 +555,17 @@ local horde_compositions = {
 					amount = {
 						50,
 						52
+					}
+				}
+			}
+		},
+		{
+			breeds = {
+				{
+					name = "chaos_poxwalker",
+					amount = {
+						52,
+						54
 					}
 				}
 			}
@@ -531,6 +626,17 @@ local horde_compositions = {
 					}
 				}
 			}
+		},
+		{
+			breeds = {
+				{
+					name = "renegade_rifleman",
+					amount = {
+						12,
+						14
+					}
+				}
+			}
 		}
 	},
 	renegade_trickle_riflemen_high = {
@@ -585,6 +691,17 @@ local horde_compositions = {
 					amount = {
 						18,
 						20
+					}
+				}
+			}
+		},
+		{
+			breeds = {
+				{
+					name = "renegade_rifleman",
+					amount = {
+						22,
+						24
 					}
 				}
 			}
@@ -680,6 +797,24 @@ local horde_compositions = {
 					}
 				}
 			}
+		},
+		{
+			breeds = {
+				{
+					name = "renegade_rifleman",
+					amount = {
+						11,
+						12
+					}
+				},
+				{
+					name = "renegade_gunner",
+					amount = {
+						2,
+						3
+					}
+				}
+			}
 		}
 	},
 	renegade_trickle_ogryn_gunners = {
@@ -772,6 +907,24 @@ local horde_compositions = {
 					}
 				}
 			}
+		},
+		{
+			breeds = {
+				{
+					name = "renegade_rifleman",
+					amount = {
+						8,
+						9
+					}
+				},
+				{
+					name = "chaos_ogryn_gunner",
+					amount = {
+						1,
+						3
+					}
+				}
+			}
 		}
 	},
 	renegade_trickle_assault = {
@@ -829,6 +982,17 @@ local horde_compositions = {
 					}
 				}
 			}
+		},
+		{
+			breeds = {
+				{
+					name = "renegade_assault",
+					amount = {
+						7,
+						8
+					}
+				}
+			}
 		}
 	},
 	renegade_trickle_melee = {
@@ -883,6 +1047,17 @@ local horde_compositions = {
 					amount = {
 						6,
 						7
+					}
+				}
+			}
+		},
+		{
+			breeds = {
+				{
+					name = "renegade_melee",
+					amount = {
+						7,
+						8
 					}
 				}
 			}
@@ -968,6 +1143,24 @@ local horde_compositions = {
 					amount = {
 						7,
 						8
+					}
+				},
+				{
+					name = "renegade_executor",
+					amount = {
+						1,
+						2
+					}
+				}
+			}
+		},
+		{
+			breeds = {
+				{
+					name = "renegade_melee",
+					amount = {
+						8,
+						9
 					}
 				},
 				{
@@ -1070,6 +1263,24 @@ local horde_compositions = {
 					}
 				}
 			}
+		},
+		{
+			breeds = {
+				{
+					name = "renegade_melee",
+					amount = {
+						6,
+						7
+					}
+				},
+				{
+					name = "chaos_ogryn_executor",
+					amount = {
+						1,
+						2
+					}
+				}
+			}
 		}
 	},
 	renegade_trickle_ogryn_bulwarks = {
@@ -1159,6 +1370,24 @@ local horde_compositions = {
 					amount = {
 						1,
 						1
+					}
+				}
+			}
+		},
+		{
+			breeds = {
+				{
+					name = "renegade_melee",
+					amount = {
+						6,
+						7
+					}
+				},
+				{
+					name = "chaos_ogryn_bulwark",
+					amount = {
+						1,
+						2
 					}
 				}
 			}
@@ -1632,6 +1861,24 @@ local horde_compositions = {
 					}
 				}
 			}
+		},
+		{
+			breeds = {
+				{
+					name = "renegade_rifleman",
+					amount = {
+						11,
+						12
+					}
+				},
+				{
+					name = "renegade_gunner",
+					amount = {
+						3,
+						4
+					}
+				}
+			}
 		}
 	},
 	renegade_coordinated_melee_mix = {
@@ -1735,6 +1982,31 @@ local horde_compositions = {
 					amount = {
 						9,
 						10
+					}
+				},
+				{
+					name = "renegade_executor",
+					amount = {
+						2,
+						3
+					}
+				}
+			}
+		},
+		{
+			breeds = {
+				{
+					name = "chaos_poxwalker",
+					amount = {
+						18,
+						20
+					}
+				},
+				{
+					name = "renegade_melee",
+					amount = {
+						10,
+						12
 					}
 				},
 				{
@@ -1858,6 +2130,31 @@ local horde_compositions = {
 					}
 				}
 			}
+		},
+		{
+			breeds = {
+				{
+					name = "chaos_poxwalker",
+					amount = {
+						18,
+						20
+					}
+				},
+				{
+					name = "renegade_melee",
+					amount = {
+						10,
+						11
+					}
+				},
+				{
+					name = "chaos_ogryn_executor",
+					amount = {
+						1,
+						1
+					}
+				}
+			}
 		}
 	},
 	renegade_small_coordinated_ranged_horde = {
@@ -1912,6 +2209,17 @@ local horde_compositions = {
 					amount = {
 						8,
 						9
+					}
+				}
+			}
+		},
+		{
+			breeds = {
+				{
+					name = "renegade_rifleman",
+					amount = {
+						9,
+						10
 					}
 				}
 			}
@@ -1997,6 +2305,24 @@ local horde_compositions = {
 					amount = {
 						5,
 						6
+					}
+				},
+				{
+					name = "chaos_ogryn_executor",
+					amount = {
+						4,
+						4
+					}
+				}
+			}
+		},
+		{
+			breeds = {
+				{
+					name = "renegade_melee",
+					amount = {
+						6,
+						7
 					}
 				},
 				{
@@ -2099,6 +2425,24 @@ local horde_compositions = {
 					}
 				}
 			}
+		},
+		{
+			breeds = {
+				{
+					name = "renegade_melee",
+					amount = {
+						6,
+						7
+					}
+				},
+				{
+					name = "chaos_ogryn_bulwark",
+					amount = {
+						4,
+						4
+					}
+				}
+			}
 		}
 	},
 	renegade_trickle_ogryns_high_3 = {
@@ -2181,6 +2525,24 @@ local horde_compositions = {
 					amount = {
 						5,
 						6
+					}
+				},
+				{
+					name = "chaos_ogryn_bulwark",
+					amount = {
+						4,
+						4
+					}
+				}
+			}
+		},
+		{
+			breeds = {
+				{
+					name = "renegade_assault",
+					amount = {
+						6,
+						7
 					}
 				},
 				{
@@ -2283,6 +2645,24 @@ local horde_compositions = {
 					}
 				}
 			}
+		},
+		{
+			breeds = {
+				{
+					name = "renegade_assault",
+					amount = {
+						6,
+						7
+					}
+				},
+				{
+					name = "chaos_ogryn_executor",
+					amount = {
+						4,
+						4
+					}
+				}
+			}
 		}
 	},
 	renegade_trickle_high_1 = {
@@ -2375,6 +2755,24 @@ local horde_compositions = {
 					}
 				}
 			}
+		},
+		{
+			breeds = {
+				{
+					name = "renegade_assault",
+					amount = {
+						12,
+						16
+					}
+				},
+				{
+					name = "renegade_shocktrooper",
+					amount = {
+						5,
+						8
+					}
+				}
+			}
 		}
 	},
 	renegade_trickle_high_2 = {
@@ -2464,6 +2862,24 @@ local horde_compositions = {
 					amount = {
 						5,
 						7
+					}
+				}
+			}
+		},
+		{
+			breeds = {
+				{
+					name = "renegade_rifleman",
+					amount = {
+						12,
+						16
+					}
+				},
+				{
+					name = "renegade_gunner",
+					amount = {
+						5,
+						8
 					}
 				}
 			}

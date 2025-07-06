@@ -125,6 +125,50 @@ local dialogue_speaker_voice_settings = {
 		subtitles_enabled = true,
 		player_voice = true
 	},
+	adamant_male_a = {
+		full_name = "loc_class_adamant_name",
+		short_name = "loc_class_adamant_name",
+		subtitles_enabled = true,
+		player_voice = true
+	},
+	adamant_male_b = {
+		full_name = "loc_class_adamant_name",
+		short_name = "loc_class_adamant_name",
+		subtitles_enabled = true,
+		player_voice = true
+	},
+	adamant_male_c = {
+		full_name = "loc_class_adamant_name",
+		short_name = "loc_class_adamant_name",
+		subtitles_enabled = true,
+		player_voice = true
+	},
+	adamant_female_a = {
+		full_name = "loc_class_adamant_name",
+		short_name = "loc_class_adamant_name",
+		subtitles_enabled = true,
+		player_voice = true
+	},
+	adamant_female_b = {
+		full_name = "loc_class_adamant_name",
+		short_name = "loc_class_adamant_name",
+		subtitles_enabled = true,
+		player_voice = true
+	},
+	adamant_female_c = {
+		full_name = "loc_class_adamant_name",
+		short_name = "loc_class_adamant_name",
+		subtitles_enabled = true,
+		player_voice = true
+	},
+	adamant_officer_a = {
+		full_name = "loc_npc_full_name_adamant_officer_a",
+		material_small = "content/ui/materials/icons/npc_portraits/mission_givers/procter_a_small",
+		subtitles_enabled = true,
+		short_name = "loc_npc_short_name_adamant_officer_a",
+		icon = "content/ui/textures/icons/npc_portraits/mission_givers/procter_a",
+		player_voice = false
+	},
 	sergeant_a = {
 		full_name = "loc_npc_full_name_sergeant_a",
 		material_small = "content/ui/materials/icons/npc_portraits/mission_givers/sergeant_a_small",
@@ -503,8 +547,8 @@ local dialogue_speaker_voice_settings = {
 		subtitles_enabled = true,
 		player_voice = false
 	},
-	servitor_female_a = {
-		short_name = "loc_npc_short_name_servitor_female_a",
+	servitor_grendyl_a = {
+		short_name = "loc_npc_short_name_grendyl",
 		subtitles_enabled = true,
 		player_voice = false
 	},
@@ -782,6 +826,12 @@ local dialogue_speaker_voice_settings = {
 		subtitles_enabled = true,
 		player_voice = false
 	},
+	past_alpha_a = {
+		full_name = "loc_npc_full_name_past_alpha_a",
+		short_name = "loc_npc_short_name_past_alpha_a",
+		subtitles_enabled = true,
+		player_voice = false
+	},
 	past_armourer_a = {
 		full_name = "loc_npc_full_name_past_armourer_a",
 		short_name = "loc_npc_short_name_past_armourer_a",
@@ -815,6 +865,12 @@ local dialogue_speaker_voice_settings = {
 	past_enemy_nemesis_wolfer_a = {
 		full_name = "loc_npc_full_name_past_enemy_nemesis_wolfer_a",
 		short_name = "loc_npc_short_name_past_enemy_nemesis_wolfer_a",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	past_enginseer_a = {
+		full_name = "loc_npc_full_name_past_enginseer_a",
+		short_name = "loc_npc_short_name_past_enginseer_a",
 		subtitles_enabled = true,
 		player_voice = false
 	},
@@ -878,6 +934,18 @@ local dialogue_speaker_voice_settings = {
 		subtitles_enabled = true,
 		player_voice = false
 	},
+	past_matriarch_a = {
+		full_name = "loc_npc_full_name_past_matriarch_a",
+		short_name = "loc_npc_short_name_past_matriarch_a",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	past_mourningstar_officer_a = {
+		full_name = "loc_npc_full_name_past_mourningstar_officer_a",
+		short_name = "loc_npc_short_name_past_mourningstar_officer_a",
+		subtitles_enabled = true,
+		player_voice = false
+	},
 	past_ragged_king_a = {
 		full_name = "loc_npc_full_name_past_ragged_king_a",
 		short_name = "loc_npc_short_name_past_ragged_king_a",
@@ -887,6 +955,18 @@ local dialogue_speaker_voice_settings = {
 	past_sergeant_a = {
 		full_name = "loc_npc_full_name_past_sergeant_a",
 		short_name = "loc_npc_short_name_past_sergeant_a",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	past_shipmistress_a = {
+		full_name = "loc_npc_full_name_past_shipmistress_a",
+		short_name = "loc_npc_short_name_past_shipmistress_a",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	past_tech_priest_a = {
+		full_name = "loc_npc_full_name_past_tech_priest_a",
+		short_name = "loc_npc_short_name_past_tech_priest_a",
 		subtitles_enabled = true,
 		player_voice = false
 	},
@@ -923,6 +1003,24 @@ local dialogue_speaker_voice_settings = {
 	fx = {
 		full_name = "loc_npc_full_name_fx",
 		short_name = "loc_npc_short_name_fx",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	nox_commissar_a = {
+		full_name = "loc_npc_short_name_nox_commissar_a",
+		short_name = "loc_npc_short_name_nox_commissar_a",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	nox_soldier_a = {
+		full_name = "loc_npc_short_name_nox_soldier_a",
+		short_name = "loc_npc_short_name_nox_soldier_a",
+		subtitles_enabled = true,
+		player_voice = false
+	},
+	nox_stranger_a = {
+		full_name = "loc_npc_short_name_nox_stranger_a",
+		short_name = "loc_npc_short_name_nox_stranger_a",
 		subtitles_enabled = true,
 		player_voice = false
 	}

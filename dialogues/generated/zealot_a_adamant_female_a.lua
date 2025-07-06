@@ -138,8 +138,8 @@ local zealot_a_adamant_female_a = {
 			[2.0] = "loc_adamant_female_a__combat_pause_quirk_stench_b_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 4.399667,
+			[2.0] = 2.907927
 		},
 		randomize_indexes = {}
 	},
@@ -151,8 +151,8 @@ local zealot_a_adamant_female_a = {
 			[2.0] = "loc_adamant_female_a__combat_pause_quirk_zealot_a_emperor_b_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 3.080031,
+			[2.0] = 2.328938
 		},
 		randomize_indexes = {}
 	},
@@ -164,8 +164,8 @@ local zealot_a_adamant_female_a = {
 			[2.0] = "loc_adamant_female_a__combat_pause_quirk_zealot_a_wounded_b_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 2.757563,
+			[2.0] = 2.02351
 		},
 		randomize_indexes = {}
 	}

@@ -3,9 +3,24 @@ local action_data = BreedActions.companion_dog
 local FOLLOW = {
 	"BtSelectorNode",
 	{
-		"BtCompanionMoveToPositionAction",
-		name = "move_to_position",
-		action_data = action_data.move_to_position
+		"BtSelectorNode",
+		{
+			"BtSelectorNode",
+			{
+				"BtCompanionMoveToPositionAction",
+				name = "move_to_position",
+				action_data = action_data.move_to_position
+			},
+			name = "companion_has_move_position",
+			condition = "companion_has_move_position",
+			action_data = action_data.companion_has_move_position
+		},
+		{
+			"BtIdleAction",
+			name = "idle",
+			action_data = action_data.idle
+		},
+		name = "move_or_idle_selector"
 	},
 	name = "follow",
 	leave_hook = "companion_leaving_movement",
@@ -25,10 +40,6 @@ local FOLLOW = {
 					field = "current_state",
 					component_name = "behavior"
 				}
-			},
-			{
-				hook = "reset_companion_movement_buffer",
-				args = {}
 			}
 		}
 	}
@@ -74,6 +85,12 @@ local IDLE = {
 local behavior_tree = {
 	"BtSelectorNode",
 	{
+		"BtManualTeleportAction",
+		name = "manual_teleport",
+		condition = "has_manual_teleport",
+		action_data = action_data.manual_teleport
+	},
+	{
 		"BtCompanionUnstuckAction",
 		name = "companion_unstuck",
 		condition = "companion_is_out_of_bound",
@@ -89,8 +106,9 @@ local behavior_tree = {
 		"BtSelectorNode",
 		{
 			"BtTeleportAction",
+			name = "teleport",
 			condition = "at_teleport_smart_object",
-			name = "teleport"
+			action_data = action_data.teleport
 		},
 		{
 			"BtClimbAction",

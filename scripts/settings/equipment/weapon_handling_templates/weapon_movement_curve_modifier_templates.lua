@@ -65,6 +65,18 @@ local weapon_movement_curve_modifier_templates = {
 			lerp_basic = 0.7
 		}
 	},
+	shotgun_p4 = {
+		modifier = {
+			lerp_perfect = 1.2,
+			lerp_basic = 0.6
+		}
+	},
+	shotpistol = {
+		modifier = {
+			lerp_perfect = 1.1,
+			lerp_basic = 0.6
+		}
+	},
 	boltpistol_p1_m1 = {
 		modifier = {
 			lerp_perfect = 1.25,

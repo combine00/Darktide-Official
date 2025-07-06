@@ -36,9 +36,10 @@ local abilities = {
 	},
 	adamant_charge = {
 		hud_icon = "content/ui/textures/icons/abilities/hud/adamant/adamant_ability_charge",
+		ability_group = "adamant_charge",
 		ability_template = "adamant_charge",
-		icon = "content/ui/materials/icons/abilities/combat/default",
 		ability_type = "combat_ability",
+		icon = "content/ui/materials/icons/abilities/combat/default",
 		ability_template_tweak_data = {
 			lunge_template_name = LungeTemplates.adamant_charge.name
 		},
@@ -50,9 +51,10 @@ local abilities = {
 	},
 	adamant_stance = {
 		hud_icon = "content/ui/textures/icons/abilities/hud/adamant/adamant_ability_stance",
+		ability_group = "adamant_stance",
 		ability_template = "adamant_stance",
-		icon = "content/ui/materials/icons/abilities/ultimate/default",
 		ability_type = "combat_ability",
+		icon = "content/ui/materials/icons/abilities/ultimate/default",
 		cooldown = adamant_talent_settings.combat_ability.stance.cooldown,
 		max_charges = adamant_talent_settings.combat_ability.stance.max_charges,
 		archetypes = {
@@ -64,6 +66,7 @@ local abilities = {
 	},
 	adamant_area_buff_drone = {
 		inventory_item_name = "content/items/weapons/player/drone_area_buff",
+		ability_group = "adamant_area_buff_drone",
 		cooldown = 60,
 		can_be_previously_wielded_to = false,
 		can_be_wielded_when_depleted = false,
@@ -81,7 +84,7 @@ local abilities = {
 		stat_buff = "extra_max_amount_of_grenades",
 		inventory_item_name = "content/items/weapons/player/grenade_adamant",
 		icon = "content/ui/materials/icons/abilities/combat/default",
-		max_charges = 2,
+		max_charges = adamant_talent_settings.blitz_ability.grenade.base_charges,
 		archetypes = {
 			"adamant"
 		}
@@ -92,16 +95,20 @@ local abilities = {
 		stat_buff = "extra_max_amount_of_grenades",
 		inventory_item_name = "content/items/weapons/player/grenade_adamant",
 		icon = "content/ui/materials/icons/abilities/combat/default",
-		max_charges = 3,
+		max_charges = adamant_talent_settings.blitz_ability.grenade.improved_charges,
 		archetypes = {
 			"adamant"
 		}
 	},
 	adamant_whistle = {
-		inventory_item_name = "content/items/weapons/player/adamant_whistle",
-		hud_icon = "content/ui/materials/icons/abilities/throwables/default",
+		ability_template = "adamant_whistle",
+		ability_group = "adamant_whistle",
+		hud_icon = "content/ui/materials/icons/throwables/hud/adamant_whistle",
 		ability_type = "grenade_ability",
 		icon = "content/ui/materials/icons/abilities/combat/default",
+		hud_configuration = {
+			uses_ammunition = true
+		},
 		max_charges = adamant_talent_settings.blitz_ability.whistle.charges,
 		cooldown = adamant_talent_settings.blitz_ability.whistle.cooldown,
 		archetypes = {

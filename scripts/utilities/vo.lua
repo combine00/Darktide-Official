@@ -397,10 +397,13 @@ function Vo.closest_player_except_vo_enemy_attack_event(unit, breed_name, vo_eve
 end
 
 function Vo.player_vo_event_by_concept(vo_concept)
-	local random_player = _get_random_player()
+	local healthy_players = _get_healthy_players()
+	local num_healthy_players = #healthy_players
 
-	if random_player then
-		local dialogue_extension = ScriptUnit.has_extension(random_player, "dialogue_system")
+	for i = 1, num_healthy_players do
+		local player = healthy_players[i]
+		local unit = player.player_unit
+		local dialogue_extension = ScriptUnit.has_extension(unit, "dialogue_system")
 		local concept = vo_concept
 
 		if _can_player_trigger_vo(dialogue_extension, concept) then
@@ -1224,7 +1227,7 @@ function Vo.substring_exists_in_backend_vo(backend_group_id, substring)
 	return exists
 end
 
-function Vo.play_local_vo_events(dialogue_system, vo_rules, voice_profile, wwise_route_key, on_play_callback, seed, is_opinion_vo)
+function Vo.play_local_vo_events(dialogue_system, vo_rules, voice_profile, wwise_route_key, on_play_callback, seed, is_opinion_vo, specific_lines)
 	local vo_unit, dialogue_extension = nil
 	local unit_to_extension_map = dialogue_system:unit_to_extension_map()
 
@@ -1254,7 +1257,7 @@ function Vo.play_local_vo_events(dialogue_system, vo_rules, voice_profile, wwise
 				dialogue_extension:play_local_vo_event(rule, wwise_route_key, nil, seed)
 			end
 		else
-			dialogue_extension:play_local_vo_events(vo_rules, wwise_route_key, on_play_callback, seed)
+			dialogue_extension:play_local_vo_events(vo_rules, wwise_route_key, on_play_callback, seed, specific_lines)
 		end
 
 		return vo_unit
@@ -1373,6 +1376,10 @@ function Vo.set_ignore_server_play_requests(value)
 end
 
 function Vo.set_unit_vo_memory(unit, memory_type, memory_id, value)
+	if value == "timeset" then
+		value = Managers.time:time("gameplay") + 900
+	end
+
 	local dialogue_extension = ScriptUnit.has_extension(unit, "dialogue_system")
 
 	if dialogue_extension then

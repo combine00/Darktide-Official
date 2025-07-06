@@ -62,7 +62,7 @@ function BotBehaviorExtension:init(extension_init_context, unit, extension_init_
 	self:_set_nav_spawn_points()
 end
 
-function BotBehaviorExtension:on_gameplay_post_init(level)
+function BotBehaviorExtension:on_gameplay_post_init(unit)
 	self:_set_nav_spawn_points()
 end
 

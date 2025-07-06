@@ -2152,10 +2152,10 @@ return function ()
 	})
 	define_rule({
 		name = "smart_tag_vo_enemy_chaos_hound_mutator",
-		category = "player_on_demand_vo",
 		wwise_route = 0,
 		response = "smart_tag_vo_enemy_chaos_hound_mutator",
 		database = "circumstance_vo_hunting_grounds",
+		category = "player_on_demand_vo",
 		criterias = {
 			{
 				"query_context",
@@ -2188,6 +2188,9 @@ return function ()
 				"enemy_chaos_hound_mutator",
 				OP.TIMESET
 			}
+		},
+		heard_speak_routing = {
+			target = "self"
 		},
 		on_pre_rule_execution = {
 			delay_vo = {

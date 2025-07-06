@@ -10,6 +10,7 @@ local MasterItems = require("scripts/backend/master_items")
 local Offer = require("scripts/utilities/offer")
 local Personalities = require("scripts/settings/character/personalities")
 local Promise = require("scripts/foundation/utilities/promise")
+local PromiseContainer = require("scripts/utilities/ui/promise_container")
 local ScriptWorld = require("scripts/foundation/utilities/script_world")
 local StoreItemDetailViewSettings = require("scripts/ui/views/store_item_detail_view/store_item_detail_view_settings")
 local Text = require("scripts/utilities/ui/text")
@@ -55,6 +56,8 @@ function StoreItemDetailView:init(settings, context)
 	if IS_PLAYSTATION then
 		self._ps_store_icon_showing = false
 	end
+
+	self._promise_container = PromiseContainer:new()
 end
 
 function StoreItemDetailView:_setup_offscreen_gui()
@@ -1218,7 +1221,7 @@ function StoreItemDetailView:_generic_profile_from_item(item)
 			item_gender = wanted_gender
 		end
 
-		local wanted_breed = profile.breed
+		local wanted_breed = profile.archetype.breed
 		local item_breeds = item.breeds
 
 		if item_breeds and not table.is_empty(item_breeds) then
@@ -1300,7 +1303,7 @@ function StoreItemDetailView:_is_spawn_profile_by_item_valid(item)
 	end
 
 	local required_profile = self:_generic_profile_from_item(item)
-	local same_breed = required_profile.breed == current_profile.breed
+	local same_breed = required_profile.archetype.breed == current_profile.archetype.breed
 	local same_gender = required_profile.gender == current_profile.gender
 	local same_archetype = required_profile.archetype.name == current_profile.archetype.name
 
@@ -1528,7 +1531,7 @@ end
 function StoreItemDetailView:_can_zoom()
 	local item_type = table.nested_get(self, "_selected_element", "item", "item_type")
 
-	return self._zoom_delay == 0 and (item_type == "GEAR_EXTRA_COSMETIC" or item_type == "GEAR_HEAD" or item_type == "GEAR_LOWERBODY" or item_type == "GEAR_UPPERBODY")
+	return self._zoom_delay == 0 and (item_type == "GEAR_EXTRA_COSMETIC" or item_type == "GEAR_HEAD" or item_type == "GEAR_LOWERBODY" or item_type == "GEAR_UPPERBODY") and not self._aquilas_showing
 end
 
 function StoreItemDetailView:_can_preview_voice()
@@ -1637,6 +1640,7 @@ function StoreItemDetailView:_set_initial_viewport_camera_position(default_camer
 end
 
 function StoreItemDetailView:on_exit()
+	self._promise_container:delete()
 	self:_stop_current_voice()
 	self:_destroy_profile()
 	self:_destroy_side_panel()
@@ -1678,6 +1682,12 @@ function StoreItemDetailView:on_exit()
 
 	if has_purchased_item then
 		Managers.event:trigger("event_force_refresh_inventory")
+	end
+
+	if self._dlc_info_popup_id then
+		Managers.event:trigger("event_remove_ui_popup", self._dlc_info_popup_id)
+
+		self._dlc_info_popup_id = nil
 	end
 
 	StoreItemDetailView.super.on_exit(self)
@@ -1744,7 +1754,7 @@ function StoreItemDetailView:_handle_input(input_service)
 				self._activate_navigation_next_frame = true
 			end
 		elseif self._widgets_by_name.purchase_item_button.content.visible == true and not self._widgets_by_name.purchase_item_button.content.hotspot.disabled and input_service:get("confirm_pressed") then
-			self:cb_on_purchase_pressed()
+			self._widgets_by_name.purchase_item_button.content.hotspot.pressed_callback()
 		end
 	end
 end
@@ -1820,6 +1830,14 @@ function StoreItemDetailView:update(dt, t, input_service)
 		local keep_current_rotation = self._keep_current_rotation
 
 		self:_spawn_profile(profile, initial_rotation, disable_rotation_input, keep_current_rotation)
+
+		local item = self._selected_element and self._selected_element.item and MasterItems.get_item(self._selected_element.item)
+		local is_companion_slot = item and item.slots and table.find(item.slots, "slot_companion_gear_full")
+		local toggle_companion = item and (item.companion_state_machine ~= nil and item.companion_state_machine ~= "" or is_companion_slot)
+		local toggle_character = not is_companion_slot
+
+		self._profile_spawner:toggle_companion(toggle_companion)
+		self._profile_spawner:toggle_character(toggle_character)
 
 		self._keep_current_rotation = nil
 		self._spawn_player = false
@@ -2501,9 +2519,152 @@ function StoreItemDetailView:_update_purchase_buttons()
 	widgets_by_name.background.content.force_show_price = self._should_expire
 	widgets_by_name.owned_info_text.content.visible = #self._items > 1 and is_selected_item_owned
 	local purchase_item_button = widgets_by_name.purchase_item_button
+
+	if self._current_archetype_available_promise and not self._current_archetype_available_promise:is_fulfilled() then
+		self._current_archetype_available_promise:cancel()
+	end
+
+	local item_archetypes = nil
+
+	if not selected_element.offer.bundleInfo then
+		local current_item = selected_element.item or items[selected_element.index].item
+		item_archetypes = self:_get_item_archetypes(current_item)
+	else
+		item_archetypes = self:_get_bundle_archetypes(selected_element.offer)
+	end
+
+	local availability_promises = {}
+	local all_promises_fulfilled = true
+
+	for k, v in ipairs(item_archetypes) do
+		local archetype_available_promise = v:is_available()
+		all_promises_fulfilled = all_promises_fulfilled and archetype_available_promise:is_fulfilled()
+
+		table.insert(availability_promises, archetype_available_promise)
+	end
+
+	if not all_promises_fulfilled then
+		purchase_item_button.content.visible = false
+		purchase_item_button.content.hotspot.disabled = true
+	end
+
+	if #availability_promises == 0 then
+		table.insert(availability_promises, Promise.resolved({
+			available = true
+		}))
+	end
+
+	local are_archetypes_available_promises = Promise.all(unpack(availability_promises))
+	self._current_archetype_available_promise = are_archetypes_available_promises
+
+	self._promise_container:cancel_on_destroy(are_archetypes_available_promises):next(function (is_archetype_available_results)
+		local unavailable_archetype = nil
+
+		for _, result in ipairs(is_archetype_available_results) do
+			if result.available then
+				self:_setup_purchase_button_for_item(purchase_item_button, is_selected_item_owned, selected_element)
+
+				return
+			else
+				unavailable_archetype = result.archetype
+			end
+		end
+
+		self:_setup_purchase_button_for_dlc(purchase_item_button, unavailable_archetype)
+	end)
+end
+
+function StoreItemDetailView:_get_item_archetypes(item)
+	local item_archetypes = {}
+
+	if not item.archetypes then
+		local preview_item = item.preview_item and MasterItems.get_item(item.preview_item)
+		local preview_item_archetypes = preview_item and self:_get_item_archetypes(preview_item)
+
+		return preview_item_archetypes or item_archetypes
+	end
+
+	for k, v in pairs(item.archetypes) do
+		table.insert(item_archetypes, Archetypes[v])
+	end
+
+	return item_archetypes
+end
+
+function StoreItemDetailView:_get_bundle_archetypes(offer)
+	local item_archetypes = {}
+	local offer_items = Offer.extract_items(offer)
+
+	for _, offer_item in ipairs(offer_items) do
+		table.append(item_archetypes, self:_get_item_archetypes(offer_item.item))
+	end
+
+	item_archetypes = table.unique_array_values(item_archetypes)
+
+	return item_archetypes
+end
+
+function StoreItemDetailView:_setup_purchase_button_for_dlc(purchase_item_button, archetype)
+	self._widgets_by_name.dlc_required_text.content.visible = true
+	local localized_dlc_name = Localize(archetype.dlc_settings.loc_name_generic)
+	self._widgets_by_name.dlc_required_text.content.text = Localize("loc_dlc_required", true, {
+		dlc_name = localized_dlc_name
+	})
+	purchase_item_button.content.visible = true
+	purchase_item_button.content.hotspot.disabled = false
+	purchase_item_button.content.hotspot.pressed_callback = callback(self, "_cb_show_dlc_information_popup", purchase_item_button, archetype)
+	local purchase_button_text = Utf8.upper(Localize("loc_dlc_cta"))
+	purchase_item_button.content.original_text = purchase_button_text
+	local purchase_item_button_style_options = UIFonts.get_font_options_by_style(purchase_item_button.style.text)
+	local purchase_item_button_width, _ = self:_text_size(purchase_button_text, purchase_item_button.style.text.font_type, purchase_item_button.style.text.font_size, {
+		1920,
+		ButtonPassTemplates.default_button.size[2]
+	}, purchase_item_button_style_options)
+
+	self:_set_scenegraph_size("purchase_button", math.max(ButtonPassTemplates.default_button.size[1], purchase_item_button_width + 100), nil)
+end
+
+function StoreItemDetailView:_cb_show_dlc_information_popup(purchase_item_button, archetype)
+	local localized_dlc_name = Localize(archetype.dlc_settings.loc_name_generic)
+	local context = {
+		title_text = "loc_dlc_required",
+		description_text = "loc_dlc_store_popup_info",
+		title_text_params = {
+			dlc_name = localized_dlc_name
+		},
+		description_text_params = {
+			dlc_name = localized_dlc_name
+		},
+		options = {
+			{
+				text = "loc_confirm",
+				close_on_pressed = true,
+				callback = callback(archetype, "acquire_callback", function (is_success)
+					if is_success then
+						self:_update_purchase_buttons()
+					end
+				end)
+			},
+			{
+				text = "loc_dlc_store_popup_cancel",
+				close_on_pressed = true,
+				hotkey = "back"
+			}
+		}
+	}
+
+	Managers.telemetry_events:dlc_popup_opened(archetype.dlc_settings.telemetry_id)
+	Managers.event:trigger("event_show_ui_popup", context, function (id)
+		self._dlc_info_popup_id = id
+	end)
+end
+
+function StoreItemDetailView:_setup_purchase_button_for_item(purchase_item_button, is_selected_item_owned, selected_element)
+	self._widgets_by_name.dlc_required_text.content.visible = false
 	purchase_item_button.content.visible = true
 	purchase_item_button.content.hotspot.disabled = is_selected_item_owned
 	purchase_item_button.content.visible = not is_selected_item_owned
+	purchase_item_button.content.hotspot.pressed_callback = callback(self, "cb_on_purchase_pressed", "item")
 
 	self:_update_price_presentation()
 
@@ -2790,7 +2951,9 @@ function StoreItemDetailView:_create_aquilas_presentation(offer, item_name)
 	local pass_template = template.pass_template
 	local store_service = Managers.data_service.store
 	self._store_promise = store_service:get_premium_store("hard_currency_store"):next(function (data)
-		if self._destroyed or not self._store_promise then
+		if self._destroyed or not self._store_promise or not data then
+			self._store_promise = nil
+
 			return
 		end
 
@@ -3197,7 +3360,11 @@ function StoreItemDetailView:cb_on_inspect_pressed()
 			is_item_supported_on_played_character = true
 		end
 
-		local profile = is_item_supported_on_played_character and table.clone_instance(player_profile) or Items.create_mannequin_profile_by_item(item)
+		local gender_name = player_profile.gender
+		local archetype = player_profile.archetype
+		local archetype_name = archetype and archetype.name
+		local breed_name = player_profile.archetype.breed
+		local profile = is_item_supported_on_played_character and table.clone_instance(player_profile) or Items.create_mannequin_profile_by_item(item, gender_name, archetype_name, breed_name)
 		context = {
 			use_store_appearance = true,
 			profile = profile,

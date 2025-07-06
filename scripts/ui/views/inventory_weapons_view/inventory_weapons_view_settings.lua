@@ -24,7 +24,7 @@ local inventory_weapons_view = {
 	viewport_name = "ui_weapon_preview_viewport",
 	viewport_layer = 1,
 	stats_anim_duration = 1,
-	level_name = "content/levels/ui/cosmetics_preview/cosmetics_preview",
+	level_name = "content/levels/ui/inventory_weapon_view/inventory_weapon_view",
 	world_name = "ui_weapon_preview",
 	grid_spacing = {
 		32,

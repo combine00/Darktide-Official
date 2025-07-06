@@ -29,6 +29,10 @@ local sprint_trait_templates = WeaponTraitTemplates[template_types.sprint]
 local weapon_handling_trait_templates = WeaponTraitTemplates[template_types.weapon_handling]
 
 local function _crosshair_type_func(condition_func_params)
+	if not condition_func_params then
+		return "shotgun"
+	end
+
 	local inventory_slot_component = condition_func_params.inventory_slot_component
 	local current_ammunition_clip = inventory_slot_component.current_ammunition_clip
 
@@ -42,7 +46,7 @@ end
 local weapon_template = {
 	action_inputs = {
 		shoot_pressed = {
-			buffer_time = 0.25,
+			buffer_time = 0.35,
 			max_queue = 2,
 			input_sequence = {
 				{
@@ -52,7 +56,7 @@ local weapon_template = {
 			}
 		},
 		block_shoot_pressed = {
-			buffer_time = 0.5,
+			buffer_time = 0.35,
 			max_queue = 2,
 			input_sequence = {
 				{
@@ -201,7 +205,7 @@ local weapon_template = {
 				{
 					value = false,
 					time_window = 1.5,
-					auto_complete = false,
+					auto_complete = true,
 					input = "weapon_extra_hold"
 				}
 			}
@@ -248,10 +252,6 @@ weapon_template.action_input_hierarchy = {
 					},
 					{
 						transition = "base",
-						input = "reload_pressed"
-					},
-					{
-						transition = "base",
 						input = "wield"
 					},
 					{
@@ -263,10 +263,6 @@ weapon_template.action_input_hierarchy = {
 						input = "grenade_ability"
 					}
 				}
-			},
-			{
-				transition = "base",
-				input = "special_action_hold"
 			},
 			{
 				input = "block_reload_pressed",
@@ -296,6 +292,10 @@ weapon_template.action_input_hierarchy = {
 						input = "grenade_ability"
 					}
 				}
+			},
+			{
+				transition = "previous",
+				input = "reload_pressed"
 			},
 			{
 				transition = "base",
@@ -408,13 +408,13 @@ weapon_template.actions = {
 		}
 	},
 	action_shoot_hip = {
-		start_input = "shoot_pressed",
-		kind = "shoot_pellets",
-		sprint_ready_up_time = 0.2,
-		weapon_handling_template = "stubrevolver_single_shot",
 		ammunition_usage = 1,
 		sprint_requires_press_to_interrupt = true,
+		sprint_ready_up_time = 0.2,
+		kind = "shoot_pellets",
+		weapon_handling_template = "stubrevolver_single_shot",
 		allowed_during_sprint = false,
+		start_input = "shoot_pressed",
 		total_time = 0.75,
 		action_movement_curve = {
 			{
@@ -454,6 +454,37 @@ weapon_template.actions = {
 			shotshell = ShotshellTemplates.shotpistol_shield,
 			damage_type = damage_types.pellet
 		},
+		action_condition_func = function (action_settings, condition_func_params, used_input, t)
+			if not condition_func_params then
+				return true
+			end
+
+			local weapon_extension = condition_func_params.weapon_extension
+			local last_shoot_action_t = weapon_extension.last_shoot_action_t
+			local next_allowed_shoot_action_t = last_shoot_action_t + 0.3
+			local weapon_action_component = condition_func_params.weapon_action_component
+			local current_action_name = weapon_action_component.current_action_name
+			local previous_action_name = weapon_action_component.previous_action_name
+			local previous_action_end_t = weapon_action_component.end_t
+			local allow_after_block = current_action_name ~= "none" or previous_action_name ~= "action_block" or t >= previous_action_end_t + 0.3
+			local allow_shot = next_allowed_shoot_action_t <= t
+
+			if allow_after_block and allow_shot then
+				return true
+			end
+
+			return false
+		end,
+		action_finish_func = function (reason, data, condition_func_params, t)
+			if not condition_func_params then
+				return
+			end
+
+			local weapon_extension = condition_func_params.weapon_extension
+			local weapon_action_component = condition_func_params.weapon_action_component
+			local start_t = weapon_action_component.start_t
+			weapon_extension.last_shoot_action_t = start_t
+		end,
 		allowed_chain_actions = {
 			combat_ability = {
 				action_name = "combat_ability"
@@ -467,7 +498,7 @@ weapon_template.actions = {
 			},
 			shoot_pressed = {
 				action_name = "action_shoot_hip",
-				chain_time = 0.65
+				chain_time = 0.55
 			},
 			block_hold = {
 				action_name = "action_block",
@@ -487,16 +518,16 @@ weapon_template.actions = {
 		}
 	},
 	action_shoot_blocking = {
-		ammunition_usage = 1,
-		weapon_handling_template = "stubrevolver_single_shot",
 		kind = "shoot_pellets",
-		spread_template = "default_shotpistol_shield_ads",
 		start_input = "block_shoot_pressed",
 		recoil_template = "default_shotpistol_shield_ads",
-		allowed_during_sprint = true,
+		weapon_handling_template = "stubrevolver_single_shot",
 		sprint_ready_up_time = 0,
+		allowed_during_sprint = true,
+		ammunition_usage = 1,
+		spread_template = "default_shotpistol_shield_ads",
 		total_time = 0.75,
-		haptic_trigger_template = HapticTriggerTemplates.ranged.stubrevolver_p1_m2_special_shoot,
+		haptic_trigger_template = HapticTriggerTemplates.ranged.shotgun_p2_double_shot,
 		crosshair = {
 			crosshair_type = "shotgun"
 		},
@@ -537,6 +568,31 @@ weapon_template.actions = {
 			shotshell = ShotshellTemplates.shotpistol_shield,
 			damage_type = damage_types.pellet
 		},
+		action_condition_func = function (action_settings, condition_func_params, used_input, t)
+			if not condition_func_params then
+				return true
+			end
+
+			local weapon_extension = condition_func_params.weapon_extension
+			local last_shoot_action_t = weapon_extension.last_shoot_action_t
+			local next_allowed_shoot_action_t = last_shoot_action_t + 0.55
+
+			if t >= next_allowed_shoot_action_t then
+				return condition_func_params.inventory_slot_component.current_ammunition_clip > 0
+			end
+
+			return false
+		end,
+		action_finish_func = function (reason, data, condition_func_params, t)
+			if not condition_func_params then
+				return
+			end
+
+			local weapon_extension = condition_func_params.weapon_extension
+			local weapon_action_component = condition_func_params.weapon_action_component
+			local start_t = weapon_action_component.start_t
+			weapon_extension.last_shoot_action_t = start_t
+		end,
 		allowed_chain_actions = {
 			combat_ability = {
 				action_name = "combat_ability"
@@ -545,56 +601,66 @@ weapon_template.actions = {
 			wield = {
 				action_name = "action_unwield"
 			},
-			reload_pressed = {
-				action_name = "action_reload"
-			},
-			block_shoot_pressed = {
-				action_name = "action_shoot_blocking",
-				chain_time = 0.65
-			},
 			block_hold = {
 				action_name = "action_block_from_shoot",
-				chain_time = 0.5
+				chain_time = 0.1
 			},
 			block_release = {
 				action_name = "action_unaim",
-				chain_time = 0.5
-			},
-			special_action_hold = {
-				action_name = "action_bash_start",
-				chain_time = 0.5
+				chain_time = 0.4
 			}
 		},
 		time_scale_stat_buffs = {
 			buff_stat_buffs.attack_speed,
 			buff_stat_buffs.ranged_attack_speed
+		},
+		block_attack_types = {
+			[attack_types.melee] = true,
+			[attack_types.ranged] = true
 		}
 	},
 	action_block = {
-		block_unblockable = false,
-		weapon_handling_template = "time_scale_1_4",
 		start_input = "block_hold",
+		sprint_requires_press_to_interrupt = true,
+		weapon_handling_template = "time_scale_1_4",
+		allowed_during_sprint = true,
 		kind = "block_aiming",
 		minimum_hold_time = 0.3,
+		block_unblockable = true,
+		abort_sprint = true,
 		uninterruptible = true,
 		stop_input = "block_release",
 		total_time = math.huge,
 		anim_event_func = function (action_settings, condition_func_params, is_chain_action, previous_action)
+			if not condition_func_params then
+				return "to_braced", "to_braced"
+			end
+
 			local inventory_slot_component = condition_func_params.inventory_slot_component
 			local current_ammunition_clip = inventory_slot_component.current_ammunition_clip
+			local current_ammunition_reserve = inventory_slot_component.current_ammunition_reserve
 
-			if current_ammunition_clip == 0 then
-				return "to_reload_parry", "to_braced"
+			if current_ammunition_reserve == 0 and current_ammunition_clip == 0 then
+				return "to_parry_block", "to_reload_parry"
+			elseif current_ammunition_clip == 0 then
+				return "to_reload_parry", "to_reload_parry"
 			end
 
 			return "to_braced", "to_braced"
 		end,
 		anim_end_event_func = function (action_settings, condition_func_params)
+			if not condition_func_params then
+				return "to_unaim_braced", "to_unaim_braced"
+			end
+
 			local inventory_slot_component = condition_func_params.inventory_slot_component
 			local current_ammunition_clip = inventory_slot_component.current_ammunition_clip
+			local current_ammunition_reserve = inventory_slot_component.current_ammunition_reserve
 
-			if current_ammunition_clip == 0 then
-				return "to_unaim_reload_parry", "to_unaim_braced"
+			if current_ammunition_reserve == 0 and current_ammunition_clip == 0 then
+				return "to_unaim_parry_block", "to_unaim_reload_parry"
+			elseif current_ammunition_clip == 0 then
+				return "to_unaim_reload_parry", "to_unaim_reload_parry"
 			end
 
 			return "to_unaim_braced", "to_unaim_braced"
@@ -608,7 +674,7 @@ weapon_template.actions = {
 		smart_targeting_template = SmartTargetingTemplates.alternate_fire_bfg,
 		action_movement_curve = {
 			{
-				modifier = 0.85,
+				modifier = 0.75,
 				t = 0.05
 			},
 			{
@@ -616,15 +682,15 @@ weapon_template.actions = {
 				t = 0.15
 			},
 			{
-				modifier = 0.915,
+				modifier = 0.9,
 				t = 0.175
 			},
 			{
 				modifier = 0.95,
-				t = 0.3
+				t = 0.5
 			},
 			{
-				modifier = 1.1,
+				modifier = 1,
 				t = 1
 			},
 			start_modifier = 0.9
@@ -642,8 +708,14 @@ weapon_template.actions = {
 			},
 			grenade_ability = BaseTemplateSettings.generate_grenade_ability_chain_actions(),
 			special_action = {
-				action_name = "action_bash_light",
-				chain_time = 0.25
+				{
+					action_name = "action_bash_light_from_block_no_ammo",
+					chain_time = 0.25
+				},
+				{
+					action_name = "action_bash_light",
+					chain_time = 0.25
+				}
 			}
 		},
 		block_attack_types = {
@@ -652,111 +724,42 @@ weapon_template.actions = {
 		}
 	},
 	action_block_from_shoot = {
-		block_unblockable = false,
+		block_unblockable = true,
 		skip_enter_alternate_fire = true,
 		kind = "block_aiming",
 		skip_update_perfect_blocking = true,
 		uninterruptible = true,
-		stop_input = "block_release",
 		total_time = math.huge,
 		anim_event_func = function (action_settings, condition_func_params, is_chain_action, previous_action)
+			if not condition_func_params then
+				return nil
+			end
+
 			local inventory_slot_component = condition_func_params.inventory_slot_component
 			local current_ammunition_clip = inventory_slot_component.current_ammunition_clip
+			local current_ammunition_reserve = inventory_slot_component.current_ammunition_reserve
 
-			if current_ammunition_clip == 0 then
-				return "attack_shoot_to_parry", "to_braced"
+			if current_ammunition_reserve == 0 and current_ammunition_clip == 0 then
+				return "attack_shoot_to_parry", "attack_shoot_to_parry"
+			elseif current_ammunition_clip == 0 then
+				return "attack_shoot_to_parry", "attack_shoot_to_parry"
 			end
 
 			return nil
 		end,
 		anim_end_event_func = function (action_settings, condition_func_params)
-			local inventory_slot_component = condition_func_params.inventory_slot_component
-			local current_ammunition_clip = inventory_slot_component.current_ammunition_clip
-
-			if current_ammunition_clip == 0 then
-				return "to_unaim_reload_parry", "to_unaim_braced"
+			if not condition_func_params then
+				return "to_unaim_braced"
 			end
 
-			return "to_unaim_braced"
-		end,
-		anim_end_event_condition_func = function (unit, data, end_reason)
-			return end_reason ~= "new_interrupting_action" and end_reason ~= "action_complete"
-		end,
-		crosshair = {
-			crosshair_type = "shotgun"
-		},
-		smart_targeting_template = SmartTargetingTemplates.alternate_fire_bfg,
-		action_movement_curve = {
-			{
-				modifier = 0.85,
-				t = 0.05
-			},
-			{
-				modifier = 0.85,
-				t = 0.15
-			},
-			{
-				modifier = 0.825,
-				t = 0.175
-			},
-			{
-				modifier = 0.85,
-				t = 0.3
-			},
-			{
-				modifier = 1.15,
-				t = 1
-			},
-			start_modifier = 0.9
-		},
-		allowed_chain_actions = {
-			wield = {
-				action_name = "action_unwield"
-			},
-			reload_pressed = {
-				action_name = "action_reload"
-			},
-			block_shoot_pressed = {
-				action_name = "action_shoot_blocking",
-				chain_time = 0.15
-			},
-			combat_ability = {
-				action_name = "combat_ability"
-			},
-			grenade_ability = BaseTemplateSettings.generate_grenade_ability_chain_actions(),
-			special_action = {
-				action_name = "action_bash_light",
-				chain_time = 0.25
-			}
-		},
-		block_attack_types = {
-			[attack_types.melee] = true,
-			[attack_types.ranged] = true
-		}
-	},
-	action_block_from_bash = {
-		block_unblockable = false,
-		kind = "block_aiming",
-		skip_update_perfect_blocking = true,
-		uninterruptible = true,
-		stop_input = "block_release",
-		total_time = math.huge,
-		anim_event_func = function (action_settings, condition_func_params, is_chain_action, previous_action)
 			local inventory_slot_component = condition_func_params.inventory_slot_component
 			local current_ammunition_clip = inventory_slot_component.current_ammunition_clip
+			local current_ammunition_reserve = inventory_slot_component.current_ammunition_reserve
 
-			if current_ammunition_clip == 0 then
-				return "to_reload_parry", "to_braced"
-			end
-
-			return "to_braced", "to_braced"
-		end,
-		anim_end_event_func = function (action_settings, condition_func_params)
-			local inventory_slot_component = condition_func_params.inventory_slot_component
-			local current_ammunition_clip = inventory_slot_component.current_ammunition_clip
-
-			if current_ammunition_clip == 0 then
-				return "to_unaim_reload_parry", "to_unaim_braced"
+			if current_ammunition_reserve == 0 and current_ammunition_clip == 0 then
+				return "to_unaim_parry_block", "to_unaim_reload_parry"
+			elseif current_ammunition_clip == 0 then
+				return "to_unaim_reload_parry", "to_unaim_reload_parry"
 			end
 
 			return "to_unaim_braced", "to_unaim_braced"
@@ -774,19 +777,122 @@ weapon_template.actions = {
 				t = 0.05
 			},
 			{
-				modifier = 0.75,
+				modifier = 0.8,
 				t = 0.15
 			},
 			{
-				modifier = 0.725,
+				modifier = 0.9,
 				t = 0.175
 			},
 			{
-				modifier = 0.85,
-				t = 0.3
+				modifier = 0.95,
+				t = 0.5
+			},
+			{
+				modifier = 1,
+				t = 1
+			},
+			start_modifier = 0.9
+		},
+		allowed_chain_actions = {
+			wield = {
+				action_name = "action_unwield"
+			},
+			block_shoot_pressed = {
+				action_name = "action_shoot_blocking",
+				chain_time = 0.45
+			},
+			combat_ability = {
+				action_name = "combat_ability"
+			},
+			grenade_ability = BaseTemplateSettings.generate_grenade_ability_chain_actions(),
+			special_action = {
+				{
+					action_name = "action_bash_light_from_block_no_ammo",
+					chain_time = 0.25
+				},
+				{
+					action_name = "action_bash_light",
+					chain_time = 0.25
+				}
+			},
+			block_release = {
+				action_name = "action_unaim",
+				chain_time = 0.35
+			}
+		},
+		block_attack_types = {
+			[attack_types.melee] = true,
+			[attack_types.ranged] = true
+		}
+	},
+	action_block_from_bash = {
+		block_unblockable = true,
+		kind = "block_aiming",
+		skip_update_perfect_blocking = true,
+		uninterruptible = true,
+		stop_input = "block_release",
+		total_time = math.huge,
+		anim_event_func = function (action_settings, condition_func_params, is_chain_action, previous_action)
+			if not condition_func_params then
+				return "to_braced", "to_braced"
+			end
+
+			local inventory_slot_component = condition_func_params.inventory_slot_component
+			local current_ammunition_clip = inventory_slot_component.current_ammunition_clip
+			local current_ammunition_reserve = inventory_slot_component.current_ammunition_reserve
+
+			if current_ammunition_reserve == 0 and current_ammunition_clip == 0 then
+				return "to_parry_block", "to_reload_parry"
+			elseif current_ammunition_clip == 0 then
+				return "to_reload_parry", "to_reload_parry"
+			end
+
+			return "to_braced", "to_braced"
+		end,
+		anim_end_event_func = function (action_settings, condition_func_params)
+			if not condition_func_params then
+				return "to_unaim_braced", "to_unaim_braced"
+			end
+
+			local inventory_slot_component = condition_func_params.inventory_slot_component
+			local current_ammunition_clip = inventory_slot_component.current_ammunition_clip
+			local current_ammunition_reserve = inventory_slot_component.current_ammunition_reserve
+
+			if current_ammunition_reserve == 0 and current_ammunition_clip == 0 then
+				return "to_unaim_parry_block", "to_unaim_reload_parry"
+			elseif current_ammunition_clip == 0 then
+				return "to_unaim_reload_parry", "to_unaim_reload_parry"
+			end
+
+			return "to_unaim_braced", "to_unaim_braced"
+		end,
+		anim_end_event_condition_func = function (unit, data, end_reason)
+			return end_reason ~= "new_interrupting_action" and end_reason ~= "action_complete"
+		end,
+		crosshair = {
+			crosshair_type = "shotgun"
+		},
+		smart_targeting_template = SmartTargetingTemplates.alternate_fire_bfg,
+		action_movement_curve = {
+			{
+				modifier = 0.75,
+				t = 0.05
+			},
+			{
+				modifier = 0.8,
+				t = 0.15
+			},
+			{
+				modifier = 0.9,
+				t = 0.175
 			},
 			{
 				modifier = 0.95,
+				t = 0.5
+			},
+			{
+				modifier = 1,
 				t = 1
 			},
 			start_modifier = 0.7
@@ -807,8 +913,14 @@ weapon_template.actions = {
 			},
 			grenade_ability = BaseTemplateSettings.generate_grenade_ability_chain_actions(),
 			special_action = {
-				action_name = "action_bash_light",
-				chain_time = 0.25
+				{
+					action_name = "action_bash_light_from_block_no_ammo",
+					chain_time = 0.25
+				},
+				{
+					action_name = "action_bash_light",
+					chain_time = 0.25
+				}
 			}
 		},
 		block_attack_types = {
@@ -817,11 +929,34 @@ weapon_template.actions = {
 		}
 	},
 	action_unaim = {
-		block_unblockable = false,
+		block_unblockable = true,
 		start_input = "block_release",
-		kind = "unaim",
-		anim_event = "to_unaim_braced",
-		total_time = 0.35,
+		kind = "block_unaim",
+		total_time = 0.035,
+		anim_event_func = function (action_settings, condition_func_params, is_chain_action, previous_action)
+			if not condition_func_params then
+				return "to_unaim_braced"
+			end
+
+			local inventory_slot_component = condition_func_params.inventory_slot_component
+			local current_ammunition_clip = inventory_slot_component.current_ammunition_clip
+			local current_ammunition_reserve = inventory_slot_component.current_ammunition_reserve
+
+			if current_ammunition_reserve == 0 and current_ammunition_clip == 0 then
+				return "to_unaim_parry_block", "to_unaim_reload_parry"
+			elseif current_ammunition_clip == 0 then
+				local previous_actions_settings = previous_action and previous_action:action_settings()
+				local previous_action_name = previous_actions_settings and previous_actions_settings.name
+
+				if previous_action_name and previous_action_name == "action_shoot_blocking" then
+					return "to_unaim_braced", "to_unaim_braced"
+				else
+					return "to_unaim_reload_parry", "to_unaim_reload_parry"
+				end
+			end
+
+			return "to_unaim_braced"
+		end,
 		crosshair = {
 			crosshair_type_func = _crosshair_type_func
 		},
@@ -831,37 +966,26 @@ weapon_template.actions = {
 				t = 0.05
 			},
 			{
-				modifier = 0.75,
+				modifier = 0.8,
 				t = 0.15
 			},
 			{
-				modifier = 0.725,
+				modifier = 0.9,
 				t = 0.175
 			},
 			{
-				modifier = 0.85,
-				t = 0.3
+				modifier = 0.95,
+				t = 0.5
 			},
 			{
-				modifier = 0.8,
+				modifier = 1,
 				t = 1
 			},
-			start_modifier = 0.5
+			start_modifier = 0.7
 		},
 		allowed_chain_actions = {
 			wield = {
 				action_name = "action_unwield"
-			},
-			reload_pressed = {
-				action_name = "action_reload"
-			},
-			block_hold = {
-				action_name = "action_block",
-				chain_time = 0.3
-			},
-			shoot_pressed = {
-				action_name = "action_shoot_hip",
-				chain_time = 0.55
 			},
 			combat_ability = {
 				action_name = "combat_ability"
@@ -877,42 +1001,34 @@ weapon_template.actions = {
 		stop_alternate_fire = true,
 		start_input = "reload_pressed",
 		kind = "reload_state",
-		weapon_handling_template = "time_scale_1_3",
+		weapon_handling_template = "time_scale_1_2",
 		sprint_requires_press_to_interrupt = true,
 		abort_sprint = true,
 		allowed_during_sprint = true,
 		total_time = 2.5,
 		crosshair = {
-			crosshair_type = "none"
+			crosshair_type = "dot"
 		},
 		action_movement_curve = {
 			{
-				modifier = 0.775,
+				modifier = 0.75,
 				t = 0.05
 			},
 			{
-				modifier = 0.75,
-				t = 0.075
-			},
-			{
-				modifier = 0.59,
-				t = 0.25
-			},
-			{
-				modifier = 0.6,
-				t = 0.3
-			},
-			{
-				modifier = 0.85,
-				t = 0.8
+				modifier = 0.8,
+				t = 0.15
 			},
 			{
 				modifier = 0.9,
-				t = 0.9
+				t = 0.175
+			},
+			{
+				modifier = 0.95,
+				t = 0.5
 			},
 			{
 				modifier = 1,
-				t = 2
+				t = 1
 			},
 			start_modifier = 1
 		},
@@ -931,7 +1047,7 @@ weapon_template.actions = {
 			},
 			block_hold = {
 				action_name = "action_block",
-				chain_time = 0.3
+				chain_time = 0.35
 			},
 			wield = {
 				action_name = "action_unwield"
@@ -952,40 +1068,32 @@ weapon_template.actions = {
 		allowed_during_sprint = true,
 		anim_event = "charge_special",
 		prevent_sprint = true,
-		total_time = math.huge,
+		total_time = 2,
 		crosshair = {
 			crosshair_type = "dot"
 		},
 		action_movement_curve = {
 			{
-				modifier = 0.85,
-				t = 0.1
-			},
-			{
-				modifier = 0.87,
-				t = 0.25
-			},
-			{
-				modifier = 0.89,
-				t = 0.3
-			},
-			{
-				modifier = 1.3,
-				t = 0.35
-			},
-			{
-				modifier = 1.3,
-				t = 0.4
-			},
-			{
-				modifier = 0.9,
-				t = 0.6
+				modifier = 0.75,
+				t = 0.05
 			},
 			{
 				modifier = 0.8,
+				t = 0.15
+			},
+			{
+				modifier = 0.9,
+				t = 0.175
+			},
+			{
+				modifier = 0.95,
+				t = 0.5
+			},
+			{
+				modifier = 1,
 				t = 1
 			},
-			start_modifier = 0.9
+			start_modifier = 0.8
 		},
 		allowed_chain_actions = {
 			combat_ability = {
@@ -1001,7 +1109,7 @@ weapon_template.actions = {
 			},
 			special_action_heavy = {
 				action_name = "action_bash_heavy",
-				chain_time = 0.4
+				chain_time = 0.525
 			},
 			shoot_pressed = {
 				action_name = "action_shoot_hip",
@@ -1018,7 +1126,7 @@ weapon_template.actions = {
 		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
 	action_bash_light = {
-		push_radius = 3.75,
+		push_radius = 3.25,
 		range_mod = 1.15,
 		block_duration = 0.5,
 		sprint_requires_press_to_interrupt = true,
@@ -1027,7 +1135,7 @@ weapon_template.actions = {
 		weapon_handling_template = "time_scale_1",
 		stop_alternate_fire = true,
 		anim_end_event = "to_unaim_braced",
-		block_unblockable = false,
+		block_unblockable = true,
 		abort_sprint = true,
 		uninterruptible = true,
 		anim_event = "attack_stab_01",
@@ -1043,34 +1151,26 @@ weapon_template.actions = {
 		outer_damage_type = damage_types.physical,
 		action_movement_curve = {
 			{
-				modifier = 0.9,
-				t = 0.1
+				modifier = 0.75,
+				t = 0.05
 			},
 			{
 				modifier = 0.8,
-				t = 0.25
+				t = 0.15
 			},
 			{
-				modifier = 0.85,
-				t = 0.3
+				modifier = 0.9,
+				t = 0.175
 			},
 			{
-				modifier = 1.2,
-				t = 0.35
+				modifier = 0.95,
+				t = 0.5
 			},
 			{
-				modifier = 1.3,
-				t = 0.4
-			},
-			{
-				modifier = 1.05,
-				t = 0.6
-			},
-			{
-				modifier = 0.85,
+				modifier = 1,
 				t = 1
 			},
-			start_modifier = 0.9
+			start_modifier = 0.8
 		},
 		allowed_chain_actions = {
 			combat_ability = {
@@ -1081,7 +1181,8 @@ weapon_template.actions = {
 				action_name = "action_unwield"
 			},
 			reload_pressed = {
-				action_name = "action_reload"
+				action_name = "action_reload",
+				chain_time = 2.5
 			},
 			shoot_pressed = {
 				action_name = "action_shoot_hip",
@@ -1101,11 +1202,15 @@ weapon_template.actions = {
 			[attack_types.ranged] = true
 		},
 		anim_end_event_func = function (action_settings, condition_func_params)
+			if not condition_func_params then
+				return "to_unaim_braced", "to_unaim_braced"
+			end
+
 			local inventory_slot_component = condition_func_params.inventory_slot_component
 			local current_ammunition_clip = inventory_slot_component.current_ammunition_clip
 
 			if current_ammunition_clip == 0 then
-				return nil, nil
+				return "to_unaim_braced", "to_unaim_braced"
 			end
 
 			return "to_unaim_braced", "to_unaim_braced"
@@ -1119,17 +1224,108 @@ weapon_template.actions = {
 		},
 		haptic_trigger_template = HapticTriggerTemplates.ranged.none
 	},
+	action_bash_light_from_block_no_ammo = {
+		push_radius = 3.25,
+		block_duration = 0.5,
+		sprint_requires_press_to_interrupt = true,
+		kind = "push",
+		allowed_during_sprint = true,
+		weapon_handling_template = "time_scale_1",
+		range_mod = 1.15,
+		stop_alternate_fire = true,
+		block_unblockable = true,
+		anim_end_event = "to_unaim_braced",
+		abort_sprint = true,
+		uninterruptible = true,
+		anim_event = "attack_stab_01",
+		total_time = 0.6,
+		crosshair = {
+			crosshair_type = "dot"
+		},
+		inner_push_rad = math.pi * 0.55,
+		outer_push_rad = math.pi * 1,
+		inner_damage_profile = DamageProfileTemplates.human_shield_push,
+		inner_damage_type = damage_types.physical,
+		outer_damage_profile = DamageProfileTemplates.default_shield_push,
+		outer_damage_type = damage_types.physical,
+		action_movement_curve = {
+			{
+				modifier = 0.75,
+				t = 0.05
+			},
+			{
+				modifier = 0.8,
+				t = 0.15
+			},
+			{
+				modifier = 0.9,
+				t = 0.175
+			},
+			{
+				modifier = 0.95,
+				t = 0.5
+			},
+			{
+				modifier = 1,
+				t = 1
+			},
+			start_modifier = 0.8
+		},
+		allowed_chain_actions = {
+			combat_ability = {
+				action_name = "combat_ability"
+			},
+			grenade_ability = BaseTemplateSettings.generate_grenade_ability_chain_actions(),
+			wield = {
+				action_name = "action_unwield"
+			},
+			block_hold = {
+				action_name = "action_block_from_bash",
+				chain_time = 0.5
+			},
+			special_action = {
+				action_name = "action_bash_light_from_block_no_ammo",
+				chain_time = 0.25
+			}
+		},
+		action_condition_func = function (action_settings, condition_func_params, used_input)
+			return condition_func_params.inventory_slot_component.current_ammunition_clip <= 0
+		end,
+		block_attack_types = {
+			[attack_types.melee] = true,
+			[attack_types.ranged] = true
+		},
+		anim_end_event_func = function (action_settings, condition_func_params)
+			local inventory_slot_component = condition_func_params.inventory_slot_component
+			local current_ammunition_clip = inventory_slot_component.current_ammunition_clip
+			local current_ammunition_reserve = inventory_slot_component.current_ammunition_reserve
+
+			if current_ammunition_reserve == 0 and current_ammunition_clip == 0 then
+				return "to_unaim_parry_block", "to_unaim_reload_parry"
+			end
+
+			return "to_unaim_reload_parry", "to_unaim_reload_parry"
+		end,
+		anim_end_event_condition_func = function (unit, data, end_reason)
+			return end_reason ~= "new_interrupting_action"
+		end,
+		time_scale_stat_buffs = {
+			buff_stat_buffs.attack_speed,
+			buff_stat_buffs.melee_attack_speed
+		},
+		haptic_trigger_template = HapticTriggerTemplates.ranged.none
+	},
 	action_bash_heavy = {
-		damage_window_start = 0.15,
+		damage_window_start = 0.14166666666666666,
 		hit_armor_anim = "attack_hit",
 		sprint_requires_press_to_interrupt = true,
 		kind = "sweep",
 		attack_direction_override = "push",
-		range_mod = 1.5,
+		range_mod = 1.3,
 		first_person_hit_stop_anim = "attack_hit",
 		stop_alternate_fire = true,
 		weapon_handling_template = "time_scale_1_3",
-		damage_window_end = 0.35,
+		damage_window_end = 0.31666666666666665,
 		allowed_during_sprint = true,
 		abort_sprint = true,
 		uninterruptible = true,
@@ -1191,23 +1387,23 @@ weapon_template.actions = {
 			},
 			special_action_hold = {
 				action_name = "action_bash_start",
-				chain_time = 0.8
+				chain_time = 0.9
 			}
 		},
 		action_condition_func = function (action_settings, condition_func_params, used_input)
 			return not condition_func_params.alternate_fire_component.is_active
 		end,
 		weapon_box = {
-			0.3,
-			1.5,
-			0.45
+			1.15,
+			0.9,
+			0.5
 		},
 		spline_settings = {
 			matrices_data_location = "content/characters/player/human/first_person/animations/assault_shield_shotpistol/special_attack",
 			anchor_point_offset = {
-				0.1,
-				0.1,
-				-0.25
+				-0.15,
+				0.85,
+				-0.45
 			}
 		},
 		damage_type = damage_types.weapon_butt,
@@ -1253,6 +1449,7 @@ weapon_template.conditional_state_to_action_input = {
 	}
 }
 weapon_template.no_ammo_delay = 0.35
+weapon_template.combo_reset_duration = 0.5
 weapon_template.hud_configuration = {
 	uses_overheat = false,
 	uses_ammunition = true
@@ -1442,7 +1639,7 @@ weapon_template.sprint_template = "support"
 weapon_template.stamina_template = "shotpistol_shield_p1_m1"
 weapon_template.toughness_template = "default"
 weapon_template.footstep_intervals = FootstepIntervalsTemplates.default
-weapon_template.movement_curve_modifier_template = "default"
+weapon_template.movement_curve_modifier_template = "shotpistol"
 weapon_template.smart_targeting_template = SmartTargetingTemplates.killshot
 weapon_template.haptic_trigger_template = HapticTriggerTemplates.ranged.killshot_semiauto
 weapon_template.hipfire_inputs = {

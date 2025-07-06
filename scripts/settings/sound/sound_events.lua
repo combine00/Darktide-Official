@@ -39,6 +39,7 @@ local sound_events = {
 	"wwise/events/minions/play_minion_special_netgunner_spawn",
 	"wwise/events/minions/play_minion_special_poxwalker_bomber_spawn",
 	"wwise/events/minions/play_minion_special_sniper_spawn_circumstance",
+	"wwise/events/minions/play_minion_special_grenadier_spawn",
 	"wwise/events/minions/play_minion_special_twins_ambush_spawn",
 	"wwise/events/minions/play_minion_terror_event_group_sfx_cultists",
 	"wwise/events/minions/play_minion_terror_event_group_sfx_newly_infected",
@@ -47,8 +48,10 @@ local sound_events = {
 	"wwise/events/minions/play_minion_twins_ambush_spawn_impact_hit",
 	"wwise/events/minions/play_minion_twins_ambush_spawn_impact",
 	"wwise/events/minions/play_minion_twins_disappear_explosion",
+	"wwise/events/minions/play_mutator_abhuman_spawn_stinger",
 	"wwise/events/minions/play_nurgle_corpse_explode_loop",
 	"wwise/events/minions/play_nurgle_corpse_explode",
+	"wwise/events/minions/play_nurgle_corpse_explode_rotten",
 	"wwise/events/minions/play_nurgle_head_parasite_explode",
 	"wwise/events/minions/play_signal_horde_poxwalkers_2d",
 	"wwise/events/minions/play_signal_horde_poxwalkers_3d",
@@ -99,6 +102,8 @@ local sound_events = {
 	"wwise/events/player/play_pick_up_grenade",
 	"wwise/events/player/play_pick_up_syringe",
 	"wwise/events/player/play_pick_up_tome",
+	"wwise/events/player/play_pick_up_grimoire",
+	"wwise/events/player/play_pick_up_grimoire_husk",
 	"wwise/events/player/play_pick_up_paper",
 	"wwise/events/player/play_pick_up_valuable",
 	"wwise/events/player/play_pickup_metal_object",
@@ -184,7 +189,8 @@ local sound_events = {
 	"wwise/events/minions/play_mutator_daemonhost_cult_chant",
 	"wwise/events/minions/stop_mutator_daemonhost_cult_chant",
 	"wwise/events/player/play_player_get_hit_mutator_damage_2d_tick",
-	"wwise/events/minions/play_havoc_mutator_enraging_elites_buff_stinger"
+	"wwise/events/minions/play_havoc_mutator_enraging_elites_buff_stinger",
+	"wwise/events/player/play_player_ability_adamant_dog_explosion"
 }
 
 return sound_events

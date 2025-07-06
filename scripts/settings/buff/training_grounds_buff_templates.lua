@@ -13,6 +13,15 @@ templates.tg_player_unperceivable = {
 		keywords.unperceivable
 	}
 }
+templates.tg_minion_unperceivable = {
+	max_stacks = 1,
+	predicted = false,
+	max_stacks_cap = 1,
+	class_name = "buff",
+	keywords = {
+		keywords.unperceivable
+	}
+}
 templates.tg_health_station_scenario_corruption = {
 	class_name = "buff",
 	predicted = false

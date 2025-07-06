@@ -2599,6 +2599,12 @@ local color_definitions = {
 		246,
 		223,
 		182
+	},
+	mb_terminal_base = {
+		255,
+		79,
+		255,
+		123
 	}
 }
 local color_list = {}

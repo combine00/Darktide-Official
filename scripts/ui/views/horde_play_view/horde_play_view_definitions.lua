@@ -207,6 +207,17 @@ local scenegraph_definition = {
 			0
 		}
 	},
+	option_5 = {
+		vertical_alignment = "top",
+		parent = "option_4",
+		horizontal_alignment = "left",
+		size = option_size,
+		position = {
+			0,
+			option_size[2] + 20,
+			0
+		}
+	},
 	play_button = {
 		vertical_alignment = "bottom",
 		parent = "canvas",
@@ -247,6 +258,26 @@ local scenegraph_definition = {
 		}
 	}
 }
+
+local function _hide_when_disabled(content, style)
+	return not content.hotspot.disabled
+end
+
+local function _show_when_disabled(content, style)
+	return not _hide_when_disabled(content, style)
+end
+
+local function _toggle_color_when_disabled(selector, ok_color, disabled_color)
+	return function (content, style, animations, dt)
+		if content.hotspot.disabled then
+			style[selector] = disabled_color
+
+			return
+		end
+
+		style[selector] = ok_color
+	end
+end
 
 local function create_option_widget(scenegraph_id)
 	return UIWidget.create_definition({
@@ -320,6 +351,28 @@ local function create_option_widget(scenegraph_id)
 			},
 			change_function = ButtonPassTemplates.terminal_list_button_frame_hover_change_function,
 			visibility_function = ButtonPassTemplates.list_button_focused_visibility_function
+		},
+		{
+			value = "content/ui/materials/patterns/diagonal_lines_pattern_01",
+			pass_type = "texture",
+			style = {
+				offset = {
+					0,
+					0,
+					0
+				},
+				color = {
+					107,
+					159,
+					67,
+					67
+				},
+				size_addition = {
+					0,
+					-30
+				}
+			},
+			visibility_function = _show_when_disabled
 		},
 		{
 			pass_type = "texture",
@@ -435,7 +488,8 @@ local function create_option_widget(scenegraph_id)
 					28,
 					20
 				}
-			}
+			},
+			visibility_function = _hide_when_disabled
 		},
 		{
 			style_id = "reward_icon_2",
@@ -459,7 +513,8 @@ local function create_option_widget(scenegraph_id)
 					28,
 					20
 				}
-			}
+			},
+			visibility_function = _hide_when_disabled
 		},
 		{
 			value_id = "reward_text_1",
@@ -493,7 +548,8 @@ local function create_option_widget(scenegraph_id)
 					-100,
 					0
 				}
-			}
+			},
+			visibility_function = _hide_when_disabled
 		},
 		{
 			value_id = "reward_text_2",
@@ -527,13 +583,14 @@ local function create_option_widget(scenegraph_id)
 					-100,
 					0
 				}
-			}
+			},
+			visibility_function = _hide_when_disabled
 		},
 		{
-			value_id = "title_text",
 			style_id = "title_text",
 			pass_type = "text",
 			value = "title_text",
+			value_id = "title_text",
 			style = {
 				font_size = 24,
 				text_vertical_alignment = "center",
@@ -552,7 +609,8 @@ local function create_option_widget(scenegraph_id)
 					-100,
 					0
 				}
-			}
+			},
+			change_function = _toggle_color_when_disabled("text_color", Color.terminal_text_header(nil, true), Color.terminal_text_header(128, true))
 		},
 		{
 			value_id = "reward_header",
@@ -581,111 +639,70 @@ local function create_option_widget(scenegraph_id)
 					-100,
 					0
 				}
-			}
+			},
+			visibility_function = _hide_when_disabled
 		},
 		{
-			style_id = "difficulty_box_5",
-			pass_type = "rect",
+			value_id = "required_difficulty_text",
+			style_id = "required_difficulty_text",
+			pass_type = "text",
+			value = Localize("loc_hub_locked_by_progression"),
 			style = {
-				horizontal_alignment = "right",
+				font_size = 18,
+				text_vertical_alignment = "center",
+				horizontal_alignment = "left",
+				text_horizontal_alignment = "left",
+				vertical_alignment = "bottom",
+				drop_shadow = true,
+				line_spacing = 1.2,
+				font_type = "proxima_nova_bold",
+				text_color = {
+					255,
+					159,
+					67,
+					67
+				},
 				offset = {
-					-30,
-					20,
-					2
+					30,
+					-2,
+					5
 				},
 				size = {
-					10,
+					nil,
 					30
 				},
-				color = Color.terminal_text_body_dark(nil, true)
-			}
+				size_addition = {
+					-100,
+					0
+				}
+			},
+			visibility_function = _show_when_disabled
 		},
 		{
-			style_id = "difficulty_box_4",
-			pass_type = "rect",
-			style = {
-				horizontal_alignment = "right",
-				offset = {
-					-48,
-					20,
-					2
-				},
-				size = {
-					10,
-					30
-				},
-				color = Color.terminal_text_body_dark(nil, true)
-			}
-		},
-		{
-			style_id = "difficulty_box_3",
-			pass_type = "rect",
-			style = {
-				horizontal_alignment = "right",
-				offset = {
-					-66,
-					20,
-					2
-				},
-				size = {
-					10,
-					30
-				},
-				color = Color.terminal_text_body_dark(nil, true)
-			}
-		},
-		{
-			style_id = "difficulty_box_2",
-			pass_type = "rect",
-			style = {
-				horizontal_alignment = "right",
-				offset = {
-					-84,
-					20,
-					2
-				},
-				size = {
-					10,
-					30
-				},
-				color = Color.terminal_text_body_dark(nil, true)
-			}
-		},
-		{
-			style_id = "difficulty_box_1",
-			pass_type = "rect",
-			style = {
-				horizontal_alignment = "right",
-				offset = {
-					-102,
-					20,
-					2
-				},
-				size = {
-					10,
-					30
-				},
-				color = Color.terminal_text_body_dark(nil, true)
-			}
-		},
-		{
-			value = "content/ui/materials/icons/generic/danger",
 			style_id = "difficulty_icon",
 			pass_type = "texture",
+			value = "content/ui/materials/icons/difficulty/flat/difficulty_skull_uprising",
+			value_id = "difficulty_icon",
 			style = {
 				vertical_alignment = "top",
 				horizontal_alignment = "right",
-				color = Color.terminal_icon(nil, true),
+				color = Color.terminal_text_header(255, true),
 				offset = {
-					-118,
-					15,
-					2
+					-25,
+					10,
+					3
 				},
 				size = {
-					40,
-					40
+					48,
+					48
 				}
-			}
+			},
+			change_function = _toggle_color_when_disabled("color", Color.terminal_text_header(255, true), {
+				255,
+				159,
+				67,
+				67
+			})
 		}
 	}, scenegraph_id)
 end
@@ -803,6 +820,7 @@ local widget_definitions = {
 	option_2 = create_option_widget("option_2"),
 	option_3 = create_option_widget("option_3"),
 	option_4 = create_option_widget("option_4"),
+	option_5 = create_option_widget("option_5"),
 	page_header = UIWidget.create_definition({
 		{
 			value_id = "text",
@@ -1145,58 +1163,59 @@ local widget_definitions = {
 		}
 	}, "objective")
 }
-local animations = {}
-animations.on_enter = {
-	{
-		name = "fade_in",
-		end_time = 0.6,
-		start_time = 0,
-		init = function (parent, ui_scenegraph, scenegraph_definition, widgets, params)
-			for _, widget in pairs(widgets) do
-				widget.alpha_multiplier = 0
+local animations = {
+	on_enter = {
+		{
+			name = "fade_in",
+			end_time = 0.6,
+			start_time = 0,
+			init = function (parent, ui_scenegraph, scenegraph_definition, widgets, params)
+				for _, widget in pairs(widgets) do
+					widget.alpha_multiplier = 0
+				end
 			end
-		end
+		},
+		{
+			name = "move",
+			end_time = 0.8,
+			start_time = 0.35,
+			init = function (parent, ui_scenegraph, scenegraph_definition, widgets, params)
+				return
+			end,
+			update = function (parent, ui_scenegraph, scenegraph_definition, widgets, progress, params)
+				local anim_progress = math.easeOutCubic(progress)
+
+				for _, widget in pairs(widgets) do
+					widget.alpha_multiplier = anim_progress
+				end
+
+				local x_anim_distance_max = 50
+				local x_anim_distance = x_anim_distance_max - x_anim_distance_max * anim_progress
+				local extra_amount = math.clamp(15 - 15 * anim_progress * 1.2, 0, 15)
+
+				parent:_set_scenegraph_position("page_header", scenegraph_definition.page_header.position[1] - x_anim_distance)
+				parent:_set_scenegraph_position("play_button", scenegraph_definition.play_button.position[1] + x_anim_distance)
+				parent:_set_scenegraph_position("option_1", scenegraph_definition.option_1.position[1] - x_anim_distance)
+				parent:_set_scenegraph_position("option_4", scenegraph_definition.option_4.position[1] - x_anim_distance)
+			end
+		}
 	},
-	{
-		name = "move",
-		end_time = 0.8,
-		start_time = 0.35,
-		init = function (parent, ui_scenegraph, scenegraph_definition, widgets, params)
-			return
-		end,
-		update = function (parent, ui_scenegraph, scenegraph_definition, widgets, progress, params)
-			local anim_progress = math.easeOutCubic(progress)
+	on_enter_fast = {
+		{
+			name = "fade_in",
+			end_time = 0.45,
+			start_time = 0,
+			init = function (parent, ui_scenegraph, scenegraph_definition, widgets, params)
+				return
+			end,
+			update = function (parent, ui_scenegraph, scenegraph_definition, widgets, progress, params)
+				local anim_progress = math.easeOutCubic(progress)
 
-			for _, widget in pairs(widgets) do
-				widget.alpha_multiplier = anim_progress
+				for _, widget in pairs(widgets) do
+					widget.alpha_multiplier = anim_progress
+				end
 			end
-
-			local x_anim_distance_max = 50
-			local x_anim_distance = x_anim_distance_max - x_anim_distance_max * anim_progress
-			local extra_amount = math.clamp(15 - 15 * anim_progress * 1.2, 0, 15)
-
-			parent:_set_scenegraph_position("page_header", scenegraph_definition.page_header.position[1] - x_anim_distance)
-			parent:_set_scenegraph_position("play_button", scenegraph_definition.play_button.position[1] + x_anim_distance)
-			parent:_set_scenegraph_position("option_1", scenegraph_definition.option_1.position[1] - x_anim_distance)
-			parent:_set_scenegraph_position("option_4", scenegraph_definition.option_4.position[1] - x_anim_distance)
-		end
-	}
-}
-animations.on_enter_fast = {
-	{
-		name = "fade_in",
-		end_time = 0.45,
-		start_time = 0,
-		init = function (parent, ui_scenegraph, scenegraph_definition, widgets, params)
-			return
-		end,
-		update = function (parent, ui_scenegraph, scenegraph_definition, widgets, progress, params)
-			local anim_progress = math.easeOutCubic(progress)
-
-			for _, widget in pairs(widgets) do
-				widget.alpha_multiplier = anim_progress
-			end
-		end
+		}
 	}
 }
 

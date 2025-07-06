@@ -9,7 +9,13 @@ table.sort(archetype_names_array)
 
 archetype_settings = {
 	archetype_names = archetype_names,
-	archetype_names_array = archetype_names_array
+	archetype_names_array = archetype_names_array,
+	archetype_cosmetics_whitelist = {
+		"ogryn",
+		"psyker",
+		"veteran",
+		"zealot"
+	}
 }
 
 return settings("ArchetypeSettings", archetype_settings)

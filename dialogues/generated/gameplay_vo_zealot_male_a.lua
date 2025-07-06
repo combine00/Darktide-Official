@@ -4485,24 +4485,39 @@ local gameplay_vo_zealot_male_a = {
 	},
 	seen_enemy_executor = {
 		randomize_indexes_n = 0,
-		sound_events_n = 4,
+		sound_events_n = 9,
 		sound_events = {
+			"loc_zealot_male_a__seen_enemy_executor_01",
+			"loc_zealot_male_a__seen_enemy_executor_02",
+			"loc_zealot_male_a__seen_enemy_executor_03",
+			"loc_zealot_male_a__seen_enemy_executor_04",
+			"loc_zealot_male_a__seen_enemy_executor_05",
 			"loc_zealot_male_a__smart_tag_vo_enemy_traitor_executor_01",
 			"loc_zealot_male_a__smart_tag_vo_enemy_traitor_executor_02",
 			"loc_zealot_male_a__smart_tag_vo_enemy_traitor_executor_03",
 			"loc_zealot_male_a__smart_tag_vo_enemy_traitor_executor_04"
 		},
 		sound_events_duration = {
+			0.849875,
+			0.888354,
+			3.162115,
+			3.204427,
+			2.61674,
 			0.788729,
 			0.781875,
 			0.959563,
 			1.05675
 		},
 		sound_event_weights = {
-			0.25,
-			0.25,
-			0.25,
-			0.25
+			0.1111111,
+			0.1111111,
+			0.1111111,
+			0.1111111,
+			0.1111111,
+			0.1111111,
+			0.1111111,
+			0.1111111,
+			0.1111111
 		},
 		randomize_indexes = {}
 	},
@@ -4593,6 +4608,32 @@ local gameplay_vo_zealot_male_a = {
 		},
 		randomize_indexes = {}
 	},
+	seen_enemy_heavy_gunner = {
+		randomize_indexes_n = 0,
+		sound_events_n = 5,
+		sound_events = {
+			"loc_zealot_male_a__seen_enemy_heavy_gunner_01",
+			"loc_zealot_male_a__seen_enemy_heavy_gunner_02",
+			"loc_zealot_male_a__seen_enemy_heavy_gunner_03",
+			"loc_zealot_male_a__seen_enemy_heavy_gunner_04",
+			"loc_zealot_male_a__seen_enemy_heavy_gunner_05"
+		},
+		sound_events_duration = {
+			1.132354,
+			1.485198,
+			1.944688,
+			1.381979,
+			2.42349
+		},
+		sound_event_weights = {
+			0.2,
+			0.2,
+			0.2,
+			0.2,
+			0.2
+		},
+		randomize_indexes = {}
+	},
 	seen_enemy_mutant_charger = {
 		randomize_indexes_n = 0,
 		sound_events_n = 10,
@@ -4622,32 +4663,32 @@ local gameplay_vo_zealot_male_a = {
 		},
 		randomize_indexes = {}
 	},
-	seen_enemy_netgunner = {
+	seen_enemy_poxwalker_bomber = {
 		randomize_indexes_n = 0,
 		sound_events_n = 10,
 		sound_events = {
-			"loc_zealot_male_a__seen_netgunner_01",
-			"loc_zealot_male_a__seen_netgunner_02",
-			"loc_zealot_male_a__seen_netgunner_03",
-			"loc_zealot_male_a__seen_netgunner_04",
-			"loc_zealot_male_a__seen_netgunner_05",
-			"loc_zealot_male_a__seen_netgunner_06",
-			"loc_zealot_male_a__seen_netgunner_07",
-			"loc_zealot_male_a__seen_netgunner_08",
-			"loc_zealot_male_a__seen_netgunner_09",
-			"loc_zealot_male_a__seen_netgunner_10"
+			"loc_zealot_male_a__seen_enemy_poxwalker_bomber_01",
+			"loc_zealot_male_a__seen_enemy_poxwalker_bomber_02",
+			"loc_zealot_male_a__seen_enemy_poxwalker_bomber_03",
+			"loc_zealot_male_a__seen_enemy_poxwalker_bomber_04",
+			"loc_zealot_male_a__seen_enemy_poxwalker_bomber_05",
+			"loc_zealot_male_a__seen_enemy_poxwalker_bomber_06",
+			"loc_zealot_male_a__seen_enemy_poxwalker_bomber_07",
+			"loc_zealot_male_a__seen_enemy_poxwalker_bomber_08",
+			"loc_zealot_male_a__seen_enemy_poxwalker_bomber_09",
+			"loc_zealot_male_a__seen_enemy_poxwalker_bomber_10"
 		},
 		sound_events_duration = {
-			0.881229,
-			1.178375,
-			1.043573,
-			1.735344,
-			1.37926,
-			1.501417,
-			2.318177,
-			1.658219,
-			3.178073,
-			2.943792
+			0.692531,
+			0.787271,
+			1.40276,
+			1.295427,
+			1.560281,
+			2.393854,
+			1.479688,
+			2.270146,
+			2.600177,
+			2.958948
 		},
 		sound_event_weights = {
 			0.1,
@@ -4660,70 +4701,6 @@ local gameplay_vo_zealot_male_a = {
 			0.1,
 			0.1,
 			0.1
-		},
-		randomize_indexes = {}
-	},
-	seen_enemy_ogryn_heavy_gunner = {
-		randomize_indexes_n = 0,
-		sound_events_n = 5,
-		sound_events = {
-			"loc_zealot_male_a__seen_enemy_heavy_gunner_01",
-			"loc_zealot_male_a__seen_enemy_heavy_gunner_02",
-			"loc_zealot_male_a__seen_enemy_heavy_gunner_03",
-			"loc_zealot_male_a__seen_enemy_heavy_gunner_04",
-			"loc_zealot_male_a__seen_enemy_heavy_gunner_05"
-		},
-		sound_events_duration = {
-			1.132354,
-			1.485198,
-			1.944688,
-			1.381979,
-			2.42349
-		},
-		sound_event_weights = {
-			0.2,
-			0.2,
-			0.2,
-			0.2,
-			0.2
-		},
-		randomize_indexes = {}
-	},
-	seen_enemy_poxwalker_bomber = {
-		randomize_indexes_n = 0,
-		sound_events_n = 9,
-		sound_events = {
-			"loc_zealot_male_a__seen_enemy_poxwalker_bomber_01",
-			"loc_zealot_male_a__seen_enemy_poxwalker_bomber_02",
-			"loc_zealot_male_a__seen_enemy_poxwalker_bomber_03",
-			"loc_zealot_male_a__seen_enemy_poxwalker_bomber_04",
-			"loc_zealot_male_a__seen_enemy_poxwalker_bomber_05",
-			"loc_zealot_male_a__seen_enemy_poxwalker_bomber_06",
-			"loc_zealot_male_a__seen_enemy_poxwalker_bomber_08",
-			"loc_zealot_male_a__seen_enemy_poxwalker_bomber_09",
-			"loc_zealot_male_a__seen_enemy_poxwalker_bomber_10"
-		},
-		sound_events_duration = {
-			0.692531,
-			0.787271,
-			1.40276,
-			1.295427,
-			1.560281,
-			2.393854,
-			2.270146,
-			2.600177,
-			2.958948
-		},
-		sound_event_weights = {
-			0.1111111,
-			0.1111111,
-			0.1111111,
-			0.1111111,
-			0.1111111,
-			0.1111111,
-			0.1111111,
-			0.1111111,
-			0.1111111
 		},
 		randomize_indexes = {}
 	},
@@ -4905,6 +4882,35 @@ local gameplay_vo_zealot_male_a = {
 			3.074833,
 			4.486688,
 			2.992875
+		},
+		randomize_indexes = {}
+	},
+	seen_netgunner = {
+		randomize_indexes_n = 0,
+		sound_events_n = 10,
+		sound_events = {
+			"loc_zealot_male_a__seen_netgunner_01",
+			"loc_zealot_male_a__seen_netgunner_02",
+			"loc_zealot_male_a__seen_netgunner_03",
+			"loc_zealot_male_a__seen_netgunner_04",
+			"loc_zealot_male_a__seen_netgunner_05",
+			"loc_zealot_male_a__seen_netgunner_06",
+			"loc_zealot_male_a__seen_netgunner_07",
+			"loc_zealot_male_a__seen_netgunner_08",
+			"loc_zealot_male_a__seen_netgunner_09",
+			"loc_zealot_male_a__seen_netgunner_10"
+		},
+		sound_events_duration = {
+			0.881229,
+			1.178375,
+			1.043573,
+			1.735344,
+			1.37926,
+			1.501417,
+			2.318177,
+			1.658219,
+			3.178073,
+			2.943792
 		},
 		randomize_indexes = {}
 	},

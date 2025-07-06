@@ -232,6 +232,18 @@ local behavior_tree = {
 	VOMIT,
 	HUNT,
 	{
+		"BtAlertedAction",
+		name = "passive_alerted",
+		condition = "is_alerted",
+		action_data = action_data.passive_alerted
+	},
+	{
+		"BtPatrolAction",
+		name = "patrol",
+		condition = "should_patrol",
+		action_data = action_data.patrol
+	},
+	{
 		"BtIdleAction",
 		name = "idle",
 		action_data = action_data.idle

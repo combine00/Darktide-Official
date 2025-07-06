@@ -94,9 +94,9 @@ local chain_sword_light_smiter_mod = {
 		[armor_types.armored] = damage_lerp_values.lerp_0_75,
 		[armor_types.resistant] = damage_lerp_values.lerp_1,
 		[armor_types.player] = damage_lerp_values.lerp_1,
-		[armor_types.berserker] = damage_lerp_values.lerp_0_5,
+		[armor_types.berserker] = damage_lerp_values.lerp_0_9,
 		[armor_types.super_armor] = damage_lerp_values.lerp_0_25,
-		[armor_types.disgustingly_resilient] = damage_lerp_values.lerp_0_75,
+		[armor_types.disgustingly_resilient] = damage_lerp_values.lerp_1,
 		[armor_types.void_shield] = damage_lerp_values.lerp_0_75
 	},
 	impact = {
@@ -180,8 +180,8 @@ damage_templates.default_light_chainsword_2h = {
 		{
 			power_distribution = {
 				attack = {
-					70,
-					140
+					100,
+					200
 				},
 				impact = {
 					4,
@@ -192,8 +192,8 @@ damage_templates.default_light_chainsword_2h = {
 		{
 			power_distribution = {
 				attack = {
-					60,
-					120
+					70,
+					140
 				},
 				impact = {
 					3,
@@ -216,8 +216,8 @@ damage_templates.default_light_chainsword_2h = {
 		{
 			power_distribution = {
 				attack = {
-					0,
-					0
+					30,
+					60
 				},
 				impact = {
 					2,
@@ -228,8 +228,8 @@ damage_templates.default_light_chainsword_2h = {
 		{
 			power_distribution = {
 				attack = {
-					0,
-					0
+					20,
+					40
 				},
 				impact = {
 					2,
@@ -239,7 +239,10 @@ damage_templates.default_light_chainsword_2h = {
 		},
 		default_target = {
 			power_distribution = {
-				attack = damage_lerp_values.no_damage,
+				attack = {
+					15,
+					30
+				},
 				impact = {
 					2,
 					5
@@ -294,66 +297,6 @@ overrides.light_chainsword_2h_push_follow = {
 	parent_template_name = "default_light_chainsword_2h",
 	overrides = {
 		{
-			"targets",
-			1,
-			"power_distribution",
-			"attack",
-			{
-				75,
-				150
-			}
-		},
-		{
-			"targets",
-			1,
-			"power_distribution",
-			"impact",
-			{
-				10,
-				20
-			}
-		},
-		{
-			"targets",
-			2,
-			"power_distribution",
-			"attack",
-			{
-				50,
-				100
-			}
-		},
-		{
-			"targets",
-			2,
-			"power_distribution",
-			"impact",
-			{
-				8,
-				16
-			}
-		},
-		{
-			"targets",
-			3,
-			"power_distribution",
-			"attack",
-			{
-				40,
-				80
-			}
-		},
-		{
-			"targets",
-			3,
-			"power_distribution",
-			"impact",
-			{
-				7,
-				14
-			}
-		},
-		{
 			"ragdoll_push_force",
 			450
 		},
@@ -366,66 +309,6 @@ overrides.light_chainsword_2h_push_follow = {
 overrides.light_chainsword_active_2h_push_follow = {
 	parent_template_name = "default_light_chainsword_2h",
 	overrides = {
-		{
-			"targets",
-			1,
-			"power_distribution",
-			"attack",
-			{
-				75,
-				150
-			}
-		},
-		{
-			"targets",
-			1,
-			"power_distribution",
-			"impact",
-			{
-				10,
-				20
-			}
-		},
-		{
-			"targets",
-			2,
-			"power_distribution",
-			"attack",
-			{
-				50,
-				100
-			}
-		},
-		{
-			"targets",
-			2,
-			"power_distribution",
-			"impact",
-			{
-				8,
-				16
-			}
-		},
-		{
-			"targets",
-			3,
-			"power_distribution",
-			"attack",
-			{
-				40,
-				80
-			}
-		},
-		{
-			"targets",
-			3,
-			"power_distribution",
-			"impact",
-			{
-				7,
-				14
-			}
-		},
 		{
 			"ignore_shield",
 			true
@@ -474,16 +357,6 @@ overrides.light_chainsword_active_2h = {
 		{
 			"ignore_instant_ragdoll_chance",
 			true
-		},
-		{
-			"targets",
-			1,
-			"power_distribution",
-			"attack",
-			{
-				50,
-				100
-			}
 		},
 		{
 			"targets",
@@ -980,8 +853,7 @@ damage_templates.smiter_light_chainsword_2h = {
 		{
 			armor_damage_modifier = {
 				attack = {
-					[armor_types.armored] = damage_lerp_values.lerp_1,
-					[armor_types.super_armor] = damage_lerp_values.lerp_0_1
+					[armor_types.armored] = damage_lerp_values.lerp_1
 				},
 				impact = {
 					[armor_types.super_armor] = damage_lerp_values.lerp_0_3
@@ -1038,6 +910,40 @@ damage_templates.smiter_light_chainsword_2h = {
 		}
 	}
 }
+overrides.light_chainsword_2h_smiter_push_follow = {
+	parent_template_name = "smiter_light_chainsword_2h",
+	overrides = {
+		{
+			"ragdoll_push_force",
+			450
+		},
+		{
+			"cleave_distribution",
+			no_cleave
+		}
+	}
+}
+overrides.light_chainsword_active_2h_smiter_push_follow = {
+	parent_template_name = "smiter_light_chainsword_2h",
+	overrides = {
+		{
+			"ignore_shield",
+			true
+		},
+		{
+			"ragdoll_push_force",
+			450
+		},
+		{
+			"cleave_distribution",
+			no_cleave
+		},
+		{
+			"weapon_special",
+			true
+		}
+	}
+}
 overrides.smiter_light_chainsword_2h_active = {
 	parent_template_name = "smiter_light_chainsword_2h",
 	overrides = {
@@ -1072,29 +978,10 @@ overrides.smiter_light_chainsword_2h_active = {
 		{
 			"targets",
 			1,
-			"power_distribution",
-			"attack",
-			{
-				50,
-				120
-			}
-		},
-		{
-			"targets",
-			1,
 			"power_level_multiplier",
 			{
 				0.5,
 				1.5
-			}
-		},
-		{
-			"targets",
-			1,
-			"boost_curve_multiplier_finesse",
-			{
-				0.2,
-				0.6
 			}
 		},
 		{
@@ -1193,15 +1080,6 @@ overrides.smiter_light_chainsword_2h_sticky = {
 			{
 				0.5,
 				1.5
-			}
-		},
-		{
-			"targets",
-			1,
-			"boost_curve_multiplier_finesse",
-			{
-				0.2,
-				0.6
 			}
 		},
 		{
@@ -1339,15 +1217,18 @@ damage_templates.heavy_chainsword_2h = {
 			},
 			power_distribution = {
 				attack = {
-					150,
-					300
+					165,
+					345
 				},
 				impact = {
 					12,
 					24
 				}
 			},
-			boost_curve_multiplier_finesse = damage_lerp_values.lerp_0_5
+			boost_curve_multiplier_finesse = {
+				0.4,
+				1
+			}
 		},
 		{
 			armor_damage_modifier = {
@@ -1360,8 +1241,8 @@ damage_templates.heavy_chainsword_2h = {
 			},
 			power_distribution = {
 				attack = {
-					50,
-					100
+					110,
+					220
 				},
 				impact = {
 					11,
@@ -1380,8 +1261,8 @@ damage_templates.heavy_chainsword_2h = {
 			},
 			power_distribution = {
 				attack = {
-					40,
-					80
+					80,
+					160
 				},
 				impact = {
 					8,
@@ -1400,8 +1281,8 @@ damage_templates.heavy_chainsword_2h = {
 			},
 			power_distribution = {
 				attack = {
-					25,
-					50
+					40,
+					85
 				},
 				impact = {
 					5,
@@ -1420,8 +1301,8 @@ damage_templates.heavy_chainsword_2h = {
 			},
 			power_distribution = {
 				attack = {
-					10,
-					20
+					30,
+					60
 				},
 				impact = {
 					4,
@@ -1440,8 +1321,8 @@ damage_templates.heavy_chainsword_2h = {
 			},
 			power_distribution = {
 				attack = {
-					10,
-					20
+					20,
+					40
 				},
 				impact = {
 					4,
@@ -1460,8 +1341,8 @@ damage_templates.heavy_chainsword_2h = {
 			},
 			power_distribution = {
 				attack = {
-					10,
-					20
+					20,
+					40
 				},
 				impact = {
 					4,
@@ -1480,8 +1361,8 @@ damage_templates.heavy_chainsword_2h = {
 			},
 			power_distribution = {
 				attack = {
-					10,
-					20
+					20,
+					30
 				},
 				impact = {
 					4,
@@ -1493,8 +1374,8 @@ damage_templates.heavy_chainsword_2h = {
 			armor_damage_modifier = chain_sword_heavy_mod,
 			power_distribution = {
 				attack = {
-					10,
-					20
+					15,
+					30
 				},
 				impact = {
 					4,
@@ -1528,7 +1409,7 @@ damage_templates.heavy_chainsword_2h_smiter = {
 			armor_damage_modifier = {
 				attack = {
 					[armor_types.armored] = damage_lerp_values.lerp_1,
-					[armor_types.super_armor] = damage_lerp_values.lerp_0_25
+					[armor_types.super_armor] = damage_lerp_values.lerp_0_5
 				},
 				impact = {
 					[armor_types.super_armor] = damage_lerp_values.lerp_1
@@ -1536,15 +1417,18 @@ damage_templates.heavy_chainsword_2h_smiter = {
 			},
 			power_distribution = {
 				attack = {
-					150,
-					300
+					175,
+					350
 				},
 				impact = {
 					8,
 					16
 				}
 			},
-			boost_curve_multiplier_finesse = damage_lerp_values.lerp_0_5,
+			boost_curve_multiplier_finesse = {
+				0.5,
+				1
+			},
 			power_level_multiplier = {
 				0.7,
 				1.3
@@ -1845,15 +1729,6 @@ overrides.heavy_chainsword_active_2h_smiter = {
 			{
 				0.5,
 				1.5
-			}
-		},
-		{
-			"targets",
-			1,
-			"boost_curve_multiplier_finesse",
-			{
-				0.2,
-				0.6
 			}
 		},
 		{
@@ -2778,16 +2653,6 @@ overrides.heavy_chainsword_smiter_active_abort_2h = {
 			"targets",
 			1,
 			"power_distribution",
-			"attack",
-			{
-				100,
-				220
-			}
-		},
-		{
-			"targets",
-			1,
-			"power_distribution",
 			"impact",
 			{
 				18,
@@ -2801,15 +2666,6 @@ overrides.heavy_chainsword_smiter_active_abort_2h = {
 			{
 				0.5,
 				1.5
-			}
-		},
-		{
-			"targets",
-			1,
-			"boost_curve_multiplier_finesse",
-			{
-				0.2,
-				0.6
 			}
 		},
 		{

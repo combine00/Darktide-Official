@@ -109,7 +109,7 @@ function ActionHandler:update(dt, t)
 	end
 end
 
-function ActionHandler:fixed_update(dt, t, condition_func_params)
+function ActionHandler:fixed_update(dt, t, condition_func_params, frame)
 	local registered_components = self._registered_components
 	local action_input_extension = self._action_input_extension
 
@@ -118,7 +118,7 @@ function ActionHandler:fixed_update(dt, t, condition_func_params)
 		local component = handler_data.component
 
 		if running_action then
-			local action_complete = self:_update_action(handler_data, running_action, dt, t)
+			local action_complete = self:_update_action(handler_data, running_action, dt, t, frame)
 
 			if action_complete then
 				local action_settings = running_action:action_settings()
@@ -141,11 +141,11 @@ function ActionHandler:fixed_update(dt, t, condition_func_params)
 	end
 end
 
-function ActionHandler:_update_action(handler_data, action, dt, t)
+function ActionHandler:_update_action(handler_data, action, dt, t, frame)
 	local component = handler_data.component
 	local start_t = component.start_t
 	local time_in_action = t - start_t
-	local is_done = action:fixed_update(dt, t, time_in_action)
+	local is_done = action:fixed_update(dt, t, time_in_action, frame)
 	local is_infinite_duration = component.is_infinite_duration
 	local end_t = is_infinite_duration and math.huge or component.end_t
 
@@ -210,6 +210,12 @@ function ActionHandler:_finish_action(handler_data, reason, data, t, next_action
 		end
 
 		buff_extension:add_proc_event(proc_events.on_action_finish, param_table)
+	end
+
+	local action_finish_func = action_settings.action_finish_func
+
+	if action_finish_func then
+		action_finish_func(reason, data, condition_func_params, t)
 	end
 
 	handler_data.running_action = nil
@@ -657,7 +663,7 @@ function ActionHandler:_validate_action(action_settings, condition_func_params, 
 
 	local action_condition_func = action_settings.action_condition_func
 
-	if action_condition_func and not action_condition_func(action_settings, condition_func_params, used_input) then
+	if action_condition_func and not action_condition_func(action_settings, condition_func_params, used_input, t) then
 		return false
 	end
 

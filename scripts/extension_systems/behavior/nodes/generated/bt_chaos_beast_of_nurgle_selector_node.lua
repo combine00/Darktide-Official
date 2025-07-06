@@ -709,7 +709,82 @@ function BtChaosBeastOfNurgleSelectorNode:evaluate(unit, blackboard, scratchpad,
 		return node_movement
 	end
 
-	local node_idle = children[16]
+	local node_passive_alerted = children[16]
+	local is_running = last_leaf_node_running and last_running_node == node_passive_alerted
+	local condition_result = nil
+
+	repeat
+		local sub_condition_result_01, condition_result = nil
+
+		repeat
+			local perception_component = blackboard.perception
+
+			if not is_running and perception_component.lock_target then
+				condition_result = false
+			else
+				local target_unit = perception_component.target_unit
+				condition_result = HEALTH_ALIVE[target_unit]
+			end
+		until true
+
+		sub_condition_result_01 = condition_result
+		local has_target_unit = sub_condition_result_01
+
+		if not has_target_unit then
+			condition_result = false
+		else
+			local perception_component = blackboard.perception
+			local is_alerted_aggro_state = perception_component.aggro_state == "alerted"
+			condition_result = is_alerted_aggro_state
+		end
+	until true
+
+	if condition_result then
+		new_running_child_nodes[node_identifier] = node_passive_alerted
+
+		return node_passive_alerted
+	end
+
+	local node_patrol = children[17]
+	local is_running = last_leaf_node_running and last_running_node == node_patrol
+	local condition_result = nil
+
+	repeat
+		local sub_condition_result_01, condition_result = nil
+
+		repeat
+			local perception_component = blackboard.perception
+
+			if not is_running and perception_component.lock_target then
+				condition_result = false
+			else
+				local target_unit = perception_component.target_unit
+				condition_result = HEALTH_ALIVE[target_unit]
+			end
+		until true
+
+		sub_condition_result_01 = condition_result
+		local has_target_unit = sub_condition_result_01
+
+		if has_target_unit then
+			condition_result = false
+		else
+			local patrol_component = blackboard.patrol
+			local should_patrol = patrol_component.should_patrol
+			local perception_component = blackboard.perception
+			local aggro_state = perception_component.aggro_state
+			local is_passive = aggro_state == "passive"
+			condition_result = is_passive and should_patrol
+		end
+	until true
+
+	if condition_result then
+		new_running_child_nodes[node_identifier] = node_patrol
+
+		return node_patrol
+	end
+
+	local node_idle = children[18]
 	new_running_child_nodes[node_identifier] = node_idle
 
 	return node_idle

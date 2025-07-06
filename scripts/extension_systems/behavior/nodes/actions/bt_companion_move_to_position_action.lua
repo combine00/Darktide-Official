@@ -3,6 +3,8 @@ require("scripts/extension_systems/behavior/nodes/bt_node")
 local Blackboard = require("scripts/extension_systems/blackboard/utilities/blackboard")
 local MinionMovement = require("scripts/utilities/minion_movement")
 local CompanionDogSettings = require("scripts/utilities/companion/companion_dog_settings")
+local CompanionFollowUtility = require("scripts/utilities/companion_follow_utility")
+local MinionAttack = require("scripts/utilities/minion_attack")
 local BtCompanionMoveToPositionAction = class("BtCompanionMoveToPositionAction", "BtNode")
 BtCompanionMoveToPositionAction.TIME_TO_FIRST_EVALUATE = {
 	0.8,
@@ -13,18 +15,16 @@ BtCompanionMoveToPositionAction.CONSECUTIVE_EVALUATE_INTERVAL = {
 	2
 }
 local lean_settings = CompanionDogSettings.leaning
+local ARRIVED_AT_POSITION_THRESHOLD_SQ = 0.1
 
 function BtCompanionMoveToPositionAction:enter(unit, breed, blackboard, scratchpad, action_data, t)
 	local navigation_extension = ScriptUnit.extension(unit, "navigation_system")
 	scratchpad.animation_extension = ScriptUnit.extension(unit, "animation_system")
 	scratchpad.locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
 	scratchpad.navigation_extension = navigation_extension
+	local speed = breed.run_speed
 
-	if action_data.enable_disable_locomotion_speed then
-		local speed = breed.run_speed
-
-		navigation_extension:set_enabled(true, speed)
-	end
+	navigation_extension:set_enabled(true, speed)
 
 	local behavior_component = Blackboard.write_component(blackboard, "behavior")
 	local move_to_position = behavior_component.move_to_position:unbox()
@@ -35,20 +35,39 @@ function BtCompanionMoveToPositionAction:enter(unit, breed, blackboard, scratchp
 	scratchpad.behavior_component = behavior_component
 	local follow_component = Blackboard.write_component(blackboard, "follow")
 	scratchpad.follow_component = follow_component
+
+	if action_data.follow_aim then
+		local aim_component = Blackboard.write_component(blackboard, "aim")
+		scratchpad.aim_component = aim_component
+	end
+
 	local owner_unit = behavior_component.owner_unit
 
 	if owner_unit then
 		local unit_data_extension = ScriptUnit.extension(owner_unit, "unit_data_system")
 		local movement_state_component = unit_data_extension:read_component("movement_state")
+		local hub_jog_character_state_component = unit_data_extension:read_component("hub_jog_character_state")
 		scratchpad.owner_movement_state_component = movement_state_component
+		scratchpad.owner_hub_jog_character_state_component = hub_jog_character_state_component
 	end
 
 	if action_data.adapt_speed then
 		scratchpad.current_speed_timer = 0
+		local arrived_at_distance_threshold_sq = action_data.arrived_at_distance_threshold_sq or ARRIVED_AT_POSITION_THRESHOLD_SQ
+		local speed_threshold = arrived_at_distance_threshold_sq
+
+		MinionMovement.smooth_speed_based_on_distance(unit, scratchpad, 0, action_data, breed, false, speed_threshold, false, true)
+	end
+
+	if action_data.effect_template then
+		local fx_system = Managers.state.extension:system("fx_system")
+		local global_effect_id = fx_system:start_template_effect(action_data.effect_template, unit)
+		scratchpad.global_effect_id = global_effect_id
 	end
 
 	local nav_world = navigation_extension:nav_world()
 	scratchpad.nav_world = nav_world
+	scratchpad.pushed_enemies = {}
 end
 
 function BtCompanionMoveToPositionAction:init_values(blackboard)
@@ -64,11 +83,15 @@ function BtCompanionMoveToPositionAction:init_values(blackboard)
 
 	follow_component.last_referenced_vector:store(0, 0, 0)
 
+	follow_component.speed_reference = 0
 	follow_component.current_owner_cooldown = -1
 	follow_component.last_owner_cooldown_time = -1
 	follow_component.current_position_cooldown = -1
 	follow_component.current_movement_type = "none"
 	follow_component.current_movement_animation = "none"
+	follow_component.current_adaptive_angle_check_left = 0
+	follow_component.current_adaptive_angle_check_right = 0
+	follow_component.adaptive_angle_enlarge_t = 0
 end
 
 function BtCompanionMoveToPositionAction:leave(unit, breed, blackboard, scratchpad, action_data, t, reason, destroy)
@@ -86,19 +109,41 @@ function BtCompanionMoveToPositionAction:leave(unit, breed, blackboard, scratchp
 		slot_system:do_slot_search(unit, true)
 	end
 
+	if action_data.effect_template then
+		local fx_system = Managers.state.extension:system("fx_system")
+
+		fx_system:stop_template_effect(scratchpad.global_effect_id)
+	end
+
 	local behavior_component = scratchpad.behavior_component
 	behavior_component.has_move_to_position = false
 end
 
-local ARRIVED_AT_POSITION_THRESHOLD_SQ = 0.1
-
 function BtCompanionMoveToPositionAction:run(unit, breed, blackboard, scratchpad, action_data, dt, t)
+	if action_data.push_enemies_damage_profile then
+		MinionAttack.push_nearby_enemies(unit, scratchpad, action_data, unit, nil, action_data.push_ignored_breeds)
+	end
+
+	MinionMovement.update_ground_normal_rotation(unit, scratchpad, nil, 0.7)
+
+	local behavior_component = scratchpad.behavior_component
 	local self_position = POSITION_LOOKUP[unit]
 	local move_to_position = scratchpad.move_to_position:unbox()
+	local arrived_at_distance_threshold_sq = action_data.arrived_at_distance_threshold_sq or ARRIVED_AT_POSITION_THRESHOLD_SQ
 	local distance_sq = Vector3.distance_squared(self_position, move_to_position)
 
-	if action_data.stop_at_target_position and not scratchpad.is_anim_driven and distance_sq <= ARRIVED_AT_POSITION_THRESHOLD_SQ or scratchpad.navigation_extension:has_reached_destination() then
+	if action_data.stop_at_target_position and not scratchpad.is_anim_driven and distance_sq <= arrived_at_distance_threshold_sq or scratchpad.navigation_extension:is_following_path() and scratchpad.navigation_extension:has_reached_destination() then
+		behavior_component.has_move_to_position = false
+
 		return "done"
+	end
+
+	if action_data.follow_aim then
+		local owner_unit_position = POSITION_LOOKUP[behavior_component.owner_unit]
+		local follow_aim_entry = CompanionFollowUtility.follow_aim_entry(scratchpad, action_data, Vector3.zero())
+		local aim_target_position = follow_aim_entry == "player" and owner_unit_position or move_to_position
+
+		CompanionFollowUtility.set_up_aim_target(unit, scratchpad, aim_target_position)
 	end
 
 	scratchpad.move_to_position = scratchpad.behavior_component.move_to_position
@@ -106,7 +151,6 @@ function BtCompanionMoveToPositionAction:run(unit, breed, blackboard, scratchpad
 
 	scratchpad.navigation_extension:move_to(move_to_position)
 
-	local behavior_component = scratchpad.behavior_component
 	local should_start_idle, should_be_idling = MinionMovement.should_start_idle(scratchpad, behavior_component)
 
 	if should_start_idle or should_be_idling then
@@ -137,7 +181,7 @@ function BtCompanionMoveToPositionAction:run(unit, breed, blackboard, scratchpad
 		local owner_movement_state_component = scratchpad.owner_movement_state_component
 		local is_crouching = owner_movement_state_component and owner_movement_state_component.is_crouching or false
 
-		if action_data.skip_start_animation_on_crouch and is_crouching or behavior_component.should_skip_start_anim then
+		if action_data.skip_start_anim or action_data.skip_start_animation_on_crouch and is_crouching or behavior_component.should_skip_start_anim then
 			behavior_component.move_state = "moving"
 
 			scratchpad.animation_extension:anim_event(action_data.skip_start_animation_event)
@@ -160,12 +204,26 @@ function BtCompanionMoveToPositionAction:run(unit, breed, blackboard, scratchpad
 
 	if not scratchpad.is_anim_driven and not scratchpad.start_move_event_anim_speed_duration and action_data.adapt_speed then
 		local owner_movement_state_component = scratchpad.owner_movement_state_component
+		local owner_hub_jog_character_state_component = scratchpad.owner_hub_jog_character_state_component
 		local is_crouching = owner_movement_state_component and owner_movement_state_component.is_crouching or false
+		local is_walking_in_hub = self:_is_in_hub() and owner_hub_jog_character_state_component and owner_hub_jog_character_state_component.move_state == "walk" or false
+		local follow_config = CompanionFollowUtility.follow_config(blackboard, action_data)
+		local adapt_threshold_multiplier = nil
 
-		MinionMovement.smooth_speed_based_on_distance(unit, scratchpad, dt, action_data, breed, is_crouching)
+		if is_crouching or is_walking_in_hub then
+			adapt_threshold_multiplier = follow_config and follow_config.crouch_adapt_threshold_multiplier or action_data.crouch_adapt_threshold_multiplier or 0
+		else
+			adapt_threshold_multiplier = follow_config and follow_config.adapt_threshold_multiplier or action_data.adapt_threshold_multiplier or 0
+		end
+
+		local speed_threshold = arrived_at_distance_threshold_sq * adapt_threshold_multiplier
+
+		MinionMovement.smooth_speed_based_on_distance(unit, scratchpad, dt, action_data, breed, is_crouching, speed_threshold)
 	end
 
-	if not scratchpad.is_anim_driven and breed.animation_speed_thresholds then
+	local animation_speed_thresholds = breed.get_animation_speed_thresholds and breed.get_animation_speed_thresholds() or breed.animation_speed_thresholds
+
+	if not scratchpad.is_anim_driven and animation_speed_thresholds then
 		MinionMovement.companion_select_movement_animation(unit, scratchpad, dt, action_data, breed)
 	end
 
@@ -174,8 +232,6 @@ function BtCompanionMoveToPositionAction:run(unit, breed, blackboard, scratchpad
 	if is_following_path then
 		self:_update_anim_lean_variable(unit, scratchpad, action_data, dt)
 	end
-
-	MinionMovement.update_ground_normal_rotation(unit, scratchpad)
 
 	return "running"
 end
@@ -224,6 +280,13 @@ function BtCompanionMoveToPositionAction:_update_anim_lean_variable(unit, scratc
 
 		scratchpad.animation_extension:set_variable(lean_variable_name, lean_value)
 	end
+end
+
+function BtCompanionMoveToPositionAction:_is_in_hub()
+	local game_mode_name = Managers.state.game_mode:game_mode_name()
+	local is_in_hub = game_mode_name == "hub"
+
+	return is_in_hub
 end
 
 return BtCompanionMoveToPositionAction

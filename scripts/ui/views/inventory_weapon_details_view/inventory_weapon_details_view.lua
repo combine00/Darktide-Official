@@ -1,18 +1,15 @@
 local Definitions = require("scripts/ui/views/inventory_weapon_details_view/inventory_weapon_details_view_definitions")
-local InventoryWeaponDetailsViewSettings = require("scripts/ui/views/inventory_weapon_details_view/inventory_weapon_details_view_settings")
-local ItemUtils = require("scripts/utilities/items")
+local InputDevice = require("scripts/managers/input/input_device")
 local ScriptWorld = require("scripts/foundation/utilities/script_world")
 local UIRenderer = require("scripts/managers/ui/ui_renderer")
 local UIWidget = require("scripts/managers/ui/ui_widget")
 local ViewElementInputLegend = require("scripts/ui/view_elements/view_element_input_legend/view_element_input_legend")
 local ViewElementInventoryWeaponPreview = require("scripts/ui/view_elements/view_element_inventory_weapon_preview/view_element_inventory_weapon_preview")
+local ViewElementWeaponActionsExtended = require("scripts/ui/view_elements/view_element_weapon_actions/view_element_weapon_actions_extended")
+local ViewElementWeaponInfo = require("scripts/ui/view_elements/view_element_weapon_info/view_element_weapon_info")
+local ViewElementWeaponPatterns = require("scripts/ui/view_elements/view_element_weapon_patterns/view_element_weapon_patterns")
 local WeaponStats = require("scripts/utilities/weapon_stats")
 local WeaponTemplate = require("scripts/utilities/weapon/weapon_template")
-local InputDevice = require("scripts/managers/input/input_device")
-local UIWorldSpawner = require("scripts/managers/ui/ui_world_spawner")
-local ViewElementWeaponInfo = require("scripts/ui/view_elements/view_element_weapon_info/view_element_weapon_info")
-local ViewElementWeaponActionsExtended = require("scripts/ui/view_elements/view_element_weapon_actions/view_element_weapon_actions_extended")
-local ViewElementWeaponPatterns = require("scripts/ui/view_elements/view_element_weapon_patterns/view_element_weapon_patterns")
 local InventoryWeaponDetailsView = class("InventoryWeaponDetailsView", "BaseView")
 
 function InventoryWeaponDetailsView:init(settings, context)
@@ -119,9 +116,9 @@ function InventoryWeaponDetailsView:_setup_weapon_info()
 		local title_height = 70
 		local edge_padding = 40
 		local grid_width = 600
-		local grid_height = 1000
+		local grid_height = 950
 		local grid_size = {
-			grid_width - edge_padding,
+			grid_width,
 			grid_height
 		}
 		local grid_spacing = {
@@ -129,7 +126,7 @@ function InventoryWeaponDetailsView:_setup_weapon_info()
 			0
 		}
 		local mask_size = {
-			grid_width,
+			grid_width + edge_padding,
 			grid_height
 		}
 		local context = {
@@ -164,7 +161,7 @@ function InventoryWeaponDetailsView:_setup_weapon_actions_extended()
 		local title_height = 70
 		local edge_padding = 4
 		local grid_width = 460
-		local grid_height = 1000
+		local grid_height = 900
 		local grid_size = {
 			grid_width - edge_padding,
 			grid_height
@@ -216,7 +213,7 @@ function InventoryWeaponDetailsView:_setup_attack_patterns()
 		local title_height = 70
 		local edge_padding = 4
 		local grid_width = 850
-		local grid_height = 1000
+		local grid_height = 900
 		local grid_size = {
 			grid_width - edge_padding,
 			grid_height

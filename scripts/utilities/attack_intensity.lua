@@ -19,6 +19,15 @@ local AttackIntensity = {
 
 		target_attack_intensity_extension:set_attacked()
 	end,
+	set_damage_dealt = function (target_unit)
+		local target_attack_intensity_extension = ScriptUnit.has_extension(target_unit, "attack_intensity_system")
+
+		if not target_attack_intensity_extension then
+			return
+		end
+
+		target_attack_intensity_extension:set_damage_dealt()
+	end,
 	set_attacked_melee = function (target_unit)
 		local target_attack_intensity_extension = ScriptUnit.has_extension(target_unit, "attack_intensity_system")
 

@@ -174,6 +174,7 @@ function SmartTagSystem:set_tag(template_name, tagger_unit, target_unit, target_
 
 		tg_on_tag_event_data.target_unit = target_unit
 		tg_on_tag_event_data.target_location = target_location
+		tg_on_tag_event_data.template_name = template_name
 
 		Managers.event:trigger("tg_on_tag", tg_on_tag_event_data)
 	end
@@ -267,6 +268,25 @@ function SmartTagSystem:reply_tag(tag_id, replier_unit, reply_name)
 	end
 end
 
+function SmartTagSystem:unit_tagged_by_player_unit(player_unit)
+	for _, tag in pairs(self._all_tags) do
+		local tagger_unit = tag:tagger_unit()
+		local target_unit = tag:target_unit()
+
+		if tagger_unit == player_unit and target_unit then
+			local unit_data = ScriptUnit.has_extension(target_unit, "unit_data_system")
+			local buff_extension = ScriptUnit.has_extension(target_unit, "buff_system")
+			local target_breed = unit_data and unit_data:breed()
+
+			if target_breed and target_breed.tags.minion and buff_extension and not buff_extension:has_keyword("unperceivable") then
+				return target_unit, tag
+			end
+		end
+	end
+
+	return nil
+end
+
 function SmartTagSystem:unit_tag_id(unit)
 	local extension = self._unit_extension_data[unit]
 	local tag_id = extension and extension:tag_id()
@@ -345,7 +365,7 @@ end
 
 function SmartTagSystem:_create_tag_locally(tag_id, template_name, tagger_unit, target_unit, target_location, replies, is_hotjoin_synced)
 	local template = SmartTagSettings.templates[template_name]
-	local tag = SmartTag:new(tag_id, template, tagger_unit, target_unit, target_location, replies)
+	local tag = SmartTag:new(tag_id, template, tagger_unit, target_unit, target_location, replies, self._is_server)
 	self._all_tags[tag_id] = tag
 
 	if self._is_server then
@@ -435,7 +455,7 @@ function SmartTagSystem:_remove_tag_locally(tag_id, reason)
 	if target_unit and ALIVE[target_unit] then
 		local target_extension = self._unit_extension_data[target_unit]
 
-		target_extension:unregister_tag()
+		target_extension:unregister_tag(tag_id)
 
 		if self._is_server and tagger_unit then
 			local side_system = Managers.state.extension:system("side_system")

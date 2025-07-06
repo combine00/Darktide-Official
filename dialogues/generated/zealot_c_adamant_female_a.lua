@@ -112,8 +112,8 @@ local zealot_c_adamant_female_a = {
 			[2.0] = "loc_adamant_female_a__combat_pause_quirk_your_sins_b_02"
 		},
 		sound_events_duration = {
-			[1.0] = 3.45678,
-			[2.0] = 3.45678
+			[1.0] = 3.536271,
+			[2.0] = 3.768896
 		},
 		randomize_indexes = {}
 	}

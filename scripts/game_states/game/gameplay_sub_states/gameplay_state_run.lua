@@ -221,6 +221,7 @@ function GameplayStateRun:_fixed_update(extension_manager, player_manager, playe
 	for frame = self._fixed_frame_counter + 1, last_frame do
 		local fixed_t = fixed_dt * frame
 
+		Managers.state.companion_interaction:fixed_update(fixed_dt, fixed_t, frame)
 		player_manager:state_fixed_update(fixed_dt, fixed_t, frame)
 		player_unit_spawn_manager:fixed_update(fixed_dt, fixed_t, frame)
 		Managers.state.player_overlap_manager:fixed_update(fixed_dt, fixed_t, frame)

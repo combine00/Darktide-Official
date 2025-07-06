@@ -1591,14 +1591,16 @@ local breed_name_size = {
 	renegade_gunner = 2,
 	renegade_flamer = 2,
 	chaos_mutator_ritualist = 1,
-	renegade_radio_operator = 2,
+	renegade_flamer_mutator = 2,
 	renegade_twin_captain = 2,
 	chaos_newly_infected = 1,
-	renegade_twin_captain_two = 2,
+	renegade_radio_operator = 2,
 	chaos_spawn = 10,
+	renegade_executor = 3,
+	renegade_twin_captain_two = 2,
 	renegade_rifleman = 1,
-	renegade_shocktrooper = 2,
 	renegade_melee = 1,
+	renegade_shocktrooper = 2,
 	chaos_ogryn_executor = 5,
 	cultist_assault = 1,
 	renegade_grenadier = 2,
@@ -1612,7 +1614,7 @@ local breed_name_size = {
 	chaos_hound = 3,
 	chaos_ogryn_bulwark = 5,
 	cultist_gunner = 2,
-	renegade_executor = 3
+	companion_dog = 1
 }
 
 function _big_bull_add_stacks(template_context, stacks)

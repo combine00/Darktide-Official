@@ -155,6 +155,28 @@ local ogryn_b_veteran_female_a = {
 			[2.0] = 3.438771
 		},
 		randomize_indexes = {}
+	},
+	oval_bonding_conversation_gun_b = {
+		randomize_indexes_n = 0,
+		sound_events_n = 1,
+		sound_events = {
+			[1.0] = "loc_veteran_female_a__oval_bonding_conversation_gun_b_01"
+		},
+		sound_events_duration = {
+			[1.0] = 4.728833
+		},
+		randomize_indexes = {}
+	},
+	oval_bonding_conversation_gun_d = {
+		randomize_indexes_n = 0,
+		sound_events_n = 1,
+		sound_events = {
+			[1.0] = "loc_veteran_female_a__oval_bonding_conversation_gun_d_01"
+		},
+		sound_events_duration = {
+			[1.0] = 1.838479
+		},
+		randomize_indexes = {}
 	}
 }
 

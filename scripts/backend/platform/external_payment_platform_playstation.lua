@@ -3,11 +3,11 @@ local ExternalPaymentPlatformBase = require("scripts/backend/platform/external_p
 local Promise = require("scripts/foundation/utilities/promise")
 local ExternalPaymentPlatformPlaystation = class("ExternalPaymentPlatformPlaystation", "ExternalPaymentPlatformBase")
 
-function ExternalPaymentPlatformPlaystation:_get_payment_platform()
+function ExternalPaymentPlatformPlaystation:get_payment_platform()
 	return "psn"
 end
 
-function ExternalPaymentPlatformPlaystation:_get_platform_token(retry_delay)
+function ExternalPaymentPlatformPlaystation:get_platform_token(retry_delay)
 	local request_id, start_time = nil
 
 	if retry_delay then
@@ -85,6 +85,10 @@ local function _show_commerce_dialogue(product_id)
 	end)
 end
 
+function ExternalPaymentPlatformPlaystation:show_commerce_dialogue(product_id)
+	return _show_commerce_dialogue(product_id)
+end
+
 function ExternalPaymentPlatformPlaystation:update_account_store_status()
 	return Promise.resolved(nil)
 end
@@ -99,9 +103,9 @@ function ExternalPaymentPlatformPlaystation:payment_options()
 end
 
 function ExternalPaymentPlatformPlaystation:reconcile_pending_txns(retry_delay)
-	return self:_get_platform_token(retry_delay):next(function (token)
+	return self:get_platform_token(retry_delay):next(function (token)
 		return Managers.backend:authenticate():next(function (account)
-			local builder = BackendUtilities.url_builder():path("/store/"):path(account.sub):path("/payments/reconcile"):query("platform", self:_get_payment_platform())
+			local builder = BackendUtilities.url_builder():path("/store/"):path(account.sub):path("/payments/reconcile"):query("platform", self:get_payment_platform())
 
 			return Managers.backend:title_request(builder:to_string(), {
 				method = "POST",
@@ -134,9 +138,9 @@ function ExternalPaymentPlatformPlaystation:reconcile_pending_txns(retry_delay)
 end
 
 function ExternalPaymentPlatformPlaystation:reconcile_dlc(store_ids)
-	return self:_get_platform_token():next(function (token)
+	return self:get_platform_token():next(function (token)
 		return Managers.backend:authenticate():next(function (account)
-			local builder = BackendUtilities.url_builder():path("/store/"):path(account.sub):path("/dlc/reconcile"):query("platform", self:_get_payment_platform())
+			local builder = BackendUtilities.url_builder():path("/store/"):path(account.sub):path("/dlc/reconcile"):query("platform", self:get_payment_platform())
 
 			return Managers.backend:title_request(builder:to_string(), {
 				method = "POST",
@@ -156,13 +160,36 @@ function ExternalPaymentPlatformPlaystation:reconcile_dlc(store_ids)
 	end)
 end
 
+function ExternalPaymentPlatformPlaystation:get_entitlement(entitlement_key)
+	return self:get_platform_token():next(function (token)
+		return Managers.backend:authenticate():next(function (account)
+			local builder = BackendUtilities.url_builder():path("/store/"):path(account.sub):path("/psn/entitlement"):query("platform", self:get_payment_platform()):query("entitlementId", entitlement_key)
+
+			return Managers.backend:title_request(builder:to_string(), {
+				method = "GET",
+				headers = {
+					["platform-token"] = token
+				}
+			}):next(function (response)
+				return response.body
+			end):catch(function (error)
+				Log.error("ExternalPayment", "Failed to get entitlement", tostring(error))
+
+				return Promise.rejected({
+					error = error
+				})
+			end)
+		end)
+	end)
+end
+
 function ExternalPaymentPlatformPlaystation:init_txn_tmp(payment_option)
 	return Promise.resolved(nil)
 end
 
 function ExternalPaymentPlatformPlaystation:init_txn(payment_option)
 	return Managers.backend:authenticate():next(function (account)
-		local builder = BackendUtilities.url_builder():path("/store/"):path(account.sub):path("/payments"):query("platform", self:_get_payment_platform())
+		local builder = BackendUtilities.url_builder():path("/store/"):path(account.sub):path("/payments"):query("platform", self:get_payment_platform())
 
 		return Managers.backend:title_request(builder:to_string(), {
 			method = "POST",
@@ -176,9 +203,9 @@ function ExternalPaymentPlatformPlaystation:init_txn(payment_option)
 end
 
 function ExternalPaymentPlatformPlaystation:finalize_txn(order_id)
-	return self:_get_platform_token():next(function (token)
+	return self:get_platform_token():next(function (token)
 		return Managers.backend:authenticate():next(function (account)
-			local builder = BackendUtilities.url_builder():path("/store/"):path(account.sub):path("/payments/"):path(order_id):query("platform", self:_get_payment_platform())
+			local builder = BackendUtilities.url_builder():path("/store/"):path(account.sub):path("/payments/"):path(order_id):query("platform", self:get_payment_platform())
 
 			return Managers.backend:title_request(builder:to_string(), {
 				method = "POST",
@@ -197,7 +224,7 @@ end
 
 function ExternalPaymentPlatformPlaystation:fail_txn(order_id)
 	return Managers.backend:authenticate():next(function (account)
-		local builder = BackendUtilities.url_builder():path("/store/"):path(account.sub):path("/payments/"):path(order_id):query("platform", self:_get_payment_platform())
+		local builder = BackendUtilities.url_builder():path("/store/"):path(account.sub):path("/payments/"):path(order_id):query("platform", self:get_payment_platform())
 
 		return Managers.backend:title_request(builder:to_string(), {
 			method = "DELETE"

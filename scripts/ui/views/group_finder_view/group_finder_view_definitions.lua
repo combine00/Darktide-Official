@@ -1224,10 +1224,7 @@ local widget_definitions = {
 					0,
 					3
 				}
-			},
-			visibility_function = function (content, style)
-				return not content.level_requirement_met
-			end
+			}
 		}
 	}, "join_button_level_warning"),
 	category_description = UIWidget.create_definition({

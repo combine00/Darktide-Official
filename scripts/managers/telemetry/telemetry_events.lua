@@ -1136,6 +1136,20 @@ function TelemetryEvents:player_hordes_mode_ended(player, game_won, time, curren
 	self._manager:register_event(event)
 end
 
+function TelemetryEvents:player_interacted_with_companion_in_hub(player, interaction_name, interaction_completion_percentage)
+	local event = TelemetryEvent:new(SOURCE, player:telemetry_subject(), "player_interacted_with_companion_in_hub", {
+		game = player:telemetry_game_session(),
+		gameplay = self._session.gameplay
+	})
+	local data = {
+		interaction_name = interaction_name,
+		completion_percent = interaction_completion_percentage
+	}
+
+	event:set_data(data)
+	self._manager:register_event(event)
+end
+
 function TelemetryEvents:fixed_update_missed_inputs_report(reports)
 	for player, report in pairs(reports) do
 		local entries = report.entries
@@ -1208,7 +1222,7 @@ function TelemetryEvents:post_batch(batch_size, time_since_last_post, event_type
 end
 
 function TelemetryEvents:crashify_properties()
-	local crashify_properties = Application.get_crash_properties()
+	local crashify_properties = Crashify.get_print_properties()
 	local event = self:_create_event("crashify_properties")
 
 	event:set_data(crashify_properties)
@@ -1231,6 +1245,39 @@ function TelemetryEvents:memory_usage(tag)
 		mission_id = mission_id,
 		missions_started = missions_started,
 		usage = usage
+	})
+	self._manager:register_event(event)
+end
+
+function TelemetryEvents:dlc_popup_opened(dlc_telemetry_id)
+	local event = self:_create_event("dlc_popup_opened")
+	local active_views = Managers.ui:active_views()
+
+	event:set_data({
+		identifier = dlc_telemetry_id,
+		active_views = active_views
+	})
+	self._manager:register_event(event)
+end
+
+function TelemetryEvents:dlc_purchase_button_clicked(dlc_telemetry_id, dlc_variant)
+	local event = self:_create_event("dlc_purchase_button_clicked")
+	local active_views = Managers.ui:active_views()
+
+	event:set_data({
+		identifier = dlc_telemetry_id,
+		dlc_variant = dlc_variant,
+		active_views = active_views
+	})
+	self._manager:register_event(event)
+end
+
+function TelemetryEvents:player_journey_popup_play_journey(context, choice)
+	local event = self:_create_event("player_journey_skip_popup_choice")
+
+	event:set_data({
+		context = context,
+		chose_to_skip = choice
 	})
 	self._manager:register_event(event)
 end

@@ -120,6 +120,17 @@ local adamant_b_adamant_male_a = {
 		},
 		randomize_indexes = {}
 	},
+	combat_pause_limited_bolt_on_a_adamant_b_01_b = {
+		randomize_indexes_n = 0,
+		sound_events_n = 1,
+		sound_events = {
+			[1.0] = "loc_adamant_male_a__combat_pause_limited_bolt_on_a_adamant_b_01_b_01"
+		},
+		sound_events_duration = {
+			[1.0] = 6.918177
+		},
+		randomize_indexes = {}
+	},
 	combat_pause_quirk_adamant_b_trait_01_b = {
 		randomize_indexes_n = 0,
 		sound_events_n = 2,

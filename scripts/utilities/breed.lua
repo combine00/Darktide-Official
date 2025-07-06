@@ -2,6 +2,7 @@ local BreedSettings = require("scripts/settings/breed/breed_settings")
 local breed_types = BreedSettings.types
 local type_player = breed_types.player
 local type_minion = breed_types.minion
+local type_companion = breed_types.companion
 local type_living_prop = breed_types.living_prop
 local type_objective_prop = breed_types.objective_prop
 local type_prop = breed_types.prop
@@ -32,6 +33,9 @@ local Breed = {
 	end,
 	is_minion = function (breed_or_nil)
 		return breed_or_nil and breed_or_nil.breed_type == type_minion
+	end,
+	is_companion = function (breed_or_nil)
+		return breed_or_nil and breed_or_nil.breed_type and breed_or_nil.breed_type == type_companion
 	end,
 	is_prop = function (breed_or_nil)
 		local breed_type = breed_or_nil and breed_or_nil.breed_type

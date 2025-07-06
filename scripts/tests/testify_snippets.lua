@@ -96,8 +96,9 @@ function TestifySnippets.mission_circumstances(mission_name)
 
 	for circumstance_name, circumstance in pairs(circumstances) do
 		local theme_tag = circumstance.theme_tag
+		local testify_skip = circumstance.testify_skip
 
-		if mission_themes[theme_tag] ~= nil then
+		if mission_themes[theme_tag] ~= nil and not testify_skip then
 			i = i + 1
 			mission_circumstances[i] = circumstance_name
 		end

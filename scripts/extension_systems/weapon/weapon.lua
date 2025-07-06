@@ -1,6 +1,8 @@
+require("scripts/extension_systems/weapon/special_classes/weapon_special_block_charges")
 require("scripts/extension_systems/weapon/special_classes/weapon_special_charging")
 require("scripts/extension_systems/weapon/special_classes/weapon_special_deactivate_after_num_activations")
 require("scripts/extension_systems/weapon/special_classes/weapon_special_explode_on_impact")
+require("scripts/extension_systems/weapon/special_classes/weapon_special_fake_separate_ammo_pool")
 require("scripts/extension_systems/weapon/special_classes/weapon_special_interface")
 require("scripts/extension_systems/weapon/special_classes/weapon_special_kill_count_charges")
 require("scripts/extension_systems/weapon/special_classes/weapon_special_self_disorientation")
@@ -29,6 +31,7 @@ function Weapon:init(init_data)
 	self.damage_profile_lerp_values = damage_profile_lerp_values
 	self.explosion_template_lerp_values = explosion_template_lerp_values
 	self.buffs = buffs
+	self.special_rules = init_data.weapon_template.special_rules
 	self.actions = {}
 end
 

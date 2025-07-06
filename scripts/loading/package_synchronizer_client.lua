@@ -213,11 +213,9 @@ function PackageSynchronizerClient:resolve_profile_packages(profile)
 	end
 
 	local default_items = MasterItems.default_inventory(archetype_name, game_mode_settings)
-
-	self:_resolve_item_packages(default_items, profile_packages, mission)
-
 	local visual_loadout = profile.visual_loadout
 
+	self:_resolve_item_packages(default_items, profile_packages, mission)
 	self:_resolve_item_packages(visual_loadout, profile_packages, mission)
 
 	local all_items = {}

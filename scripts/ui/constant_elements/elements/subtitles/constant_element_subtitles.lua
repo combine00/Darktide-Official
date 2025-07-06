@@ -223,7 +223,7 @@ function ConstantElementSubtitles:_get_active_dialogue_system()
 	local num_views = #active_views
 
 	if num_views > 0 then
-		for i = num_views, 1, -1 do
+		for i = 1, num_views do
 			local view_name = active_views[i]
 			local view = ui_manager:view_instance(view_name)
 
@@ -362,9 +362,14 @@ function ConstantElementSubtitles:_add_subtitle(currently_playing, secondary_sub
 			speaker_display_name = player:name()
 		else
 			local speaker_name = currently_playing.speaker_name
-			local speaker_voice_settings = DialogueSpeakerVoiceSettings[speaker_name]
-			local character_short_name = speaker_voice_settings.short_name
-			speaker_display_name = self:_localize(character_short_name)
+
+			if speaker_name then
+				local speaker_voice_settings = DialogueSpeakerVoiceSettings[speaker_name]
+				local character_short_name = speaker_voice_settings.short_name
+				speaker_display_name = self:_localize(character_short_name)
+			else
+				subtitle_format = "loc_subtitle_speaker_format_speakerless"
+			end
 		end
 
 		local no_cache = true

@@ -8,9 +8,6 @@ local adamant_a_adamant_male_b = {
 		sound_events_duration = {
 			[1.0] = 1.691563
 		},
-		sound_event_weights = {
-			[1.0] = 1
-		},
 		randomize_indexes = {}
 	},
 	combat_pause_limited_adamant_a_02_b = {
@@ -22,22 +19,16 @@ local adamant_a_adamant_male_b = {
 		sound_events_duration = {
 			[1.0] = 4.624125
 		},
-		sound_event_weights = {
-			[1.0] = 1
-		},
 		randomize_indexes = {}
 	},
 	combat_pause_limited_adamant_a_03_b = {
 		randomize_indexes_n = 0,
 		sound_events_n = 1,
 		sound_events = {
-			[1.0] = "loc_adamant_male_b__combat_pause_limited_adamant_a_02_b_01"
+			[1.0] = "loc_adamant_male_b__combat_pause_limited_adamant_a_03_b_01"
 		},
 		sound_events_duration = {
-			[1.0] = 4.624125
-		},
-		sound_event_weights = {
-			[1.0] = 1
+			[1.0] = 3.005792
 		},
 		randomize_indexes = {}
 	},
@@ -104,6 +95,17 @@ local adamant_a_adamant_male_b = {
 		},
 		sound_events_duration = {
 			[1.0] = 3.893292
+		},
+		randomize_indexes = {}
+	},
+	combat_pause_limited_bolt_on_a_adamant_a_01_b = {
+		randomize_indexes_n = 0,
+		sound_events_n = 1,
+		sound_events = {
+			[1.0] = "loc_adamant_male_b__combat_pause_limited_bolt_on_a_adamant_a_01_b_01"
+		},
+		sound_events_duration = {
+			[1.0] = 6.17524
 		},
 		randomize_indexes = {}
 	},

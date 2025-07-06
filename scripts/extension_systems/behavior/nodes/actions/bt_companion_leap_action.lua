@@ -40,9 +40,9 @@ function BtCompanionLeapAction:enter(unit, breed, blackboard, scratchpad, action
 
 	local start_duration, start_leap_anim = nil
 	local target_distance = perception_component.target_distance
-	local current_speed = Vector3.length(locomotion_extension:current_velocity())
+	local use_fast_jump = scratchpad.pounce_component.use_fast_jump
 
-	if current_speed < leap_settings.long_leap_min_speed or target_distance < leap_settings.short_distance then
+	if not use_fast_jump then
 		start_leap_anim = action_data.start_leap_anim_event_short
 		start_duration = action_data.start_duration_short
 		scratchpad.short_leap = true
@@ -51,6 +51,7 @@ function BtCompanionLeapAction:enter(unit, breed, blackboard, scratchpad, action
 		start_duration = action_data.start_duration
 	end
 
+	scratchpad.pounce_component.use_fast_jump = false
 	scratchpad.start_duration = t + start_duration
 
 	animation_extension:anim_event(start_leap_anim)
@@ -68,6 +69,21 @@ function BtCompanionLeapAction:leave(unit, breed, blackboard, scratchpad, action
 
 		locomotion_extension:set_movement_type("snap_to_navmesh")
 
+		local perception_component = scratchpad.perception_component
+		local target_unit = perception_component.target_unit
+		local target_unit_data_extension = ScriptUnit.has_extension(target_unit, "unit_data_system")
+		local target_unit_breed = target_unit_data_extension and target_unit_data_extension:breed()
+		local companion_pounce_setting = target_unit_breed and target_unit_breed.companion_pounce_setting
+		local token_extension = ScriptUnit.has_extension(target_unit, "token_system")
+
+		if token_extension and companion_pounce_setting then
+			local required_token = companion_pounce_setting.required_token
+
+			if token_extension:is_token_free_or_mine(unit, required_token.name) then
+				token_extension:free_token(required_token.name)
+			end
+		end
+
 		local original_rotation_speed = scratchpad.original_rotation_speed
 
 		if original_rotation_speed then
@@ -78,6 +94,12 @@ function BtCompanionLeapAction:leave(unit, breed, blackboard, scratchpad, action
 	scratchpad.pounce_component.started_leap = false
 
 	MinionPerception.set_target_lock(unit, scratchpad.perception_component, false)
+
+	if action_data.effect_template and scratchpad.global_effect_id then
+		local fx_system = scratchpad.fx_system
+
+		fx_system:stop_template_effect(scratchpad.global_effect_id)
+	end
 end
 
 function BtCompanionLeapAction:run(unit, breed, blackboard, scratchpad, action_data, dt, t)
@@ -86,6 +108,14 @@ function BtCompanionLeapAction:run(unit, breed, blackboard, scratchpad, action_d
 	local result = nil
 	local locomotion_extension = scratchpad.locomotion_extension
 	local state = scratchpad.state
+
+	if state ~= "landing" and state ~= "stopping" and state ~= "starting" then
+		self:_check_if_stuck(unit, scratchpad, action_data, t, locomotion_extension)
+	end
+
+	if state == "wall_jump" then
+		self:_check_if_stuck_between_walls(unit, scratchpad, action_data, dt)
+	end
 
 	if state == "starting" then
 		result = self:_update_starting_state(unit, scratchpad, action_data, dt, t, locomotion_extension, perception_component, target_unit)
@@ -126,25 +156,22 @@ function BtCompanionLeapAction:_update_starting_state(unit, scratchpad, action_d
 	local leap_speed = leap_settings.leap_speed
 	local leap_relax_distance = leap_settings.collision_radius
 	local leap_start_position = position + Vector3(0, 0, NAV_Z_CORRECTION)
+	local target_node_name = leap_settings.leap_target_node_name
+	local target_node = Unit.node(target_unit, target_node_name)
+	local target_position = Unit.world_position(target_unit, target_node) + Vector3(0, 0, leap_settings.leap_target_z_offset)
+	local target_locomotion = ScriptUnit.extension(target_unit, "locomotion_system")
+	local target_velocity = target_locomotion:current_velocity()
+	current_leap_velocity = self:_calculate_wanted_velocity(scratchpad.physics_world, leap_start_position, target_position, target_velocity, leap_speed, leap_relax_distance, debug)
 
-	if perception_component.has_line_of_sight then
-		local target_node_name = leap_settings.leap_target_node_name
-		local target_node = Unit.node(target_unit, target_node_name)
-		local target_position = Unit.world_position(target_unit, target_node) + Vector3(0, 0, leap_settings.leap_target_z_offset)
-		local target_locomotion = ScriptUnit.extension(target_unit, "locomotion_system")
-		local target_velocity = target_locomotion:current_velocity()
-		current_leap_velocity = self:_calculate_wanted_velocity(scratchpad.physics_world, leap_start_position, target_position, target_velocity, leap_speed, leap_relax_distance, debug)
+	if current_leap_velocity then
+		local target_direction = Vector3.normalize(Vector3.flat(target_position - position))
+		scratchpad.last_visible_leap_flat_target_direction = scratchpad.last_visible_leap_flat_target_direction or Vector3Box()
 
-		if current_leap_velocity then
-			local target_direction = Vector3.normalize(Vector3.flat(target_position - position))
-			scratchpad.last_visible_leap_flat_target_direction = scratchpad.last_visible_leap_flat_target_direction or Vector3Box()
+		scratchpad.last_visible_leap_flat_target_direction:store(target_direction)
 
-			scratchpad.last_visible_leap_flat_target_direction:store(target_direction)
+		scratchpad.last_visible_leap_target_position = scratchpad.last_visible_leap_target_position or Vector3Box()
 
-			scratchpad.last_visible_leap_target_position = scratchpad.last_visible_leap_target_position or Vector3Box()
-
-			scratchpad.last_visible_leap_target_position:store(target_position)
-		end
+		scratchpad.last_visible_leap_target_position:store(target_position)
 	end
 
 	if scratchpad.start_duration <= t then
@@ -163,30 +190,8 @@ function BtCompanionLeapAction:_update_starting_state(unit, scratchpad, action_d
 
 			return "running"
 		end
-	elseif not is_short_leap then
-		local wanted_flat_direction = nil
-
-		if current_leap_velocity then
-			wanted_flat_direction = Vector3.normalize(Vector3.flat(current_leap_velocity))
-		elseif scratchpad.last_visible_leap_flat_target_direction then
-			wanted_flat_direction = scratchpad.last_visible_leap_flat_target_direction:unbox()
-		else
-			local target_position = scratchpad.perception_extension:last_los_position(target_unit) or POSITION_LOOKUP[target_unit]
-			wanted_flat_direction = Vector3.normalize(Vector3.flat(target_position - position))
-		end
-
-		local wanted_velocity = wanted_flat_direction * action_data.start_move_speed
-		local found_position = GwNavQueries.move_on_navmesh(scratchpad.nav_world, position, wanted_velocity, dt, scratchpad.traverse_logic)
-		local found_flat_direction = Vector3.normalize(Vector3.flat(found_position - position))
-		local dot = Vector3.dot(found_flat_direction, wanted_flat_direction)
-
-		if math.inverse_sqrt_2 < dot then
-			locomotion_extension:set_wanted_velocity(wanted_velocity)
-		else
-			self:_stop(scratchpad, action_data, t)
-
-			return "running"
-		end
+	elseif not is_short_leap and current_leap_velocity then
+		locomotion_extension:set_wanted_velocity(current_leap_velocity)
 	end
 
 	return "running"
@@ -261,16 +266,17 @@ function BtCompanionLeapAction:_calculate_wanted_velocity(physics_world, start_p
 		return nil
 	end
 
-	local velocity, time_in_flight = Trajectory.get_trajectory_velocity(start_position, est_pos, gravity, speed, angle_to_hit_target)
-	time_in_flight = math.min(time_in_flight, leap_settings.leap_max_time_in_flight)
-	local num_sections = leap_settings.leap_num_sections
-	local collision_filter = leap_settings.leap_collision_filter
-	local radius = leap_settings.leap_radius
-	local trajectory_is_ok = Trajectory.check_trajectory_collisions(physics_world, start_position, est_pos, gravity, speed, angle_to_hit_target, num_sections, collision_filter, time_in_flight, debug, radius, optional_relax_distance)
+	local max_jump_angle = leap_settings.max_jump_angle
+	local target_companion_distance = Vector3.length(target_position - start_position)
 
-	if not trajectory_is_ok then
-		return nil
+	if target_companion_distance <= leap_settings.close_distance then
+		max_jump_angle = leap_settings.max_jump_angle_close_distance
+		speed = leap_settings.leap_speed_close_distance
+		est_pos = target_position
 	end
+
+	angle_to_hit_target = math.clamp(angle_to_hit_target, 0, max_jump_angle)
+	local velocity, _ = Trajectory.get_trajectory_velocity(start_position, est_pos, gravity, speed, angle_to_hit_target)
 
 	return velocity
 end
@@ -290,15 +296,10 @@ function BtCompanionLeapAction:_leap(unit, scratchpad, action_data, start_positi
 		return "running"
 	end
 
-	local sound_event = companion_pounce_setting.leap_sound_event
-
-	if sound_event then
-		local fx_node_name = "fx_jaw"
-		local fx_node = Unit.node(unit, fx_node_name)
-
-		if fx_node then
-			scratchpad.fx_system:trigger_wwise_event(sound_event, nil, unit, fx_node)
-		end
+	if action_data.effect_template then
+		local fx_system = scratchpad.fx_system
+		local global_effect_id = fx_system:start_template_effect(action_data.effect_template, unit)
+		scratchpad.global_effect_id = global_effect_id
 	end
 
 	scratchpad.init_hit_target = hit_target
@@ -394,7 +395,7 @@ end
 
 local FALLING_NAV_MESH_ABOVE = 0.5
 local FALLING_NAV_MESH_BELOW = 30
-local FALLING_NAV_MESH_LATERAL = 5
+local FALLING_NAV_MESH_LATERAL = 0.5
 local FALLING_NAV_MESH_BORDER_DISTANCE = 0.01
 local LANDED_DOT_THRESHOLD = math.inverse_sqrt_2
 
@@ -411,7 +412,7 @@ function BtCompanionLeapAction:_advance_leap(unit, scratchpad, action_data, loco
 		local new_wall_jump_velocity = has_hit_wall and self:_calculate_wall_jump_velocity(action_data, physics_world, nav_world, traverse_logic, new_position, hit_normal)
 		local above = 0.1
 		local below = 0.1
-		local lateral = 0.1
+		local lateral = 0.3
 		local has_nav_land_position = NavQueries.position_on_mesh_with_outside_position(nav_world, traverse_logic, hit_position, above, below, lateral)
 
 		if has_nav_land_position and has_landed then
@@ -420,10 +421,13 @@ function BtCompanionLeapAction:_advance_leap(unit, scratchpad, action_data, loco
 		elseif new_wall_jump_velocity then
 			self:_start_wall_jump(scratchpad, action_data, t, hit_normal, new_position, new_wall_jump_velocity)
 		elseif NavQueries.position_on_mesh_with_outside_position(nav_world, traverse_logic, new_position, FALLING_NAV_MESH_ABOVE, FALLING_NAV_MESH_BELOW, FALLING_NAV_MESH_LATERAL, FALLING_NAV_MESH_BORDER_DISTANCE) then
-			local collision_filter = leap_settings.leap_collision_filter
-			local hit, hit_pos, _, _, _ = PhysicsWorld.raycast(physics_world, new_position, Vector3.down(), FALLING_NAV_MESH_BELOW, "closest", "collision_filter", collision_filter)
-			scratchpad.use_inside_from_outside_z = hit and hit_pos.z or new_position.z
+			locomotion_extension:set_gravity(nil)
+			locomotion_extension:set_affected_by_gravity(true)
+			locomotion_extension:set_movement_type("constrained_by_mover")
+
 			scratchpad.state = "falling"
+
+			return scratchpad.state
 		else
 			scratchpad.behavior_component.is_out_of_bound = true
 
@@ -455,7 +459,7 @@ end
 local EPSILON = 0.01
 local WALL_JUMP_NAV_ABOVE = 1
 local WALL_JUMP_NAV_BELOW = 5
-local WALL_JUMP_NAV_LATERAL = 1
+local WALL_JUMP_NAV_LATERAL = 0.3
 
 function BtCompanionLeapAction:_calculate_wall_jump_velocity(action_data, physics_world, nav_world, traverse_logic, position, wall_normal)
 	local flat_wall_normal = Vector3.flat(wall_normal)
@@ -583,41 +587,37 @@ function BtCompanionLeapAction:_update_wall_jump_state(unit, scratchpad, action_
 	return "running"
 end
 
-function BtCompanionLeapAction:_update_falling_state(unit, scratchpad, action_data, dt, t, locomotion_extension, target_unit)
-	local current_velocity = locomotion_extension:current_velocity()
-	local gravity = leap_settings.leap_gravity
-	local fall_speed = current_velocity.z - gravity * dt
-	local current_position = POSITION_LOOKUP[unit]
-	local landing_position = nil
+local SPEED_THRESHOLD = 0.1
 
-	if fall_speed < 0 then
-		local above = 0.1
-		local below = -fall_speed * dt
+function BtCompanionLeapAction:_update_falling_state(unit, scratchpad, action_data, dt, t, locomotion_extension, target_unit)
+	local mover = Unit.mover(unit)
+
+	if Mover.collides_down(mover) then
+		local unit_position = POSITION_LOOKUP[unit]
+		local above = 0.2
+		local below = 0.2
+		local lateral = 0.3
 		local nav_world = scratchpad.nav_world
 		local traverse_logic = scratchpad.traverse_logic
+		local landing_position = NavQueries.position_on_mesh_with_outside_position(nav_world, traverse_logic, unit_position, above, below, lateral)
 
-		if scratchpad.use_inside_from_outside_z >= current_position.z - below then
-			local nav_mesh_position = NavQueries.position_on_mesh_with_outside_position(nav_world, traverse_logic, current_position, above, below, FALLING_NAV_MESH_LATERAL, FALLING_NAV_MESH_BORDER_DISTANCE)
-
-			if nav_mesh_position then
-				landing_position = Vector3(current_position.x, current_position.y, nav_mesh_position.z)
-			end
+		if landing_position then
+			scratchpad.state = "landing"
+			scratchpad.start_landing = true
 		else
-			landing_position = NavQueries.position_on_mesh(nav_world, current_position, above, below, traverse_logic)
+			local velocity = Vector3.flat(locomotion_extension:current_velocity())
+			local speed = Vector3.length(velocity)
+
+			if speed < SPEED_THRESHOLD then
+				scratchpad.behavior_component.is_out_of_bound = true
+
+				return "failed"
+			end
+
+			return "running"
 		end
 	end
 
-	local wanted_velocity = nil
-
-	if landing_position then
-		scratchpad.state = "landing"
-		scratchpad.start_landing = true
-		wanted_velocity = (landing_position - current_position) / dt
-	else
-		wanted_velocity = Vector3(0, 0, fall_speed)
-	end
-
-	locomotion_extension:set_wanted_velocity(wanted_velocity)
 	MinionAttack.push_friendly_minions(unit, scratchpad, action_data, t)
 	MinionAttack.push_nearby_enemies(unit, scratchpad, action_data, target_unit)
 
@@ -647,6 +647,41 @@ function BtCompanionLeapAction:_update_landing_state(unit, scratchpad, action_da
 	end
 
 	return "running"
+end
+
+local STUCK_OFFSET = 0.01
+
+function BtCompanionLeapAction:_check_if_stuck(unit, scratchpad, action_data, t, locomotion_extension)
+	local current_velocity = locomotion_extension:current_velocity()
+	local speed = Vector3.length(current_velocity)
+
+	if speed < STUCK_OFFSET then
+		if not scratchpad.stuck_timer then
+			scratchpad.stuck_timer = t + action_data.stuck_time
+		end
+	else
+		scratchpad.stuck_timer = nil
+	end
+
+	if scratchpad.stuck_timer and scratchpad.stuck_timer < t then
+		scratchpad.behavior_component.is_out_of_bound = true
+	end
+end
+
+function BtCompanionLeapAction:_check_if_stuck_between_walls(unit, scratchpad, action_data, dt)
+	local state = scratchpad.state
+
+	if state and state == "wall_jump" then
+		if not scratchpad.stuck_between_walls_timer then
+			scratchpad.stuck_between_walls_timer = 0
+		else
+			scratchpad.stuck_between_walls_timer = scratchpad.stuck_between_walls_timer + dt
+		end
+
+		if scratchpad.stuck_between_walls_timer and action_data.stuck_between_walls_time < scratchpad.stuck_between_walls_timer then
+			scratchpad.behavior_component.is_out_of_bound = true
+		end
+	end
 end
 
 return BtCompanionLeapAction

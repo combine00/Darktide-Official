@@ -4,6 +4,7 @@ local GameSession_game_object_fields_array = GameSession.game_object_fields_arra
 
 function MinionAnimationExtension:init(extension_init_context, unit, extension_init_data, game_object_data_or_game_session, nil_or_game_object_id)
 	local is_server = extension_init_context.is_server
+	local is_in_hub = not not extension_init_data.is_in_hub
 	self._is_server = is_server
 	self._unit = unit
 
@@ -14,13 +15,13 @@ function MinionAnimationExtension:init(extension_init_context, unit, extension_i
 
 	local breed = extension_init_data.breed
 	self._breed = breed
-	local state_machine = breed.state_machine
+	local state_machine = is_in_hub and breed.hub_state_machine or breed.state_machine
 
 	if state_machine then
 		Unit.set_animation_state_machine(unit, state_machine)
 	end
 
-	self._animation_variable_bounds = breed.animation_variable_bounds
+	self._animation_variable_bounds = breed.get_animation_variable_bounds and breed.get_animation_variable_bounds() or breed.animation_variable_bounds
 	local next_seed = extension_init_data.random_seed
 	local seeds, num_seeds = Unit.animation_get_seeds(unit)
 
@@ -62,9 +63,11 @@ end
 function MinionAnimationExtension:game_object_initialized(game_session, game_object_id)
 	self._game_object_id = game_object_id
 	self._game_session = game_session
+	local breed = self._breed
+	local animation_variable_init = breed.get_animation_variable_init and breed.get_animation_variable_init() or breed.animation_variable_init
 
-	if self._breed.animation_variable_init then
-		for name, value in pairs(self._breed.animation_variable_init) do
+	if animation_variable_init then
+		for name, value in pairs(animation_variable_init) do
 			self:set_variable(name, value)
 		end
 	end

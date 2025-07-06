@@ -1,5 +1,5 @@
 local templates = {
-	outline_types = table.enum("special_target", "psyker_marked_target", "smart_tagged_enemy", "smart_tagged_enemy_passive", "scanning", "knocked_down", "buff")
+	outline_types = table.enum("special_target", "psyker_marked_target", "smart_tagged_enemy", "smart_tagged_enemy_passive", "scanning", "knocked_down", "owned_companion", "allied_companion", "adamant_mark_target", "buff")
 }
 
 local function _minion_alive_check(unit)
@@ -71,6 +71,32 @@ templates.MinionOutlineExtension = {
 		},
 		visibility_check = _minion_alive_check
 	},
+	adamant_smart_tag = {
+		priority = 2,
+		material_layers = {
+			"minion_outline",
+			"minion_outline_reversed_depth"
+		},
+		color = {
+			1,
+			0.25,
+			0.25
+		},
+		visibility_check = _minion_alive_check
+	},
+	adamant_mark_target = {
+		priority = 2,
+		material_layers = {
+			"minion_outline",
+			"minion_outline_reversed_depth"
+		},
+		color = {
+			0.5,
+			0.4,
+			1
+		},
+		visibility_check = _minion_alive_check
+	},
 	hordes_tagged_remaining_target = {
 		priority = 4,
 		material_layers = {
@@ -83,6 +109,38 @@ templates.MinionOutlineExtension = {
 			1
 		},
 		visibility_check = _minion_alive_check
+	}
+}
+templates.CompanionOutlineExtension = {
+	owned_companion = {
+		priority = 2,
+		material_layers = {
+			"minion_outline",
+			"minion_outline_reversed_depth"
+		},
+		color = {
+			0,
+			0.4,
+			0.1
+		},
+		visibility_check = function (unit)
+			return true
+		end
+	},
+	allied_companion = {
+		priority = 2,
+		material_layers = {
+			"minion_outline",
+			"minion_outline_reversed_depth"
+		},
+		color = {
+			0.7,
+			1,
+			0.8
+		},
+		visibility_check = function (unit)
+			return true
+		end
 	}
 }
 templates.PropOutlineExtension = {
@@ -114,6 +172,8 @@ templates.PlayerUnitOutlineExtension = {
 			""
 		},
 		visibility_check = function (unit)
+			return false
+
 			if not HEALTH_ALIVE[unit] then
 				return false
 			end
@@ -128,6 +188,8 @@ templates.PlayerUnitOutlineExtension = {
 			"player_outline_knocked_down_reversed_depth"
 		},
 		visibility_check = function (unit)
+			return false
+
 			if not HEALTH_ALIVE[unit] then
 				return false
 			end

@@ -142,6 +142,28 @@ local adamant_c_adamant_male_a = {
 		},
 		randomize_indexes = {}
 	},
+	combat_pause_limited_bolt_on_a_adamant_c_03_b = {
+		randomize_indexes_n = 0,
+		sound_events_n = 1,
+		sound_events = {
+			[1.0] = "loc_adamant_male_a__combat_pause_limited_bolt_on_a_adamant_c_03_b_01"
+		},
+		sound_events_duration = {
+			[1.0] = 9.246271
+		},
+		randomize_indexes = {}
+	},
+	combat_pause_limited_bolt_on_a_adamant_c_04_b = {
+		randomize_indexes_n = 0,
+		sound_events_n = 1,
+		sound_events = {
+			[1.0] = "loc_adamant_male_a__combat_pause_limited_bolt_on_a_adamant_c_04_b_01"
+		},
+		sound_events_duration = {
+			[1.0] = 2.978729
+		},
+		randomize_indexes = {}
+	},
 	combat_pause_quirk_adamant_c_trait_01_b = {
 		randomize_indexes_n = 0,
 		sound_events_n = 2,
@@ -230,6 +252,45 @@ local adamant_c_adamant_male_a = {
 		sound_events_duration = {
 			[1.0] = 3.395031,
 			[2.0] = 5.175958
+		},
+		randomize_indexes = {}
+	},
+	combat_pause_quirk_adamant_c_trait_08_b = {
+		randomize_indexes_n = 0,
+		sound_events_n = 2,
+		sound_events = {
+			[1.0] = "loc_adamant_male_a__combat_pause_quirk_adamant_c_trait_08_b_01",
+			[2.0] = "loc_adamant_male_a__combat_pause_quirk_adamant_c_trait_08_b_02"
+		},
+		sound_events_duration = {
+			[1.0] = 2.272,
+			[2.0] = 3.577333
+		},
+		randomize_indexes = {}
+	},
+	combat_pause_quirk_adamant_c_trait_09_b = {
+		randomize_indexes_n = 0,
+		sound_events_n = 2,
+		sound_events = {
+			[1.0] = "loc_adamant_male_a__combat_pause_quirk_adamant_c_trait_09_b_01",
+			[2.0] = "loc_adamant_male_a__combat_pause_quirk_adamant_c_trait_09_b_02"
+		},
+		sound_events_duration = {
+			[1.0] = 2.809333,
+			[2.0] = 2.950667
+		},
+		randomize_indexes = {}
+	},
+	combat_pause_quirk_adamant_c_trait_10_b = {
+		randomize_indexes_n = 0,
+		sound_events_n = 2,
+		sound_events = {
+			[1.0] = "loc_adamant_male_a__combat_pause_quirk_adamant_c_trait_10_b_01",
+			[2.0] = "loc_adamant_male_a__combat_pause_quirk_adamant_c_trait_10_b_02"
+		},
+		sound_events_duration = {
+			[1.0] = 1.173333,
+			[2.0] = 2.462
 		},
 		randomize_indexes = {}
 	}

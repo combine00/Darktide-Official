@@ -198,6 +198,27 @@ function RemotePlayer:breed_name()
 	return self._profile.archetype.breed
 end
 
+function RemotePlayer:companion_name()
+	local companion_data = self._profile.companion
+
+	return companion_data and companion_data.name or nil
+end
+
+function RemotePlayer:is_player_blocked()
+	local account_id = self._account_id
+	local social_service_manager = self._social_service_manager
+
+	if account_id and social_service_manager then
+		local player_info = social_service_manager:get_player_info_by_account_id(account_id)
+
+		if player_info then
+			return player_info:is_blocked()
+		end
+	end
+
+	return false
+end
+
 function RemotePlayer:telemetry_game_session()
 	return self._telemetry_game_session
 end

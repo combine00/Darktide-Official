@@ -46,14 +46,14 @@ function ComponentExtension:hot_join_sync(unit, client, channel)
 	end
 end
 
-function ComponentExtension:on_gameplay_post_init(unit, level)
+function ComponentExtension:on_gameplay_post_init(unit)
 	local list = self._component_list
 
 	for i = 1, #list do
 		local component = list[i]
 
 		if component.on_gameplay_post_init then
-			component:on_gameplay_post_init(unit, level)
+			component:on_gameplay_post_init(unit)
 		end
 	end
 end

@@ -260,6 +260,11 @@ templates.veteran_combat_ability_outlines_coherency.duration = talent_settings_2
 function templates.veteran_combat_ability_outlines_coherency.start_func(template_data, template_context)
 	local is_local_unit = template_context.is_local_unit
 	local player = template_context.player
+
+	if not player then
+		return
+	end
+
 	local is_human_controlled = player:is_human_controlled()
 	local local_player = Managers.player:local_player(1)
 	local camera_handler = local_player and local_player.camera_handler
@@ -2139,7 +2144,7 @@ templates.veteran_share_toughness_gained = {
 	proc_func = function (params, template_data, template_context)
 		local reason = params.reason
 
-		if reason == "squad_leader_share_toughness" then
+		if reason == "shared" then
 			return
 		end
 
@@ -2150,7 +2155,7 @@ templates.veteran_share_toughness_gained = {
 
 		for unit, _ in pairs(units_in_coherency) do
 			if unit ~= template_context.unit then
-				Toughness.replenish_flat(unit, toughness_to_restore, false, "squad_leader_share_toughness")
+				Toughness.replenish_flat(unit, toughness_to_restore, false, "shared")
 			end
 		end
 	end

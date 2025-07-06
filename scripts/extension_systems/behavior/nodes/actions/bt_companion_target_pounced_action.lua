@@ -3,7 +3,10 @@ require("scripts/extension_systems/behavior/nodes/bt_node")
 local Attack = require("scripts/utilities/attack/attack")
 local AttackSettings = require("scripts/settings/damage/attack_settings")
 local Blackboard = require("scripts/extension_systems/blackboard/utilities/blackboard")
+local BuffSettings = require("scripts/settings/buff/buff_settings")
 local Explosion = require("scripts/utilities/attack/explosion")
+local ImpactEffect = require("scripts/utilities/attack/impact_effect")
+local proc_events = BuffSettings.proc_events
 local BtCompanionTargetPouncedAction = class("BtCompanionTargetPouncedAction", "BtNode")
 
 function BtCompanionTargetPouncedAction:enter(unit, breed, blackboard, scratchpad, action_data, t)
@@ -31,9 +34,7 @@ function BtCompanionTargetPouncedAction:enter(unit, breed, blackboard, scratchpa
 	local perception_component = blackboard.perception
 	scratchpad.perception_component = perception_component
 	scratchpad.attempting_pounce = true
-
-	self:_damage_target(unit, pounce_target, action_data, companion_pounce_setting.initial_damage_profile)
-
+	local damage_dealt, attack_result, damage_efficiency, _, _ = self:_damage_target(unit, pounce_target, action_data, companion_pounce_setting.initial_damage_profile)
 	local explosion_template = action_data.enter_explosion_template
 
 	if explosion_template then
@@ -53,14 +54,18 @@ function BtCompanionTargetPouncedAction:enter(unit, breed, blackboard, scratchpa
 	scratchpad.target_blackboard = target_blackboard
 	scratchpad.target_death_component = target_blackboard.death
 	scratchpad.target_disable_component = Blackboard.write_component(target_blackboard, "disable")
-	local looping_sound_event_start = companion_pounce_setting.looping_sound_event_start
 
-	if looping_sound_event_start then
-		local fx_node_name = "fx_jaw"
-		local fx_node = Unit.node(unit, fx_node_name)
-
-		scratchpad.fx_system:trigger_wwise_event(looping_sound_event_start, nil, unit, fx_node)
+	if action_data.effect_template then
+		local global_effect_id = fx_system:start_template_effect(action_data.effect_template, unit)
+		scratchpad.global_effect_id = global_effect_id
 	end
+
+	local attack_direction = Vector3.normalize(Quaternion.forward(Unit.local_rotation(unit, 1)))
+	local hit_position = Unit.world_position(unit, Unit.node(unit, pounce_component.leap_node))
+
+	ImpactEffect.play(pounce_target, nil, damage_dealt, "companion_dog_pin", pounce_component.target_hit_zone_name, attack_result, hit_position, nil, attack_direction, unit, nil, nil, nil, damage_efficiency, companion_pounce_setting.initial_damage_profile)
+	self:_handle_pounce_enemy_stats(unit, breed, pounce_target, target_unit_breed)
+	self:_trigger_pounce_enemy_proc_event(unit, breed, pounce_target, target_unit_breed)
 end
 
 function BtCompanionTargetPouncedAction:init_values(blackboard)
@@ -69,6 +74,7 @@ function BtCompanionTargetPouncedAction:init_values(blackboard)
 	pounce_component.pounce_cooldown = 0
 	pounce_component.started_leap = false
 	pounce_component.has_pounce_target = false
+	pounce_component.use_fast_jump = false
 end
 
 function BtCompanionTargetPouncedAction:leave(unit, breed, blackboard, scratchpad, action_data, t, reason, destroy)
@@ -81,21 +87,29 @@ function BtCompanionTargetPouncedAction:leave(unit, breed, blackboard, scratchpa
 		if token_extension then
 			local required_token = scratchpad.companion_pounce_setting.required_token
 
-			token_extension:free_token(required_token.name)
+			if token_extension:is_token_free_or_mine(unit, required_token.name) then
+				token_extension:free_token(required_token.name)
+			end
+		end
+
+		if scratchpad.target_disable_component then
+			scratchpad.target_disable_component.attacker_unit = nil
 		end
 	end
+
+	local target_unit_data_extension = ScriptUnit.has_extension(pounce_target, "unit_data_system")
+	local target_unit_breed = target_unit_data_extension and target_unit_data_extension:breed()
+
+	self:_trigger_pounce_enemy_finish_proc_event(unit, breed, pounce_target, target_unit_breed, reason)
 
 	pounce_component.pounce_target = nil
 
 	scratchpad.locomotion_extension:set_movement_type("snap_to_navmesh")
 
-	local looping_sound_event_stop = scratchpad.companion_pounce_setting.looping_sound_event_stop
+	if action_data.effect_template then
+		local fx_system = scratchpad.fx_system
 
-	if looping_sound_event_stop then
-		local fx_node_name = "fx_jaw"
-		local fx_node = Unit.node(unit, fx_node_name)
-
-		scratchpad.fx_system:trigger_wwise_event(looping_sound_event_stop, nil, unit, fx_node)
+		fx_system:stop_template_effect(scratchpad.global_effect_id)
 	end
 end
 
@@ -131,10 +145,7 @@ function BtCompanionTargetPouncedAction:run(unit, breed, blackboard, scratchpad,
 	local target_unit = scratchpad.perception_component.target_unit
 
 	if scratchpad.lerp_position_duration < t and pounce_target ~= target_unit then
-		local companion_pounce_setting = scratchpad.companion_pounce_setting
-
-		Attack.execute(pounce_target, companion_pounce_setting.damage_profile, "instakill", true)
-
+		scratchpad.target_disable_component.attacker_unit = nil
 		scratchpad.pounce_component.has_pounce_target = false
 
 		return "done"
@@ -151,7 +162,7 @@ function BtCompanionTargetPouncedAction:_damage_target(unit, pounce_target, acti
 	local attack_type = AttackSettings.attack_types.companion_dog
 	local damage_type = action_data.damage_type
 
-	Attack.execute(pounce_target, damage_profile, "power_level", POWER_LEVEL, "hit_world_position", hit_position, "attack_type", attack_type, "attacking_unit", unit, "damage_type", damage_type)
+	return Attack.execute(pounce_target, damage_profile, "power_level", POWER_LEVEL, "hit_world_position", hit_position, "attack_type", attack_type, "attacking_unit", unit, "damage_type", damage_type, "attack_direction", -Vector3.up())
 end
 
 function BtCompanionTargetPouncedAction:_position_companion(unit, scratchpad, action_data, t, pounce_target)
@@ -167,6 +178,52 @@ function BtCompanionTargetPouncedAction:_position_companion(unit, scratchpad, ac
 		Unit.set_local_position(unit, 1, new_position)
 	else
 		Unit.set_local_position(unit, 1, pounce_target_position)
+	end
+end
+
+function BtCompanionTargetPouncedAction:_trigger_pounce_enemy_proc_event(companion_unit, companion_breed, pounced_unit, pounced_unit_breed)
+	local player_owner = Managers.state.player_unit_spawn:owner(companion_unit)
+	local player_unit_buff_extension = player_owner.player_unit and ScriptUnit.has_extension(player_owner.player_unit, "buff_system")
+	local proc_event_param_table = player_unit_buff_extension and player_unit_buff_extension:request_proc_event_param_table()
+
+	if proc_event_param_table then
+		proc_event_param_table.owner_unit = player_owner.player_unit
+		proc_event_param_table.companion_breed = companion_breed.name
+		proc_event_param_table.companion_unit = companion_unit
+		proc_event_param_table.target_unit_breed_name = pounced_unit_breed.name
+		proc_event_param_table.pounced_unit = pounced_unit
+
+		player_unit_buff_extension:add_proc_event(proc_events.on_player_companion_pounce, proc_event_param_table)
+	end
+end
+
+function BtCompanionTargetPouncedAction:_trigger_pounce_enemy_finish_proc_event(companion_unit, companion_breed, pounced_unit, pounced_unit_breed, reason)
+	local player_owner = Managers.state.player_unit_spawn:owner(companion_unit)
+	local player_unit_buff_extension = player_owner.player_unit and ScriptUnit.has_extension(player_owner.player_unit, "buff_system")
+	local proc_event_param_table = player_unit_buff_extension and player_unit_buff_extension:request_proc_event_param_table()
+
+	if proc_event_param_table then
+		proc_event_param_table.owner_unit = player_owner.player_unit
+		proc_event_param_table.companion_breed = companion_breed.name
+		proc_event_param_table.companion_unit = companion_unit
+		proc_event_param_table.target_unit_breed_name = pounced_unit_breed and pounced_unit_breed.name or "none"
+		proc_event_param_table.reason = reason
+		proc_event_param_table.pounced_unit = pounced_unit
+
+		player_unit_buff_extension:add_proc_event(proc_events.on_player_companion_pounce_finish, proc_event_param_table)
+	end
+end
+
+function BtCompanionTargetPouncedAction:_handle_pounce_enemy_stats(companion_unit, companion_breed, pounced_unit, pounced_unit_breed)
+	local pounced_unit_behaviour_extension = ScriptUnit.has_extension(pounced_unit, "behavior_system")
+	local previously_pounced = pounced_unit_behaviour_extension and pounced_unit_behaviour_extension.pounced_by_companion_before and pounced_unit_behaviour_extension:pounced_by_companion_before(companion_unit)
+	local player_unit_spawn_manager = Managers.state.player_unit_spawn
+	local player_owner = player_unit_spawn_manager:owner(companion_unit)
+	local companion_breed_name = companion_breed.name
+	local pounced_unit_breed_name = pounced_unit_breed.name
+
+	if player_owner then
+		Managers.stats:record_private("hook_adamant_companion_pounce_enemy", player_owner, companion_unit, companion_breed_name, pounced_unit, pounced_unit_breed_name, previously_pounced)
 	end
 end
 

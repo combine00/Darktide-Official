@@ -20,16 +20,18 @@ function ChargeEffects:fixed_update(unit, dt, t, frame)
 	local charge_level = self:_charge_level(t)
 	local have_charge = charge_level > 0
 
-	if not self._played_start_effects and have_charge then
+	if not self._effects_running and have_charge then
 		self:_start_effects(t)
 
-		self._played_start_effects = true
+		self._effects_running = true
 		self._is_charge_done_sound_played = false
-	elseif self._played_start_effects and not have_charge then
+	elseif self._effects_running and not have_charge then
 		self:_stop_effects(t)
 
-		self._played_start_effects = false
+		self._effects_running = false
 		self._is_charge_done_sound_played = false
+	elseif self._effects_running then
+		self:_run_looping_sfx(frame)
 	end
 
 	self:_play_charged_done_effects()
@@ -57,25 +59,33 @@ function ChargeEffects:destroy()
 	self:_stop_effects()
 end
 
+function ChargeEffects:_run_looping_sfx(frame)
+	local charge_effects = self._charge_effects
+
+	if not charge_effects then
+		return
+	end
+
+	local action_settings = Action.current_action_settings_from_component(self._weapon_action_component, self._weapon_actions)
+	self._looping_sound_alias = charge_effects.looping_sound_alias
+
+	if self._looping_sound_alias then
+		local fx_sources = self._fx_sources
+		local sfx_source_name = charge_effects.sfx_source_name
+		local sfx_source = fx_sources[sfx_source_name]
+
+		self._fx_extension:run_looping_sound(self._looping_sound_alias, sfx_source, nil, frame)
+	end
+end
+
 function ChargeEffects:_start_effects(t)
 	local fx_extension = self._fx_extension
 	local action_settings = Action.current_action_settings_from_component(self._weapon_action_component, self._weapon_actions)
 	local charge_effects = action_settings and action_settings.charge_effects or self._weapon_template_charge_effects
 
 	if charge_effects then
+		self._charge_effects = charge_effects
 		local fx_sources = self._fx_sources
-		local looping_sound_alias = charge_effects.looping_sound_alias
-		local looping_sound_is_playing = looping_sound_alias and fx_extension:is_looping_wwise_event_playing(looping_sound_alias)
-
-		if looping_sound_alias and not looping_sound_is_playing then
-			local sfx_source_name = charge_effects.sfx_source_name
-			local sfx_source = fx_sources[sfx_source_name]
-
-			fx_extension:trigger_looping_wwise_event(looping_sound_alias, sfx_source)
-
-			self._looping_sound_alias = looping_sound_alias
-		end
-
 		local looping_effect_alias = charge_effects.looping_effect_alias
 		local looping_effect_is_playing = looping_effect_alias and fx_extension:is_looping_particles_playing(looping_effect_alias)
 
@@ -89,7 +99,7 @@ function ChargeEffects:_start_effects(t)
 			self._should_fade_kill = not not charge_effects.should_fade_kill
 		end
 
-		self._played_start_effects = true
+		self._effects_running = true
 	end
 
 	return true
@@ -97,15 +107,6 @@ end
 
 function ChargeEffects:_stop_effects()
 	local fx_extension = self._fx_extension
-	local looping_sound_alias = self._looping_sound_alias
-	local looping_sound_is_playing = looping_sound_alias and fx_extension:is_looping_wwise_event_playing(looping_sound_alias)
-
-	if looping_sound_alias and looping_sound_is_playing then
-		fx_extension:stop_looping_wwise_event(looping_sound_alias)
-
-		self._looping_sound_alias = nil
-	end
-
 	local looping_effect_alias = self._looping_effect_alias
 	local looping_effect_is_playing = looping_effect_alias and fx_extension:is_looping_particles_playing(looping_effect_alias)
 
@@ -115,7 +116,8 @@ function ChargeEffects:_stop_effects()
 		self._looping_effect_alias = nil
 	end
 
-	self._played_start_effects = false
+	self._looping_sound_alias = nil
+	self._effects_running = false
 	self._is_charge_done_sound_played = false
 end
 

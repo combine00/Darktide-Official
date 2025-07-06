@@ -478,6 +478,10 @@ function Buff:set_start_time(start_time)
 	end
 end
 
+function Buff:force_finish()
+	self._finished = true
+end
+
 function Buff:need_to_sync_start_time()
 	return self._need_to_sync_start_time
 end

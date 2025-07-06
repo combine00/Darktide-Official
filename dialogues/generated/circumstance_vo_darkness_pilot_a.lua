@@ -15,29 +15,6 @@ local circumstance_vo_darkness_pilot_a = {
 			4.948854
 		},
 		randomize_indexes = {}
-	},
-	power_circumstance_start_b = {
-		randomize_indexes_n = 0,
-		sound_events_n = 4,
-		sound_events = {
-			"loc_pilot_a__power_circumstance_start_b_01",
-			"loc_pilot_a__power_circumstance_start_b_02",
-			"loc_pilot_a__power_circumstance_start_b_03",
-			"loc_pilot_a__power_circumstance_start_b_04"
-		},
-		sound_events_duration = {
-			5.187729,
-			4.633563,
-			6.149021,
-			5.189875
-		},
-		sound_event_weights = {
-			0.25,
-			0.25,
-			0.25,
-			0.25
-		},
-		randomize_indexes = {}
 	}
 }
 

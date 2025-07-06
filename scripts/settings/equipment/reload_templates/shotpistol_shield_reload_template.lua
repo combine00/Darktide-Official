@@ -72,7 +72,7 @@ local reload_template = {
 			end
 
 			local previous_action_kind = previous_action_settings.kind
-			local from_block = previous_action_kind == "block_aiming" or previous_action_kind == "block"
+			local from_block = previous_action_kind == "block_aiming" or previous_action_kind == "block" or previous_action_kind == "block_unaim"
 
 			if from_block then
 				return "reload_middle_from_block"

@@ -35,6 +35,23 @@ local circumstance_vo_darkness_veteran_male_b = {
 			[2.0] = 0.5
 		},
 		randomize_indexes = {}
+	},
+	power_circumstance_start_b = {
+		randomize_indexes_n = 0,
+		sound_events_n = 4,
+		sound_events = {
+			"loc_veteran_male_b__power_circumstance_start_b_01",
+			"loc_veteran_male_b__power_circumstance_start_b_02",
+			"loc_veteran_male_b__power_circumstance_start_b_03",
+			"loc_veteran_male_b__power_circumstance_start_b_04"
+		},
+		sound_events_duration = {
+			4.461042,
+			3.901396,
+			3.428042,
+			4.393688
+		},
+		randomize_indexes = {}
 	}
 }
 

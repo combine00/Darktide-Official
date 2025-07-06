@@ -19,6 +19,10 @@ function Store:get_ogryn_credits_goods_store(t, character_id)
 	return self:_get_storefront(t, "credits_store_bespoke_weapons_ogryn", character_id, character_id)
 end
 
+function Store:get_adamant_credits_goods_store(t, character_id)
+	return self:_get_storefront(t, "credits_store_bespoke_weapons_adamant", character_id, character_id)
+end
+
 function Store:get_veteran_credits_store(t, character_id)
 	return self:_get_storefront(t, "credits_store_veteran", character_id, character_id, true)
 end
@@ -33,6 +37,10 @@ end
 
 function Store:get_ogryn_credits_store(t, character_id)
 	return self:_get_storefront(t, "credits_store_ogryn", character_id, character_id, true)
+end
+
+function Store:get_adamant_credits_store(t, character_id)
+	return self:_get_storefront(t, "credits_store_adamant", character_id, character_id, true)
 end
 
 function Store:get_veteran_credits_cosmetics_store(t, character_id)
@@ -51,6 +59,10 @@ function Store:get_ogryn_credits_cosmetics_store(t, character_id)
 	return self:_get_storefront(t, "credits_cosmetics_store_ogryn", character_id, character_id, false)
 end
 
+function Store:get_adamant_credits_cosmetics_store(t, character_id)
+	return self:_get_storefront(t, "credits_cosmetics_store_adamant", character_id, character_id, false)
+end
+
 function Store:get_veteran_credits_weapon_cosmetics_store(t, character_id)
 	return self:_get_storefront(t, "credits_weapon_cosmetics_store_veteran", character_id, character_id, false)
 end
@@ -67,6 +79,10 @@ function Store:get_ogryn_credits_weapon_cosmetics_store(t, character_id)
 	return self:_get_storefront(t, "credits_weapon_cosmetics_store_ogryn", character_id, character_id, false)
 end
 
+function Store:get_adamant_credits_weapon_cosmetics_store(t, character_id)
+	return self:_get_storefront(t, "credits_weapon_cosmetics_store_adamant", character_id, character_id, false)
+end
+
 function Store:get_veteran_marks_store(t, character_id)
 	return self:_get_storefront(t, "marks_store_veteran", character_id, character_id, true)
 end
@@ -81,6 +97,10 @@ end
 
 function Store:get_ogryn_marks_store(t, character_id)
 	return self:_get_storefront(t, "marks_store_ogryn", character_id, character_id, true)
+end
+
+function Store:get_adamant_marks_store(t, character_id)
+	return self:_get_storefront(t, "marks_store_adamant", character_id, character_id, true)
 end
 
 function Store:get_premium_storefront(storefront, t)

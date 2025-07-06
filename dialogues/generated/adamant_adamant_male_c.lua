@@ -1,4 +1,79 @@
 local adamant_adamant_male_c = {
+	ability_charge_a = {
+		randomize_indexes_n = 0,
+		sound_events_n = 8,
+		sound_events = {
+			"loc_adamant_male_c__ability_charge_a_01",
+			"loc_adamant_male_c__ability_charge_a_02",
+			"loc_adamant_male_c__ability_charge_a_03",
+			"loc_adamant_male_c__ability_charge_a_04",
+			"loc_adamant_male_c__ability_charge_a_05",
+			"loc_adamant_male_c__ability_charge_a_06",
+			"loc_adamant_male_c__ability_charge_a_07",
+			"loc_adamant_male_c__ability_charge_a_08"
+		},
+		sound_events_duration = {
+			1.104146,
+			1.062667,
+			1.222833,
+			1.294521,
+			0.941333,
+			1.084708,
+			1.290229,
+			1.001667
+		},
+		randomize_indexes = {}
+	},
+	ability_howl_a = {
+		randomize_indexes_n = 0,
+		sound_events_n = 8,
+		sound_events = {
+			"loc_adamant_male_c__ability_howl_a_01",
+			"loc_adamant_male_c__ability_howl_a_02",
+			"loc_adamant_male_c__ability_howl_a_03",
+			"loc_adamant_male_c__ability_howl_a_04",
+			"loc_adamant_male_c__ability_howl_a_05",
+			"loc_adamant_male_c__ability_howl_a_06",
+			"loc_adamant_male_c__ability_howl_a_07",
+			"loc_adamant_male_c__ability_howl_a_08"
+		},
+		sound_events_duration = {
+			1.432708,
+			1.713677,
+			1.544427,
+			1.744073,
+			3.27026,
+			2.564167,
+			1.802208,
+			2.015135
+		},
+		randomize_indexes = {}
+	},
+	ability_stance_a = {
+		randomize_indexes_n = 0,
+		sound_events_n = 8,
+		sound_events = {
+			"loc_adamant_male_c__ability_stance_a_01",
+			"loc_adamant_male_c__ability_stance_a_02",
+			"loc_adamant_male_c__ability_stance_a_03",
+			"loc_adamant_male_c__ability_stance_a_04",
+			"loc_adamant_male_c__ability_stance_a_05",
+			"loc_adamant_male_c__ability_stance_a_06",
+			"loc_adamant_male_c__ability_stance_a_07",
+			"loc_adamant_male_c__ability_stance_a_08"
+		},
+		sound_events_duration = {
+			1.314896,
+			1.693688,
+			2.151083,
+			1.407438,
+			1.316958,
+			1.744104,
+			1.831896,
+			1.976375
+		},
+		randomize_indexes = {}
+	},
 	adamant_seen_killstreak_adamant = {
 		randomize_indexes_n = 0,
 		sound_events_n = 4,
@@ -46,7 +121,7 @@ local adamant_adamant_male_c = {
 			2.428,
 			2.516,
 			4.067333,
-			3.45678
+			1.776865
 		},
 		randomize_indexes = {}
 	},
@@ -62,7 +137,7 @@ local adamant_adamant_male_c = {
 		sound_events_duration = {
 			3.04,
 			1.962667,
-			3.45678,
+			2.501031,
 			3.901333
 		},
 		randomize_indexes = {}
@@ -141,7 +216,7 @@ local adamant_adamant_male_c = {
 			3.361333,
 			3.137,
 			4.178,
-			3.45678,
+			3.750906,
 			3.657333,
 			4.874667
 		},
@@ -162,7 +237,7 @@ local adamant_adamant_male_c = {
 			3.290667,
 			3.046667,
 			3.202,
-			3.45678,
+			6.142417,
 			1.994667,
 			2.664
 		},
@@ -186,6 +261,158 @@ local adamant_adamant_male_c = {
 			3.420667,
 			4.094667,
 			3.252
+		},
+		randomize_indexes = {}
+	},
+	blitz_grenade_a = {
+		randomize_indexes_n = 0,
+		sound_events_n = 8,
+		sound_events = {
+			"loc_adamant_male_c__blitz_grenade_a_01",
+			"loc_adamant_male_c__blitz_grenade_a_02",
+			"loc_adamant_male_c__blitz_grenade_a_03",
+			"loc_adamant_male_c__blitz_grenade_a_04",
+			"loc_adamant_male_c__blitz_grenade_a_05",
+			"loc_adamant_male_c__blitz_grenade_a_06",
+			"loc_adamant_male_c__blitz_grenade_a_07",
+			"loc_adamant_male_c__blitz_grenade_a_08"
+		},
+		sound_events_duration = {
+			1.260698,
+			1.481542,
+			2.237396,
+			0.828833,
+			1.045698,
+			2.60651,
+			0.807375,
+			1.369729
+		},
+		randomize_indexes = {}
+	},
+	blitz_kill_attack_a = {
+		randomize_indexes_n = 0,
+		sound_events_n = 8,
+		sound_events = {
+			"loc_adamant_male_c__blitz_kill_attack_a_01",
+			"loc_adamant_male_c__blitz_kill_attack_a_02",
+			"loc_adamant_male_c__blitz_kill_attack_a_03",
+			"loc_adamant_male_c__blitz_kill_attack_a_04",
+			"loc_adamant_male_c__blitz_kill_attack_a_05",
+			"loc_adamant_male_c__blitz_kill_attack_a_06",
+			"loc_adamant_male_c__blitz_kill_attack_a_07",
+			"loc_adamant_male_c__blitz_kill_attack_a_08"
+		},
+		sound_events_duration = {
+			0.834823,
+			0.875021,
+			1.183177,
+			1.111927,
+			2.006719,
+			1.148156,
+			1.522375,
+			1.025542
+		},
+		randomize_indexes = {}
+	},
+	blitz_kill_attack_a_heard_tag = {
+		randomize_indexes_n = 0,
+		sound_events_n = 8,
+		sound_events = {
+			"loc_adamant_male_c__blitz_kill_attack_a_01",
+			"loc_adamant_male_c__blitz_kill_attack_a_02",
+			"loc_adamant_male_c__blitz_kill_attack_a_03",
+			"loc_adamant_male_c__blitz_kill_attack_a_04",
+			"loc_adamant_male_c__blitz_kill_attack_a_05",
+			"loc_adamant_male_c__blitz_kill_attack_a_06",
+			"loc_adamant_male_c__blitz_kill_attack_a_07",
+			"loc_adamant_male_c__blitz_kill_attack_a_08"
+		},
+		sound_events_duration = {
+			0.834823,
+			0.875021,
+			1.183177,
+			1.111927,
+			2.006719,
+			1.148156,
+			1.522375,
+			1.025542
+		},
+		sound_event_weights = {
+			0.125,
+			0.125,
+			0.125,
+			0.125,
+			0.125,
+			0.125,
+			0.125,
+			0.125
+		},
+		randomize_indexes = {}
+	},
+	blitz_mine_a = {
+		randomize_indexes_n = 0,
+		sound_events_n = 8,
+		sound_events = {
+			"loc_adamant_male_c__blitz_mine_a_01",
+			"loc_adamant_male_c__blitz_mine_a_02",
+			"loc_adamant_male_c__blitz_mine_a_03",
+			"loc_adamant_male_c__blitz_mine_a_04",
+			"loc_adamant_male_c__blitz_mine_a_05",
+			"loc_adamant_male_c__blitz_mine_a_06",
+			"loc_adamant_male_c__blitz_mine_a_07",
+			"loc_adamant_male_c__blitz_mine_a_08"
+		},
+		sound_events_duration = {
+			1.179552,
+			2.581677,
+			1.112333,
+			1.50026,
+			1.571594,
+			1.952615,
+			1.243219,
+			1.516885
+		},
+		randomize_indexes = {}
+	},
+	blitz_nuncio_a = {
+		randomize_indexes_n = 0,
+		sound_events_n = 8,
+		sound_events = {
+			"loc_adamant_male_c__blitz_nuncio_a_01",
+			"loc_adamant_male_c__blitz_nuncio_a_02",
+			"loc_adamant_male_c__blitz_nuncio_a_03",
+			"loc_adamant_male_c__blitz_nuncio_a_04",
+			"loc_adamant_male_c__blitz_nuncio_a_05",
+			"loc_adamant_male_c__blitz_nuncio_a_06",
+			"loc_adamant_male_c__blitz_nuncio_a_07",
+			"loc_adamant_male_c__blitz_nuncio_a_08"
+		},
+		sound_events_duration = {
+			2.07625,
+			1.925917,
+			2.217229,
+			2.595333,
+			2.431354,
+			2.543229,
+			2.874167,
+			2.386688
+		},
+		randomize_indexes = {}
+	},
+	found_ammo_adamant_low_on_ammo = {
+		randomize_indexes_n = 0,
+		sound_events_n = 4,
+		sound_events = {
+			"loc_adamant_male_c__found_ammo_adamant_low_on_ammo_01",
+			"loc_adamant_male_c__found_ammo_adamant_low_on_ammo_02",
+			"loc_adamant_male_c__found_ammo_adamant_low_on_ammo_03",
+			"loc_adamant_male_c__found_ammo_adamant_low_on_ammo_04"
+		},
+		sound_events_duration = {
+			2.083448,
+			3.810604,
+			3.201938,
+			3.710104
 		},
 		randomize_indexes = {}
 	},
@@ -222,7 +449,7 @@ local adamant_adamant_male_c = {
 			2.268,
 			2.536,
 			3.304,
-			3.45678,
+			3.127792,
 			3.316
 		},
 		randomize_indexes = {}
@@ -261,7 +488,7 @@ local adamant_adamant_male_c = {
 		},
 		sound_events_duration = {
 			6.594,
-			3.45678,
+			2.95676,
 			2.363333,
 			1.942,
 			2.938667,
@@ -324,7 +551,7 @@ local adamant_adamant_male_c = {
 			3.368,
 			4.329333,
 			3.104,
-			3.45678
+			2.97324
 		},
 		randomize_indexes = {}
 	},
@@ -472,6 +699,40 @@ local adamant_adamant_male_c = {
 		},
 		randomize_indexes = {}
 	},
+	response_for_adamant_seen_killstreak_adamant = {
+		randomize_indexes_n = 0,
+		sound_events_n = 4,
+		sound_events = {
+			"loc_adamant_male_c__response_for_adamant_seen_killstreak_adamant_01",
+			"loc_adamant_male_c__response_for_adamant_seen_killstreak_adamant_02",
+			"loc_adamant_male_c__response_for_adamant_seen_killstreak_adamant_03",
+			"loc_adamant_male_c__response_for_adamant_seen_killstreak_adamant_04"
+		},
+		sound_events_duration = {
+			2.609927,
+			2.272031,
+			2.04001,
+			2.508438
+		},
+		randomize_indexes = {}
+	},
+	response_for_adamant_start_revive_adamant = {
+		randomize_indexes_n = 0,
+		sound_events_n = 4,
+		sound_events = {
+			"loc_adamant_male_c__response_for_adamant_start_revive_adamant_01",
+			"loc_adamant_male_c__response_for_adamant_start_revive_adamant_02",
+			"loc_adamant_male_c__response_for_adamant_start_revive_adamant_03",
+			"loc_adamant_male_c__response_for_adamant_start_revive_adamant_04"
+		},
+		sound_events_duration = {
+			4.536,
+			2.553333,
+			4.216,
+			3.416667
+		},
+		randomize_indexes = {}
+	},
 	response_for_friendly_fire_from_adamant_to_adamant = {
 		randomize_indexes_n = 0,
 		sound_events_n = 4,
@@ -518,7 +779,7 @@ local adamant_adamant_male_c = {
 		sound_events_duration = {
 			1.93,
 			1.83,
-			3.45678,
+			2.71951,
 			2.153333
 		},
 		randomize_indexes = {}
@@ -639,7 +900,7 @@ local adamant_adamant_male_c = {
 			"loc_adamant_male_c__response_for_psyker_start_revive_adamant_04"
 		},
 		sound_events_duration = {
-			3.45678,
+			2.523375,
 			2.111,
 			1.566667,
 			2.049333

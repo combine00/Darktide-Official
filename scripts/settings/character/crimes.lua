@@ -1,11 +1,9 @@
-local crimes = {
-	veteran_1 = {
+local crime_options = {
+	{
 		description = "loc_character_sentence_01_description",
 		name = "Insubordination",
 		display_name = "loc_character_sentence_01_name",
 		story_snippet = "loc_character_sentence_01_description_snippet",
-		archetype = "veteran",
-		id = "sentence_01",
 		unlocks = {
 			{
 				text = "loc_character_sentence_01_unlocks",
@@ -15,15 +13,19 @@ local crimes = {
 		slot_items = {
 			slot_gear_lowerbody = "content/items/characters/player/human/gear_lowerbody/prisoner_lowerbody_c",
 			slot_gear_upperbody = "content/items/characters/player/human/gear_upperbody/prisoner_upperbody_c"
+		},
+		visibility = {
+			archetypes = {
+				"veteran",
+				"zealot"
+			}
 		}
 	},
-	veteran_2 = {
+	{
 		description = "loc_character_sentence_02_description",
 		name = "Theft",
 		display_name = "loc_character_sentence_02_name",
 		story_snippet = "loc_character_sentence_02_description_snippet",
-		archetype = "veteran",
-		id = "sentence_02",
 		unlocks = {
 			{
 				text = "loc_character_sentence_02_unlocks",
@@ -33,15 +35,19 @@ local crimes = {
 		slot_items = {
 			slot_gear_lowerbody = "content/items/characters/player/human/gear_lowerbody/prisoner_lowerbody_a",
 			slot_gear_upperbody = "content/items/characters/player/human/gear_upperbody/prisoner_upperbody_a"
+		},
+		visibility = {
+			archetypes = {
+				"veteran",
+				"zealot"
+			}
 		}
 	},
-	veteran_3 = {
+	{
 		description = "loc_character_sentence_03_description",
 		name = "Unauthorized absence",
 		display_name = "loc_character_sentence_03_name",
 		story_snippet = "loc_character_sentence_03_description_snippet",
-		archetype = "veteran",
-		id = "sentence_03",
 		unlocks = {
 			{
 				text = "loc_character_sentence_03_unlocks",
@@ -51,15 +57,19 @@ local crimes = {
 		slot_items = {
 			slot_gear_lowerbody = "content/items/characters/player/human/gear_lowerbody/prisoner_lowerbody_b",
 			slot_gear_upperbody = "content/items/characters/player/human/gear_upperbody/prisoner_upperbody_b"
+		},
+		visibility = {
+			archetypes = {
+				"veteran",
+				"zealot"
+			}
 		}
 	},
-	veteran_4 = {
+	{
 		description = "loc_character_sentence_04_description",
 		name = "Smuggling",
 		display_name = "loc_character_sentence_04_name",
 		story_snippet = "loc_character_sentence_04_description_snippet",
-		archetype = "veteran",
-		id = "sentence_04",
 		unlocks = {
 			{
 				text = "loc_character_sentence_04_unlocks",
@@ -69,87 +79,19 @@ local crimes = {
 		slot_items = {
 			slot_gear_lowerbody = "content/items/characters/player/human/gear_lowerbody/prisoner_lowerbody_d",
 			slot_gear_upperbody = "content/items/characters/player/human/gear_upperbody/prisoner_upperbody_d"
+		},
+		visibility = {
+			archetypes = {
+				"veteran",
+				"zealot"
+			}
 		}
 	},
-	zealot_1 = {
+	{
 		description = "loc_character_sentence_01_description",
 		name = "Insubordination",
 		display_name = "loc_character_sentence_01_name",
 		story_snippet = "loc_character_sentence_01_description_snippet",
-		archetype = "zealot",
-		id = "sentence_01",
-		unlocks = {
-			{
-				text = "loc_character_sentence_01_unlocks",
-				type = "text"
-			}
-		},
-		slot_items = {
-			slot_gear_lowerbody = "content/items/characters/player/human/gear_lowerbody/prisoner_lowerbody_c",
-			slot_gear_upperbody = "content/items/characters/player/human/gear_upperbody/prisoner_upperbody_c"
-		}
-	},
-	zealot_2 = {
-		description = "loc_character_sentence_02_description",
-		name = "Theft",
-		display_name = "loc_character_sentence_02_name",
-		story_snippet = "loc_character_sentence_02_description_snippet",
-		archetype = "zealot",
-		id = "sentence_02",
-		unlocks = {
-			{
-				text = "loc_character_sentence_02_unlocks",
-				type = "text"
-			}
-		},
-		slot_items = {
-			slot_gear_lowerbody = "content/items/characters/player/human/gear_lowerbody/prisoner_lowerbody_a",
-			slot_gear_upperbody = "content/items/characters/player/human/gear_upperbody/prisoner_upperbody_a"
-		}
-	},
-	zealot_3 = {
-		description = "loc_character_sentence_03_description",
-		name = "Unauthorized absence",
-		display_name = "loc_character_sentence_03_name",
-		story_snippet = "loc_character_sentence_03_description_snippet",
-		archetype = "zealot",
-		id = "sentence_03",
-		unlocks = {
-			{
-				text = "loc_character_sentence_03_unlocks",
-				type = "text"
-			}
-		},
-		slot_items = {
-			slot_gear_lowerbody = "content/items/characters/player/human/gear_lowerbody/prisoner_lowerbody_b",
-			slot_gear_upperbody = "content/items/characters/player/human/gear_upperbody/prisoner_upperbody_b"
-		}
-	},
-	zealot_4 = {
-		description = "loc_character_sentence_04_description",
-		name = "Smuggling",
-		display_name = "loc_character_sentence_04_name",
-		story_snippet = "loc_character_sentence_04_description_snippet",
-		archetype = "zealot",
-		id = "sentence_04",
-		unlocks = {
-			{
-				text = "loc_character_sentence_04_unlocks",
-				type = "text"
-			}
-		},
-		slot_items = {
-			slot_gear_lowerbody = "content/items/characters/player/human/gear_lowerbody/prisoner_lowerbody_d",
-			slot_gear_upperbody = "content/items/characters/player/human/gear_upperbody/prisoner_upperbody_d"
-		}
-	},
-	psyker_1 = {
-		description = "loc_character_sentence_01_description",
-		name = "Insubordination",
-		display_name = "loc_character_sentence_01_name",
-		story_snippet = "loc_character_sentence_01_description_snippet",
-		archetype = "psyker",
-		id = "sentence_01",
 		unlocks = {
 			{
 				text = "loc_character_sentence_01_unlocks",
@@ -159,15 +101,18 @@ local crimes = {
 		slot_items = {
 			slot_gear_lowerbody = "content/items/characters/player/human/gear_lowerbody/prisoner_lowerbody_c",
 			slot_gear_upperbody = "content/items/characters/player/human/gear_upperbody/prisoner_upperbody_psyker_c"
+		},
+		visibility = {
+			archetypes = {
+				"psyker"
+			}
 		}
 	},
-	psyker_2 = {
+	{
 		description = "loc_character_sentence_02_description",
 		name = "Theft",
 		display_name = "loc_character_sentence_02_name",
 		story_snippet = "loc_character_sentence_02_description_snippet",
-		archetype = "psyker",
-		id = "sentence_02",
 		unlocks = {
 			{
 				text = "loc_character_sentence_02_unlocks",
@@ -177,15 +122,18 @@ local crimes = {
 		slot_items = {
 			slot_gear_lowerbody = "content/items/characters/player/human/gear_lowerbody/prisoner_lowerbody_a",
 			slot_gear_upperbody = "content/items/characters/player/human/gear_upperbody/prisoner_upperbody_psyker_a"
+		},
+		visibility = {
+			archetypes = {
+				"psyker"
+			}
 		}
 	},
-	psyker_3 = {
+	{
 		description = "loc_character_sentence_03_description",
 		name = "Unauthorized absence",
 		display_name = "loc_character_sentence_03_name",
 		story_snippet = "loc_character_sentence_03_description_snippet",
-		archetype = "psyker",
-		id = "sentence_03",
 		unlocks = {
 			{
 				text = "loc_character_sentence_03_unlocks",
@@ -195,15 +143,18 @@ local crimes = {
 		slot_items = {
 			slot_gear_lowerbody = "content/items/characters/player/human/gear_lowerbody/prisoner_lowerbody_b",
 			slot_gear_upperbody = "content/items/characters/player/human/gear_upperbody/prisoner_upperbody_psyker_b"
+		},
+		visibility = {
+			archetypes = {
+				"psyker"
+			}
 		}
 	},
-	psyker_4 = {
+	{
 		description = "loc_character_sentence_04_description",
 		name = "Smuggling",
 		display_name = "loc_character_sentence_04_name",
 		story_snippet = "loc_character_sentence_04_description_snippet",
-		archetype = "psyker",
-		id = "sentence_04",
 		unlocks = {
 			{
 				text = "loc_character_sentence_04_unlocks",
@@ -213,15 +164,18 @@ local crimes = {
 		slot_items = {
 			slot_gear_lowerbody = "content/items/characters/player/human/gear_lowerbody/prisoner_lowerbody_d",
 			slot_gear_upperbody = "content/items/characters/player/human/gear_upperbody/prisoner_upperbody_psyker_d"
+		},
+		visibility = {
+			archetypes = {
+				"psyker"
+			}
 		}
 	},
-	ogryn_1 = {
+	{
 		description = "loc_character_sentence_01_description",
 		name = "Insubordination",
 		display_name = "loc_character_sentence_01_name",
 		story_snippet = "loc_character_sentence_01_description_snippet",
-		archetype = "ogryn",
-		id = "sentence_01",
 		unlocks = {
 			{
 				text = "loc_character_sentence_01_unlocks",
@@ -231,15 +185,18 @@ local crimes = {
 		slot_items = {
 			slot_gear_lowerbody = "content/items/characters/player/ogryn/gear_lowerbody/ogryn_prisoner_lowerbody_c",
 			slot_gear_upperbody = "content/items/characters/player/ogryn/gear_upperbody/ogryn_prisoner_upperbody_c"
+		},
+		visibility = {
+			archetypes = {
+				"ogryn"
+			}
 		}
 	},
-	ogryn_2 = {
+	{
 		description = "loc_character_sentence_02_description",
 		name = "Theft",
 		display_name = "loc_character_sentence_02_name",
 		story_snippet = "loc_character_sentence_02_description_snippet",
-		archetype = "ogryn",
-		id = "sentence_02",
 		unlocks = {
 			{
 				text = "loc_character_sentence_02_unlocks",
@@ -249,15 +206,18 @@ local crimes = {
 		slot_items = {
 			slot_gear_lowerbody = "content/items/characters/player/ogryn/gear_lowerbody/ogryn_prisoner_lowerbody_a",
 			slot_gear_upperbody = "content/items/characters/player/ogryn/gear_upperbody/ogryn_prisoner_upperbody_a"
+		},
+		visibility = {
+			archetypes = {
+				"ogryn"
+			}
 		}
 	},
-	ogryn_3 = {
+	{
 		description = "loc_character_sentence_03_description",
 		name = "Unauthorized absence",
 		display_name = "loc_character_sentence_03_name",
 		story_snippet = "loc_character_sentence_03_description_snippet",
-		archetype = "ogryn",
-		id = "sentence_03",
 		unlocks = {
 			{
 				text = "loc_character_sentence_03_unlocks",
@@ -267,15 +227,18 @@ local crimes = {
 		slot_items = {
 			slot_gear_lowerbody = "content/items/characters/player/ogryn/gear_lowerbody/ogryn_prisoner_lowerbody_b",
 			slot_gear_upperbody = "content/items/characters/player/ogryn/gear_upperbody/ogryn_prisoner_upperbody_b"
+		},
+		visibility = {
+			archetypes = {
+				"ogryn"
+			}
 		}
 	},
-	ogryn_4 = {
+	{
 		description = "loc_character_sentence_04_description",
 		name = "Smuggling",
 		display_name = "loc_character_sentence_04_name",
 		story_snippet = "loc_character_sentence_04_description_snippet",
-		archetype = "ogryn",
-		id = "sentence_04",
 		unlocks = {
 			{
 				text = "loc_character_sentence_04_unlocks",
@@ -285,8 +248,113 @@ local crimes = {
 		slot_items = {
 			slot_gear_lowerbody = "content/items/characters/player/ogryn/gear_lowerbody/ogryn_prisoner_lowerbody_d",
 			slot_gear_upperbody = "content/items/characters/player/ogryn/gear_upperbody/ogryn_prisoner_upperbody_d"
+		},
+		visibility = {
+			archetypes = {
+				"ogryn"
+			}
+		}
+	},
+	{
+		description = "loc_character_precinct_01_description",
+		name = "Adamant 1",
+		display_name = "loc_character_precinct_01_name",
+		story_snippet = "loc_character_precinct_01_description_snippet",
+		unlocks = {
+			{
+				text = "loc_character_precinct_01_unlocks",
+				type = "text"
+			}
+		},
+		slot_items = {
+			slot_gear_lowerbody = "content/items/characters/player/human/gear_lowerbody/adamant_lowerbody_a_var_01",
+			slot_gear_upperbody = "content/items/characters/player/human/gear_upperbody/adamant_upperbody_a_var_01",
+			slot_gear_head = "content/items/characters/player/human/gear_head/adamant_headgear_01_var_01",
+			slot_gear_material_override_decal = "content/items/characters/player/human/gear_material_override_decal/decal_atlas_adamant_precincts_01_decal_01"
+		},
+		visibility = {
+			archetypes = {
+				"adamant"
+			}
+		}
+	},
+	{
+		description = "loc_character_precinct_02_description",
+		name = "Adamant 2",
+		display_name = "loc_character_precinct_02_name",
+		story_snippet = "loc_character_precinct_02_description_snippet",
+		unlocks = {
+			{
+				text = "loc_character_precinct_02_unlocks",
+				type = "text"
+			}
+		},
+		slot_items = {
+			slot_gear_lowerbody = "content/items/characters/player/human/gear_lowerbody/adamant_lowerbody_a_var_01",
+			slot_gear_upperbody = "content/items/characters/player/human/gear_upperbody/adamant_upperbody_a_var_01",
+			slot_gear_head = "content/items/characters/player/human/gear_head/adamant_headgear_01_var_01",
+			slot_gear_material_override_decal = "content/items/characters/player/human/gear_material_override_decal/decal_atlas_adamant_precincts_01_decal_02"
+		},
+		visibility = {
+			archetypes = {
+				"adamant"
+			}
+		}
+	},
+	{
+		description = "loc_character_precinct_03_description",
+		name = "Adamant 3",
+		display_name = "loc_character_precinct_03_name",
+		story_snippet = "loc_character_precinct_03_description_snippet",
+		unlocks = {
+			{
+				text = "loc_character_precinct_03_unlocks",
+				type = "text"
+			}
+		},
+		slot_items = {
+			slot_gear_lowerbody = "content/items/characters/player/human/gear_lowerbody/adamant_lowerbody_a_var_01",
+			slot_gear_upperbody = "content/items/characters/player/human/gear_upperbody/adamant_upperbody_a_var_01",
+			slot_gear_head = "content/items/characters/player/human/gear_head/adamant_headgear_01_var_01",
+			slot_gear_material_override_decal = "content/items/characters/player/human/gear_material_override_decal/decal_atlas_adamant_precincts_01_decal_03"
+		},
+		visibility = {
+			archetypes = {
+				"adamant"
+			}
+		}
+	},
+	{
+		description = "loc_character_precinct_04_description",
+		name = "Adamant 4",
+		display_name = "loc_character_precinct_04_name",
+		story_snippet = "loc_character_precinct_04_description_snippet",
+		unlocks = {
+			{
+				text = "loc_character_precinct_04_unlocks",
+				type = "text"
+			}
+		},
+		slot_items = {
+			slot_gear_lowerbody = "content/items/characters/player/human/gear_lowerbody/adamant_lowerbody_a_var_01",
+			slot_gear_upperbody = "content/items/characters/player/human/gear_upperbody/adamant_upperbody_a_var_01",
+			slot_gear_head = "content/items/characters/player/human/gear_head/adamant_headgear_01_var_01",
+			slot_gear_material_override_decal = "content/items/characters/player/human/gear_material_override_decal/decal_atlas_adamant_precincts_01_decal_04"
+		},
+		visibility = {
+			archetypes = {
+				"adamant"
+			}
 		}
 	}
 }
+local crime_options_by_id = {}
 
-return settings("Crimes", crimes)
+for i = 1, #crime_options do
+	local crime_option = crime_options[i]
+	local id = string.format("option_%d", i)
+	crime_option.id = id
+	crime_options_by_id[id] = crime_option
+end
+
+return settings("Crimes", crime_options_by_id)

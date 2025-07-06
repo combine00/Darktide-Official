@@ -4,6 +4,8 @@ local ClassSelectionViewTestify = GameParameters.testify and require("scripts/ui
 local ContentBlueprints = require("scripts/ui/views/class_selection_view/class_selection_view_blueprints")
 local Definitions = require("scripts/ui/views/class_selection_view/class_selection_view_definitions")
 local MasterItems = require("scripts/backend/master_items")
+local Promise = require("scripts/foundation/utilities/promise")
+local PromiseContainer = require("scripts/utilities/ui/promise_container")
 local TalentBuilderViewSettings = require("scripts/ui/views/talent_builder_view/talent_builder_view_settings")
 local TalentLayoutParser = require("scripts/ui/views/talent_builder_view/utilities/talent_layout_parser")
 local UIFonts = require("scripts/managers/ui/ui_fonts")
@@ -17,9 +19,10 @@ local ViewElementInputLegend = require("scripts/ui/view_elements/view_element_in
 local ClassSelectionView = class("ClassSelectionView", "BaseView")
 local temp_archetype_to_specialization_lookup = {
 	psyker = "psyker_2",
+	adamant = "adamant",
+	ogryn = "ogryn_2",
 	veteran = "veteran_2",
-	zealot = "zealot_2",
-	ogryn = "ogryn_2"
+	zealot = "zealot_2"
 }
 
 function ClassSelectionView:init(settings, context)
@@ -29,6 +32,7 @@ function ClassSelectionView:init(settings, context)
 	self._pass_draw = false
 	self._allow_close_hotkey = false
 	self._force_character_creation = context.force_character_creation
+	self._promise_container = PromiseContainer:new()
 end
 
 function ClassSelectionView:on_enter()
@@ -66,10 +70,6 @@ function ClassSelectionView:_setup_input_legend()
 end
 
 function ClassSelectionView:_register_button_callbacks()
-	function self._widgets_by_name.continue_button.content.hotspot.pressed_callback()
-		self:_on_continue_pressed()
-	end
-
 	function self._widgets_by_name.details_button.content.hotspot.pressed_callback()
 		self:_on_details_pressed()
 	end
@@ -267,6 +267,8 @@ function ClassSelectionView:_on_quit_pressed()
 end
 
 function ClassSelectionView:on_exit()
+	self._promise_container:delete()
+
 	if self._input_legend_element then
 		self._input_legend_element = nil
 
@@ -291,7 +293,9 @@ function ClassSelectionView:_handle_input(input_service)
 
 			input_handled = true
 		elseif input_service:get("confirm_pressed") then
-			self._widgets_by_name.continue_button.content.hotspot.pressed_callback()
+			if not self._widgets_by_name.continue_button.disabled then
+				self._widgets_by_name.continue_button.content.hotspot.pressed_callback()
+			end
 
 			input_handled = true
 		end
@@ -489,6 +493,40 @@ function ClassSelectionView:_on_archetype_pressed(selected_archetype)
 
 	local selected_specialization_name = temp_archetype_to_specialization_lookup[self._selected_archetype.name]
 
+	if self._current_archetype_available_promise and not self._current_archetype_available_promise:is_fulfilled() then
+		self._current_archetype_available_promise:cancel()
+	end
+
+	local is_archetype_available_promise = Promise:resolved(false)
+
+	if selected_archetype.is_available then
+		is_archetype_available_promise = selected_archetype:is_available()
+	end
+
+	if not is_archetype_available_promise:is_fulfilled() then
+		self._widgets_by_name.continue_button.visible = false
+		self._widgets_by_name.continue_button.disabled = true
+	end
+
+	self._current_archetype_available_promise = is_archetype_available_promise
+
+	self._promise_container:cancel_on_destroy(is_archetype_available_promise):next(function (result)
+		self._widgets_by_name.continue_button.visible = true
+		self._widgets_by_name.continue_button.content.original_text = result.available and Utf8.upper(Localize("loc_character_creator_continue")) or Utf8.upper(Localize("loc_dlc_cta"))
+		self._widgets_by_name.continue_button.disabled = false
+
+		function self._widgets_by_name.continue_button.content.hotspot.pressed_callback()
+			if result.available then
+				self:_on_continue_pressed()
+			else
+				selected_archetype:acquire_callback(function (is_success)
+					if is_success then
+						self:_on_archetype_pressed(selected_archetype)
+					end
+				end)
+			end
+		end
+	end)
 	self:_update_archetype_info()
 end
 

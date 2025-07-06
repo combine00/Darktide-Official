@@ -2,13 +2,19 @@ require("scripts/extension_systems/behavior/nodes/bt_node")
 
 local Animation = require("scripts/utilities/animation")
 local Blackboard = require("scripts/extension_systems/blackboard/utilities/blackboard")
+local MinionPerception = require("scripts/utilities/minion_perception")
 local BtDisableAction = class("BtDisableAction", "BtNode")
 local BASE_LAYER_EMPTY_EVENT = "base_layer_to_empty"
 
 function BtDisableAction:enter(unit, breed, blackboard, scratchpad, action_data, t)
 	local behavior_component = Blackboard.write_component(blackboard, "behavior")
+	scratchpad.perception_component = Blackboard.write_component(blackboard, "perception")
 	behavior_component.move_state = "disabled"
 	scratchpad.behavior_component = behavior_component
+	local navigation_extension = ScriptUnit.extension(unit, "navigation_system")
+
+	navigation_extension:set_enabled(false)
+
 	scratchpad.visual_loadout_extension = ScriptUnit.extension(unit, "visual_loadout_system")
 
 	self:_play_disable_anim(unit, blackboard, action_data, scratchpad)
@@ -45,15 +51,30 @@ function BtDisableAction:run(unit, breed, blackboard, scratchpad, action_data, d
 		scratchpad.animation_extension:anim_event(stand_anim.name)
 
 		scratchpad.standing_animation_duration = t + stand_anim.duration
+		local visual_loadout_extension = scratchpad.visual_loadout_extension
 
 		if scratchpad.current_slot then
-			local visual_loadout_extension = scratchpad.visual_loadout_extension
+			local current_slot_data = visual_loadout_extension:slot_item(scratchpad.current_slot)
 
-			visual_loadout_extension:set_slot_visibility(scratchpad.current_slot, true)
+			if not current_slot_data.visible then
+				visual_loadout_extension:set_slot_visibility(scratchpad.current_slot, true)
+			end
 		end
+
+		local should_hide = false
+
+		visual_loadout_extension:send_on_show_hide_weapon_event(should_hide)
 	end
 
 	return "running"
+end
+
+function BtDisableAction:leave(unit, breed, blackboard, scratchpad, action_data, t, reason, destroy)
+	local perception_component = scratchpad.perception_component
+
+	if perception_component and perception_component.lock_target then
+		MinionPerception.set_target_lock(unit, perception_component, false)
+	end
 end
 
 function BtDisableAction:_select_disable_anim_and_rotation(unit, impact_vector, disable_anims, blackboard, action_data)
@@ -85,8 +106,7 @@ function BtDisableAction:_play_disable_anim(unit, blackboard, action_data, scrat
 	local disable_type = disable_component.type
 	local disable_anims = action_data.disable_anims[disable_type]
 	local attacker_unit = disable_component.attacker_unit
-	local attacker_position = attacker_unit and POSITION_LOOKUP[attacker_unit]
-	local attack_direction = attacker_position and Vector3.normalize(Vector3.flat(POSITION_LOOKUP[unit] - attacker_position))
+	local attack_direction = Vector3.normalize(Quaternion.forward(Unit.local_rotation(attacker_unit, 1)))
 	scratchpad.disable_component = disable_component
 
 	if not attack_direction then
@@ -111,6 +131,10 @@ function BtDisableAction:_play_disable_anim(unit, blackboard, action_data, scrat
 
 		visual_loadout_extension:set_slot_visibility(current_slot, false)
 	end
+
+	local should_hide = true
+
+	visual_loadout_extension:send_on_show_hide_weapon_event(should_hide)
 end
 
 return BtDisableAction

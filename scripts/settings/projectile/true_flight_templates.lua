@@ -103,6 +103,19 @@ local true_flight_templates = {
 			return distance < d and 1 or d / distance
 		end
 	},
+	drone = {
+		speed_multiplier = 1,
+		on_target_acceleration = 0,
+		trigger_time = 0,
+		target_tracking_update_function = "drone_update_towards_position",
+		update_seeking_position_function = "drone_projectile_locomotion",
+		time_between_raycasts = 0.1,
+		lerp_modifier_func = function (integration_data, distance)
+			local d = 1.5
+
+			return distance < d and 1 or d / distance
+		end
+	},
 	magic_missile = {
 		legitimate_target_function = "legitimate_dot_check",
 		find_target_function = "find_closest_highest_value_target",

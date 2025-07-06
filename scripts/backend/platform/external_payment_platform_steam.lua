@@ -3,11 +3,11 @@ local ExternalPaymentPlatformBase = require("scripts/backend/platform/external_p
 local Promise = require("scripts/foundation/utilities/promise")
 local ExternalPaymentPlatformSteam = class("ExternalPaymentPlatformSteam", "ExternalPaymentPlatformBase")
 
-function ExternalPaymentPlatformSteam:_get_payment_platform()
+function ExternalPaymentPlatformSteam:get_payment_platform()
 	return "steam"
 end
 
-function ExternalPaymentPlatformSteam:_get_platform_token()
+function ExternalPaymentPlatformSteam:get_platform_token()
 	return Promise.resolved(nil)
 end
 
@@ -26,9 +26,9 @@ function ExternalPaymentPlatformSteam:payment_options()
 end
 
 function ExternalPaymentPlatformSteam:reconcile_pending_txns()
-	return self:_get_platform_token():next(function (token)
+	return self:get_platform_token():next(function (token)
 		return Managers.backend:authenticate():next(function (account)
-			local builder = BackendUtilities.url_builder():path("/store/"):path(account.sub):path("/payments/reconcile"):query("platform", self:_get_payment_platform())
+			local builder = BackendUtilities.url_builder():path("/store/"):path(account.sub):path("/payments/reconcile"):query("platform", self:get_payment_platform())
 
 			return Managers.backend:title_request(builder:to_string(), {
 				method = "POST",
@@ -43,9 +43,9 @@ function ExternalPaymentPlatformSteam:reconcile_pending_txns()
 end
 
 function ExternalPaymentPlatformSteam:reconcile_dlc(store_ids)
-	return self:_get_platform_token():next(function (token)
+	return self:get_platform_token():next(function (token)
 		return Managers.backend:authenticate():next(function (account)
-			local builder = BackendUtilities.url_builder():path("/store/"):path(account.sub):path("/dlc/reconcile"):query("platform", self:_get_payment_platform())
+			local builder = BackendUtilities.url_builder():path("/store/"):path(account.sub):path("/dlc/reconcile"):query("platform", self:get_payment_platform())
 
 			return Managers.backend:title_request(builder:to_string(), {
 				method = "POST",
@@ -67,7 +67,7 @@ end
 
 function ExternalPaymentPlatformSteam:init_txn(payment_option)
 	return Managers.backend:authenticate():next(function (account)
-		local builder = BackendUtilities.url_builder():path("/store/"):path(account.sub):path("/payments"):query("platform", self:_get_payment_platform())
+		local builder = BackendUtilities.url_builder():path("/store/"):path(account.sub):path("/payments"):query("platform", self:get_payment_platform())
 
 		return Managers.backend:title_request(builder:to_string(), {
 			method = "POST",
@@ -81,9 +81,9 @@ function ExternalPaymentPlatformSteam:init_txn(payment_option)
 end
 
 function ExternalPaymentPlatformSteam:finalize_txn(order_id)
-	return self:_get_platform_token():next(function (token)
+	return self:get_platform_token():next(function (token)
 		return Managers.backend:authenticate():next(function (account)
-			local builder = BackendUtilities.url_builder():path("/store/"):path(account.sub):path("/payments/"):path(order_id):query("platform", self:_get_payment_platform())
+			local builder = BackendUtilities.url_builder():path("/store/"):path(account.sub):path("/payments/"):path(order_id):query("platform", self:get_payment_platform())
 
 			return Managers.backend:title_request(builder:to_string(), {
 				method = "POST",
@@ -102,7 +102,7 @@ end
 
 function ExternalPaymentPlatformSteam:fail_txn(order_id)
 	return Managers.backend:authenticate():next(function (account)
-		local builder = BackendUtilities.url_builder():path("/store/"):path(account.sub):path("/payments/"):path(order_id):query("platform", self:_get_payment_platform())
+		local builder = BackendUtilities.url_builder():path("/store/"):path(account.sub):path("/payments/"):path(order_id):query("platform", self:get_payment_platform())
 
 		return Managers.backend:title_request(builder:to_string(), {
 			method = "DELETE"

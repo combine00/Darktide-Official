@@ -3453,7 +3453,13 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -3601,7 +3607,13 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -3749,7 +3761,13 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -3897,7 +3915,13 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -4045,7 +4069,13 @@ return function ()
 					"zealot_female_a",
 					"zealot_male_a",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -4193,7 +4223,13 @@ return function ()
 					"zealot_female_a",
 					"zealot_male_a",
 					"zealot_female_b",
-					"zealot_male_b"
+					"zealot_male_b",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -4341,7 +4377,13 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -4489,7 +4531,13 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -4637,7 +4685,13 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -4785,7 +4839,13 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -4933,7 +4993,13 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{
@@ -5081,7 +5147,13 @@ return function ()
 					"zealot_female_b",
 					"zealot_male_b",
 					"zealot_female_c",
-					"zealot_male_c"
+					"zealot_male_c",
+					"adamant_male_a",
+					"adamant_female_a",
+					"adamant_male_b",
+					"adamant_female_b",
+					"adamant_male_c",
+					"adamant_female_c"
 				}
 			},
 			{

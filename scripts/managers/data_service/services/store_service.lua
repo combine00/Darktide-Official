@@ -115,11 +115,7 @@ function StoreService:_get_store(function_name)
 	local character_id = _current_character_id()
 	local time_since_launch = Application.time_since_launch()
 
-	return store_interace[function_name](store_interace, time_since_launch, character_id):catch(function (error)
-		Log.error("StoreService", "Error fetching '%s': %s", function_name, error)
-
-		return error
-	end)
+	return store_interace[function_name](store_interace, time_since_launch, character_id)
 end
 
 function StoreService:_get_cached_store(cache_key, logging_function)
@@ -185,11 +181,22 @@ function StoreService:_get_archetype_store_catalogue(store_by_archetype, catalog
 	local function_name = store_by_archetype[archetype_name]
 	local store_promise = self:_get_store(function_name)
 	store_promise = store_promise or Promise.rejected()
-	local full_promise = store_promise:next(function (store_front)
-		local offers, current_rotation_end = nil
+	local full_promise = store_promise:catch(function (error)
+		local is_404 = type(error) == "table" and error.code == 404
+		local should_use_empty_store = is_404
 
-		if store_front then
-			local store_data = store_front.data
+		if should_use_empty_store then
+			Log.info("StoreService", "Store %s not found. Using empty.", function_name)
+
+			return nil
+		end
+
+		return Promise.rejected(error)
+	end):next(function (store_front)
+		local offers, current_rotation_end = nil
+		local store_data = store_front and store_front.data
+
+		if store_data then
 			offers = store_data[catalogue_name]
 			current_rotation_end = store_data.currentRotationEnd
 		end
@@ -610,7 +617,18 @@ function StoreService:get_premium_store(storefront_key)
 	end
 
 	local time_since_launch = Application.time_since_launch()
-	store_cache[cache_key].promise = Managers.backend.interfaces.store:get_premium_storefront(storefront_key, time_since_launch):next(function (store_catalogue)
+	store_cache[cache_key].promise = Managers.backend.interfaces.store:get_premium_storefront(storefront_key, time_since_launch):catch(function (error)
+		local is_404 = type(error) == "table" and (error.code == 404 or error[1] and error[1].code == 404)
+		local should_use_empty_store = is_404
+
+		if should_use_empty_store then
+			Log.info("StoreService", "Premium storefront %s not found. Using empty.", storefront_key)
+
+			return nil
+		end
+
+		return Promise.rejected(error)
+	end):next(function (store_catalogue)
 		local id, offers, current_rotation_end, layout_config, catalog_validity, bundle_rules = nil
 
 		if store_catalogue then
@@ -623,14 +641,20 @@ function StoreService:get_premium_store(storefront_key)
 			id = store_catalogue.id
 		end
 
-		local store_front = store_catalogue.storefront
+		local backend_time = _backend_time()
+		local store_front = store_catalogue and store_catalogue.storefront
 
-		store_front:set_interaction_callback(callback(self, "invalidate_store_cache", cache_key))
+		if store_front then
+			store_front:set_interaction_callback(callback(self, "invalidate_store_cache", cache_key))
 
-		store_cache[cache_key].valid_to = store_front:cache_until("public_filtered")
-		store_cache[cache_key].cached_at = _backend_time()
+			store_cache[cache_key].valid_to = store_front:cache_until("public_filtered")
+		else
+			store_cache[cache_key].valid_to = backend_time + StoreService.max_cache_time
+		end
 
-		if StoreService:is_featured_store(storefront_key) then
+		store_cache[cache_key].cached_at = backend_time
+
+		if self:is_featured_store(storefront_key) then
 			self._current_store_id = id
 		end
 
@@ -643,15 +667,13 @@ function StoreService:get_premium_store(storefront_key)
 			bundle_rules = bundle_rules
 		}
 	end):catch(function (error)
-		Log.error("StoreService", "Failed to fetch premium storefront %s %s", storefront_key, error)
+		Log.error("StoreService", "Failed to fetch premium storefront %s %s", storefront_key, type(error) == "table" and table.tostring(error) or error)
 
 		return Promise.rejected(error)
 	end)
 
 	return store_cache[cache_key].promise:next(function (t)
 		return t and table.clone_instance(t)
-	end):catch(function (error)
-		return Promise.rejected(error)
 	end)
 end
 

@@ -10,9 +10,10 @@ local circumstance_templates = {
 		},
 		ui = {
 			description = "loc_circumstance_hunting_grounds_description",
-			icon = "content/ui/materials/icons/circumstances/hunting_grounds_01",
+			happening_display_name = "loc_happening_hunting_grounds",
 			display_name = "loc_circumstance_hunting_grounds_title",
-			happening_display_name = "loc_happening_hunting_grounds"
+			mission_board_icon = "content/ui/materials/mission_board/circumstances/hunting_grounds_01",
+			icon = "content/ui/materials/icons/circumstances/hunting_grounds_01"
 		}
 	},
 	poxwalker_bombers_01 = {
@@ -25,9 +26,10 @@ local circumstance_templates = {
 		},
 		ui = {
 			description = "loc_circumstance_hunting_grounds_description",
-			icon = "content/ui/materials/icons/circumstances/hunting_grounds_01",
+			happening_display_name = "loc_happening_hunting_grounds",
 			display_name = "loc_circumstance_hunting_grounds_title",
-			happening_display_name = "loc_happening_hunting_grounds"
+			mission_board_icon = "content/ui/materials/mission_board/circumstances/hunting_grounds_01",
+			icon = "content/ui/materials/icons/circumstances/hunting_grounds_01"
 		},
 		mission_overrides = MissionOverrides.no_empty_hazards
 	},
@@ -41,9 +43,10 @@ local circumstance_templates = {
 		},
 		ui = {
 			description = "loc_circumstance_hunting_grounds_description",
-			icon = "content/ui/materials/icons/circumstances/hunting_grounds_01",
+			happening_display_name = "loc_happening_hunting_grounds",
 			display_name = "loc_circumstance_hunting_grounds_title",
-			happening_display_name = "loc_happening_hunting_grounds"
+			mission_board_icon = "content/ui/materials/mission_board/circumstances/hunting_grounds_01",
+			icon = "content/ui/materials/icons/circumstances/hunting_grounds_01"
 		}
 	}
 }

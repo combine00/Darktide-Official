@@ -77,15 +77,17 @@ local penance_overview_view_settings = {
 	image_size = image_size,
 	animation_event_by_archetype = {
 		psyker = "human_psyker_inspect_pose",
+		adamant = "human_adamant_inspect_pose",
+		ogryn = "ogryn_inspect_pose",
 		veteran = "human_veteran_inspect_pose",
-		zealot = "human_zealot_inspect_pose",
-		ogryn = "ogryn_inspect_pose"
+		zealot = "human_zealot_inspect_pose"
 	},
 	archetype_badge_texture_by_name = {
 		psyker = "content/ui/textures/icons/class_badges/psyker_01_01",
+		adamant = "content/ui/textures/icons/class_badges/adamant_01_01",
+		ogryn = "content/ui/textures/icons/class_badges/ogryn_01_01",
 		veteran = "content/ui/textures/icons/class_badges/veteran_01_01",
-		zealot = "content/ui/textures/icons/class_badges/zealot_01_01",
-		ogryn = "content/ui/textures/icons/class_badges/ogryn_01_01"
+		zealot = "content/ui/textures/icons/class_badges/zealot_01_01"
 	},
 	roman_numeral_texture_array = {
 		"content/ui/textures/icons/achievements/number_overlays/01",
@@ -190,11 +192,12 @@ local penance_overview_view_settings = {
 		}
 	},
 	category_icons = {
-		tactical = "content/ui/materials/icons/achievements/categories/category_tactical",
+		adamant = "content/ui/materials/icons/achievements/categories/category_adamant",
 		weapons = "content/ui/materials/icons/achievements/categories/category_weapons",
 		heretics = "content/ui/materials/icons/achievements/categories/category_heretics",
 		missions = "content/ui/materials/icons/achievements/categories/category_mission",
 		zealot_2 = "content/ui/materials/icons/achievements/categories/category_zealot",
+		tactical = "content/ui/materials/icons/achievements/categories/category_tactical",
 		psyker_2 = "content/ui/materials/icons/achievements/categories/category_psyker",
 		veteran_2 = "content/ui/materials/icons/achievements/categories/category_veteran",
 		ogryn_2 = "content/ui/materials/icons/achievements/categories/category_ogryn",
@@ -203,6 +206,16 @@ local penance_overview_view_settings = {
 		endeavours = "content/ui/materials/icons/achievements/categories/category_endeavour"
 	},
 	default_highlight_penances = {
+		adamant = {
+			"basic_training",
+			"slide_dodge",
+			"coherency_toughness",
+			"fast_headshot_1",
+			"enemies_1",
+			"kill_renegades_1",
+			"mission_circumstace_1",
+			"amount_of_chests_opened_1"
+		},
 		ogryn = {
 			"basic_training",
 			"slide_dodge",

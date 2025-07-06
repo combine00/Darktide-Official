@@ -22,34 +22,34 @@ local hit_zone_names = HitZone.hit_zone_names
 local stagger_types = StaggerSettings.stagger_types
 local weakspot_types = WeakspotSettings.types
 local breed_data = {
-	display_name = "loc_breed_display_name_renegade_netgunner",
-	run_speed = 5.2,
+	walk_speed = 2.3,
 	use_bone_lod = true,
-	spawn_inventory_slot = "slot_netgun",
 	fx_proximity_culling_weight = 6,
-	unit_template_name = "minion",
-	can_be_used_for_all_factions = true,
-	faction_name = "chaos",
-	spawn_aggro_state = "aggroed",
-	volley_fire_target = true,
 	uses_wwise_special_targeting_parameter = true,
+	volley_fire_target = true,
+	spawn_aggro_state = "aggroed",
+	target_stickiness_distance = 14,
+	unit_template_name = "minion",
 	sub_faction_name = "renegade",
 	broadphase_radius = 1,
+	spawn_inventory_slot = "slot_netgun",
 	stagger_resistance = 1,
-	walk_speed = 2.3,
-	line_of_sight_collision_filter = "filter_minion_line_of_sight_check_no_transparent",
-	base_height = 2,
-	stagger_reduction = 0,
-	target_stickiness_distance = 14,
-	state_machine = "content/characters/enemy/chaos_traitor_guard/third_person/animations/chaos_traitor_guard_netgunner",
-	stagger_reduction_ranged = 2,
-	smart_tag_target_type = "breed",
 	game_object_type = "minion_netgunner",
-	use_wounds = true,
-	player_locomotion_constrain_radius = 0.4,
-	base_unit = "content/characters/enemy/chaos_traitor_guard/third_person/base",
 	challenge_rating = 3,
 	bone_lod_radius = 1.05,
+	use_wounds = true,
+	display_name = "loc_breed_display_name_renegade_netgunner",
+	run_speed = 5.2,
+	can_be_used_for_all_factions = true,
+	faction_name = "chaos",
+	base_height = 2,
+	state_machine = "content/characters/enemy/chaos_traitor_guard/third_person/animations/chaos_traitor_guard_netgunner",
+	line_of_sight_collision_filter = "filter_minion_line_of_sight_check_no_transparent",
+	stagger_reduction = 0,
+	player_locomotion_constrain_radius = 0.4,
+	stagger_reduction_ranged = 2,
+	smart_tag_target_type = "breed",
+	base_unit = "content/characters/enemy/chaos_traitor_guard/third_person/base",
 	has_direct_ragdoll_flow_event = true,
 	name = breed_name,
 	breed_type = breed_types.minion,
@@ -396,7 +396,18 @@ local breed_data = {
 		}
 	},
 	outline_config = {},
-	blackboard_component_config = BreedBlackboardComponentTemplates.netgunner
+	blackboard_component_config = BreedBlackboardComponentTemplates.netgunner,
+	tokens = {},
+	companion_pounce_setting = {
+		pounce_anim_event = "leap_attack",
+		companion_pounce_action = "human",
+		damage_profile = DamageProfileTemplates.adamant_companion_human_pounce,
+		initial_damage_profile = DamageProfileTemplates.adamant_companion_initial_pounce,
+		required_token = {
+			free_target_on_assigned_token = true,
+			name = "pounced"
+		}
+	}
 }
 
 return breed_data

@@ -22,8 +22,8 @@ function ActionOverloadChargeTargetFinder:start(action_settings, t, time_scale, 
 	self._targeting_module:start(t)
 end
 
-function ActionOverloadChargeTargetFinder:fixed_update(dt, t, time_in_action)
-	ActionOverloadChargeTargetFinder.super.fixed_update(self, dt, t, time_in_action)
+function ActionOverloadChargeTargetFinder:fixed_update(dt, t, time_in_action, frame)
+	ActionOverloadChargeTargetFinder.super.fixed_update(self, dt, t, time_in_action, frame)
 	self._overload_module:fixed_update(dt, t)
 	self._targeting_module:fixed_update(dt, t)
 end

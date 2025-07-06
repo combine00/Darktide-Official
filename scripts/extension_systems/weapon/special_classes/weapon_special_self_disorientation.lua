@@ -24,6 +24,10 @@ function WeaponSpecialSelfDisorientation:init(context, init_data)
 	self._buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 end
 
+function WeaponSpecialSelfDisorientation:on_wieldable_slot_equipped()
+	return
+end
+
 function WeaponSpecialSelfDisorientation:fixed_update(dt, t)
 	WeaponSpecial.update_active(t, self._tweak_data, self._inventory_slot_component, self._buff_extension, self._input_extension, self._weapon_extension)
 end
@@ -95,6 +99,10 @@ function WeaponSpecialSelfDisorientation:process_hit(t, weapon, action_settings,
 	if deactivation_animation then
 		self:_trigger_anim_event(deactivation_animation, deactivation_animation)
 	end
+end
+
+function WeaponSpecialSelfDisorientation:blocked_attack(attacking_unit, block_cost, block_broken, is_perfect_block)
+	return
 end
 
 function WeaponSpecialSelfDisorientation:on_exit_damage_window(t, num_hit_enemies)

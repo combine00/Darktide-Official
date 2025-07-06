@@ -288,7 +288,7 @@ function ViewElementWeaponInfo:present_item(item, on_present_callback, ignore_li
 		widget_type = "dynamic_spacing",
 		size = {
 			grid_size[1],
-			15
+			10
 		}
 	}
 
@@ -312,8 +312,10 @@ function ViewElementWeaponInfo:present_grid_layout(layout, on_present_callback)
 
 	ViewElementWeaponInfo.super.present_grid_layout(self, layout, ContentBlueprints, left_click_callback, right_click_callback, grid_display_name, grow_direction, on_present_callback)
 
+	local area_length = self:grid_area_length()
 	local length = self:grid_length()
-	self._ui_scenegraph.grid_background.size[2] = length
+	local grid_length = math.min(length, area_length)
+	self._ui_scenegraph.grid_background.size[2] = grid_length
 end
 
 function ViewElementWeaponInfo:draw(dt, t, ui_renderer, render_settings, input_service)
@@ -510,7 +512,9 @@ function ViewElementWeaponInfo:_create_bar_breakdown_widgets(bar_data)
 		end
 	end
 
-	local grid_length = self:grid_length()
+	local area_length = self:grid_area_length()
+	local length = self:grid_length()
+	local grid_length = math.min(length, area_length)
 	local offset = 65
 	local base_size = 50
 	local size = base_size + num_entries * entry_size + description_offset
